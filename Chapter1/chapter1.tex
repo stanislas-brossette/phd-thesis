@@ -2,7 +2,8 @@
 %*********************************** First Chapter *****************************
 %*******************************************************************************
 
-\chapter{Getting started}  %Title of the First Chapter
+\chapter{Numerical Optimization}
+\label{chapter:optimization}
 
 \ifpdf
     \graphicspath{{Chapter1/Figs/Raster/}{Chapter1/Figs/PDF/}{Chapter1/Figs/}}
@@ -12,88 +13,198 @@
 
 
 %********************************** %First Section  **************************************
-\section{What is loren ipsum? Title with math \texorpdfstring{$\sigma$}{[sigma]}} %Section - 1.1 
+\section{Introduction}
+In modern science, optimization has a very important place. Mechanical engineers
+optimize the shape of stuctural parts. Investors optimize the profit of a
+portfolio while minimizing the risks. Chemists optimize the efficiency and speed
+of reactions. When it comes to robotics, optimization is everywhere. From the
+design of a robot to its actuation. Any positioning of a robot requires to
+compute the articular parameters of each joint of the robot, finding such
+parameters might be possible by using analytical methods for very simple robots,
+but for robots as complex as humanoid robots, it is definitely not possible. And
+most often, an optimization process is used.
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry (see 
-Section~\ref{section1.3}). Lorem Ipsum~\citep{Aup91} has been the industry's 
-standard dummy text ever since the 1500s, when an unknown printer took a galley 
-of type and scrambled it to make a type specimen book. It has survived not only 
-five centuries, but also the leap into electronic typesetting, remaining 
-essentially unchanged. It was popularised in the 1960s with the release of 
-Letraset sheets containing Lorem Ipsum passages, and more recently with desktop 
-publishing software like Aldus PageMaker including versions of Lorem 
-Ipsum~\citep{AAB95,Con90,LM65}.
+The goal of an optimization algorithm is to find an optimal solution to a
+problem. Optimal in the sense that the solution is an optimum of a given
+objective function. And solution of a problem in the sense that is satisfies a
+set of constraints defined by the problem. Both the constraints and the
+objective function are defined on the variable space, which is the space in
+which we search a solution, the space in which the variable lives.
 
-The most famous equation in the world: $E^2 = (m_0c^2)^2 + (pc)^2$, which is 
-known as the \textbf{energy-mass-momentum} relation as an in-line equation.
+In this chapter, we will use the following notations:
+\begin{itemize}
+  \item $\mathcal{S}$ is the variable space (usually $\mathbb{R}^n$)
+  \item $x\in\mathcal{S}$ is the vector of variables
+  \item $f:\mathcal{S}\rightarrow\mathbb{R}$ is the objective function, or Cost function
+  \item $c_i:\mathcal{S}\rightarrow\mathbb{R}$ is the i-th constraint function
+    ($0\leq i \leq m$)
+\end{itemize}
 
-A {\em \LaTeX{} class file}\index{\LaTeX{} class file@LaTeX class file} is a file, which holds style information for a particular \LaTeX{}.
-
-
+Using these notations, an optimization problem can be written as follows:
 \begin{align}
-CIF: \hspace*{5mm}F_0^j(a) = \frac{1}{2\pi \iota} \oint_{\gamma} \frac{F_0^j(z)}{z - a} dz
+  \min_{\bf x \in \mathcal{S}} & \quad \mbox{\emph{f}}({\bf x}) \nonumber\\
+\text{s.t.}&
+\left\{
+\begin{array}{lr}
+c_i = 0 \ \ \ \forall i\in \mathcal{E} \\
+c_i \leq 0 \ \ \ \forall i\in \mathcal{I} 
+\end{array}\right.
+\label{eq:basicOptim}
 \end{align}
 
-\nomenclature[z-cif]{$CIF$}{Cauchy's Integral Formula}                                % first letter Z is for Acronyms 
-\nomenclature[a-F]{$F$}{complex function}                                                   % first letter A is for Roman symbols
-\nomenclature[g-p]{$\pi$}{ $\simeq 3.14\ldots$}                                             % first letter G is for Greek Symbols
-\nomenclature[g-i]{$\iota$}{unit imaginary number $\sqrt{-1}$}                      % first letter G is for Greek Symbols
-\nomenclature[g-g]{$\gamma$}{a simply closed curve on a complex plane}  % first letter G is for Greek Symbols
-\nomenclature[x-i]{$\oint_\gamma$}{integration around a curve $\gamma$} % first letter X is for Other Symbols
-\nomenclature[r-j]{$j$}{superscript index}                                                       % first letter R is for superscripts
-\nomenclature[s-0]{$0$}{subscript index}                                                        % first letter S is for subscripts
+We call $\mathcal{E}$ the set of index for which the constraints are equality
+conditions and $\mathcal{I}$ the set for which the constraints are inequality
+conditions.
+
+This set of equations presents the optimisation process under a very general
+form. In order to  present the principles of optimization, we will consider
+simpler problems. The first type of problem that we will talk about in this
+section is the unconstrained problem, that has the particularity to not have any
+constraint and its variable space is $\mathbb{R}^n$. Then we will considere the
+same problem, but with added constraints, and we will particularly detail one
+specific constrained problem optimization algorithm that is called the
+Sequential Quadratic Program(SQP). And finally we will study the implications of
+solving an optimization problem on a manifold that is different from
+$\mathbb{R}^n$.
+
+In this section we will present the theory of optimization methods, starting from
+the "simplest" unconstrained optimization and work our way up to more complex
+thing by adding constraints and solving problems on non-Euclidian spaces.
 
 
-%********************************** %Second Section  *************************************
-\section{Why do we use loren ipsum?} %Section - 1.2
+\section{Unconstrained Optimization}
 
+An unconstrained optimization problem is a problem that has an objective
+function but no constraints. It can be formulated as follows:
 
-It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using `Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for `lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+\begin{align}
+  \min_{\bf x \in \mathcal{S}} & \quad \mbox{\emph{f}}({\bf x})
+\label{eq:unconstrainedOptim}
+\end{align}
 
-%********************************** % Third Section  *************************************
-\section{Where does it come from?}  %Section - 1.3 
-\label{section1.3}
+In order to solve this problem, we want to design an algorithm that, starting
+from an initial guess $x_0$, will converge toward the solution $x^*$. The
+objective function is not necessarily completely known. In the sense that we
+can't always have an explicit formula, often, the function $f$ is computed by
+another program that is able to compute $f(x)$ and $\nabla f(x)$ for a given
+value of $x$. In order to have an efficient algorithm, we want to avoid any
+unnecessary computation of $f(x)$ and its derivatives. We will denote the values
+taken by $x$ along the iterations as $x_0$, $x_1$, $x_2$,\ldots $x_i$. And
+$f(x_i)$ is denoted $f_i$. 
 
-Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+Since our knowledge of the objective function is only partial, it would not be
+possible to guarantee that a point $x^*$ is a global solution: 
+\begin{equation}
+  \forall x \in \mathcal{S}, f(x^*) \leq f(x)
+\end{equation}
+Though, we can find a local minimizer of $f$: 
+\begin{equation}
+  \text{There exist a neighborhood } \mathcal{N}\text{ of }x^*\text{ such that
+  }\forall x\in \mathcal{N}, \ f(x^*) \leq f(x) 
+\end{equation}
+That is the kind of solution that we are looking for and that our algorithms will
+find.
 
-The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from ``de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham
+Under the assumption that the objective function is smooth and sufficiently
+continuous ($\mathcal{C}_2$), then we have the following sufficient conditions
+for the optimality of $x^*$ as presented in \cite{Nocedal}:
 
-``Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+\begin{theorem}
+  If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$ and that $\nabla
+  f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite. Then $x^*$ is a strict
+  local minimizer of $f$.
+  \label{optimalityTheorem}
+\end{theorem}
 
-Section 1.10.32 of ``de Finibus Bonorum et Malorum", written by Cicero in 45 BC: ``Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
+During the resolution of an optimization problem, the algorithm will generate a
+sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
+usually provided by the user). During the step $k$ of the optimization process,
+the solver, the current point is $x_k$ and we try to find $x_{k+1}$ such that
+$f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only focus
+on 2 of them that are the most popular, the line-search and trust-region
+methods.
 
-1914 translation by H. Rackham: ``But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?"
+\subsection{The Line-Search Strategy}
+In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
+point is chosen and then a length of step is calculated to minimize the
+following 1-dimentional problem:
+\begin{align}
+  \min_{\bf \alpha \in \mathbb{R}^+} & \quad \mbox{\emph{f}}(x_k + \alpha.p_k)
+\label{eq:lineSearch}
+\end{align}
 
-Section 1.10.33 of ``de Finibus Bonorum et Malorum", written by Cicero in 45 BC: ``At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."
+Once the best value of $\alpha$ has been found, the next iterate is computed:
+$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
+satisfying solution is found. 
 
-1914 translation by H. Rackham: ``On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains."
+It is not always necessary to find the optimal value of $\alpha$, especially if
+that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
+from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
+imprecision on the computation of $\alpha$ will be errased in the other steps of
+the resolution.
 
-\nomenclature[z-DEM]{DEM}{Discrete Element Method}
-\nomenclature[z-FEM]{FEM}{Finite Element Method}
-\nomenclature[z-PFEM]{PFEM}{Particle Finite Element Method}
-\nomenclature[z-FVM]{FVM}{Finite Volume Method}
-\nomenclature[z-BEM]{BEM}{Boundary Element Method}
-\nomenclature[z-MPM]{MPM}{Material Point Method}
-\nomenclature[z-LBM]{LBM}{Lattice Boltzmann Method}
-\nomenclature[z-MRT]{MRT}{Multi-Relaxation 
-Time}
-\nomenclature[z-RVE]{RVE}{Representative Elemental Volume}
-\nomenclature[z-GPU]{GPU}{Graphics Processing Unit}
-\nomenclature[z-SH]{SH}{Savage Hutter}
-\nomenclature[z-CFD]{CFD}{Computational Fluid Dynamics}
-\nomenclature[z-LES]{LES}{Large Eddy Simulation}
-\nomenclature[z-FLOP]{FLOP}{Floating Point Operations}
-\nomenclature[z-ALU]{ALU}{Arithmetic Logic Unit}
-\nomenclature[z-FPU]{FPU}{Floating Point Unit}
-\nomenclature[z-SM]{SM}{Streaming Multiprocessors}
-\nomenclature[z-PCI]{PCI}{Peripheral Component Interconnect}
-\nomenclature[z-CK]{CK}{Carman - Kozeny}
-\nomenclature[z-CD]{CD}{Contact Dynamics}
-\nomenclature[z-DNS]{DNS}{Direct Numerical Simulation}
-\nomenclature[z-EFG]{EFG}{Element-Free Galerkin}
-\nomenclature[z-PIC]{PIC}{Particle-in-cell}
-\nomenclature[z-USF]{USF}{Update Stress First}
-\nomenclature[z-USL]{USL}{Update Stress Last}
-\nomenclature[s-crit]{crit}{Critical state}
-\nomenclature[z-DKT]{DKT}{Draft Kiss Tumble}
-\nomenclature[z-PPC]{PPC}{Particles per cell}
+There are several ways to choose a descent direction from an iterate $x_k$. The
+most obvious one is probably the steepest descent direction $-\nabla f_k$. This
+method provides the direction along which f decreases most rapidly and only
+requires the evaluation of the first derivative of $f$, but that method can
+become extremely slow on complicated problems. Another popular approach is the
+Newton method, in which the objective function is approximated to the second
+order
+
+\begin{equation}
+  f(x_k+p) = f_k + p^T\nabla f_k + p^T\nabla^2f_k p
+\end{equation}
+
+Then the chosen descent direction is the optimum of that approximated function,
+the Newton direction.
+\begin{equation}
+  p^N_k = -(\nabla^2 f_k)^{-1} \nabla f_k
+\end{equation}
+The choice of this descent direction implies that the $\nabla^2f_k$ is positive
+definite, in which case an adaptation of the definition of $p_k$ is required. Or
+an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
+used. For example, the symmetric-rank-one(SR1) formula and the BFGS(Broyden,
+Fletcher, Goldfarb, Shanno) formula. Then the step becomes 
+
+\begin{equation}
+  p_k = -B_k^{-1}\nabla f_k
+\end{equation}
+
+\subsection{The Trust-Region Strategy}
+The Trust-Region Strategy works in an opposite way than the line-search one in
+the sense that during a line-search step, a direction is chosen, and based on
+that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
+maximum step-length is chosen, and based on it, the descent direction and lenght
+are chosen.
+The principle of the trust region is that along the optimization process, a
+model of the problem is constructed and enriched at every step and at each step,
+the next iterate is the optimum of the model, with the constraint that the step
+to get there lies inside the trust-region. For example, let us considere that
+the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
+constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
+objective function is the quadratic model with approximated Hessian
+\begin{equation}
+  m_k(p) = f(x_k+p) = f_k + p^T\nabla f_k + p^TB_k p
+\end{equation}
+And the optimization problem to solve at each step of the optimization is
+
+\begin{align}
+  \min_{p} & \quad f_k + p^T\nabla f_k + p^TB_k p \nonumber\\
+\text{s.t.}&
+\quad \|p\| \leq \rho_k
+\label{eq:trustRegion}
+\end{align}
+
+Once the solution $p_k$ to this quadratic problem is found, its quality is
+estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
+is satisfying (compared to the decrease predicted by the model) then the step is
+accepted and the size of the trust-region can be increased. Otherwise, the step
+is refused, the trust-region radius is reduced and a new step from $x_k$ is
+computed on that smaller trust region.
+
+\section{Constrained Optimization}
+
+\section{Constrained Optimization on Manifolds}
+
+\section{Conclusion}
+

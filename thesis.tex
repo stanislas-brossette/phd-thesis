@@ -75,6 +75,14 @@
 % `PageStyleII': Chapter Name on Even Side (Left Even) in Header. Section Number
 % and Section Name in Header on Odd Side (Right Odd). Page numbering in footer
 
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{color}
+\usepackage{flushend}
+
+\input{./theorem.tex}
 
 % ********************************** Preamble **********************************
 % Preamble: Contains packages and user-defined commands and settings
@@ -103,6 +111,19 @@
 \ifdefineChapter
  \includeonly{Chapter3/chapter3}
 \fi
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%  Custom Commands  %
+%%%%%%%%%%%%%%%%%%%%%
+\def\note{\textcolor{red}}
+
+\newcommand{\Figref}[2]{Fig.~\ref{#1}#2}
+\newcommand{\compare}[2]{\textcolor{red}{#1} \textcolor{blue}{#2}}
+\newcommand{\diff}[2]{\dfrac{\partial #1}{\partial #2}}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+\DeclareMathOperator*{\minimize}{min.}
+
 
 % ******************************** Front Matter ********************************
 \begin{document}
@@ -138,7 +159,10 @@
 \include{Chapter1/chapter1}
 \include{Chapter2/chapter2}
 \include{Chapter3/chapter3}
-%\include{Chapter4/chapter4}
+\include{Chapter4/chapter4}
+\include{papers/RAM2013/RAM2013}
+\include{papers/IROS2014/IROS2014}
+\include{papers/Humanoids2015/Humanoids2015}
 %\include{Chapter5/chapter5}
 %\include{Chapter6/chapter6}
 %\include{Chapter7/chapter7}
@@ -160,7 +184,7 @@
 %\bibliographystyle{unsrt} % Use for unsorted references  
 %\bibliographystyle{plainnat} % use this to have URLs listed in References
 \cleardoublepage
-\bibliography{References/references} % Path to your References.bib file
+\bibliography{References/SBbib} % Path to your References.bib file
 
 
 % If you would like to use BibLaTeX for your references, pass `custombib' as
@@ -177,8 +201,8 @@
 
 \begin{appendices} % Using appendices environment for more functunality
 
-\include{Appendix1/appendix1}
-\include{Appendix2/appendix2}
+%\include{Appendix1/appendix1}
+%\include{Appendix2/appendix2}
 
 \end{appendices}
 
