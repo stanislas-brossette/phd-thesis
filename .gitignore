@@ -30,6 +30,7 @@
 *#*
 *.nls*
 *.nlg*
+thesis.pdf*
 thesis.txt*
 thesis.bcf*
 thesis.run.xml*
