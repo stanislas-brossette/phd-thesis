@@ -116,6 +116,7 @@ for the optimality of $x^*$ as presented in \cite{Nocedal}:
   \label{optimalityTheorem}
 \end{theorem}
 
+\subsection{globalization methods}
 During the resolution of an optimization problem, the algorithm will generate a
 sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
 usually provided by the user). During the step $k$ of the optimization process,
@@ -124,7 +125,7 @@ $f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only 
 on 2 of them that are the most popular, the line-search and trust-region
 methods.
 
-\subsection{The Line-Search Strategy}
+\subsubsection{The Line-Search Strategy}
 In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
 point is chosen and then a length of step is calculated to minimize the
 following 1-dimentional problem:
@@ -170,7 +171,7 @@ Fletcher, Goldfarb, Shanno) formula. Then the step becomes
   p_k = -B_k^{-1}\nabla f_k
 \end{equation}
 
-\subsection{The Trust-Region Strategy}
+\subsubsection{The Trust-Region Strategy}
 The Trust-Region Strategy works in an opposite way than the line-search one in
 the sense that during a line-search step, a direction is chosen, and based on
 that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
@@ -204,7 +205,15 @@ computed on that smaller trust region.
 
 \section{Constrained Optimization}
 
-\section{Constrained Optimization on Manifolds}
+List of topics to cover:
+\begin{itemize}
+  \item Constrained optimization is more interesting for robotics but the algorithms are much more complicated
+  \item Optimizing a constrained problem is equivalent to solving the KKT conditions.
+  \item Hessian Approximation: BFGS, SR1
+  \item Method to decide if an iterate is accepted: merit function, filter\dots
+  \item Restoration phase
+\end{itemize}
 
 \section{Conclusion}
+This section gives a general introduction to Non-linear constrained optimization without regards for robotics or optimization on manifolds
 
