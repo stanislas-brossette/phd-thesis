@@ -49,7 +49,6 @@ We provide a simple solution that relaxes hard contact constraints and gets rid 
 
 
 \section{Contact geometry formulation}
-\label{sec:background}
 
 For our formulation, we consider a situation where a set of contacts between the robot and its environment are already made, and therefore fixed, and we want to add a new contact to this set. This doesn't induce any loss of generality since it just comes down to adding the contacts one by one.
 To ensure that the new contact can be reached in a quasi-static way, we look for a configuration where the new contact is ``barely" made: the position of contact is reached, but that contact does not support any contact forces (this is a necessary step to generate a sequence of quasi-static transitions). We call it a geometric contact. Let us consider that the contact to add is defined by two flat surfaces $S_1$ and $S_2$ which are respectively delimited by two convex polygons $P_1$ and $P_2$. For this contact to be valid, it is obviously necessary that the intersection $P_1 \cap P_2$ is not empty. We propose a method in which the size of the contact area is approximated by the size of an ellipse that is inscribed in it. If such an ellipse is found and is of a sufficient size, then the contact is valid. This allows to consider contacts between surfaces that do not necessarily include each other.
