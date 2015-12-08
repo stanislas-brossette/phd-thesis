@@ -13,11 +13,19 @@
 
 \maketitle
 
-\paragraph {Posture generation: state of the art/Introduction}
+
+%%%%%%%%%%%%%%%
+%  CHAPTER 1  %
+%%%%%%%%%%%%%%%
+
+\paragraph {Chapter 1: Posture generation, state of the art/Introduction}
 \begin{itemize}
   \item Generalities, introduction
+  \item Presentation of the existing methods
+  \item From Inverse Kinematics to Generalized IK/posture Generation/pose estimation (addition of articular limits, forces, stability etc.
   \item Topology of the parametrization space (Free-flyer, q, f, other)
   \item Formulation as a non-linear constrained optimization problem
+  \item Adrien \& Karim's formulations
   \item Formulation of several types of cost/constraints
   \begin{itemize}
     \item Contact with plane surface
@@ -30,37 +38,41 @@
     \item Torque minimization
     \item Goal Posture
   \end{itemize}
-  \item  Utilization of posture generation in planning
-\end{itemize}
-
-\paragraph {Numerical optimization: State of the art/Introduction}
-\begin{itemize}
-  \item Generalities, introduction
-\end{itemize}
-
-\paragraph {Contact Planning in Real environment}
-\begin{itemize}
-  \item Understanding the environment through a point-cloud
-    Segmentation pipeline:
+  \item Reasons why it is not enough and why we needed a new PG
     \begin{itemize}
-      \item Acquisition
-      \item Filtering
-      \item Region growing segmentation
-      \item Planar Extraction
-      \item Planar projection and Hull convex generation
-      \item Re-orientation and transfer to the planner
+      \item Having an easier way to formulate problems
+      \item Avoid having to de some gymnastic to remain on manifolds
+      \item Automatic variable management
+      \item Robustness
     \end{itemize}
-  \item Contact generation with convex surface inclusions
-Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We extend that to the inclusion of convex surfaces.
-  \item{Simulated scenarios planned on real-environment: HRP-2 climbing on table through stairs, HRP-2 climbing on table through slope}
+  \item Utilization of posture generation in planning
 \end{itemize}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  SECTION INTEGRATION ON NON-INCLUSIVE CONTACTS IN POSTURE GENERATION  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+%  CHAPTER 2  %
+%%%%%%%%%%%%%%%
 
-\paragraph{Integration on Non-Inclusive Contacts in Posture Generation}
+\paragraph {Chapter 2: Numerical optimization: Introduction}
+\begin{itemize}
+  \item Introduction to optimization
+  \item Notions of unconstrained optimization
+  \item Notions of Constrained Optimization
+  \item KKT
+  \item Line Search
+  \item Trust Region
+  \item Filter
+  \item Merit function
+  \item SQP
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%
+%  CHAPTER 3  %
+%%%%%%%%%%%%%%%
+
+\paragraph {Chapter 3: Some extensions of posture generation}
+\subparagraph{Integration on Non-Inclusive Contacts in Posture Generation}
 
 The method presented before is limiting in many cases. Ladder, stairs climbing\dots.
 Sometimes it is not possible to ensure inclusion of 2 surfaces.
@@ -69,15 +81,17 @@ Sometimes it is not possible to ensure inclusion of 2 surfaces.
   \item Contact geometry formulation
     \begin{itemize}
       \item Discretisation of contact surfaces for practical reasons
-      \item Inclusize contacts are no problem
-      \item Non-Inclusive contacts lead to non-constant number of constraints, cannot be solved with that formulation
+      \item Contact generation with convex surface inclusions
+Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We extend that to the inclusion of convex surfaces.
+      \item Inclusive contacts are no problem
+      \item Non-Inclusive contacts lead to non-constant number of constraints or non-smooth gradients, cannot be solved with usual solvers with that formulation
     \end{itemize}
   \item{Non inclusive contact constraints}
     \begin{itemize}
       \item {Main Idea: Inserting an ellipse in the intersection of polygons}
-      \item {Pseudo-distance}
+      \item {Pseudo-distance(to simplify the formulation)}
       \item {Modification of the optimization problem}
-      \item {Maximixation of the contact area}
+      \item {Maximization of the contact area}
       \item {Using non inclusive contact to maintain stability}
       \item {Extension to singular cases}
     \end{itemize}
@@ -88,37 +102,192 @@ Sometimes it is not possible to ensure inclusion of 2 surfaces.
       \item{Climbing Stairs}
       \item{Walking along a path made of small objects}
     \end{itemize}
+  \item{Application to ladder climbing (cf. Joris papers)}
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  ON THE USE OF LIFTED VARIABLES FOR ROBOTICS POSTURE GENERATION  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\paragraph{On the use of lifted variables for Robotics Posture Generation}
-
+\subparagraph{On the use of lifted variables for Robotics Posture Generation}
 \begin{itemize}
-  \item {Introduction}
-  \item {Lifting Algorithm}
+  \item {Introduction: "J. Albersmeyer and M. Diehl, The lifted Newton Method and its Application in Optimisation"}
+  \item {Lifting Algorithm: Introduce additional variables to reduce the complexity/degree of the equations to solve. And then use a trick to re-condense the system and avoid loosing computation time}
   \item {Optimization on lifted variables}
   \item {Condensed BFGS update}
   \item {Results, experimentation}
-  \item {conclusion}
+  \begin{itemize}
+    \item Symbolic Inverse Kinematics
+    \item Automatic Lifting algorithm adapted to posture generation
+    \item Several Solvers for lifted and non-lifted systems (Gauss Newton, SQP, lifted Newton.... )
+    \item Compared many optimization methods (Globalization, regularization....)
+    \item Never managed to get results faster than basic methods
+  \end{itemize}
+  \item{Motivation:Development of a posture generator with a specialized solver}
+    \begin{itemize}
+      \item Problem
+        \begin{itemize}
+          \item Robotics problems solved with generic solvers (IPOPT, CFSQP, fmincon...)
+          \item Robotics problems(especially posture generation) are very specific (Constraints, costs, working spaces, sizes...)
+        \end{itemize}
+      \item Solution
+        \begin{itemize}
+          \item Develop a posture generator, along with a non-linear solver
+          \item Better understanding of our own solver
+          \item Ability to use the solver in new ways:
+          \begin{itemize}
+            \item Working on Manifolds
+            \item Variable numbers of constraints
+            \item Automatic management of variables, constraints and mathematical expressions
+          \end{itemize}
+        \end{itemize}
+    \end{itemize}
 \end{itemize}
 
-\paragraph { Posture generation and Optimisation on non-Eclidean manifolds }
+
+%%%%%%%%%%%%%%%
+%  CHAPTER 4  %
+%%%%%%%%%%%%%%%
+
+\paragraph {Chapter 4: Optimisation on non-Eclidean manifolds }
 \begin{itemize}
-  \item{Introduction}
-  \item{Optimisation on Manifolds Theory}
+  \item{Optimisation on Manifolds}
+    \begin{itemize}
+      \item Definition and examples of non-Euclidean manifolds
+        \begin{itemize}
+          \item $\mathbb{R}^n$
+          \item SO(3)
+          \item S2
+          \item Cartesian Products
+        \end{itemize}
+      \item Representation space vs Tangent space vs manifold
+      \item Local parametrization, notion of retractation
+      \item Computation of function's derivatives, differentiation of retractation
+      \item Hessian update on manifolds, notion of vector transport and application to BFGS and SR1 updates
+    \end{itemize}
   \item{Practical Implementation: PGSolver}
-  \item{Posture Generation, variables and architecture}
-  \item{Problem Formulation}
-  \item{Simulation Results}
-  \item{Parametrization of complex solids on S2}
-  \item{Potential contacts}
-  \item{Optimization of the solvers parameter for a class of problems}
+    \begin{itemize}
+      \item General SQP algorithm adapted to local parametrization of manifolds.
+      \item Local QP and resolution with LSSOL
+      \item Feasibility problems and resolution with LSSOL
+      \item Acceptance criterion:
+        \begin{itemize}
+          \item Merit function
+          \item Filter
+        \end{itemize}
+      \item Globalization method:
+        \begin{itemize}
+          \item Line-Search
+          \item Trust-Region
+            \begin{itemize}
+              \item Notions of limit-Map vs trust-region vs problem's boundaries
+              \item Decisions of increase or decrease of trust region's size
+              \item Anisotrope trust-region
+            \end{itemize}
+        \end{itemize}
+      \item Hessian Update:
+        \begin{itemize}
+          \item BFGS
+          \item SR1
+          \item Fletcher LQNU
+          \item Individual vs grouped updates
+          \item Limited memory updates
+        \end{itemize}
+      \item Termination conditions:
+        \begin{itemize}
+          \item Satisfaction of KKT constraints
+          \item Null step
+          \item Failure of QP, FP, other\dots
+        \end{itemize}
+      \item Restoration Phase:
+        \begin{itemize}
+          \item Problem to solve: minimization of violation, relaxation of violated cstr
+          \item Exit condition: Feasible problem
+          \item Second-order correction phase
+        \end{itemize}
+    \end{itemize}
+  \item{Applications and testings of PGSolver on non-robotic problems}
+    \begin{itemize}
+      \item Point cloud fitting
+      \item Surface parametrisation
+      \item Cube stacks
+      \item Schitkowsky
+    \end{itemize}
 \end{itemize}
 
 
+%%%%%%%%%%%%%%%
+%  CHAPTER 5  %
+%%%%%%%%%%%%%%%
+
+\paragraph{Chapter 5: New Posture Generation}
+\begin{itemize}
+  \item{Posture Generation, variables and architecture}
+    \begin{itemize}
+      \item Geometric expressions:
+        \begin{itemize}
+          \item Represent everything based on frames
+          \item Automatic derivative computation
+        \end{itemize}
+      \item Automatic mapping
+      \item Problem generator: a posture generation problem factory
+    \end{itemize}
+  \item{Problem Formulation: formulation of usual problems in the geometric expressions framework}
+    \begin{itemize}
+      \item Contact with plane surface
+      \item Static equilibrium: Newton/CoM projection
+      \item Forces in friction cones
+      \item Articular limits
+      \item Torque limits
+      \item Torque minimization
+      \item Goal Posture
+    \end{itemize}
+  \item{Implementation of new types of constraints in our formulation}
+    \begin{itemize}
+      \item Contact with parametrized surfaces on $\mathbb{R}^n$
+      \item Contact with parametrized surfaces on S2: Sphere, SuperEllipsoid
+      \item Contact with Catmull-Clark Subdivision surfaces
+    \end{itemize}
+  \item{Simulation Results}
+\end{itemize}
+
+%%%%%%%%%%%%%%%
+%  CHAPTER 6  %
+%%%%%%%%%%%%%%%
+
+\paragraph{Chapter 6: Forces in posture generation}
+\begin{itemize}
+  \item{Contact with desired force}
+  \item{Potential contacts}
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%
+%  CHAPTER 7  %
+%%%%%%%%%%%%%%%
+
+\paragraph{Chapter 7: Evaluation of the PG, experimentation}
+\begin{itemize}
+  \item Understanding the environment through a point-cloud
+    Extraction of plane polygons from Kinect acquired point-clouds.
+
+    Segmentation pipeline:
+    \begin{itemize}
+      \item Acquisition
+      \item Filtering
+      \item Region growing segmentation
+      \item Planar Extraction
+      \item Planar projection and Hull convex generation
+      \item Re-orientation and transfer to the planner
+    \end{itemize}
+  \item Generation of sequences of postures on segmented environment
+  \item{Simulated scenarios planned on real-environment: HRP-2 climbing on table through stairs, HRP-2 climbing on table through slope}
+  \item{Optimization of the solvers parameter for a class of problems}
+    \begin{itemize}
+      \item Developpement of a list of typical robotics optimization problem
+      \item Training of a genetic algorithm to find the "best" solver tuning to solve our list of problems
+    \end{itemize}
+  \item{Several scenarios, including Airbus}
+\end{itemize}
+
+
+\paragraph{Optional: Inertial Identification: Minimal parametrization of Inertia matrix that ensures physical consistency}
 
 
 \end{document}
