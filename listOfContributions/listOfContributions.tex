@@ -13,6 +13,31 @@
 
 \maketitle
 
+\paragraph {Posture generation: state of the art/Introduction}
+\begin{itemize}
+  \item Generalities, introduction
+  \item Topology of the parametrization space (Free-flyer, q, f, other)
+  \item Formulation as a non-linear constrained optimization problem
+  \item Formulation of several types of cost/constraints
+  \begin{itemize}
+    \item Contact with plane surface
+    \item Collision avoidance
+    \item Auto-Collision avoidance
+    \item Static equilibrium: Newton/CoM projection
+    \item Forces in friction cones
+    \item Articular limits
+    \item Torque limits
+    \item Torque minimization
+    \item Goal Posture
+  \end{itemize}
+  \item  Utilization of posture generation in planning
+\end{itemize}
+
+\paragraph {Numerical optimization: State of the art/Introduction}
+\begin{itemize}
+  \item Generalities, introduction
+\end{itemize}
+
 \paragraph {Contact Planning in Real environment}
 \begin{itemize}
   \item Understanding the environment through a point-cloud
@@ -25,13 +50,10 @@
       \item Planar projection and Hull convex generation
       \item Re-orientation and transfer to the planner
     \end{itemize}
-
   \item Contact generation with convex surface inclusions
-Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We proposed to extend that to the inclusion of convex surfaces.
-  \item{Simulated scenarios planned on real-environment}
-We present 2 planned scenarios with the HRP-2 robot
+Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We extend that to the inclusion of convex surfaces.
+  \item{Simulated scenarios planned on real-environment: HRP-2 climbing on table through stairs, HRP-2 climbing on table through slope}
 \end{itemize}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,29 +62,32 @@ We present 2 planned scenarios with the HRP-2 robot
 
 \paragraph{Integration on Non-Inclusive Contacts in Posture Generation}
 
-The method presented before is still limiting in many cases. Ladder, stairs climbing\dots.
+The method presented before is limiting in many cases. Ladder, stairs climbing\dots.
 Sometimes it is not possible to ensure inclusion of 2 surfaces.
 
 \begin{itemize}
   \item Contact geometry formulation
-  \item Present the difficulties related to intersecting 2 convex polygons. Non-constant number of constraints.
-
+    \begin{itemize}
+      \item Discretisation of contact surfaces for practical reasons
+      \item Inclusize contacts are no problem
+      \item Non-Inclusive contacts lead to non-constant number of constraints, cannot be solved with that formulation
+    \end{itemize}
   \item{Non inclusive contact constraints}
     \begin{itemize}
-      \item {Main Idea}
+      \item {Main Idea: Inserting an ellipse in the intersection of polygons}
       \item {Pseudo-distance}
       \item {Modification of the optimization problem}
       \item {Maximixation of the contact area}
-      \item {Using non inclusuve contact to maintain stability}
+      \item {Using non inclusive contact to maintain stability}
       \item {Extension to singular cases}
     \end{itemize}
   \item{Simulation Results}
-     \begin{itemize}
+    \begin{itemize}
       \item{Inclined ladder climbing}
       \item{Vertical ladder climbing}
       \item{Climbing Stairs}
       \item{Walking along a path made of small objects}
-     \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,4 +104,21 @@ Sometimes it is not possible to ensure inclusion of 2 surfaces.
   \item {Results, experimentation}
   \item {conclusion}
 \end{itemize}
+
+\paragraph { Posture generation and Optimisation on non-Eclidean manifolds }
+\begin{itemize}
+  \item{Introduction}
+  \item{Optimisation on Manifolds Theory}
+  \item{Practical Implementation: PGSolver}
+  \item{Posture Generation, variables and architecture}
+  \item{Problem Formulation}
+  \item{Simulation Results}
+  \item{Parametrization of complex solids on S2}
+  \item{Potential contacts}
+  \item{Optimization of the solvers parameter for a class of problems}
+\end{itemize}
+
+
+
+
 \end{document}
