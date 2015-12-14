@@ -2,8 +2,11 @@
 %*********************************** First Chapter *****************************
 %*******************************************************************************
 
-\chapter{Numerical Optimization}
-\label{chapter:optimization}
+\chapter{Posture Generation, state of the Art, Introduction}
+
+\nomenclature[z-SQP]{SQP}{Sequential Quadratic Programing}
+\nomenclature[z-FEM]{FEM}{Finite Element Method}
+
 
 \ifpdf
     \graphicspath{{Chapter1/Figs/Raster/}{Chapter1/Figs/PDF/}{Chapter1/Figs/}}
@@ -11,209 +14,64 @@
     \graphicspath{{Chapter1/Figs/Vector/}{Chapter1/Figs/}}
 \fi
 
+\section{List of contributions}
+\begin{itemize}
+  \item Generalities, introduction
+  \item Presentation of the existing methods
+  \item From Inverse Kinematics to Generalized IK/posture Generation/pose estimation (addition of articular limits, forces, stability etc.
+  \item Topology of the parametrization space (Free-flyer, q, f, other)
+  \item Formulation as a non-linear constrained optimization problem
+  \item Adrien \& Karim's formulations
+  \item Formulation of several types of cost/constraints
+  \begin{itemize}
+    \item Contact with plane surface
+    \item Collision avoidance
+    \item Auto-Collision avoidance
+    \item Static equilibrium: Newton/CoM projection
+    \item Forces in friction cones
+    \item Articular limits
+    \item Torque limits
+    \item Torque minimization
+    \item Goal Posture
+  \end{itemize}
+  \item Reasons why it is not enough and why we needed a new PG
+    \begin{itemize}
+      \item Having an easier way to formulate problems
+      \item Avoid having to de some gymnastic to remain on manifolds
+      \item Automatic variable management
+      \item Robustness
+    \end{itemize}
+  \item Utilization of posture generation in planning
+\end{itemize}
 
-%********************************** %First Section  **************************************
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  SECTION INTRODUCTION  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Introduction}
-In modern science, optimization has a very important place. Mechanical engineers
-optimize the shape of stuctural parts. Investors optimize the profit of a
-portfolio while minimizing the risks. Chemists optimize the efficiency and speed
-of reactions. When it comes to robotics, optimization is everywhere. From the
-design of a robot to its actuation. Any positioning of a robot requires to
-compute the articular parameters of each joint of the robot, finding such
-parameters might be possible by using analytical methods for very simple robots,
-but for robots as complex as humanoid robots, it is definitely not possible. And
-most often, an optimization process is used.
 
-The goal of an optimization algorithm is to find an optimal solution to a
-problem. Optimal in the sense that the solution is an optimum of a given
-objective function. And solution of a problem in the sense that is satisfies a
-set of constraints defined by the problem. Both the constraints and the
-objective function are defined on the variable space, which is the space in
-which we search a solution, the space in which the variable lives.
+Posture Generation is a necessary tool that provides the key postures for many robotics applications like planning, trajectory generation, control.
 
-In this chapter, we will use the following notations:
+More explanation about why it is necessary.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%  SECTION FORMULATION  %
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Formulation}
+
+Here we present the basic formulation of a PG problem.
+
+The free-flyer, the articular space and the forces being the usual variables.
+
+Presentation of all the constraints and their formulation
 \begin{itemize}
-  \item $\mathcal{S}$ is the variable space (usually $\mathbb{R}^n$)
-  \item $x\in\mathcal{S}$ is the vector of variables
-  \item $f:\mathcal{S}\rightarrow\mathbb{R}$ is the objective function, or Cost function
-  \item $c_i:\mathcal{S}\rightarrow\mathbb{R}$ is the i-th constraint function
-    ($0\leq i \leq m$)
+  \item Joint limits
+  \item Auto-collision
+  \item Collisions with environment
+  \item Contacts with environment
+  \item Stability
+  \item Torque limits
 \end{itemize}
-
-Using these notations, an optimization problem can be written as follows:
-\begin{align}
-  \min_{\bf x \in \mathcal{S}} & \quad \mbox{\emph{f}}({\bf x}) \nonumber\\
-\text{s.t.}&
-\left\{
-\begin{array}{lr}
-c_i = 0 \ \ \ \forall i\in \mathcal{E} \\
-c_i \leq 0 \ \ \ \forall i\in \mathcal{I} 
-\end{array}\right.
-\label{eq:basicOptim}
-\end{align}
-
-We call $\mathcal{E}$ the set of index for which the constraints are equality
-conditions and $\mathcal{I}$ the set for which the constraints are inequality
-conditions.
-
-This set of equations presents the optimisation process under a very general
-form. In order to  present the principles of optimization, we will consider
-simpler problems. The first type of problem that we will talk about in this
-section is the unconstrained problem, that has the particularity to not have any
-constraint and its variable space is $\mathbb{R}^n$. Then we will considere the
-same problem, but with added constraints, and we will particularly detail one
-specific constrained problem optimization algorithm that is called the
-Sequential Quadratic Program(SQP). And finally we will study the implications of
-solving an optimization problem on a manifold that is different from
-$\mathbb{R}^n$.
-
-In this section we will present the theory of optimization methods, starting from
-the "simplest" unconstrained optimization and work our way up to more complex
-thing by adding constraints and solving problems on non-Euclidian spaces.
-
-
-\section{Unconstrained Optimization}
-
-An unconstrained optimization problem is a problem that has an objective
-function but no constraints. It can be formulated as follows:
-
-\begin{align}
-  \min_{\bf x \in \mathcal{S}} & \quad \mbox{\emph{f}}({\bf x})
-\label{eq:unconstrainedOptim}
-\end{align}
-
-In order to solve this problem, we want to design an algorithm that, starting
-from an initial guess $x_0$, will converge toward the solution $x^*$. The
-objective function is not necessarily completely known. In the sense that we
-can't always have an explicit formula, often, the function $f$ is computed by
-another program that is able to compute $f(x)$ and $\nabla f(x)$ for a given
-value of $x$. In order to have an efficient algorithm, we want to avoid any
-unnecessary computation of $f(x)$ and its derivatives. We will denote the values
-taken by $x$ along the iterations as $x_0$, $x_1$, $x_2$,\ldots $x_i$. And
-$f(x_i)$ is denoted $f_i$. 
-
-Since our knowledge of the objective function is only partial, it would not be
-possible to guarantee that a point $x^*$ is a global solution: 
-\begin{equation}
-  \forall x \in \mathcal{S}, f(x^*) \leq f(x)
-\end{equation}
-Though, we can find a local minimizer of $f$: 
-\begin{equation}
-  \text{There exist a neighborhood } \mathcal{N}\text{ of }x^*\text{ such that
-  }\forall x\in \mathcal{N}, \ f(x^*) \leq f(x) 
-\end{equation}
-That is the kind of solution that we are looking for and that our algorithms will
-find.
-
-Under the assumption that the objective function is smooth and sufficiently
-continuous ($\mathcal{C}_2$), then we have the following sufficient conditions
-for the optimality of $x^*$ as presented in \cite{nocedal:book:2006}:
-
-\begin{theorem}
-  If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$ and that $\nabla
-  f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite. Then $x^*$ is a strict
-  local minimizer of $f$.
-  \label{optimalityTheorem}
-\end{theorem}
-
-\subsection{globalization methods}
-During the resolution of an optimization problem, the algorithm will generate a
-sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
-usually provided by the user). During the step $k$ of the optimization process,
-the solver, the current point is $x_k$ and we try to find $x_{k+1}$ such that
-$f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only focus
-on 2 of them that are the most popular, the line-search and trust-region
-methods.
-
-\subsubsection{The Line-Search Strategy}
-In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
-point is chosen and then a length of step is calculated to minimize the
-following 1-dimentional problem:
-\begin{align}
-  \min_{\bf \alpha \in \mathbb{R}^+} & \quad \mbox{\emph{f}}(x_k + \alpha.p_k)
-\label{eq:lineSearch}
-\end{align}
-
-Once the best value of $\alpha$ has been found, the next iterate is computed:
-$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
-satisfying solution is found. 
-
-It is not always necessary to find the optimal value of $\alpha$, especially if
-that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
-from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
-imprecision on the computation of $\alpha$ will be errased in the other steps of
-the resolution.
-
-There are several ways to choose a descent direction from an iterate $x_k$. The
-most obvious one is probably the steepest descent direction $-\nabla f_k$. This
-method provides the direction along which f decreases most rapidly and only
-requires the evaluation of the first derivative of $f$, but that method can
-become extremely slow on complicated problems. Another popular approach is the
-Newton method, in which the objective function is approximated to the second
-order
-
-\begin{equation}
-  f(x_k+p) = f_k + p^T\nabla f_k + p^T\nabla^2f_k p
-\end{equation}
-
-Then the chosen descent direction is the optimum of that approximated function,
-the Newton direction.
-\begin{equation}
-  p^N_k = -(\nabla^2 f_k)^{-1} \nabla f_k
-\end{equation}
-The choice of this descent direction implies that the $\nabla^2f_k$ is positive
-definite, in which case an adaptation of the definition of $p_k$ is required. Or
-an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
-used. For example, the symmetric-rank-one(SR1) formula and the BFGS(Broyden,
-Fletcher, Goldfarb, Shanno) formula. Then the step becomes 
-
-\begin{equation}
-  p_k = -B_k^{-1}\nabla f_k
-\end{equation}
-
-\subsubsection{The Trust-Region Strategy}
-The Trust-Region Strategy works in an opposite way than the line-search one in
-the sense that during a line-search step, a direction is chosen, and based on
-that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
-maximum step-length is chosen, and based on it, the descent direction and lenght
-are chosen.
-The principle of the trust region is that along the optimization process, a
-model of the problem is constructed and enriched at every step and at each step,
-the next iterate is the optimum of the model, with the constraint that the step
-to get there lies inside the trust-region. For example, let us considere that
-the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
-constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
-objective function is the quadratic model with approximated Hessian
-\begin{equation}
-  m_k(p) = f(x_k+p) = f_k + p^T\nabla f_k + p^TB_k p
-\end{equation}
-And the optimization problem to solve at each step of the optimization is
-
-\begin{align}
-  \min_{p} & \quad f_k + p^T\nabla f_k + p^TB_k p \nonumber\\
-\text{s.t.}&
-\quad \|p\| \leq \rho_k
-\label{eq:trustRegion}
-\end{align}
-
-Once the solution $p_k$ to this quadratic problem is found, its quality is
-estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
-is satisfying (compared to the decrease predicted by the model) then the step is
-accepted and the size of the trust-region can be increased. Otherwise, the step
-is refused, the trust-region radius is reduced and a new step from $x_k$ is
-computed on that smaller trust region.
-
-\section{Constrained Optimization}
-
-List of topics to cover:
-\begin{itemize}
-  \item Constrained optimization is more interesting for robotics but the algorithms are much more complicated
-  \item Optimizing a constrained problem is equivalent to solving the KKT conditions.
-  \item Hessian Approximation: BFGS, SR1
-  \item Method to decide if an iterate is accepted: merit function, filter\dots
-  \item Restoration phase
-\end{itemize}
-
-\section{Conclusion}
-This section gives a general introduction to Non-linear constrained optimization without regards for robotics or optimization on manifolds
 

@@ -1,125 +1,322 @@
-\chapter{
-Posture Generation for Humanoid Robotic Systems
-}
-\label{chapter:PG}
+%*******************************************************************************
+%*********************************** First Chapter *****************************
+%*******************************************************************************
+
+\chapter{Numerical Optimization: Introduction}
+\label{chapter:optimization}
+
+\nomenclature[x-R]{$\mathbb{R}$}{The Real space}
+\nomenclature[x-M]{$\mathcal{M}$}{A Manifold}
+\nomenclature[x-T]{$T_x\mathcal{M}$}{The tangent space of manifold $\mathcal{M}$ at point x}
+\nomenclature[a-f]{$f$}{Objective function}
+\nomenclature[a-c]{$c_i$}{Constraint function}
+\nomenclature[a-x]{$x$}{Optimization variable}
+\nomenclature[a-xstar]{$x^*$}{Solution of the optimization problem}
+\nomenclature[a-E]{${E}$}{Set of index for which constraints are equality constraints}
+\nomenclature[a-I]{${I}$}{Set of index for which constraints are inequality constraints}
+\nomenclature[x-L]{$\mathcal{L}(x,\lambda)$}{Lagrangian function of the optimization problem}
+\nomenclature[G-o]{$\Omega$}{Feasible set}
+\nomenclature[z-KKT]{KKT}{Karush-Kuhn-Tucker first order optimality conditions}
+\nomenclature[z-LICQ]{LICQ}{Linear Independence Constraints Qualification}
 
 \ifpdf
-    \graphicspath{{Chapter2/Figs/Raster/}{Chapter2/Figs/PDF/}{Chapter2/Figs/}}
+    \graphicspath{{Chapter1/Figs/Raster/}{Chapter1/Figs/PDF/}{Chapter1/Figs/}}
 \else
-    \graphicspath{{Chapter2/Figs/Vector/}{Chapter2/Figs/}}
+    \graphicspath{{Chapter1/Figs/Vector/}{Chapter1/Figs/}}
 \fi
 
+\section{List of contributions}
+\begin{itemize}
+  \item Introduction to optimization
+  \item Notions of unconstrained optimization
+  \item Notions of Constrained Optimization
+  \item KKT
+  \item Line Search
+  \item Trust Region
+  \item Filter
+  \item Merit function
+  \item SQP
+  \item Restoration phase
+  \item Hessian Approximation: BFGS, SR1
+\end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  SECTION INTRODUCTION  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%********************************** %First Section  **************************************
 \section{Introduction}
+In modern science, optimization has a very important place. Mechanical engineers
+optimize the shape of stuctural parts. Investors optimize the profit of a
+portfolio while minimizing the risks. Chemists optimize the efficiency and speed
+of reactions. When it comes to robotics, optimization is everywhere. From the
+design of a robot to its actuation. Any positioning of a robot requires to
+compute the articular parameters of each joint of the robot, finding such
+parameters might be possible by using analytical methods for very simple robots,
+but for robots as complex as humanoid robots, it is definitely not possible. And
+most often, an optimization process is used.
 
-Posture Generation is a necessary tool that provides the key postures for many robotics applications like planning, trajectory generation, control.
+The goal of an optimization algorithm is to find an optimal solution to a
+problem. Optimal in the sense that the solution is an optimum of a given
+objective function. And solution of a problem in the sense that is satisfies a
+set of constraints defined by the problem. Both the constraints and the
+objective function are defined on the variable space, which is the space in
+which we search a solution, the space in which the variable lives.
 
-More explanation about why it is necessary.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%
-%  SECTION FORMULATION  %
-%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Formulation}
-
-Here we present the basic formulation of a PG problem.
-
-The free-flyer, the articular space and the forces being the usual variables.
-
-Presentation of all the constraints and their formulation
+In this chapter, we will use the following notations:
 \begin{itemize}
-  \item Joint limits
-  \item Auto-collision
-  \item Collisions with environment
-  \item Contacts with environment
-  \item Stability
-  \item Torque limits
+  \item $\mathcal{S}$ is the variable space (usually $\mathbb{R}^n$)
+  \item $x\in\mathcal{S}$ is the vector of variables
+  \item $f:\mathcal{S}\rightarrow\mathbb{R}$ is the objective function, or Cost function
+  \item $c_i:\mathcal{S}\rightarrow\mathbb{R}$ is the i-th constraint function
+    ($0\leq i \leq m$)
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  SECTION APPLICATION TO CONTACT PLANNING ON REAL ENVIRONMENT  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Using these notations, an optimization problem can be written as follows:
+\begin{align}
+  \min_{\bf x \in \mathcal{S}} & \quad \mbox{\emph{f}}({\bf x}) \nonumber\\
+\text{s.t.}&
+\left\{
+\begin{array}{lr}
+c_i = 0 \ \ \ \forall i\in \mathcal{E} \\
+c_i \leq 0 \ \ \ \forall i\in \mathcal{I} 
+\end{array}\right.
+\label{eq:basicOptim}
+\end{align}
 
-\section{Application to contact planning on real environment}
-\subsection{Understanding the environment through a point-cloud}
-Segmentation pipeline:
-\begin{itemize}
-  \item Acquisition
-  \item Filtering
-  \item Region growing segmentation
-  \item Planar Extraction
-  \item Planar projection and Hull convex generation
-  \item Re-orientation and transfer to the planner
-\end{itemize}
+We call $\mathcal{E}$ the set of index for which the constraints are equality
+conditions and $\mathcal{I}$ the set for which the constraints are inequality
+conditions.
 
-\subsection{Contact generation with convex surface inclusions}
-Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We proposed to extend that to the inclusion of convex surfaces.
+This set of equations presents the optimisation process under a very general
+form. In order to  present the principles of optimization, we will consider
+simpler problems. The first type of problem that we will talk about in this
+section is the unconstrained problem, that has the particularity to not have any
+constraint and its variable space is $\mathbb{R}^n$. Then we will considere the
+same problem, but with added constraints, and we will particularly detail one
+specific constrained problem optimization algorithm that is called the
+Sequential Quadratic Program(SQP). And finally we will study the implications of
+solving an optimization problem on a manifold that is different from
+$\mathbb{R}^n$.
 
-\subsection{Simulated scenarios planned on real-environment}
-We present 2 planned scenarios with the HRP-2 robot
+In this section we will present the theory of optimization methods, starting from
+the "simplest" unconstrained optimization and work our way up to more complex
+thing by adding constraints and solving problems on non-Euclidian spaces.
 
 
+\section{Unconstrained Optimization}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  SECTION INTEGRATION ON NON-INCLUSIVE CONTACTS IN POSTURE GENERATION  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+An unconstrained optimization problem is a problem that has an objective
+function but no constraints. It can be formulated as follows:
 
-\section{Integration on Non-Inclusive Contacts in Posture Generation}
+\begin{align}
+  \min_{\bf x \in \mathcal{S}} & \quad \mbox{\emph{f}}({\bf x})
+\label{eq:unconstrainedOptim}
+\end{align}
 
-The method presented before is still limiting in many cases. Ladder, stairs climbing\dots.
-Sometimes it is not possible to ensure inclusion of 2 surfaces.
+In order to solve this problem, we want to design an algorithm that, starting
+from an initial guess $x_0$, will converge toward the solution $x^*$. The
+objective function is not necessarily completely known. In the sense that we
+can't always have an explicit formula, often, the function $f$ is computed by
+another program that is able to compute $f(x)$ and $\nabla f(x)$ for a given
+value of $x$. In order to have an efficient algorithm, we want to avoid any
+unnecessary computation of $f(x)$ and its derivatives. We will denote the values
+taken by $x$ along the iterations as $x_0$, $x_1$, $x_2$,\ldots $x_i$. And
+$f(x_i)$ is denoted $f_i$. 
 
-\subsection{Contact geometry formulation}
-\label{sec:background}
-Present the difficulties related to intersecting 2 convex polygons. Non-constant number of constraints.
-Usual solution: patching
+Since our knowledge of the objective function is only partial, it would not be
+possible to guarantee that a point $x^*$ is a global solution: 
+\begin{equation}
+  \forall x \in \mathcal{S}, f(x^*) \leq f(x)
+\end{equation}
+Though, we can find a local minimizer of $f$: 
+\begin{equation}
+  \text{There exist a neighborhood } \mathcal{N}\text{ of }x^*\text{ such that
+  }\forall x\in \mathcal{N}, \ f(x^*) \leq f(x) 
+\end{equation}
+That is the kind of solution that we are looking for and that our algorithms will
+find.
 
-\subsection{Non inclusive contact constraints}
-\subsubsection{Main Idea}
-\subsubsection{Pseudo-distance}
-\subsubsection{Modification of the optimization problem}
-\subsubsection{Maximixation of the contact area}
-\subsubsection{Using non inclusuve contact to maintain stability}
-\subsubsection{Extension to singular cases}
-\subsection{Simulation Results}
-\subsubsection{Inclined ladder climbing}
-\subsubsection{Vertical ladder climbing}
-\subsubsection{Climbing Stairs}
-\subsubsection{Walking along a path made of small objects}
+Under the assumption that the objective function is smooth and sufficiently
+continuous ($\mathcal{C}_2$), then we have the following sufficient conditions
+for the optimality of $x^*$ as presented in \cite{nocedal:book:2006}:
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  ON THE USE OF LIFTED VARIABLES FOR ROBOTICS POSTURE GENERATION  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{theorem}
+  If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$ and that $\nabla
+  f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite. Then $x^*$ is a strict
+  local minimizer of $f$.
+  \label{optimalityTheorem}
+\end{theorem}
 
-\section{On the use of lifted variables for Robotics Posture Generation}
-\label{sec:liftedVariables}
+\subsection{globalization methods}
+During the resolution of an optimization problem, the algorithm will generate a
+sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
+usually provided by the user). During the step $k$ of the optimization process,
+the solver, the current point is $x_k$ and we try to find $x_{k+1}$ such that
+$f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only focus
+on 2 of them that are the most popular, the line-search and trust-region
+methods.
 
-\subsection{Introduction}
-\label{subsec:Introduction}
+\subsubsection{The Line-Search Strategy}
+In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
+point is chosen and then a length of step is calculated to minimize the
+following 1-dimentional problem:
+\begin{align}
+  \min_{\bf \alpha \in \mathbb{R}^+} & \quad \mbox{\emph{f}}(x_k + \alpha.p_k)
+\label{eq:lineSearch}
+\end{align}
 
-\subsection{Lifting Algorithm}
-\label{subsec:LiftingAlgorithm}
+Once the best value of $\alpha$ has been found, the next iterate is computed:
+$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
+satisfying solution is found. 
 
-\subsection{Optimization on lifted variables}
-\label{subsec:Optimization on lifted variables}
+It is not always necessary to find the optimal value of $\alpha$, especially if
+that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
+from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
+imprecision on the computation of $\alpha$ will be errased in the other steps of
+the resolution.
 
-\subsection{Condensed BFGS update}
-\label{subsec:Condensed BFGS update}
+There are several ways to choose a descent direction from an iterate $x_k$. The
+most obvious one is probably the steepest descent direction $-\nabla f_k$. This
+method provides the direction along which f decreases most rapidly and only
+requires the evaluation of the first derivative of $f$, but that method can
+become extremely slow on complicated problems. Another popular approach is the
+Newton method, in which the objective function is approximated to the second
+order
 
-\subsection{Results, experimentation}
-\label{subsec:Results}
+\begin{equation}
+  f(x_k+p) = f_k + p^T\nabla f_k + p^T\nabla^2f_k p
+\end{equation}
 
-\subsection{conclusion}
-\label{subsec:conclusion}
+Then the chosen descent direction is the optimum of that approximated function,
+the Newton direction.
+\begin{equation}
+  p^N_k = -(\nabla^2 f_k)^{-1} \nabla f_k
+\end{equation}
+The choice of this descent direction implies that the $\nabla^2f_k$ is positive
+definite, in which case an adaptation of the definition of $p_k$ is required. Or
+an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
+used. For example, the symmetric-rank-one(SR1) formula and the BFGS(Broyden,
+Fletcher, Goldfarb, Shanno) formula. Then the step becomes 
 
-%%%%%%%%%%%%%%%%%%%%%%%%
-%  SECTION CONCLUSION  %
-%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{equation}
+  p_k = -B_k^{-1}\nabla f_k
+\end{equation}
 
-\section{Discussion and conclusion}
-All that is very nice, but still many limitations and possible improvements.
-Transition to Posture generation on Non-Euclidean Manifolds.
+\subsubsection{The Trust-Region Strategy}
+The Trust-Region Strategy works in an opposite way than the line-search one in
+the sense that during a line-search step, a direction is chosen, and based on
+that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
+maximum step-length is chosen, and based on it, the descent direction and lenght
+are chosen.
+The principle of the trust region is that along the optimization process, a
+model of the problem is constructed and enriched at every step and at each step,
+the next iterate is the optimum of the model, with the constraint that the step
+to get there lies inside the trust-region. For example, let us considere that
+the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
+constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
+objective function is the quadratic model with approximated Hessian
+\begin{equation}
+  m_k(p) = f(x_k+p) = f_k + p^T\nabla f_k + p^TB_k p
+\end{equation}
+And the optimization problem to solve at each step of the optimization is
+
+\begin{align}
+  \min_{p} & \quad f_k + p^T\nabla f_k + p^TB_k p \nonumber\\
+\text{s.t.}&
+\quad \|p\| \leq \rho_k
+\label{eq:trustRegion}
+\end{align}
+
+Once the solution $p_k$ to this quadratic problem is found, its quality is
+estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
+is satisfying (compared to the decrease predicted by the model) then the step is
+accepted and the size of the trust-region can be increased. Otherwise, the step
+is refused, the trust-region radius is reduced and a new step from $x_k$ is
+computed on that smaller trust region.
+
+\section{Constrained Optimization}
+
+Solving a constraint optimization problem consists in minimizing a function while being subject to constraints on the variables.
+
+A general formulation for such problems is:
+
+\begin{equation}
+  \label{formulation_NLCP}
+  \min_{x\in\mathbb{R}^n}{f(x)} \text{ subject to }
+  \left\{
+  \begin{array}{l}
+    c_i(x) = 0,\ \forall i\in{E}\\
+    c_i(x) \geq 0,\ \forall i\in{I}\\
+  \end{array}
+  \right.
+\end{equation}
+
+
+Where $f$ and $c_i$ are real valued functions on a subset of $\mathbb{R}^n$.
+$f$ is the objective function. And $c_i$ are the constraint funcitons.
+${I}$ and ${E}$ are sets of index such that $c_i,\ i\in{E}$ are the equality constraints and $c_i,\ i\in{I}$ are the inequality constraints.
+
+We define the feasible set $\Omega$ that contains all the feasible points (points satisfying the constraints) of \ref{formulation_NLCP}.
+
+\begin{equation}
+  \Omega = \left\{ x\in \mathbb{R}^n:\ \forall i\in {E},\ c_i=0,\ \forall i\in{I},\ c_i \geq0\right\}
+\end{equation}
+
+The formulation \ref{formulation_NLCP} can then be rewritten as:
+\begin{equation}
+  \label{formulation_NLCP_compact}
+  \min_{x\in\Omega}{f(x)}
+\end{equation}
+
+In the general case, the problem \ref{formulation_NLCP_compact} has multiple local solutions.
+And finding the global minimizer of $f$ in $\Omega$ is a difficult problem that we donot treat in this thesis. 
+Our goal is to find a local minimizer $x^*$ of $f$ in $\Omega$.
+
+\paragraph{The first order optimality condition (Karush-Kuhn-Tucker Condition)}
+The Karush-Kuhn-Tucker(KKT) condition is a necessary condition verified by all solutions of problem \ref{formulation_NLCP}. 
+We introduce the Lagrangian function of \ref{formulation_NLCP}:
+\begin{equation}
+  \mathcal{L}(x,\lambda) = f(x) + \sum_{i\in E\cup I}\lambda_i c_i(x)
+\end{equation}
+
+Any given constraint $c_i$is said to be active at $x$ if $c_i(x)=0$. 
+In particular, for any feasible point $x$, all equality constraints $c_i,\ i\in E$ are active. 
+An inequality constraint $c_i,\ i\in I$ is inactive if $c_i(x)>0$ and active if $c_i(x) = 0$
+
+\begin{definition}  
+  \label{active_set}
+  The active set $\mathcal{A}(x)$ at a feasible point $x$ is the set of all the indexes of active constraint.
+  \begin{equation}
+    \mathcal{A}(x)=E\cup\{i\in I: c_i(x) = 0\}
+  \end{equation}
+\end{definition}
+
+Most optimzation algorithms make the assumption that at the solution, the constraints satisfy the Linear Independence Constraints Qualification (LICQ)
+
+\begin{definition}
+  Given a point $x$ and an active set $\mathcal{A}(x)$, the LICQ holds if the set of active constraint gradient $\{\nabla c_i(x),\ i\in \mathcal{A}(x)\}$ is linearly independent
+\end{definition}
+
+In particular, if any gradient of a constraint is null, then the LICQ does not hold. 
+The LICQ should be taken into account during the formulation of a problem.
+
+\begin{theorem}(First-Order Necessary Conditions)\\
+  \label{KKT_condition}
+  Suppose that $x^*$ is a local solution of \ref{formulation_NLCP}, that the functions $f$ and $c_i$ are continuously differentiable, and that the LICQ holds at $x^*$.
+  Then there is a Lagrange multiplier vector $\lambda^*$, with components $\lambda_i^*$, $i\in E\cup I$, such that the following conditions are satisfied at $(x^*,\lambda^*)$
+  \begin{equation}
+  \begin{array}{ll}
+    \nabla_x\mathcal{L}(x^*,\lambda^*) = 0 &, \\
+    c_i(x^*) = 0 &,\ \forall i\in E\\
+    c_i(x^*) \geq 0 &,\ \forall i\in I\\
+    \lambda_i \geq 0 &,\ \forall i\in I\\
+    \lambda_i^* c_i(x^*)=0 &,\ \forall i \in E\cup I\\
+  \end{array}
+  \end{equation}
+\end{theorem}
+
+In many cases, the main goal of an optimization algorithm is to find a point that satisfies the KKT conditions.
+
+\paragraph{Second order conditions}
+
+
+\section{Conclusion}
+This section gives a general introduction to Non-linear constrained optimization without regards for robotics or optimization on manifolds
+

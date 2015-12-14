@@ -1,30 +1,155 @@
 \chapter{
-  Posture generation and Optimisation on non-Eclidean manifolds
+Some extensions of Posture Generation
 }
+\section{List of contributions}
+\paragraph{Integration on Non-Inclusive Contacts in Posture Generation}
 
-\section{Introduction}
-\label{sec:Introduction}
+The method presented before is limiting in many cases. Ladder, stairs climbing\dots.
+Sometimes it is not possible to ensure inclusion of 2 surfaces.
 
-\section{Optimisation on Manifolds Theory}
-\label{sec:Optimisation on Manifolds Theory}
+\begin{itemize}
+  \item Contact geometry formulation
+    \begin{itemize}
+      \item Discretisation of contact surfaces for practical reasons
+      \item Contact generation with convex surface inclusions
+Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We extend that to the inclusion of convex surfaces.
+      \item Inclusive contacts are no problem
+      \item Non-Inclusive contacts lead to non-constant number of constraints or non-smooth gradients, cannot be solved with usual solvers with that formulation
+    \end{itemize}
+  \item{Non inclusive contact constraints}
+    \begin{itemize}
+      \item {Main Idea: Inserting an ellipse in the intersection of polygons}
+      \item {Pseudo-distance(to simplify the formulation)}
+      \item {Modification of the optimization problem}
+      \item {Maximization of the contact area}
+      \item {Using non inclusive contact to maintain stability}
+      \item {Extension to singular cases}
+    \end{itemize}
+  \item{Simulation Results}
+    \begin{itemize}
+      \item{Inclined ladder climbing}
+      \item{Vertical ladder climbing}
+      \item{Climbing Stairs}
+      \item{Walking along a path made of small objects}
+    \end{itemize}
+  \item{Application to ladder climbing (cf. Joris papers)}
+\end{itemize}
 
-\section{Practical Implementation: PGSolver}
-\label{sec:Practical Implementation}
+\paragraph{On the use of lifted variables for Robotics Posture Generation}
+\begin{itemize}
+  \item {Introduction: "J. Albersmeyer and M. Diehl, The lifted Newton Method and its Application in Optimisation"}
+  \item {Lifting Algorithm: Introduce additional variables to reduce the complexity/degree of the equations to solve. And then use a trick to re-condense the system and avoid loosing computation time}
+  \item {Optimization on lifted variables}
+  \item {Condensed BFGS update}
+  \item {Results, experimentation}
+  \begin{itemize}
+    \item Symbolic Inverse Kinematics
+    \item Automatic Lifting algorithm adapted to posture generation
+    \item Several Solvers for lifted and non-lifted systems (Gauss Newton, SQP, lifted Newton.... )
+    \item Compared many optimization methods (Globalization, regularization....)
+    \item Never managed to get results faster than basic methods
+  \end{itemize}
+  \item{Motivation:Development of a posture generator with a specialized solver}
+    \begin{itemize}
+      \item Problem
+        \begin{itemize}
+          \item Robotics problems solved with generic solvers (IPOPT, CFSQP, fmincon...)
+          \item Robotics problems(especially posture generation) are very specific (Constraints, costs, working spaces, sizes...)
+        \end{itemize}
+      \item Solution
+        \begin{itemize}
+          \item Develop a posture generator, along with a non-linear solver
+          \item Better understanding of our own solver
+          \item Ability to use the solver in new ways:
+          \begin{itemize}
+            \item Working on Manifolds
+            \item Variable numbers of constraints
+            \item Automatic management of variables, constraints and mathematical expressions
+          \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
 
-\section{Posture Generation, variables and architecture}
-\label{sec:posture_generation_variables_and_architecture}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  SECTION APPLICATION TO CONTACT PLANNING ON REAL ENVIRONMENT  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Problem Formulation}
-\label{sec:problem_formulation}
+\section{Application to contact planning on real environment}
+\subsection{Understanding the environment through a point-cloud}
+Segmentation pipeline:
+\begin{itemize}
+  \item Acquisition
+  \item Filtering
+  \item Region growing segmentation
+  \item Planar Extraction
+  \item Planar projection and Hull convex generation
+  \item Re-orientation and transfer to the planner
+\end{itemize}
 
-\section{Simulation Results}
-\label{sec:simulation_results}
+\subsection{Contact generation with convex surface inclusions}
+Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We proposed to extend that to the inclusion of convex surfaces.
 
-\section{Parametrization of complex solids on S2}
-\label{sec:parametrization_of_complex_solids_on_s2}
+\subsection{Simulated scenarios planned on real-environment}
+We present 2 planned scenarios with the HRP-2 robot
 
-\section{Potential contacts}
-\label{sec:potential_contacts}
 
-\section{Optimization of the solvers parameter for a class of problems}
-\label{sec:optimization_of_the_solvers_parameter_for_a_class_of_problems}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  SECTION INTEGRATION ON NON-INCLUSIVE CONTACTS IN POSTURE GENERATION  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Integration on Non-Inclusive Contacts in Posture Generation}
+
+The method presented before is still limiting in many cases. Ladder, stairs climbing\dots.
+Sometimes it is not possible to ensure inclusion of 2 surfaces.
+
+\subsection{Contact geometry formulation}
+\label{sec:background}
+Present the difficulties related to intersecting 2 convex polygons. Non-constant number of constraints.
+Usual solution: patching
+
+\subsection{Non inclusive contact constraints}
+\subsubsection{Main Idea}
+\subsubsection{Pseudo-distance}
+\subsubsection{Modification of the optimization problem}
+\subsubsection{Maximixation of the contact area}
+\subsubsection{Using non inclusuve contact to maintain stability}
+\subsubsection{Extension to singular cases}
+\subsection{Simulation Results}
+\subsubsection{Inclined ladder climbing}
+\subsubsection{Vertical ladder climbing}
+\subsubsection{Climbing Stairs}
+\subsubsection{Walking along a path made of small objects}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  ON THE USE OF LIFTED VARIABLES FOR ROBOTICS POSTURE GENERATION  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{On the use of lifted variables for Robotics Posture Generation}
+\label{sec:liftedVariables}
+
+\subsection{Introduction}
+\label{subsec:Introduction}
+
+\subsection{Lifting Algorithm}
+\label{subsec:LiftingAlgorithm}
+
+\subsection{Optimization on lifted variables}
+\label{subsec:Optimization on lifted variables}
+
+\subsection{Condensed BFGS update}
+\label{subsec:Condensed BFGS update}
+
+\subsection{Results, experimentation}
+\label{subsec:Results}
+
+\subsection{conclusion}
+\label{subsec:conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%  SECTION CONCLUSION  %
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Discussion and conclusion}
+All that is very nice, but still many limitations and possible improvements.
+Transition to Posture generation on Non-Euclidean Manifolds.

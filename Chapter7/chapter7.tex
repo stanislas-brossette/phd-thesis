@@ -1,0 +1,27 @@
+\chapter{
+  Evaluation of the PG, experimentaion
+}
+
+\section{List of contributions}
+\begin{itemize}
+  \item Understanding the environment through a point-cloud
+    Extraction of plane polygons from Kinect acquired point-clouds.
+
+    Segmentation pipeline:
+    \begin{itemize}
+      \item Acquisition
+      \item Filtering
+      \item Region growing segmentation
+      \item Planar Extraction
+      \item Planar projection and Hull convex generation
+      \item Re-orientation and transfer to the planner
+    \end{itemize}
+  \item Generation of sequences of postures on segmented environment
+  \item{Simulated scenarios planned on real-environment: HRP-2 climbing on table through stairs, HRP-2 climbing on table through slope}
+  \item{Optimization of the solvers parameter for a class of problems}
+    \begin{itemize}
+      \item Developpement of a list of typical robotics optimization problem
+      \item Training of a genetic algorithm to find the "best" solver tuning to solve our list of problems
+    \end{itemize}
+  \item{Several scenarios, including Airbus}
+\end{itemize}

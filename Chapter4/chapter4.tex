@@ -1,3 +1,96 @@
 \chapter{
-Chapter 4
+Optimization on non-Euclidean Manifolds
 }
+\section{List of contributions}
+\begin{itemize}
+  \item{Optimisation on Manifolds}
+    \begin{itemize}
+      \item Definition and examples of non-Euclidean manifolds
+        \begin{itemize}
+          \item Rn
+          \item SO(3)
+          \item S2
+          \item Cartesian Products
+        \end{itemize}
+      \item Representation space vs Tangent space vs manifold
+      \item Local parametrization, notion of retractation
+      \item Computation of function's derivatives, differentiation of retractation
+      \item Hessian update on manifolds, notion of vector transport and application to BFGS and SR1 updates
+    \end{itemize}
+  \item{Practical Implementation: PGSolver}
+    \begin{itemize}
+      \item General SQP algorithm adapted to local parametrization of manifolds.
+      \item Local QP and resolution with LSSOL
+      \item Feasibility problems and resolution with LSSOL
+      \item Acceptance criterion:
+        \begin{itemize}
+          \item Merit function
+          \item Filter
+        \end{itemize}
+      \item Globalization method:
+        \begin{itemize}
+          \item Line-Search
+          \item Trust-Region
+            \begin{itemize}
+              \item Notions of limit-Map vs trust-region vs problem's boundaries
+              \item Decisions of increase or decrease of trust region's size
+              \item Anisotrope trust-region
+            \end{itemize}
+        \end{itemize}
+      \item Hessian Update:
+        \begin{itemize}
+          \item BFGS
+          \item SR1
+          \item Fletcher LQNU
+          \item Individual vs grouped updates
+          \item Limited memory updates
+        \end{itemize}
+      \item Termination conditions:
+        \begin{itemize}
+          \item Satisfaction of KKT constraints
+          \item Null step
+          \item Failure of QP, FP, other\dots
+        \end{itemize}
+      \item Restoration Phase:
+        \begin{itemize}
+          \item Problem to solve: minimization of violation, relaxation of violated cstr
+          \item Exit condition: Feasible problem
+          \item Second-order correction phase
+        \end{itemize}
+    \end{itemize}
+  \item{Applications and testings of PGSolver on non-robotic problems}
+    \begin{itemize}
+      \item Point cloud fitting
+      \item Surface parametrisation
+      \item Cube stacks
+      \item Schitkowsky
+    \end{itemize}
+\end{itemize}
+
+\section{Introduction}
+\label{sec:Introduction}
+
+\section{Optimisation on Manifolds Theory}
+\label{sec:Optimisation on Manifolds Theory}
+
+\section{Practical Implementation: PGSolver}
+\label{sec:Practical Implementation}
+
+\section{Posture Generation, variables and architecture}
+\label{sec:posture_generation_variables_and_architecture}
+
+\section{Problem Formulation}
+\label{sec:problem_formulation}
+
+\section{Simulation Results}
+\label{sec:simulation_results}
+
+\section{Parametrization of complex solids on S2}
+\label{sec:parametrization_of_complex_solids_on_s2}
+
+\section{Potential contacts}
+\label{sec:potential_contacts}
+
+\section{Optimization of the solvers parameter for a class of problems}
+\label{sec:optimization_of_the_solvers_parameter_for_a_class_of_problems}
+
