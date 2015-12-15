@@ -19,6 +19,7 @@
 \nomenclature[G-o]{$\Omega$}{Feasible set}
 \nomenclature[z-KKT]{KKT}{Karush-Kuhn-Tucker first order optimality conditions}
 \nomenclature[z-LICQ]{LICQ}{Linear Independence Constraints Qualification}
+\nomenclature[z-QP]{QP}{Quadratic Programming}
 
 \ifpdf
     \graphicspath{{Chapter1/Figs/Raster/}{Chapter1/Figs/PDF/}{Chapter1/Figs/}}
@@ -303,7 +304,7 @@ In particular, if any gradient of a constraint is null, then the LICQ does not h
 The LICQ should be taken into account during the formulation of a problem.
 
 \begin{theorem}(First-Order Necessary Conditions)\\
-  \label{KKT_condition}
+  \label{KKT_conditions}
   Suppose that $x^*$ is a local solution of \ref{formulation_NLCP}, that the functions $f$ and $c_i$ are continuously differentiable, and that the LICQ holds at $x^*$.
   Then there is a Lagrange multiplier vector $\lambda^*$, with components $\lambda_i^*$, $i\in E\cup I$, such that the following conditions are satisfied at $(x^*,\lambda^*)$
   \begin{equation}
@@ -365,6 +366,57 @@ In which we start from an initial guess $x_k$ for $x^*$.
 From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem \ref{formulation_NLCP}, we find a suitable increment $z$ such tha $x_k+z$ is closer to the solution than $x_k$.
 And we iterate that opertation until a point $x_k$ sufficiently close to a solution is found.
 By sufficiently close to a solution we mean that this point satisfies the optimality conditions with a good enough precision.
+
+The resolutions algorithms differ mostly by the method chosen to generate a satisfactory increment $z$. We will list here some of the most usual methods:
+
+\paragraph {The penalty method} combines the cost and constraints function in a penalty function that, as its name indicates, penalizes the violation of constraints, without completely proscribing it.
+The penalty function can be written as follows, using the notation $[y]^- = \max\{0, -y\}$:
+
+\begin{equation}
+  p(\mu, x) = f(x) + \mu \sum_{i\in E}|c_i(x)| + \mu \sum_{i\in I} [c_i(x)]^-
+\end{equation}
+
+With this approach, at each step an unconstrained optimization problem is solved.
+The minimum of $p(\mu,x)$ is found and varies with the penalty parameter $\mu$.
+By increasing $\mu$ to $\infty$, we penalize the violation of the constraints with increasing severity until reaching the solution $x^*$.
+
+\paragraph{The interior point method} generates steps by solving a relaxed constrained problem where slack variables are introduced to relax inequality constraints:
+
+\begin{equation}
+  \min_{x,s}{ f(x)- \mu\sum_{i\in I} \log(s_i)}
+  \text{ subject to }
+  \left\{
+    \begin{array}{l}
+     c_i = 0,\ i\in E\\
+     c_i - s_i = 0,\ i\in I\\
+     s_i \geq 0,\ i\in I
+  \end{array}
+  \right.
+\end{equation}
+
+\paragraph{The Sequential Quadratic Programming (SQP)} is a method in which, at each iterate $(x_k, \lambda_k)$, the increment $z$ is found by solving a Quadratic Programming (QP).
+The QP is an approximation of the KKT conditions \ref{KKT_conditions} of the actual problem \ref{formulation_NLCP} to the first order:
+
+\begin{equation}
+  \label{approx_QP}
+  \begin{array}{ll}
+    \min_{z}{} & \frac{1}{2}z^T\nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla f(x_k)^Tz \\
+    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in E \\
+                       & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I
+  \end{array}
+\end{equation}
+
+Using that method as is can be problematic as the length of the iterate needs not be bounded.
+Thus it is possible to generate a very large step that satisfies the QP approximates the original problem only locally, so taking a too big step can get us further from the solution than we were previously.
+To paliate to that issue, mainly two methods are used:
+\begin{itemize}
+  \item The line-search method: The solution $z$ of \ref{approx_QP} is viewed as a direction and we search a parameter $\alpha$ so that the next iterate $x_k + \alpha z$ is optimal for the original problem.
+  \item The trust-region method adds a set of bound constraints to the QP \ref{approx_QP}. So that the length of the step is limited by the trust-region. The size of the trust region is modified along the iterations based on the estimated quality of the QP approximation.
+\end{itemize}
+
+\section{Sequential Quadratic Programming}
+\label{sec:sequential_quadratic_programming}
+
 
 
 
