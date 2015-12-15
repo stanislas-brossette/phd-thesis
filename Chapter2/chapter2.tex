@@ -8,6 +8,7 @@
 \nomenclature[x-R]{$\mathbb{R}$}{The Real space}
 \nomenclature[x-M]{$\mathcal{M}$}{A Manifold}
 \nomenclature[x-T]{$T_x\mathcal{M}$}{The tangent space of manifold $\mathcal{M}$ at point x}
+\nomenclature[a-F]{$F$}{The set of linearized feasible directions}
 \nomenclature[a-f]{$f$}{Objective function}
 \nomenclature[a-c]{$c_i$}{Constraint function}
 \nomenclature[a-x]{$x$}{Optimization variable}
@@ -250,7 +251,7 @@ A general formulation for such problems is:
 
 
 Where $f$ and $c_i$ are real valued functions on a subset of $\mathbb{R}^n$.
-$f$ is the objective function. And $c_i$ are the constraint funcitons.
+$f$ is the objective function. And $c_i$ are the constraint functions.
 ${I}$ and ${E}$ are sets of index such that $c_i,\ i\in{E}$ are the equality constraints and $c_i,\ i\in{I}$ are the inequality constraints.
 
 We define the feasible set $\Omega$ that contains all the feasible points (points satisfying the constraints) of \ref{formulation_NLCP}.
@@ -266,17 +267,21 @@ The formulation \ref{formulation_NLCP} can then be rewritten as:
 \end{equation}
 
 In the general case, the problem \ref{formulation_NLCP_compact} has multiple local solutions.
-And finding the global minimizer of $f$ in $\Omega$ is a difficult problem that we donot treat in this thesis. 
+And finding the global minimizer of $f$ in $\Omega$ is a difficult problem that we do not treat in this thesis.
 Our goal is to find a local minimizer $x^*$ of $f$ in $\Omega$.
 
-\paragraph{The first order optimality condition (Karush-Kuhn-Tucker Condition)}
-The Karush-Kuhn-Tucker(KKT) condition is a necessary condition verified by all solutions of problem \ref{formulation_NLCP}. 
+\subsection{Optimality conditions}
+
+\paragraph{First-Order Optimality Conditions}
+
+The First Order Optimality Condition (Karush-Kuhn-Tucker Condition) is a necessary condition verified by all solutions of problem \ref{formulation_NLCP}.
+
 We introduce the Lagrangian function of \ref{formulation_NLCP}:
 \begin{equation}
   \mathcal{L}(x,\lambda) = f(x) + \sum_{i\in E\cup I}\lambda_i c_i(x)
 \end{equation}
 
-Any given constraint $c_i$is said to be active at $x$ if $c_i(x)=0$. 
+Any given constraint $c_i$ is said to be active at $x$ if $c_i(x)=0$.
 In particular, for any feasible point $x$, all equality constraints $c_i,\ i\in E$ are active. 
 An inequality constraint $c_i,\ i\in I$ is inactive if $c_i(x)>0$ and active if $c_i(x) = 0$
 
@@ -288,7 +293,7 @@ An inequality constraint $c_i,\ i\in I$ is inactive if $c_i(x)>0$ and active if 
   \end{equation}
 \end{definition}
 
-Most optimzation algorithms make the assumption that at the solution, the constraints satisfy the Linear Independence Constraints Qualification (LICQ)
+Most optimization algorithms make the assumption that at the solution, the constraints satisfy the Linear Independence Constraints Qualification (LICQ)
 
 \begin{definition}
   Given a point $x$ and an active set $\mathcal{A}(x)$, the LICQ holds if the set of active constraint gradient $\{\nabla c_i(x),\ i\in \mathcal{A}(x)\}$ is linearly independent
@@ -306,7 +311,7 @@ The LICQ should be taken into account during the formulation of a problem.
     \nabla_x\mathcal{L}(x^*,\lambda^*) = 0 &, \\
     c_i(x^*) = 0 &,\ \forall i\in E\\
     c_i(x^*) \geq 0 &,\ \forall i\in I\\
-    \lambda_i \geq 0 &,\ \forall i\in I\\
+    \lambda_i^* \geq 0 &,\ \forall i\in I\\
     \lambda_i^* c_i(x^*)=0 &,\ \forall i \in E\cup I\\
   \end{array}
   \end{equation}
@@ -314,7 +319,53 @@ The LICQ should be taken into account during the formulation of a problem.
 
 In many cases, the main goal of an optimization algorithm is to find a point that satisfies the KKT conditions.
 
-\paragraph{Second order conditions}
+\paragraph{Second-Order Optimality Conditions}
+
+\begin{definition}
+  Given a feasible point $x$, and the active set $\mathcal{A}(x)$, the  set of linearized feasible directions $F(x)$ is:
+  \begin{equation}
+    F(x)=\left\{d|
+        \begin{array}{ll}
+          d^T\nabla c_i(x) = 0&,\ \forall i\in E \\
+          d^T\nabla c_i(x) \geq 0&,\ \forall i\in \mathcal{A}(x)\cap I \\
+        \end{array}
+    \right\}
+  \end{equation}
+\end{definition}
+
+And at a KKT solution $(x^*,\lambda^*)$ the critical cone $C(x^*, \lambda^*)$ is:
+
+\begin{equation}
+  C(x^*,\lambda^*) = \{w\in F(x^*)|\nabla c_i(x^*)^Tw=0, \forall i\in\mathcal{A}(x^*)\cap I \text{ with } \lambda_i^*>0\}
+\end{equation}
+
+THe critical cone contains the linearly feasible directions for which it ix not clear from first derivative information alone if $f$ will increase or decrease.
+
+Once the KKT condition is reached for a point $(x^*, \lambda^*)$, a direction $w$ of $F(x^*)$ for which $w^T\nabla f(x^*)=0$.
+For such directions, it is impossible to tell from first derivative information only, if an increment in this direction will have a positive effect on the problem resolution.
+Thus it is possible that the KKT constaint is not enough to determine if a point is a solution or just a stationary point.
+
+The Second-Order Sufficient Conditions allow to discriminate local solutions from stationary points:
+
+\begin{theorem}
+  Suppose that for some feasible point $x^*\in \mathbb{R}^n$ there is a Lagrange multiplier vector $\lambda^*$ such that the KKT conditions are satisfied. Suppose also that
+  \begin{equation}
+    w^T\nabla_{xx}\mathcal{L}(x^*,\lambda^*)w>0,\ \forall w\in C(x^*,\lambda^*),\ w\neq 0
+  \end{equation}
+  Then $x^*$ is a strict local solution for \ref{formulation_NLCP}
+\end{theorem}
+
+\section{Resolution of a Non Linear Constrained Optimization}
+
+In the previous section, we presented some theoretical tools to describe the solution of an NLCP that only use the derivative terms of the problem's functions of order one and two.
+Here we present some methods for acually solving such problems.
+There exists many different algorithms to solve an NLCP.
+But all have in common to be iterative processes.
+In which we start from an initial guess $x_k$ for $x^*$.
+From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem \ref{formulation_NLCP}, we find a suitable increment $z$ such tha $x_k+z$ is closer to the solution than $x_k$.
+And we iterate that opertation until a point $x_k$ sufficiently close to a solution is found.
+By sufficiently close to a solution we mean that this point satisfies the optimality conditions with a good enough precision.
+
 
 
 \section{Conclusion}
