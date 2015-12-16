@@ -407,16 +407,129 @@ The QP is an approximation of the KKT conditions \ref{KKT_conditions} of the act
 \end{equation}
 
 Using that method as is can be problematic as the length of the iterate needs not be bounded.
-Thus it is possible to generate a very large step that satisfies the QP approximates the original problem only locally, so taking a too big step can get us further from the solution than we were previously.
+Thus it is possible to generate a very large step that satisfies the QP.
+Though the QP only approximates the original problem locally.
+So taking a too big step can get us further from the solution than we were previously.
 To paliate to that issue, mainly two methods are used:
 \begin{itemize}
-  \item The line-search method: The solution $z$ of \ref{approx_QP} is viewed as a direction and we search a parameter $\alpha$ so that the next iterate $x_k + \alpha z$ is optimal for the original problem.
+  \item The line-search method: The solution $z$ of \ref{approx_QP} is viewed as a direction and we search a parameter $\alpha\in [0;1]$ so that the next iterate $x_k + \alpha z$ is optimal for the original problem.
   \item The trust-region method adds a set of bound constraints to the QP \ref{approx_QP}. So that the length of the step is limited by the trust-region. The size of the trust region is modified along the iterations based on the estimated quality of the QP approximation.
 \end{itemize}
 
 \section{Sequential Quadratic Programming}
 \label{sec:sequential_quadratic_programming}
 
+The Sequential Quadratic Programming method is one of the most effective method to solve small and large scale non-linear constrained optimization problems.
+It has the upper hand on other methods mostly when solving problem with highly non-linear constraints.
+As we stated before, the main idea behind the SQP approach it to solve a subproblem that approximate linearly to the first order the KKT conditions.
+For simplicity, we considere a problem without inequality constraints.
+We denote $C$ the vector of equality constraints.
+We denote $z_x$ and $z_\lambda$ the increments on $x$ and $\lambda$ respectively.
+\begin{equation}
+  \begin{array}{l}
+    x_{k+1} = x_k + z_x\\
+    \lambda_{k+1} = \lambda_k+z_\lambda\\
+  \end{array}
+\end{equation}
+
+The problem is the following:
+\begin{equation}
+  \begin{array}{l}
+    \min_{x\in\mathbb{R}^n}{f(x)} \\
+    \text{ subject to } C(x) = 0
+  \end{array}
+\end{equation}
+
+Its KKT conditions are:
+\begin{equation}
+  \label{KKT_equ}
+  \left\{
+\begin{array}{ll}
+  \nabla_x\mathcal{L}(x^*,\lambda^*) = 0\\
+  C(x^*) = 0\\
+\end{array}
+\right.
+\end{equation}
+
+We denote with a subscript $y^k$ the value of the quantity $y$ evaluated at point $(x_k, \lambda_k)$.
+
+The first order linearization of \ref{KKT_equ} gives:
+
+\begin{equation}
+  \label{KKT_1st_order}
+  \begin{array}{l}
+
+  \left\{
+\begin{array}{l}
+  \nabla_{xx}\mathcal{L}_k z_x + \nabla_{x\lambda}\mathcal{L}_k z_\lambda + \nabla_x\mathcal{L}_k  = 0\\
+  \nabla_x C_k z_x + C_k = 0\\
+\end{array}
+\right. \\
+\text{which gives:}\\
+  \left\{
+\begin{array}{l}
+  \nabla_{xx}\mathcal{L}_k z_x + \nabla_{x}C_k (\lambda_k + z_\lambda) = - \nabla_{x}f_k\\
+  \nabla_x C_k z_x = - C_k \\
+\end{array}
+\right. \\
+\text{Or in matrix form:}\\
+  \begin{pmatrix}
+      \nabla_{xx}\mathcal{L}_k & \nabla_x C_k\\
+      \nabla_x C_k & 0\\
+  \end{pmatrix}
+  \begin{pmatrix}
+      z_x\\
+      \lambda_{k+1}\\
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+      - \nabla_{x}f_k\\
+      - C_k\\
+  \end{pmatrix}
+  \end{array}
+\end{equation}
+
+Solving this problem actually is equivalent to solving a QP problem of the following form:
+
+\begin{equation}
+  \begin{array}{ll}
+    \min_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
+    \text{s.t.} & \nabla_x C_k z_x + C_k = 0\\
+  \end{array}
+\end{equation}
+
+The unique solution of this problem satisfies the following matrix equality:
+
+\begin{equation}
+  \begin{pmatrix}
+      \nabla_{xx}\mathcal{L}_k & -\nabla_x C_k\\
+      \nabla_x C_k & 0\\
+  \end{pmatrix}
+  \begin{pmatrix}
+      z_x\\
+      l_k\\
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+      - \nabla_{x}f_k\\
+      - C_k\\
+  \end{pmatrix}
+\end{equation}
+
+Therefore, the problem raised by the linearization of the KKT conditions to the first order can be solved as a QP problem.
+Denoting the solution of the QP problem $(z_x, l_k)$, the solution to \ref{KKT_1st_order} is given by
+
+\begin{equation}
+  \begin{pmatrix}
+      z_x\\
+      \lambda_{k+1}\\
+  \end{pmatrix}
+  \leftarrow
+  \begin{pmatrix}
+      z_x\\
+      -l_k\\
+  \end{pmatrix}
+\end{equation}
 
 
 
