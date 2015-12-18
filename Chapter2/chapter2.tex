@@ -20,6 +20,7 @@
 \nomenclature[z-KKT]{KKT}{Karush-Kuhn-Tucker first order optimality conditions}
 \nomenclature[z-LICQ]{LICQ}{Linear Independence Constraints Qualification}
 \nomenclature[z-QP]{QP}{Quadratic Programming}
+\nomenclature[z-IQP]{IQP}{Inequality constrained Quadratic Programming}
 
 \ifpdf
     \graphicspath{{Chapter1/Figs/Raster/}{Chapter1/Figs/PDF/}{Chapter1/Figs/}}
@@ -288,16 +289,16 @@ An inequality constraint $c_i,\ i\in I$ is inactive if $c_i(x)>0$ and active if 
 
 \begin{definition}  
   \label{active_set}
-  The active set $\mathcal{A}(x)$ at a feasible point $x$ is the set of all the indexes of active constraint.
+  The active set $\mathit{A}(x)$ at a feasible point $x$ is the set of all the indexes of active constraint.
   \begin{equation}
-    \mathcal{A}(x)=E\cup\{i\in I: c_i(x) = 0\}
+    \mathit{A}(x)=E\cup\{i\in I: c_i(x) = 0\}
   \end{equation}
 \end{definition}
 
 Most optimization algorithms make the assumption that at the solution, the constraints satisfy the Linear Independence Constraints Qualification (LICQ)
 
 \begin{definition}
-  Given a point $x$ and an active set $\mathcal{A}(x)$, the LICQ holds if the set of active constraint gradient $\{\nabla c_i(x),\ i\in \mathcal{A}(x)\}$ is linearly independent
+  Given a point $x$ and an active set $\mathit{A}(x)$, the LICQ holds if the set of active constraint gradient $\{\nabla c_i(x),\ i\in \mathit{A}(x)\}$ is linearly independent
 \end{definition}
 
 In particular, if any gradient of a constraint is null, then the LICQ does not hold. 
@@ -323,12 +324,12 @@ In many cases, the main goal of an optimization algorithm is to find a point tha
 \paragraph{Second-Order Optimality Conditions}
 
 \begin{definition}
-  Given a feasible point $x$, and the active set $\mathcal{A}(x)$, the  set of linearized feasible directions $F(x)$ is:
+  Given a feasible point $x$, and the active set $\mathit{A}(x)$, the  set of linearized feasible directions $F(x)$ is:
   \begin{equation}
     F(x)=\left\{d|
         \begin{array}{ll}
           d^T\nabla c_i(x) = 0&,\ \forall i\in E \\
-          d^T\nabla c_i(x) \geq 0&,\ \forall i\in \mathcal{A}(x)\cap I \\
+          d^T\nabla c_i(x) \geq 0&,\ \forall i\in \mathit{A}(x)\cap I \\
         \end{array}
     \right\}
   \end{equation}
@@ -337,7 +338,7 @@ In many cases, the main goal of an optimization algorithm is to find a point tha
 And at a KKT solution $(x^*,\lambda^*)$ the critical cone $C(x^*, \lambda^*)$ is:
 
 \begin{equation}
-  C(x^*,\lambda^*) = \{w\in F(x^*)|\nabla c_i(x^*)^Tw=0, \forall i\in\mathcal{A}(x^*)\cap I \text{ with } \lambda_i^*>0\}
+  C(x^*,\lambda^*) = \{w\in F(x^*)|\nabla c_i(x^*)^Tw=0, \forall i\in\mathit{A}(x^*)\cap I \text{ with } \lambda_i^*>0\}
 \end{equation}
 
 THe critical cone contains the linearly feasible directions for which it ix not clear from first derivative information alone if $f$ will increase or decrease.
@@ -351,7 +352,7 @@ The Second-Order Sufficient Conditions allow to discriminate local solutions fro
 \begin{theorem}
   Suppose that for some feasible point $x^*\in \mathbb{R}^n$ there is a Lagrange multiplier vector $\lambda^*$ such that the KKT conditions are satisfied. Suppose also that
   \begin{equation}
-    w^T\nabla_{xx}\mathcal{L}(x^*,\lambda^*)w>0,\ \forall w\in C(x^*,\lambda^*),\ w\neq 0
+    w^T\nabla_{xx}^2\mathcal{L}(x^*,\lambda^*)w>0,\ \forall w\in C(x^*,\lambda^*),\ w\neq 0
   \end{equation}
   Then $x^*$ is a strict local solution for \ref{formulation_NLCP}
 \end{theorem}
@@ -421,6 +422,10 @@ To paliate to that issue, mainly two methods are used:
 
 The Sequential Quadratic Programming method is one of the most effective method to solve small and large scale non-linear constrained optimization problems.
 It has the upper hand on other methods mostly when solving problem with highly non-linear constraints.
+
+\subsection{Principle}
+\label{sub:principle}
+
 As we stated before, the main idea behind the SQP approach it to solve a subproblem that approximate linearly to the first order the KKT conditions.
 For simplicity, we considere a problem without inequality constraints.
 We denote $C$ the vector of equality constraints.
@@ -461,20 +466,20 @@ The first order linearization of \ref{KKT_equ} gives:
 
   \left\{
 \begin{array}{l}
-  \nabla_{xx}\mathcal{L}_k z_x + \nabla_{x\lambda}\mathcal{L}_k z_\lambda + \nabla_x\mathcal{L}_k  = 0\\
+  \nabla_{xx}^2\mathcal{L}_k z_x + \nabla_{x\lambda}^2\mathcal{L}_k z_\lambda + \nabla_x\mathcal{L}_k  = 0\\
   \nabla_x C_k z_x + C_k = 0\\
 \end{array}
 \right. \\
 \text{which gives:}\\
   \left\{
 \begin{array}{l}
-  \nabla_{xx}\mathcal{L}_k z_x + \nabla_{x}C_k (\lambda_k + z_\lambda) = - \nabla_{x}f_k\\
+  \nabla_{xx}^2\mathcal{L}_k z_x + \nabla_{x}C_k (\lambda_k + z_\lambda) = - \nabla_{x}f_k\\
   \nabla_x C_k z_x = - C_k \\
 \end{array}
 \right. \\
 \text{Or in matrix form:}\\
   \begin{pmatrix}
-      \nabla_{xx}\mathcal{L}_k & \nabla_x C_k\\
+      \nabla_{xx}^2\mathcal{L}_k & \nabla_x C_k\\
       \nabla_x C_k & 0\\
   \end{pmatrix}
   \begin{pmatrix}
@@ -494,7 +499,7 @@ Solving this problem actually is equivalent to solving a QP problem of the follo
 \begin{equation}
   \begin{array}{ll}
     \min_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
-    \text{s.t.} & \nabla_x C_k z_x + C_k = 0\\
+    \text{s.t.} & \nabla_x C_k^T z_x + C_k = 0\\
   \end{array}
 \end{equation}
 
@@ -502,7 +507,7 @@ The unique solution of this problem satisfies the following matrix equality:
 
 \begin{equation}
   \begin{pmatrix}
-      \nabla_{xx}\mathcal{L}_k & -\nabla_x C_k\\
+      \nabla_{xx}^2\mathcal{L}_k & -\nabla_x C_k\\
       \nabla_x C_k & 0\\
   \end{pmatrix}
   \begin{pmatrix}
@@ -515,6 +520,12 @@ The unique solution of this problem satisfies the following matrix equality:
       - C_k\\
   \end{pmatrix}
 \end{equation}
+
+Note that this problem has a solution if the following assumptions hold:
+\begin{itemize}
+  \item The constraint Jacobian $\nabla_x C_k$ has full rank.
+  \item The matrix $\nabla_{xx}^2\mathcal{L}_k$ is positive definite on the tangent space of the constraints:\\ $d^T\nabla_{xx}^2\mathcal{L}_k d \geq 0,\ \forall d\neq 0$ such that ${\nabla_x C_k}^T d = 0$.
+\end{itemize}
 
 Therefore, the problem raised by the linearization of the KKT conditions to the first order can be solved as a QP problem.
 Denoting the solution of the QP problem $(z_x, l_k)$, the solution to \ref{KKT_1st_order} is given by
@@ -530,6 +541,47 @@ Denoting the solution of the QP problem $(z_x, l_k)$, the solution to \ref{KKT_1
       -l_k\\
   \end{pmatrix}
 \end{equation}
+
+This development can easily be extended to treat the case of problems constrained with inequality constraints:
+
+\begin{equation}
+  \min_{x\in\mathbb{R}^n}{f(x)} \text{ subject to }
+  \left\{
+  \begin{array}{l}
+    c_i(x) = 0,\ \forall i\in{E}\\
+    c_i(x) \geq 0,\ \forall i\in{I}\\
+  \end{array}
+  \right.
+\end{equation}
+
+By solving the following IQP system at each iteration:
+
+\begin{equation}
+  \label{IQP}
+  \begin{array}{ll}
+    \min_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
+    \text{s.t.} & \nabla_x {c_i}_k z_x + {c_i}_k = 0 ,\ \forall i\in E\\
+                & \nabla_x {c_i}_k z_x + {c_i}_k \geq 0 ,\ \forall i\in I\\
+  \end{array}
+\end{equation}
+
+The main difficulty in solving that QP \ref{IQP} comes from finding the optimal active set at each step $\mathit{A}_k$.
+To find it, the QP will start from a random active set $\mathit{A}_0$ ignore the non-active constraints and try to solve the QP with the remaining active constraint, then if the solution is not satisfactory, it will change the active set and iterate over this process until the optimal active set and solution is found for the QP \ref{IQP}.
+Once the SQP gets close to the solution, the set of active constraints should not change much from one iterate $x_k$ to the next one.
+It is often very useful to initialize the IQP's active set with the optimal active set of the previous iterate: $\mathit{A}_0(x_{k+1})\leftarrow\mathit{A}^*(x_k)$.
+That method is called the \textit{warm-start}.
+
+The SQP approach to solving the problem \ref{formulation_NLCP} as presented above leans on the assumption that at each step, the QP generated is feasible,
+which requires that the Hessian $\nabla_{xx}^2\mathcal{L}$ is positive definite on the tangent space of the active constraints.
+That property is guarantied to hold near the solution, but not when staring from a remote point on a non-convex problem.
+To quope with that issue, several methods exist.
+In the next few section, we will present the globalisation methods that are the Line Search and Trust Region, they make sure that the QP subproblem is always feasible.
+Then we'll present some methods used to choose whether to accept of reject an iterate with the merit function and filter methods.
+And finally we will discuss some Hessian approximation methods.
+
+\subsection{Globalization methods}
+\label{sub:globalization_methods}
+
 
 
 
