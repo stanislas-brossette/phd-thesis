@@ -24,11 +24,7 @@
 \nomenclature[z-QP]{QP}{Quadratic Programming}
 \nomenclature[z-IQP]{IQP}{Inequality constrained Quadratic Programming}
 
-\ifpdf
-    \graphicspath{{Chapter1/Figs/Raster/}{Chapter1/Figs/PDF/}{Chapter1/Figs/}}
-\else
-    \graphicspath{{Chapter1/Figs/Vector/}{Chapter1/Figs/}}
-\fi
+\graphicspath{{Chapter2/Figs/}}
 
 \section{List of contributions}
 \begin{itemize}
@@ -108,93 +104,93 @@ Under the assumption that the objective function is smooth and sufficiently cont
   \label{optimalityTheorem}
 \end{theorem}
 
-%\subsection{Globalization methods}
+\subsection{Globalization methods (Section NEEDS TO BE REWRITTEN)}
 
-%During the resolution of an optimization problem, the algorithm will generate a
-%sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
-%usually provided by the user). During the step $k$ of the optimization process,
-%the solver, the current point is $x_k$ and we try to find $x_{k+1}$ such that
-%$f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only focus
-%on 2 of them that are the most popular, the line-search and trust-region
-%methods.
+During the resolution of an optimization problem, the algorithm will generate a
+sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
+usually provided by the user). During the step $k$ of the optimization process,
+the solver, the current point is $x_k$ and we try to find $x_{k+1}$ such that
+$f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only focus
+on 2 of them that are the most popular, the line-search and trust-region
+methods.
 
-%\subsubsection{The Line-Search Strategy}
-%In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
-%point is chosen and then a length of step is calculated to minimize the
-%following 1-dimentional problem:
-%\begin{align}
-  %\min_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
-%\label{eq:lineSearchNLP}
-%\end{align}
+\subsubsection{The Line-Search Strategy}
+In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
+point is chosen and then a length of step is calculated to minimize the
+following 1-dimentional problem:
+\begin{align}
+  \min_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
+\label{eq:lineSearchNLP}
+\end{align}
 
-%Once the best value of $\alpha$ has been found, the next iterate is computed:
-%$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
-%satisfying solution is found.
+Once the best value of $\alpha$ has been found, the next iterate is computed:
+$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
+satisfying solution is found.
 
-%It is not always necessary to find the optimal value of $\alpha$, especially if
-%that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
-%from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
-%imprecision on the computation of $\alpha$ will be errased in the other steps of
-%the resolution.
+It is not always necessary to find the optimal value of $\alpha$, especially if
+that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
+from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
+imprecision on the computation of $\alpha$ will be errased in the other steps of
+the resolution.
 
-%There are several ways to choose a descent direction from an iterate $x_k$. The
-%most obvious one is probably the steepest descent direction $-\nabla f_k$. This
-%method provides the direction along which f decreases most rapidly and only
-%requires the evaluation of the first derivative of $f$, but that method can
-%become extremely slow on complicated problems. Another popular approach is the
-%Newton method, in which the objective function is approximated to the second
-%order
+There are several ways to choose a descent direction from an iterate $x_k$. The
+most obvious one is probably the steepest descent direction $-\nabla f_k$. This
+method provides the direction along which f decreases most rapidly and only
+requires the evaluation of the first derivative of $f$, but that method can
+become extremely slow on complicated problems. Another popular approach is the
+Newton method, in which the objective function is approximated to the second
+order
 
-%\begin{equation}
-  %f(x_k+p) = f_k + p^T\nabla f_k + p^T\nabla^2f_k p
-%\end{equation}
+\begin{equation}
+  f(x_k+p) = f_k + p^T\nabla f_k + p^T\nabla^2f_k p
+\end{equation}
 
-%Then the chosen descent direction is the optimum of that approximated function,
-%the Newton direction.
-%\begin{equation}
-  %p^N_k = -(\nabla^2 f_k)^{-1} \nabla f_k
-%\end{equation}
-%The choice of this descent direction implies that the $\nabla^2f_k$ is positive
-%definite, in which case an adaptation of the definition of $p_k$ is required. Or
-%an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
-%used. For example, the symmetric-rank-one(SR1) formula and the BFGS(Broyden,
-%Fletcher, Goldfarb, Shanno) formula. Then the step becomes
+Then the chosen descent direction is the optimum of that approximated function,
+the Newton direction.
+\begin{equation}
+  p^N_k = -(\nabla^2 f_k)^{-1} \nabla f_k
+\end{equation}
+The choice of this descent direction implies that the $\nabla^2f_k$ is positive
+definite, in which case an adaptation of the definition of $p_k$ is required. Or
+an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
+used. For example, the symmetric-rank-one(SR1) formula and the BFGS(Broyden,
+Fletcher, Goldfarb, Shanno) formula. Then the step becomes
 
-%\begin{equation}
-  %p_k = -B_k^{-1}\nabla f_k
-%\end{equation}
+\begin{equation}
+  p_k = -B_k^{-1}\nabla f_k
+\end{equation}
 
-%\subsubsection{The Trust-Region Strategy}
-%The Trust-Region Strategy works in an opposite way than the line-search one in
-%the sense that during a line-search step, a direction is chosen, and based on
-%that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
-%maximum step-length is chosen, and based on it, the descent direction and lenght
-%are chosen.
-%The principle of the trust region is that along the optimization process, a
-%model of the problem is constructed and enriched at every step and at each step,
-%the next iterate is the optimum of the model, with the constraint that the step
-%to get there lies inside the trust-region. For example, let us considere that
-%the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
-%constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
-%objective function is the quadratic model with approximated Hessian
-%\begin{equation}
-  %m_k(p) = f(x_k+p) = f_k + p^T\nabla f_k + p^TB_k p
-%\end{equation}
-%And the optimization problem to solve at each step of the optimization is
+\subsubsection{The Trust-Region Strategy}
+The Trust-Region Strategy works in an opposite way than the line-search one in
+the sense that during a line-search step, a direction is chosen, and based on
+that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
+maximum step-length is chosen, and based on it, the descent direction and lenght
+are chosen.
+The principle of the trust region is that along the optimization process, a
+model of the problem is constructed and enriched at every step and at each step,
+the next iterate is the optimum of the model, with the constraint that the step
+to get there lies inside the trust-region. For example, let us considere that
+the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
+constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
+objective function is the quadratic model with approximated Hessian
+\begin{equation}
+  m_k(p) = f(x_k+p) = f_k + p^T\nabla f_k + p^TB_k p
+\end{equation}
+And the optimization problem to solve at each step of the optimization is
 
-%\begin{align}
-  %\min_{p} & \quad f_k + p^T\nabla f_k + p^TB_k p \nonumber\\
-%\text{s.t.}&
-%\quad \|p\| \leq \rho_k
-%\label{eq:trustRegionNLP}
-%\end{align}
+\begin{align}
+  \min_{p} & \quad f_k + p^T\nabla f_k + p^TB_k p \nonumber\\
+\text{s.t.}&
+\quad \|p\| \leq \rho_k
+\label{eq:trustRegionNLP}
+\end{align}
 
-%Once the solution $p_k$ to this quadratic problem is found, its quality is
-%estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
-%is satisfying (compared to the decrease predicted by the model) then the step is
-%accepted and the size of the trust-region can be increased. Otherwise, the step
-%is refused, the trust-region radius is reduced and a new step from $x_k$ is
-%computed on that smaller trust region.
+Once the solution $p_k$ to this quadratic problem is found, its quality is
+estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
+is satisfying (compared to the decrease predicted by the model) then the step is
+accepted and the size of the trust-region can be increased. Otherwise, the step
+is refused, the trust-region radius is reduced and a new step from $x_k$ is
+computed on that smaller trust region.
 
 \section{Constrained Optimization}
 
@@ -591,15 +587,17 @@ Either by multiplying the step found by the QP with a coefficient $\alpha$ in th
 Or by bounding the norm of the step found in the QP by adding a boundary constraint on $z$ directly inside of the QP problem.
 
 \subsubsection{The Line-Search Strategy}
-In the Line-Search strategy, starting from a current iterate $x_k$ with a QP generated step $z$ solution of the linearized problem. We search a coefficient $\alpha$ such that $x_{k+1}=x_k+\alpha z$ is satisfactory.
+In the Line-Search strategy, starting from a current iterate $x_k$ with a QP generated step $z$ solution of the linearized problem \ref{IQP}.
+We search a coefficient $\alpha$ such that $x_{k+1}=x_k+\alpha z$ is satisfactory.
 A usual way to decide if a point is satisfactory is to use a Merit function.
-A Merit function is somewhat similar to a penalty function.
-In the sense that it estimates the quality of a point from the value of the cost function penalized by the violation of the constraints.
+A Merit function is somewhat similar to a penalty function in the sense that it estimates the quality of a point from the value of the cost function, penalized by the violation of the constraints.
 A typical merit function for a problem with only equality constraints can be written as:
 \begin{equation}
   M(x,\mu) = f(x)+\mu \|c(x)\|_1
 \end{equation}
 
+The goal of the line-search will then be to find a value $\alpha^*$ of $\alpha$ that minimizes the Merit function: $M(\alpha^*) < M(0)$ and $M'(\alpha^*)=0$.
+Many simple and efficient methods exist to minimize a 1-dimensional function but most work better if the function to minimize is smooth.
 If inequality constraints are present, a simple penalty function like \ref{penalty_function} would not be satisfactory because of the non-smoothness of the operator $[.]^-$.
 To avoid that problem, slack variables can come in handy to replace the inequality constraints in the problem as follows:
 
@@ -613,51 +611,48 @@ To avoid that problem, slack variables can come in handy to replace the inequali
   \right.
 \end{equation}
 
+Once the Merit function is chosen, it is time to minimize it.
+But in fact, finding the optimal value of $\alpha$ is not necessary, not only because it can be an expensive.
+But also because, $\alpha$ is only used to calculate the next iterate, from which another $p_k$ and $\alpha$ will be calculated.
+And in the end, the imprecision on the computation of $\alpha$ will be errased in the other steps of the resolution.
+Ultimately, the optimality of the result of the line-search does not matter much because our goal is only to solve the SQP problem in its globality.
+Therefore, for the sake of devising a time efficient algorithm, finding an $\alpha$ that generates a 'sufficient' decrease of the merit function is enough.
 
-given a point $x_k$, a descent direction $p_k$ from this
-point is chosen and then a length of step is calculated to minimize the
-following 1-dimentional problem:
-\begin{align}
-  \min_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
-\label{eq:lineSearch}
-\end{align}
+Let $\mu_1$ and $\mu_2$ be 2 real numbers such that: $0<\mu_1<\mu_2<1$.
+A sufficient decrease of the merit function can be depicted by the condition $M(\alpha) \leq M(0) + \mu_1 \alpha M'(0)$.
+A sufficient increase of its derivative by $M'(\alpha)\geq\mu_2 M'(0)$.
+The Wolfe Line-Search proceeds by narrowing iteratively an interval $[\alpha_L,\ \alpha_R]$ by trying a value $\alpha$ in this interval against some tests and based on their results, decide to narrow it by the right or the left and repeat that operation with the new interval until a satisfying value is found.
+Note that the Wolfe line-search is guaranteed to terminate if $M$ is $\mathcal{C}^1$ and bounded below.
 
-Once the best value of $\alpha$ has been found, the next iterate is computed:
-$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
-satisfying solution is found.
+The Wolfe Line-Search can be shematized as algorithm:~\ref{alg:Wolfe} and illustrated by figure~\ref{fig:Wolfe}.
 
-It is not always necessary to find the optimal value of $\alpha$, especially if
-that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
-from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
-imprecision on the computation of $\alpha$ will be errased in the other steps of
-the resolution.
+\begin{algorithm}
+\begin{algorithmic}
+  \State Init $[\alpha_L,\alpha_R]\leftarrow[0\ ,1]$
+  \Loop Choose $\alpha\in[\alpha_L,\alpha_R]$\\
+  Evaluate $M(\alpha)$ and $M'(\alpha)$
+  {\renewcommand\labelenumi{(\theenumi)}
+  \begin{enumerate}
+    \item {$M(\alpha) \leq M(0) + \mu_1 \alpha M'(0)\text{ and } M'(\alpha)<\mu_2 M'(0)$}: $\alpha$ is too small, $\alpha_L\leftarrow a$
+    \item {$M(\alpha) \leq M(0) + \mu_1 \alpha M'(0) \text{ and } M'(\alpha)\geq\mu_2 M'(0)$}: Terminate, \Return $\alpha$
+    \item {$M(\alpha) > M(0) + \mu_1 \alpha M'(0)$}: $\alpha$ is too big, $\alpha_R\leftarrow \alpha$
+  \end{enumerate}
+}
+  \EndLoop
+  \caption{The Wolfe line-search}
+  \label{alg:Wolfe}
+\end{algorithmic}
+\end{algorithm}
 
-There are several ways to choose a descent direction from an iterate $x_k$. The
-most obvious one is probably the steepest descent direction $-\nabla f_k$. This
-method provides the direction along which f decreases most rapidly and only
-requires the evaluation of the first derivative of $f$, but that method can
-become extremely slow on complicated problems. Another popular approach is the
-Newton method, in which the objective function is approximated to the second
-order
+\begin{figure}
+  \includegraphics[width=0.7\textwidth]{line-search.pdf}
+  \caption{Illustration of the choice made by the Wolfe line-search for values of $\alpha$}
+  \label{fig:Wolfe}
+\end{figure}
 
-\begin{equation}
-  f(x_k+p) = f_k + p^T\nabla f_k + p^T\nabla^2f_k p
-\end{equation}
-
-Then the chosen descent direction is the optimum of that approximated function,
-the Newton direction.
-\begin{equation}
-  p^N_k = -(\nabla^2 f_k)^{-1} \nabla f_k
-\end{equation}
-The choice of this descent direction implies that the $\nabla^2f_k$ is positive
-definite, in which case an adaptation of the definition of $p_k$ is required. Or
-an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
-used. For example, the symmetric-rank-one(SR1) formula and the BFGS(Broyden,
-Fletcher, Goldfarb, Shanno) formula. Then the step becomes
-
-\begin{equation}
-  p_k = -B_k^{-1}\nabla f_k
-\end{equation}
+The Wolfe line-search is a very popular line-search method, but it suffers from a drawback that can be major in many cases: It requires the computation of the derivative of the merit function.
+Which can be prohibitively expensive in some cases, including in posture generation for robotics problems, where the derivatives are always expensive.
+That is why other line-search methods exist that do not require the derivative of $M$ for $\alpha\neq0$. For example the Goldstein and Price, or the Armijo methods.
 
 \subsubsection{The Trust-Region Strategy}
 The Trust-Region Strategy works in an opposite way than the line-search one in
