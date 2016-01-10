@@ -385,7 +385,6 @@ To paliate to that issue, mainly two methods are used:
   \item The line-search method: The solution $z$ of \ref{approx_QP} is viewed as a direction and we search a parameter $\alpha\in [0;1]$ so that the next iterate $x_k + \alpha z$ is optimal for the original problem.
   \item The trust-region method adds a set of bound constraints to the QP \ref{approx_QP}. So that the length of the step is limited by the trust-region. The size $\rho$ of the trust region is modified along the iterations based on the estimated quality of the QP approximation. In that case, the QP becomes:
 \begin{equation}
-  \label{approx_QP_TR}
   \begin{array}{ll}
     \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla f(x_k)^Tz \\
     \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in E \\
@@ -644,7 +643,8 @@ The Wolfe Line-Search can be shematized as algorithm:~\ref{alg:Wolfe} and illust
 \end{algorithmic}
 \end{algorithm}
 
-\begin{figure}
+\begin{figure}[ht]
+  \centering
   \includegraphics[width=0.7\textwidth]{line-search.pdf}
   \caption{Illustration of the choice made by the Wolfe line-search for values of $\alpha$}
   \label{fig:Wolfe}
@@ -688,7 +688,8 @@ The sloping envelope definition takes user defined parameters $\beta$ and $\gamm
   \end{equation}
 \end{definition}
 
-\begin{figure}
+\begin{figure}[ht]
+  \centering
   \includegraphics[width=0.7\textwidth]{filter.pdf}
   \caption{Representation of a filter with sloping envelope}
   \label{fig:Filter}
@@ -705,36 +706,48 @@ That method is generally more permissive than merit based method in the sense th
 The filter method, as well as the merit function based methods can be used in line-search and trust-region algorithms.
 
 \subsubsection{The Trust-Region Strategy}
-The Trust-Region Strategy works in an opposite way than the line-search one in
-the sense that during a line-search step, a direction is chosen, and based on
-that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
-maximum step-length is chosen, and based on it, the descent direction and lenght
-are chosen.
-The principle of the trust region is that along the optimization process, a
-model of the problem is constructed and enriched at every step and at each step,
-the next iterate is the optimum of the model, with the constraint that the step
-to get there lies inside the trust-region. For example, let us considere that
-the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
-constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
-objective function is the quadratic model with approximated Hessian
+The Trust Region strategy is based on the idea that at any iterate $x_k$ the quadratic model made of the problem and fed to the QP solver can only be trusted to be relevant is a finite region around the iterate.
+That region is called the trust region and its size is usually governed by a single positive parameter $\rho_k$ that can evolve along the optimization process.
+This translates in a modified QP to solve at each iteration.
+A boundary constraint describing the trust region is added to the problem.
+At each step, the modified problem writes as:
+
 \begin{equation}
-  m_k(p) = f(x_k+p) = f_k + p^T\nabla f_k + p^TB_k p
+  \begin{array}{ll}
+    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla f(x_k)^Tz \\
+    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in E \\
+                       & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I\\
+                       & |z|<\rho_k
+  \end{array}
+  \label{approx_QP_TR}
 \end{equation}
-And the optimization problem to solve at each step of the optimization is
 
-\begin{align}
-  \min_{p} & \quad f_k + p^T\nabla f_k + p^TB_k p \nonumber\\
-\text{s.t.}&
-\quad \|p\| \leq \rho_k
-\label{eq:trustRegion}
-\end{align}
+Once a solution $z$ of \ref{approx_QP_TR} is found, the potential next iterate $x_{k+1} = x_k + z$ is checked against the acceptance criterion (should it be a merit function or a filter or other).
+If it is accepted, that means that our current model is good, we move to the next step with $x_{k+1} \leftarrow x_k + z$, and the size of the trust region can be augmented based on some euristics.
+Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some euristics( e.g. $\rho\leftarrow\rho/2$) and the problem \ref{approx_QP_TR} is solved again with the new value of $\rho$.
+This is repeated until a satisfying point is found, or until an infeasible problem is found.
 
-Once the solution $p_k$ to this quadratic problem is found, its quality is
-estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
-is satisfying (compared to the decrease predicted by the model) then the step is
-accepted and the size of the trust-region can be increased. Otherwise, the step
-is refused, the trust-region radius is reduced and a new step from $x_k$ is
-computed on that smaller trust region.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.4\textwidth]{trust_region_incompatible.pdf}
+  \caption{Constraint incompatibility generated by trust region approach}
+  \label{fig:TR_incompatible}
+\end{figure}
+
+With this approach, a problem that is inherent to trust region methods arises: The generation of unfeasible problem.
+The reduction of the size of the trust region can lead to an incompatible set of constraints.
+For example, with a single constraint, as illustrated in figure \ref{fig:TR_incompatible}.
+The linearisation of the constraint is represented by the plain strait line, and the trust region by the circle.
+If $\rho$ is too small, there is no intersection between the linearization of the constraint and the trust region.
+The QP is then infeasible.
+An obvious solution for that would be to increase the size of the trust region, but that goes against the core idea of the trust region strategy and it would harm the convergence properties of the algorithm.
+A more appropriate solution is to enter a restoration phase when that event occur.
+The purpose of a restoration phase is to reduce the infeasibility of a problem by relaxing infeasible constraints without regards for the cost function.
+The restoration phase is exited once a feasible point is found, and the course of the SQP is continued from that point.
+
+
+
+
 
 \subsection{Quasi-Newton Approximation}
 \label{sub:quasi_newton_approximation}
