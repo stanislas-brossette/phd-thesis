@@ -714,8 +714,8 @@ At each step, the modified problem writes as:
 
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla f(x_k)^Tz \\
-    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in E \\
+    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2Hz + \sum_{i\in\mathcal{U}}\nabla c_i(x_k)^Tz \\
+    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in \mathcal{F} \\
                        & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I\\
                        & |z|<\rho_k
   \end{array}
@@ -745,9 +745,67 @@ A more appropriate solution is to enter a restoration phase when that event occu
 The purpose of a restoration phase is to reduce the infeasibility of a problem by relaxing infeasible constraints without regards for the cost function.
 The restoration phase is exited once a feasible point is found, and the course of the SQP is continued from that point.
 
+\subsection{Restoration phase}
+\label{sub:restoration_phase}
 
+As we stated previously, a restoration phase is entered when an infeasible problem is found by the trust region strategy.
+The goal of the restoration is to find a solution to the following problem:
 
+\begin{equation}
+    \text{Find $x\in\mathbb{R}^n$ such that }
+    \left\{
+    \begin{array}{l}
+      c_i(x)=0,\ i\in E \\
+      c_i(x)\geq 0,\ i\in I\\
+      |z|<\rho_k
+    \end{array}
+    \right.
+  \label{eq:resto_NL}
+\end{equation}
 
+The restoration phase proceeds in a similar way to the original SQP algorithm described earlier.
+At each step, an approximated QP is solved, then its result is compared to an acceptance criterion, if it is accepted, the trust region can be increased and the algorithm continue.
+Otherwise, the trust region is reduced and the problem is solved again.
+The acceptance criterion must be tailored for the restoration problem, meaning that it is based on the values of the cost function of the restoration problem and of its constraints.
+The big difference comes from the way the quadratic problem is constructed during this phase.
+
+During a restoration phase step, the first action is to estimate the sets of feasible $\mathcal{F}$ and infeasible $\mathcal{I}$ constraints.
+This is done by solving the linearization of problem \ref{eq:resto_NL} as presented in \ref{eq:FP}.
+Each equality constraint is cut in 2 inequality constraints.
+
+\begin{equation}
+  \text{Find $z\in\mathbb{R}^n$ such that }
+  \left\{
+  \begin{array}{l}
+    \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in E \\
+    -\nabla c_i(x_k)^Tz-c_i(x_k)\geq 0,\ i\in E \\
+    \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I\\
+    |z|<\rho_k
+  \end{array}
+  \right.
+  \label{eq:FP}
+\end{equation}
+
+The resolution of that FP gives the lists of feasible $\mathcal{F}$ and unfeasible $\mathcal{U}$ constraints.
+If the list of unfeasible constraints is empty, the problem is feasible, so the restoration phase is exited to return to the main SQP algorithm.
+The restoration QP to solve is built based on those lists.
+The unfeasible constraints are removed from the constraint set and the expression of their violation is added to the cost function, while the feasible constraints remain in the constraint list.
+This results in a problem like \ref{rest_SQP} to solve.
+(Note that the indexes of the constraints are modified to account for the duplication of the equalioty constraints)
+
+\begin{equation}
+  \begin{array}{ll}
+    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^THz - \sum\limits_{i\in\mathcal{U}}\nabla c_i(x_k)^Tz \\
+    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i \in \mathcal{F} \\
+                       & |z|<\rho_k
+  \end{array}
+  \label{rest_SQP}
+\end{equation}
+
+This problem is solved by a QP solver, its result is checked against an acceptance criterion, based on that, the trust region is enlarged or reduced, and we go back to solveing the FP.
+
+In the restoration phase, special care must be taken in the comnputation of the matrix H, that represents the Hessian of the lagrangian of a problem that changes at each iteration.
+One possible approach is to compute it as the sum of the Hessians of all the individual constraints, and those can be computed exactly or with a quasi-newton approximation.
 
 \subsection{Quasi-Newton Approximation}
 \label{sub:quasi_newton_approximation}
