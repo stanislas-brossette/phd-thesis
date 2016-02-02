@@ -1,5 +1,5 @@
 %*******************************************************************************
-%*********************************** First Chapter *****************************
+%********************************** Second Chapter *****************************
 %*******************************************************************************
 
 \chapter{Numerical Optimization: Introduction}
@@ -44,7 +44,7 @@
 %********************************** First Section *********************************
 \section{Introduction}
 In modern science, optimization has a very important place.
-Mechanical engineers optimize the shape of stuctural parts.
+Mechanical engineers optimize the shape of structural parts.
 Investors optimize the profit of a portfolio while minimizing the risks of loss.
 Chemists optimize the efficiency and speed of reactions.
 When it comes to robotics, optimization is everywhere.
@@ -117,7 +117,7 @@ methods.
 \subsubsection{The Line-Search Strategy}
 In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
 point is chosen and then a length of step is calculated to minimize the
-following 1-dimentional problem:
+following 1-dimensional problem:
 \begin{align}
   \min_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
 \label{eq:lineSearchNLP}
@@ -130,7 +130,7 @@ satisfying solution is found.
 It is not always necessary to find the optimal value of $\alpha$, especially if
 that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
 from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
-imprecision on the computation of $\alpha$ will be errased in the other steps of
+imprecision on the computation of $\alpha$ will be erased in the other steps of
 the resolution.
 
 There are several ways to choose a descent direction from an iterate $x_k$. The
@@ -164,12 +164,12 @@ Fletcher, Goldfarb, Shanno) formula. Then the step becomes
 The Trust-Region Strategy works in an opposite way than the line-search one in
 the sense that during a line-search step, a direction is chosen, and based on
 that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
-maximum step-length is chosen, and based on it, the descent direction and lenght
+maximum step-length is chosen, and based on it, the descent direction and length
 are chosen.
 The principle of the trust region is that along the optimization process, a
 model of the problem is constructed and enriched at every step and at each step,
 the next iterate is the optimum of the model, with the constraint that the step
-to get there lies inside the trust-region. For example, let us considere that
+to get there lies inside the trust-region. For example, let us consider that
 the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
 constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
 objective function is the quadratic model with approximated Hessian
@@ -309,7 +309,7 @@ The critical cone contains the linearly feasible directions for which it is not 
 
 Once the KKT condition is reached for a point $(x^*, \lambda^*)$.
 For a direction $w$ of $F(x^*)$ for which $w^T\nabla f(x^*)=0$, it is impossible to tell from first derivative information only, if an increment in this direction will have a positive effect on the problem resolution.
-Thus it is possible that the KKT constaint is not enough to determine if a point is a solution or just a stationary point.
+Thus it is possible that the KKT constraint is not enough to determine if a point is a solution or just a stationary point.
 
 The Second-Order Sufficient Conditions allow to discriminate local solutions from stationary points:
 
@@ -326,11 +326,11 @@ In particular, this condition is always verified if $\nabla_{xx}^2\mathcal{L}(x^
 \section{Resolution of a Non Linear Constrained Optimization Problem}
 
 In the previous section, we presented some theoretical tools to describe the solution of an NLCP that only use the derivative terms of order one and two of the problem's functions.
-Here we present some methods for acually solving such problems.
+Here we present some methods for actually solving such problems.
 There exists many different algorithms to solve an NLCP.
 But all have in common to be iterative processes.
 In which we start from an initial guess $x_k$ for $x^*$.
-From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem \ref{formulation_NLCP}, we find a suitable increment $z$ such tha $x_k+z$ is closer to the solution than $x_k$.
+From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem \ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
 And we iterate that operation until a point $x_k$ sufficiently close to a solution is found.
 By sufficiently close to a solution we mean that this point satisfies the optimality conditions with a good enough precision.
 
@@ -380,7 +380,7 @@ But using that method as is can be problematic as the length of the iterate need
 Thus it is possible to generate a very large step that satisfies the QP.
 The QP only approximates the original problem locally.
 So taking a too big step can get us further from the solution than we previously were.
-To paliate to that issue, mainly two methods are used:
+To palliate to that issue, mainly two methods are used:
 \begin{itemize}
   \item The line-search method: The solution $z$ of \ref{approx_QP} is viewed as a direction and we search a parameter $\alpha\in [0;1]$ so that the next iterate $x_k + \alpha z$ is optimal for the original problem.
   \item The trust-region method adds a set of bound constraints to the QP \ref{approx_QP}. So that the length of the step is limited by the trust-region. The size $\rho$ of the trust region is modified along the iterations based on the estimated quality of the QP approximation. In that case, the QP becomes:
@@ -404,7 +404,7 @@ It has the upper hand on other methods mostly when solving problem with highly n
 \label{sub:principle}
 
 As we stated before, the main idea behind the SQP approach it to solve a subproblem that approximate linearly to the first order the KKT conditions.
-For simplicity, we considere a problem without inequality constraints.
+For simplicity, we consider a problem without inequality constraints.
 We denote $C$ the vector of equality constraints.
 We denote $z_x$ and $z_\lambda$ the increments on $x$ and $\lambda$ respectively.
 \begin{equation}
@@ -545,7 +545,7 @@ By solving the following Inequality-constrained Quadratic Problem(IQP) system at
 The main difficulty in solving that QP \ref{IQP} comes from finding the optimal active set $\mathit{A}_k$.
 It is a necessary but costly operation.
 Especially when starting from a random active set $\mathit{A}_0$.
-The process is mostly based on a try and guess approach guided by euristics(that may vary with different resolution algorithms).
+The process is mostly based on a try and guess approach guided by heuristics(that may vary with different resolution algorithms).
 
 To find the optimal active set, the QP starts from a random active set $\mathit{A}_0$ ignore the non-active constraints and try to solve the QP with the remaining active constraints.
 At a step $k$ of the resolution of the IQP, all the constraints in the active set $\mathit{A}$ are treated as equality constraints and the others are simply ignored, the QP to solve becomes:
@@ -562,9 +562,9 @@ At a step $k$ of the resolution of the IQP, all the constraints in the active se
 This EQP is solved, and its solution is checked against the constraints that were previously ignored.
 If some of them are violated then the solution is not satisfactory and the active set is updated by adding one or several of the violated constraints to it.
 This operation is repeated until there is no more constraints to be added.
-Once all the constraints have been adde as active constraints to the EQP, the problem may be overconstrained.
+Once all the constraints have been added as active constraints to the EQP, the problem may be over constrained.
 To detect that, the Lagrange multipliers are computed and if some of them do not agree with the KKT conditions of the IQP \ref{IQP}, then one of them is removed from the active set and the resulting EQP is solved, and the process continues until a satisfactory solution is found.
-The euristics used to choose which constraints to add or remove from the active set and to avoid cycling between active sets are out of the scope of this dissertation.
+The heuristics used to choose which constraints to add or remove from the active set and to avoid cycling between active sets are out of the scope of this dissertation.
 
 Once the SQP gets close to the solution, the set of active constraints should not change much from one iterate $x_k$ to the next one.
 It is often useful to initialize the IQP's active set with the optimal active set of the previous iterate: $\mathit{A}_0(x_{k+1})\leftarrow\mathit{A}^*(x_k)$. Then the ${(k+1)}^{th}$ QP starts from an active set close to optimal and can be solved much faster.
@@ -573,7 +573,7 @@ That method is called the \textit{warm-start}.
 The SQP approach to solving the problem \ref{formulation_NLCP} as presented above leans on the assumption that at each step, the QP generated is feasible,
 which requires that the Hessian $\nabla_{xx}^2\mathcal{L}$ is positive definite on the tangent space of the active constraints.
 That property is guarantied to hold near the solution, but not when starting from a remote point on a non-convex problem.
-To quope with that issue, several methods exist.
+To cope with that issue, several methods exist.
 In the next few section, we will present the globalisation methods that are the Line Search and Trust Region approaches, they ensure that the QP subproblem is always feasible.
 Then we'll present some methods used to choose whether to accept of reject an iterate with the merit function and filter methods.
 And finally we will discuss some Hessian approximation methods.
@@ -581,7 +581,7 @@ And finally we will discuss some Hessian approximation methods.
 \subsection{Globalization methods}
 \label{sub:globalization_methods}
 
-As we stated above, the globalisation phase of an SQP optimization is meant to modify the step generated by the QP resolution in order to improve the the global convergence of the algorithm.
+As we stated above, the globalisation phase of an SQP optimization is meant to modify the step generated by the QP resolution in order to improve the global convergence of the algorithm.
 Either by multiplying the step found by the QP with a coefficient $\alpha$ in the Line-Search approach.
 Or by bounding the norm of the step found in the QP by adding a boundary constraint on $z$ directly inside of the QP problem.
 
@@ -613,8 +613,8 @@ To avoid that problem, slack variables can come in handy to replace the inequali
 Once the Merit function is chosen, it is time to minimize it.
 But in fact, finding the optimal value of $\alpha$ is not necessary, not only because it can be an expensive.
 But also because, $\alpha$ is only used to calculate the next iterate, from which another $p_k$ and $\alpha$ will be calculated.
-And in the end, the imprecision on the computation of $\alpha$ will be errased in the other steps of the resolution.
-Ultimately, the optimality of the result of the line-search does not matter much because our goal is only to solve the SQP problem in its globality.
+And in the end, the imprecision on the computation of $\alpha$ will be erased in the other steps of the resolution.
+Ultimately, the optimality of the result of the line-search does not matter much because our goal is only to solve the SQP problem in its totality.
 Therefore, for the sake of devising a time efficient algorithm, finding an $\alpha$ that generates a 'sufficient' decrease of the merit function is enough.
 
 Let $\mu_1$ and $\mu_2$ be 2 real numbers such that: $0<\mu_1<\mu_2<1$.
@@ -623,7 +623,7 @@ A sufficient increase of its derivative by $M'(\alpha)\geq\mu_2 M'(0)$.
 The Wolfe Line-Search proceeds by narrowing iteratively an interval $[\alpha_L,\ \alpha_R]$ by trying a value $\alpha$ in this interval against some tests and based on their results, decide to narrow it by the right or the left and repeat that operation with the new interval until a satisfying value is found.
 Note that the Wolfe line-search is guaranteed to terminate if $M$ is $\mathcal{C}^1$ and bounded below.
 
-The Wolfe Line-Search can be shematized as algorithm:~\ref{alg:Wolfe} and illustrated by figure~\ref{fig:Wolfe}.
+The Wolfe Line-Search can be schematically described as algorithm:~\ref{alg:Wolfe} and illustrated by figure~\ref{fig:Wolfe}.
 
 \begin{algorithm}
 \begin{algorithmic}
@@ -669,13 +669,13 @@ We define the notion of domination as follows:
   \end{equation}
 \end{definition}
 
-The filter maintains a list af pairs $p_i={f_i, h_i}$ such that no pair dominates any other pair.
-When a new point $x$ is submmitted to the filter for acceptance, the values $f(x)$ and $h(x)$ are computed and the pair $p = {f(x), h(x)}$ is compared to every pairs $p_i$.
+The filter maintains a list of pairs $p_i={f_i, h_i}$ such that no pair dominates any other pair.
+When a new point $x$ is submitted to the filter for acceptance, the values $f(x)$ and $h(x)$ are computed and the pair $p = {f(x), h(x)}$ is compared to every pairs $p_i$.
 If there is at least one pair $p_i$ in the filter that dominates $p$, the point is refused.
 Otherwise, no pair of the filter dominates $p$, then $p$ is accepted and added to the filter.
 Once $p$ is added to the filter, any pair in the filter that is dominated by $p$ is removed from it to ensure to keep a list of pairs non dominated by each other in the filter.
 In order to ensure global convergence, this method requires several refinements as explained in \cite{fletcher:mathprog:2000}.
-First, it needs to avoid accepting pairs that are excessively close to eachother for that, the domination criterion is modified with a sloping envelope, as proposed in Chin \cite{chin:mathprog:2003}.
+First, it needs to avoid accepting pairs that are excessively close to each other for that, the domination criterion is modified with a sloping envelope, as proposed in Chin \cite{chin:mathprog:2003}.
 The sloping envelope definition takes user defined parameters $\beta$ and $\gamma$ in $[0,\ 1]$.
 
 \begin{definition}
@@ -723,8 +723,8 @@ At each step, the modified problem writes as:
 \end{equation}
 
 Once a solution $z$ of \ref{approx_QP_TR} is found, the potential next iterate $x_{k+1} = x_k + z$ is checked against the acceptance criterion (should it be a merit function or a filter or other).
-If it is accepted, that means that our current model is good, we move to the next step with $x_{k+1} \leftarrow x_k + z$, and the size of the trust region can be augmented based on some euristics.
-Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some euristics( e.g. $\rho\leftarrow\rho/2$) and the problem \ref{approx_QP_TR} is solved again with the new value of $\rho$.
+If it is accepted, that means that our current model is good, we move to the next step with $x_{k+1} \leftarrow x_k + z$, and the size of the trust region can be augmented based on some heuristics.
+Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some heuristics( e.g. $\rho\leftarrow\rho/2$) and the problem \ref{approx_QP_TR} is solved again with the new value of $\rho$.
 This is repeated until a satisfying point is found, or until an infeasible problem is found.
 
 \begin{figure}[ht]
@@ -791,7 +791,7 @@ If the list of unfeasible constraints is empty, the problem is feasible, so the 
 The restoration QP to solve is built based on those lists.
 The unfeasible constraints are removed from the constraint set and the expression of their violation is added to the cost function, while the feasible constraints remain in the constraint list.
 This results in a problem like \ref{rest_SQP} to solve.
-(Note that the indexes of the constraints are modified to account for the duplication of the equalioty constraints)
+(Note that the indexes of the constraints are modified to account for the duplication of the equality constraints)
 
 \begin{equation}
   \begin{array}{ll}
@@ -802,9 +802,9 @@ This results in a problem like \ref{rest_SQP} to solve.
   \label{rest_SQP}
 \end{equation}
 
-This problem is solved by a QP solver, its result is checked against an acceptance criterion, based on that, the trust region is enlarged or reduced, and we go back to solveing the FP.
+This problem is solved by a QP solver, its result is checked against an acceptance criterion, based on that, the trust region is enlarged or reduced, and we go back to solving the FP.
 
-In the restoration phase, special care must be taken in the comnputation of the matrix H, that represents the Hessian of the lagrangian of a problem that changes at each iteration.
+In the restoration phase, special care must be taken in the computation of the matrix H, that represents the Hessian of the Lagrangian of a problem that changes at each iteration.
 One possible approach is to compute it as the sum of the Hessians of all the individual constraints, and those can be computed exactly or with a quasi-newton approximation.
 
 \subsection{Quasi-Newton Approximation}
@@ -836,7 +836,7 @@ The most basic formulas for the BFGS update is the following:
 \end{equation}
 
 Note that using a BFGS update requires that $s_k$ and $y_k$ satisfy the curvature condition: $s_k^Ty_k>0$.
-If that condition does not hold, then the value of $y_k$ is modified, wich gives rise to the Damped BFGS update, which guarantees to keep $B_k$ definite positive:
+If that condition does not hold, then the value of $y_k$ is modified, which gives rise to the Damped BFGS update, which guarantees to keep $B_k$ definite positive:
 
 \begin{equation}
   \label{damped_BFGS}
