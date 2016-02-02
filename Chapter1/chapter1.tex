@@ -8,6 +8,7 @@
 \nomenclature[z-PG]{PG}{Posture Generation}
 \nomenclature[z-IK]{IK}{Inverse Kinematics}
 \nomenclature[z-dof]{dof}{degrees of freedom}
+\nomenclature[x-I]{$\mathbb{I}_n$}{Matrix identity of dimension $n$}
 
 
 \graphicspath{{Chapter1/Figs/Vector/}{Chapter1/Figs/}}
@@ -120,20 +121,30 @@ Thus, the variable that describes the configuration of the robot in the optimiza
 $SO(3)$ is by nature a non-Euclidean manifold, it cannot be parameterized on an open subset of Euclidean space without having to deal with problems of gimbal lock.
 The gimbal lock is a singularity that happens when parameterizing $SO(3)$ on $\mathbb{R}^3$, with Euler angles, for example, and when two axis of rotation become aligned, in that situation, 2 elements of the parameterization correspond to the same rotation.
 Thus, one degree of freedom is lost.
+Note that this singularity can block the optimization algorithm and that it is only due to the choice of parameterization, it is not intrinsic to the manifold $SO(3)$.
 It is possible to parameterize $SO(3)$ without having to face singularities by parameterizing it over another non-Euclidean manifold.
-The most common ones being the unit quaternion space $\mathcal{H}$, and the $3\times 3$ rotation matrix.
+The most common ones being the unit quaternion space and the $3\times 3$ rotation matrix.
 Most of the solvers available make the assumption that the search space is Euclidean, which makes is complicated to use quaternion or rotation matrix efficiently.
-To put it simply, for the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 variables and an equality constraint
+To put it simply, for the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters, the coefficients of the quaternion and an equality constraint needs to be added to the optimization problem to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
+Similarly, if a variable is parameterized by a rotation matrix, then the variable $M$ has 9 parameters and several constraints need to be added to the problem so that M is symmetric, positive definite and its determinant is 1 $\{M\in\mathbb{R}^{3\times 3}:M^TM = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
+Similar issues can be found with the parameterization of other non-Euclidean manifold, like $S2$ for example.
 
-\begin{equation}
-  q\in\mathcal{H} = \{q\in\mathbb{R}^4:||q||=1\}
-\end{equation}
-
-Although, there exist some emerging methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters.
-One of the particularity in our approach of posture generation is that we develop, extend and use one such optimization algorithm on manifolds to solve robotics problems.
+There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters.
+Though to our knowledge, they are focused on non-constrained optimization.
+One of the particularity in our approach of posture generation is that we develop, extend and use one such optimization algorithm on non-Euclidean manifolds to solve robotics problems.
 
 \subsection{Posture Generation}
 \label{sub:posture_generation}
+
+Posture Generalization can be viewed as, and is sometimes called, Generalized Inverse Kinematics.
+The Inverse Kinematics problem consists in finding the joint configuration for an articulated to complete a given task.
+It is, by definition purely kinematics, it has no regards for stability, or other physics related constraints.
+The IK problem has been widely studied and used in the fields of robotics, computer graphics, computer games and animation.
+For the simplest cases, with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found.
+But for more complicated cases, optimization methods are usually used.
+\cite{aristidou2009} presents a review of existing techniques to solve inverse kinematics and one can see that the optimization approaches to that problem are various: Inverse Jacobian, Newton method, Sequential Monte Carlo and Heuristic approaches. It also presents a novel geometric iterative heuristic approach.
+
+The Generalized Inverse Kinematics refers to a problem similar to the Inverse Kinematics in the sense that it searches a joint configuration for an articulated figure to complete a task under several other constraints like ensuring the stability of the structure, respecting its joint limits, avoiding collision with the environment or with itself.
 
 \subsection{Optimization}
 \label{sub:optimization}
