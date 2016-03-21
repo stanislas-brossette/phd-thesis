@@ -7,8 +7,9 @@
 
 \nomenclature[z-PG]{PG}{Posture Generation}
 \nomenclature[z-IK]{IK}{Inverse Kinematics}
-\nomenclature[z-dof]{dof}{degrees of freedom}
+\nomenclature[z-DoF]{DoF}{degrees of freedom}
 \nomenclature[x-I]{$\mathbb{I}_n$}{Matrix identity of dimension $n$}
+\nomenclature[z-mbg]{mbg}{Multibody Graph}
 
 
 \graphicspath{{Chapter1/Figs/Vector/}{Chapter1/Figs/}}
@@ -68,16 +69,16 @@ The robots were expected to drive a car, open a door, climb stairs, cross debris
 All those tasks can usually be broken down into sets of elementary tasks in human language.
 Some typical examples of tasks for a robot can be "Put hand in contact with target", "Put foot on next step", "Avoid collision with that object", "Maintain stability" or "Look in that direction".
 As is, those tasks do not mean anything for the robot.
-A robot is made of a collection of bodies that are linked together by joints, that are actuated by motors.
+A robot is made of a collection of bodies that are linked together by joints actuated by motors.
 A robots configuration consists of the position and orientation of its base body, and the configuration of each of its joints.
 Satisfying a task requires that the joints of the robot reach a configuration for which the task is satisfied.
 The action of satisfying a task comes down to moving from an initial configuration to a goal configuration, figuring out the trajectory to follow and actually following it are the jobs of the trajectory generation and the control of the robot.
 Those are by themselves some complete fields of robotics, and they have one thing in common, they both need to be given an initial configuration, a final configuration and sometime some intermediate configurations.
 Finding those configurations is the job of what we call the Posture Generation (PG), which is the main topic of this dissertation.
 There are two types of robots. The fixed-base robots and the mobile robots.
-The first type of robots have fixed basis, which mean that the area that they can reach is predefined by their geometry and are usually fully-actuated.
-Which means that the robot has as many dof as actuators, Thus, for any joint configuration, a unique robots position is achieved.
-On the contrary, mobile robots are under actuated, which means that the robot has more dof than actuators.
+The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully-actuated.
+Which means that the robot has as many degrees of freedom(DoF) as actuators, Thus, for any joint configuration, a unique robots position is achieved.
+On the contrary, mobile robots are under actuated, which means that the robot has more DoF than actuators.
 Each link of the robot is actuated, but the position of the basis of the robot is the result of the configuration of the joints and of the contacts that the robot makes with the environment.
 A mobile robot's position depends on the location of its contacts with the environment.
 For biped robots evolving on a flat surface, a footstep planner can be used to decide of the sequence of steps to take so the robot can walk to its goal.
@@ -108,11 +109,11 @@ All the aforementioned planning method rely on the fact that we have a tool to d
 The tool used for finding a robot configuration that satisfies a set of constraints like the geometric constraints of contact is called a "Posture Generator" (PG) and the development of that tool is the main topic of this dissertation.
 
 The mission of a posture generator is, for a poly articulated system, to find a configuration so that the system satisfies a set of constraints.
-For simple systems, with simple constraints, like a 6 dof robotic arm having to reach a point with its end effector, some closed-form expressions can usually be devised.
+For simple systems, with simple constraints, like a 6 DoF robotic arm having to reach a point with its end effector, some closed-form expressions can usually be devised.
 But computing robot configuration to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
 When the robotic problem studied becomes too complex for closed-form formulas, it is formulated as a non-linear optimization program and solved using state of the art optimization algorithms.
 
-Because it is a key element for many robotics application, the posture generator is a very important element of any robotics framework.
+Because it is a key tool for many robotics application, the posture generator is a very important element of any robotics framework.
 It needs to be efficient at finding a solution when one exists and at figuring when a problem is not feasible.
 The speed of generating a multi-contact sequence is directly related to the quality of the posture generator.
 
@@ -137,7 +138,7 @@ One of the particularity in our approach of posture generation is that we develo
 \label{sub:posture_generation}
 
 Posture Generalization can be viewed as, and is sometimes called, Generalized Inverse Kinematics.
-The Inverse Kinematics problem consists in finding the joint configuration for an articulated to complete a given task.
+The Inverse Kinematics problem consists in finding the joint configuration for an articulated multibody to complete a given task.
 It is, by definition purely kinematics, it has no regards for stability, or other physics related constraints.
 The IK problem has been widely studied and used in the fields of robotics, computer graphics, computer games and animation.
 For the simplest cases, with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found.
@@ -146,19 +147,99 @@ But for more complicated cases, optimization methods are usually used.
 
 The Generalized Inverse Kinematics refers to a problem similar to the Inverse Kinematics in the sense that it searches a joint configuration for an articulated figure to complete a task under several other constraints like ensuring the stability of the structure, respecting its joint limits, avoiding collision with the environment or with itself.
 
-\subsection{Optimization}
-\label{sub:optimization}
 
 \section{Problem Definition}
 \label{sec:problem_definition}
 
-We consider a robot $\mathit{R}$ with $n$ degrees of freedom (dof), its joint configuration can be described by a point on
+In this section, we present a formulation of robotic systems that allows to specify any typical constraints usually encountered in robotics problems.
 
-\section{From Inverse Kinematics to Posture Generation}
-\label{sec:from_inverse_kinematics_to_posture_generation}
+We considere a robotic system made of $n_B$ bodies and $n_J$ joints.
+The global structure of the robot is described by an ordered graph called $mbg$ multi body graph.
+The base body has index $0$ and other bodies get different positive integer index, we denote the body of index $i$, $B_i$.
+Bodies are linked together by joints that also are indexed by positive integers, we denote the joint of index $i$, $J_i$.
+Each joint defines the relation between its predecessor and successsor bodies, for joint $J_i$ they are respectively denoted $pred(i)$ and $succ(i)$, and $B_{pred(i)}$ is called the parent body of $B_{succ(i)}$.
+We denote $parent(j)$ the index of the parent body of $B_j$.
+The number of degrees of freedom of $J_i$ is denoted $dof^J_i$ and the number of degrees of freedom of the whole robot is denoted $dof$.
+Figure \ref{fig:mbg} illustrates the numberings used for a simple robot with 4 joints and 5 bodies (including the basis)
 
-The problem of finding a configuration of a poly articulated system to satisfy some geometric constraints has been widely studied for decades under the name of Inverse Kinematics (IK).
-IK is an important tool in many fields like robotics, computer graphics and animation.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{mbg.pdf}
+  \caption{MultiBody graph}
+  \label{fig:mbg}
+\end{figure}
+
+The geometric relationships between bodies and joints are described through transformations between their bases. Transformations are described in the Spacial Vector Algebra chapter of "Rigid Body Dynamics Algorithm" by Roy Featherstone \cite{featherstone:book:2007}.
+
+Let A and B be Cartesian frames with origins O and P respectively. Let $\mathbf{t}$ be the coordinate vector expressing $\overrightarrow{OP}$ in A. And $\mathbf{R}$ be the rotation matrix that transforms 3D vectors from A to B coordinates.
+The transformation from A to B for a motion vector is then defined by:
+\begin{equation}
+  ^BX_A =
+  \begin{pmatrix}
+    \mathbf{R} & \mathbf{0} \\
+    -\mathbf{R}\hat{\mathbf{t}} & \mathbf{R} \\
+  \end{pmatrix}
+\end{equation}
+Its inverse is:
+\begin{equation}
+  {^BX_A}^{-1} = ^AX_B =
+  \begin{pmatrix}
+    \mathbf{R}^T & \mathbf{0} \\
+    \hat{\mathbf{t}}\mathbf{R}^T & \mathbf{R}^T \\
+  \end{pmatrix}
+\end{equation}
+The transformation from A to B for a force vector is defined by:
+\begin{equation}
+  ^BX_A^* =
+  \begin{pmatrix}
+    \mathbf{R} & -\mathbf{R}\hat{\mathbf{t}} \\
+    \mathbf{0} & \mathbf{R} \\
+  \end{pmatrix}
+\end{equation}
+Its inverse is:
+\begin{equation}
+  ^BX_A^{-*} = ^AX_B^* =
+  \begin{pmatrix}
+    \mathbf{R}^T & \hat{\mathbf{t}}\mathbf{R}^T \\
+    \mathbf{0} & \mathbf{R}^T \\
+  \end{pmatrix}
+\end{equation}
+
+Each joint $J_i$ is defined in the referential of its predecessor body by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ from the base of the body to the base of the joint.
+Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $\mathbf{S}_i$. Each column of $\mathbf{S}_i$ described the degrees of freedom of $J_i$ its upper part for the rotations and lower for translations.
+\begin{equation}
+  \mathbf{S}_i =
+  \begin{pmatrix}
+    S^R_{i,0} & \cdots &
+    S^R_{i,j} & \cdots &
+    S^R_{i,dof} \\
+    S^t_{i,0} & \cdots &
+    S^t_{i,j} & \cdots &
+    S^t_{i,dof}
+  \end{pmatrix}
+\end{equation}
+
+For a given joint configuration $q$, the transformation due to the joint $J_i$ from its base to the base of its successor body is denoted \\$X^J_i(q) = \{\mathbf{R}^J_i(q), \mathbf{t}^J_i(q)\}$.
+The transformation between $B_{parent(i)}$ and $B_i$ is denoted $X^{PtS}_i(q) = \{\mathbf{R}^{PtS}_i, \mathbf{t}^{PtS}_i\}$ (PtS stands for "Parent to Son") can then be computed as:
+\begin{equation}
+  X^{PtS}_i(q) = X^J_i(q) X^x_i
+\end{equation}
+
+The transformation from the World base to $B_i$ is denoted \\ $X^W_i(q) = \{\mathbf{R}^W_i(q), \mathbf{t}^W_i(q)\}$ and can be computed recurcively by the following algorithm:
+
+\begin{algorithm}
+  \caption{Forward Kinematics}
+  \label{FK}
+\begin{algorithmic}
+  \For {$i = 0:n_J$}
+  \If {$pred(i) \neq -1$} $X^W_{succ(i)}(q) = X^{PtS}_i(q)X^W_{pred(i)}$
+  \Else $X^W_{succ(i)}(q) = X^{PtS}_i(q)$
+  \EndIf
+  \EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The global structure of the robot is described by an ordered graph called a multi body graph ($mbg$).
 
 
 
