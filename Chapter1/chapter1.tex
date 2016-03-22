@@ -206,7 +206,7 @@ Its inverse is:
 \end{equation}
 
 Each joint $J_i$ is defined in the referential of its predecessor body by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ from the base of the body to the base of the joint.
-Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $\mathbf{S}_i$. Each column of $\mathbf{S}_i$ described the degrees of freedom of $J_i$ its upper part for the rotations and lower for translations.
+Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $\mathbf{S}_i$. Each column of $\mathbf{S}_i$ described a degree of freedom of $J_i$ its upper part for the rotations and lower for translations.
 \begin{equation}
   \mathbf{S}_i =
   \begin{pmatrix}
@@ -220,12 +220,22 @@ Each joint $J_i$ is associated with a motion subspace which representation matri
 \end{equation}
 
 For a given joint configuration $q$, the transformation due to the joint $J_i$ from its base to the base of its successor body is denoted \\$X^J_i(q) = \{\mathbf{R}^J_i(q), \mathbf{t}^J_i(q)\}$.
+
 The transformation between $B_{parent(i)}$ and $B_i$ is denoted $X^{PtS}_i(q) = \{\mathbf{R}^{PtS}_i, \mathbf{t}^{PtS}_i\}$ (PtS stands for "Parent to Son") can then be computed as:
 \begin{equation}
   X^{PtS}_i(q) = X^J_i(q) X^x_i
+  \label{eq:PtS}
 \end{equation}
 
-The transformation from the World base to $B_i$ is denoted \\ $X^W_i(q) = \{\mathbf{R}^W_i(q), \mathbf{t}^W_i(q)\}$ and can be computed recurcively by the following algorithm:
+The transformation from the World base to $B_i$ is denoted \\ $X^W_i(q) = \{\mathbf{R}^W_i(q), \mathbf{t}^W_i(q)\}$.
+The formula \ref{eq:PtS} can be used iteratively on every body of the robot to obtain the expression of $X^W_i(q)$.
+
+Let $\sigma(i) =\{0, i_1, i_2 ... i\}$ be the list of indexes of successive bodies going from $B_0$ to $B_i$, then we can obtain the full expression of $X^W_i$ as:
+\begin{equation}
+  X^{W}_i(q) = \prod_{j\in\sigma(i)}X^J_j(q) X^x_j
+\end{equation}
+
+Which can be computed recurcively by the following algorithm:
 
 \begin{algorithm}
   \caption{Forward Kinematics}
@@ -239,7 +249,168 @@ The transformation from the World base to $B_i$ is denoted \\ $X^W_i(q) = \{\mat
 \end{algorithmic}
 \end{algorithm}
 
-The global structure of the robot is described by an ordered graph called a multi body graph ($mbg$).
+The entire geometry of our system is described by the list of static transformations $X^x_j$ and of joint transformations $X^J_j(q)$.
+
+Let us considere a joint $J$ that governs the transformation between two frames $F_1=\{O_1, x_1, y_1, z_1\}$ and $F_2=\{O_2, x_2, y_2, z_2\}$.
+The most common types of joint encountered in robotics systems is the revolute joint, that allows a rotation around a fixed axis.
+If $J$ is a revolute joint arount the axis $(O_1,z_1)$ with parameter $q$, its motion subspace, rotation and translation are as follows:
+
+\begin{tabular}{|c|c|c|c|}
+  \hline
+  Joint type & $S$ & $Rotation$ & $translation$ \\
+  %\hline
+  %Revolute $(O_1,x_1)$ &
+  %$\begin{pmatrix}
+    %1 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0
+  %\end{pmatrix}$
+  %&
+  %$\begin{pmatrix}
+    %1 & 0 & 0 \\
+    %0 & \cos(q) & \sin(q)\\
+    %0 & -\sin(q) & \cos(q)
+  %\end{pmatrix}$
+  %&
+  %$\begin{pmatrix}
+    %0 \\ 0 \\ 0
+  %\end{pmatrix}$
+  %\\
+  %\hline
+  %Revolute $(O_1,y_1)$ &
+  %$\begin{pmatrix}
+    %0 \\ 1 \\ 0 \\ 0 \\ 0 \\ 0
+  %\end{pmatrix}$
+  %&
+  %$\begin{pmatrix}
+    %\cos(q) & 0 & -\sin(q)\\
+    %0 & 1 & 0 \\
+    %\sin(q) & 0 & \cos(q)
+  %\end{pmatrix}$
+  %&
+  %$\begin{pmatrix}
+    %0 \\ 0 \\ 0
+  %\end{pmatrix}$
+  %\\
+  \hline
+  Revolute $(O_1,z_1)$
+  &
+  $\begin{pmatrix}
+    0 \\ 0 \\ 1 \\ 0 \\ 0 \\ 0
+  \end{pmatrix}$
+  &
+  $\begin{pmatrix}
+    1 & 0 & 0 \\
+    0 & \cos(q) & \sin(q) \\
+    0 & -\sin(q) & \cos(q) \\
+  \end{pmatrix}$
+  &
+  $\bf{0}_{3\times1}$
+  \\
+  \hline
+\end{tabular}
+
+Similar formulas can be devised for rotations around any other axis, provided that $R$ describes the rotation of angle $q$ around that axis.
+
+In the case of a prismatic joint, all rotations are blocked, and only one translation along a given axis is allowed.
+For a prismatic joint along $x_1$, we have the following formulas:
+
+\begin{tabular}{|c|c|c|c|}
+  \hline
+  Joint type & $S$ & $Rotation$ & $translation$ \\
+  \hline
+  Prismatic $(x_1)$
+  &
+  $\begin{pmatrix}
+    0 \\ 0 \\ 0 \\ 1 \\ 0 \\ 0
+  \end{pmatrix}$
+  &
+  $\bf{1}_{3\times3} $
+  &
+  $\begin{pmatrix}
+    q \\ 0 \\ 0
+  \end{pmatrix}$
+  \\
+  \hline
+\end{tabular}
+
+Planar joints are also often used in robotics. A planar joint describes a plan sliding on another plan, assuming that the normal to both plans is $z_1 = z_2$ this type of joint allows free rotation of $F_2$ around $z_1$ and translations along $x_1$ and $y_1$. We denote $q = \{q_1, q_2, q_3\}$ the joint parameters, $q_1$ corresponding to the rotation and $q_2,\ q_3$ to the translations. We get:
+
+\begin{tabular}{|c|c|c|c|}
+  \hline
+  Joint type & $S$ & $Rotation$ & $translation$ \\
+  \hline
+  Planar $(z_1)$
+  &
+  $\begin{pmatrix}
+    0 & 0 & 0 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0
+  \end{pmatrix}$
+  &
+  $\begin{pmatrix}
+    1 & 0 & 0 \\
+    0 & \cos(q_1) & \sin(q_1) \\
+    0 & -\sin(q_1) & \cos(q_1) \\
+  \end{pmatrix}$
+  &
+  $\begin{pmatrix}
+    \cos(q_1)q_2 - \sin(q_1)q_3 \\ \sin(q_1)q_2 + \cos(q_1)q_3 \\ 0
+  \end{pmatrix}$
+  \\
+  \hline
+\end{tabular}
+
+A spherical joint blocks all translations and allows all rotations. This joint mut be parameterized by a 3D rotation. The space of 3D rotations $SO(3)$ can be represented in many different ways.
+The simplest and most intuitive way to parameterize $SO(3)$ is to use Euler Angles.
+It comes down to decomposing the 3D rotation into a succession of three 1D rotations around different axis.
+For example, the roll, pitch, yaw is a succession of a rotation of $F_1$ around its $x$ axis, followed by a rotation of the resulting frame around its $y$ axis and a rotation of the resulting frame around its $z$ axis.
+The rotation matrix for such a rotation is given by:
+\begin{equation}
+  \bf{R} =
+  \begin{pmatrix}
+    1 & 0 & 0 \\
+    0 & \cos(q_3) & \sin(q_3) \\
+    0 & -\sin(q_3) & \cos(q_3) \\
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+    \cos(q_2) & 0 & -\sin(q_2) \\
+    0 & 1 & 0 \\
+    \sin(q_2) & 0 & \cos(q_2) \\
+  \end{pmatrix}
+  +
+  \begin{pmatrix}
+    \cos(q_1) & \sin(q_1) & 0 \\
+    -\sin(q_1) & \cos(q_1) & 0 \\
+    0 & 0 & 1
+  \end{pmatrix}
+\end{equation}
+
+There are many other possible choices of axes to define the a Euler Angle 3D rotation.
+The advantage of such formulation is its simplicity and intuitivity.
+But they all suffers from singularities like the Gimbal lock, which happens when two of the three rotation axis become aligned.
+In such a configuration, the only rotations possible are around the aligned axis and around another axis.
+Thus one degree of freedom is lost.
+Those singularities are prohibitive for the use of such a formulation in a posture generation (the optimization algorithm could get stuck in them).
+
+One can prove that there is no smooth mapping between $SO(3)$ and $\mathbb{R}^3$ that is free of singularities.
+The most common $SO(3)$ representation in robotics uses the subset of $\mathbb{R}^4$ called the unit quaternion.
+A quaternion $q = [q_w, q_x, q_y, q_z]$ is a unit quaternion iff $q_w^2+q_x^2+q_y^2+q_z^2 = 1$.
+It represents a rotation of angle $\theta$ around an axis $\bf{u}$ such that:
+\begin{align}
+  q_w &= \cos(\theta/2) \\
+  q_x &= \sin(\theta/2)u_x \\
+  q_y &= \sin(\theta/2)u_y \\
+  q_z &= \sin(\theta/2)u_z \\
+\end{align}
+The rotation matrix associated with this rotation formulation is:
+\begin{equation}
+  \bf{R} = 2 \begin{pmatrix}
+    q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
+    q_x q_y - q_w q_z & q_w^2 +q_y^2-\frac{1}{2} & q_y q_z + q_w q_x \\
+    q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
+  \end{pmatrix}
+\end{equation}
+
+
+
 
 
 
