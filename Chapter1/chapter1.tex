@@ -243,11 +243,16 @@ Which can be computed recurcively by the following algorithm:
 \begin{algorithmic}
   \For {$i = 0:n_J$}
   \If {$pred(i) \neq -1$} $X^W_{succ(i)}(q) = X^{PtS}_i(q)X^W_{pred(i)}$
-  \Else $X^W_{succ(i)}(q) = X^{PtS}_i(q)$
+  \Else $\ X^W_{succ(i)}(q) = X^{PtS}_i(q)$
   \EndIf
   \EndFor
 \end{algorithmic}
 \end{algorithm}
+
+Using this algorithm, we are able to compute the transformation from the World base to any body frame and by extension, to any frame defined in the referential of a body of the robot.
+
+\subsection{Joints formulations}
+\label{sub:joints_formulations}
 
 The entire geometry of our system is described by the list of static transformations $X^x_j$ and of joint transformations $X^J_j(q)$.
 
@@ -258,38 +263,6 @@ If $J$ is a revolute joint arount the axis $(O_1,z_1)$ with parameter $q$, its m
 \begin{tabular}{|c|c|c|c|}
   \hline
   Joint type & $S$ & $Rotation$ & $translation$ \\
-  %\hline
-  %Revolute $(O_1,x_1)$ &
-  %$\begin{pmatrix}
-    %1 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0
-  %\end{pmatrix}$
-  %&
-  %$\begin{pmatrix}
-    %1 & 0 & 0 \\
-    %0 & \cos(q) & \sin(q)\\
-    %0 & -\sin(q) & \cos(q)
-  %\end{pmatrix}$
-  %&
-  %$\begin{pmatrix}
-    %0 \\ 0 \\ 0
-  %\end{pmatrix}$
-  %\\
-  %\hline
-  %Revolute $(O_1,y_1)$ &
-  %$\begin{pmatrix}
-    %0 \\ 1 \\ 0 \\ 0 \\ 0 \\ 0
-  %\end{pmatrix}$
-  %&
-  %$\begin{pmatrix}
-    %\cos(q) & 0 & -\sin(q)\\
-    %0 & 1 & 0 \\
-    %\sin(q) & 0 & \cos(q)
-  %\end{pmatrix}$
-  %&
-  %$\begin{pmatrix}
-    %0 \\ 0 \\ 0
-  %\end{pmatrix}$
-  %\\
   \hline
   Revolute $(O_1,z_1)$
   &
@@ -408,6 +381,61 @@ The rotation matrix associated with this rotation formulation is:
     q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
   \end{pmatrix}
 \end{equation}
+
+That formulation does not suffer from singularity, but it requires to maintain 4 parameters for a 3D rotation. And those 4 parameters must satisfy the unit norm constraint.
+Given a parameter set $q = \{ q_w, q_x, q_y, q_z\}$ we get the following table.
+
+\begin{tabular}{|c|c|c|c|}
+  \hline
+  Joint type & $S$ & $Rotation$ & $translation$ \\
+  \hline
+  Spherical
+  &
+  $\begin{pmatrix}
+    1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 0
+  \end{pmatrix}$
+  &
+  $2 \begin{pmatrix}
+    q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
+    q_x q_y - q_w q_z & q_w^2 +q_y^2-\frac{1}{2} & q_y q_z + q_w q_x \\
+    q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
+  \end{pmatrix}$
+  &
+  $\begin{pmatrix}
+    0 \\ 0 \\ 0
+  \end{pmatrix}$
+  \\
+  \hline
+\end{tabular}
+
+Finally, a free joint allows free motion of its successor body with respect to its predecessor body.
+It can be viewed as a combination of a spherical joint and 3 perpendicular prismatic joints.
+Given a parameter set $q = \{ q_w, q_x, q_y, q_z, t_x, t_y, t_z\}$ we get the following table.
+
+\begin{tabular}{|c|c|c|c|}
+  \hline
+  Joint type & $S$ & $Rotation$ & $translation$ \\
+  \hline
+  Spherical
+  &
+  $\bf{1}_{6\times 6}$
+  &
+  $2 \begin{pmatrix}
+    q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
+    q_x q_y - q_w q_z & q_w^2 +q_y^2-\frac{1}{2} & q_y q_z + q_w q_x \\
+    q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
+  \end{pmatrix}$
+  &
+  $\bf{R}^{-1}\begin{pmatrix}
+    t_x \\ t_y \\ t_z
+  \end{pmatrix}$
+  \\
+  \hline
+\end{tabular}
+
+\subsection{Jacobian computation}
+\label{sub:jacobian_computation}
+
 
 
 
