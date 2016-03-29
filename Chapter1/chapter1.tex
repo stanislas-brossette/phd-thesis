@@ -463,6 +463,20 @@ Given a parameter set $q = \{ q_w, q_x, q_y, q_z, t_x, t_y, t_z\}$ we get the fo
 For the sake of solving our problem with a non-linear optimization algorithm, it is necessary to compute the derivatives of every function used as constraint or cost with respect to any variable of the problem.
 The transformations $^iX_W$ are used in many functions, therefore, having an efficient algorithm to compute their derivatives and the derivatives of any transformation defined in $B_i$ is necessary.
 
+Let's considere a static transformation $^pX_i$ defined in body $B_i$.
+Its expression in the world frame is $^pX_W = ^pX_i\ ^iX_W$ and its expression in the frame of $B_j$ is $^pX_j = ^pX_i\ ^iX_W\ {^jX_i}^{-1}$.
+
+We denote $q_i$ the part of $q$ that correspond to the degrees of freedom of joint $J_i$.
+We denote $\text{Jac}_i.\text{cols}(j)$ the columns of $\text{Jac}_i$ associated with joint $J_i$.
+The jacobian $B_i$ at $^pX_i$ with respect to $q_i$ is given by
+\begin{equation}
+  \label{partial_jacobian}
+  \text{Jac}_i.\text{cols}(j)(^pX_i) = ^pX_j\ S_i
+\end{equation}
+
+The complete jacobian of a body $\text{Jac}_i$ is a $6\times \text{dof}$ matrix that can be computed by using formula \ref{partial_jacobian} on every index $j$ in $\kappa(i)$ and filling the rest of $\text{Jac}_i$ with zeros.
+
+
 \subsection{Formulation of external forces, stability equation and Torque computation}
 \label{sub:formulation_of_external_forces_stability_equation_and_torque_computation}
 
