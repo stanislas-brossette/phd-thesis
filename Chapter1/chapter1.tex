@@ -162,8 +162,8 @@ In this section, we present a formulation of robotic systems that allows to spec
 We considere a robotic system made of $n_B$ bodies and $n_J$ joints.
 The global structure of the robot is described by an ordered graph called $mbg$ multi body graph.
 The base body (World) has index $0$ and other bodies get different positive integer index, we denote the body of index $i$, $B_i$. And $B_0$ can be called $B_W$.
-Bodies are linked together by joints that also are indexed by positive integers, we denote the joint of index $i$, $J_i$.
-Each joint defines the relation between its predecessor and successsor bodies, for joint $J_i$ they are respectively denoted $pred(i)$ and $succ(i)$, and $B_{pred(i)}$ is called the parent body of $B_{succ(i)}$.
+Bodies are linked together by joints that also are indexed by positive integers, we denote the joint of index $i$, $J_i$, and the body that comes after it is $B_i$.
+Each joint defines the relation between its predecessor and successsor bodies, for joint $J_i$ they are respectively denoted $pred(i)$ and $i$, and $B_{pred(i)}$ is called the parent body of $B_{i}$.
 We denote $\lambda(j)$ the index of the parent body of $B_j$.
 The number of degrees of freedom of $J_i$ is denoted $dof^J_i$ and the number of degrees of freedom of the whole robot is denoted $dof$.
 Figure \ref{fig:mbg} illustrates the numberings used for a simple robot with 4 joints and 5 bodies (including the basis)
@@ -233,17 +233,17 @@ The transformation between $B_{\lambda(i)}$ and $B_i$ is denoted $X^{PtS}_i(q) =
   \label{eq:PtS}
 \end{equation}
 
-Let $\kappa(i) =\{0, i_1, i_2 ... i\}$ be the list of indexes of successive bodies going from $B_W$ to $B_i$.
+Let $\kappa(i) =\{0, i_1, i_2 ... i\}$ be the list of indexes of successive joints going from $B_W$ to $B_i$.
 It can easily be computed by adding iteratively the parent of the current body:
 
 \begin{algorithm}
   \caption{Joint Path to $B_i$}
   \label{JP}
 \begin{algorithmic}
-  \State {$j = i$, $\kappa(i)=[i]$}
+  \State {$j \leftarrow i$, $\kappa(i)=[i]$}
   \While {$j \neq 0$}
-  \State {$j = \lambda(j)$}
-  \State {$\kappa(i) = [\kappa(i),\ j]$}
+  \State {$j \leftarrow \lambda(j)$}
+  \State {$\kappa(i) \leftarrow [\kappa(i),\ j]$}
   \EndWhile
 \end{algorithmic}
 \end{algorithm}
@@ -476,6 +476,21 @@ The jacobian $B_i$ at $^pX_i$ with respect to $q_i$ is given by
 
 The complete jacobian of a body $\text{Jac}_i$ is a $6\times \text{dof}$ matrix that can be computed by using formula \ref{partial_jacobian} on every index $j$ in $\kappa(i)$ and filling the rest of $\text{Jac}_i$ with zeros.
 
+The algorithm that we use to compute $\text{Jac}_i({}^pX_i)$ writes as follows:
+
+\begin{algorithm}
+  \caption{Jacobian Computation}
+  \label{Jacobian}
+\begin{algorithmic}
+  \State {$\text{Jac}_i({}^pX_i) = \bf{0}_{6\times\text{dof}}$}
+  \State {${}^pX_W = ^pX_i\ (^iX_W)^{-1}$}
+  \For{$j = 0:\text{size}(\kappa(i))$}
+  \State{$k \leftarrow \kappa(j)$}
+  \State{$^pX_k = ^pX_W\ ({}^kX_W)^{-1}$}
+  \State{$\text{Jac}_i({}^pX_i).\text{cols}(k) = ^pX_k\ S_k$}
+  \EndFor
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Formulation of external forces, stability equation and Torque computation}
 \label{sub:formulation_of_external_forces_stability_equation_and_torque_computation}
