@@ -562,6 +562,23 @@ Satisfying \ref{eq:stability} ensures the stability of a rigid body.
 In some cases, an articulated robot is considered as a rigid body and this equation can be used to ensure its stability.
 It is only valid if the robot can generate infinite torques in its articulations, or at least if we are sure that the robot is able to generate large enough torques.
 
+The derivation of the static stability constraint is fairly straightforward.
+All the terms of equation \ref{eq:stability} are components of wrenches.
+A wrench is completely defined by the frame in which it is expressed and its values of force and moment in that frame.
+Deriving the stability condition comes down to deriving each term w.r.t its components values and w.r.t the transformation of its frame.
+
+\begin{equation}
+\left\{
+\begin{array}{r}
+  \partial\left(\sum\limits_i m_i|^G\right) = \sum\limits_i \partial(m_i|^G) \\
+  \partial\left(\sum\limits_i f_i\right) = \sum\limits_i \partial(f_i) \\
+\end{array}
+\right.
+\label{eq:derivation_stability}
+\end{equation}
+
+We will explicit a method to automatically compute those derivatives in a further chapter.
+
 \subsubsection{Center of mass projection}
 \label{subsub:center_of_mass_projection}
 
@@ -619,7 +636,7 @@ Then, the generalized forces are used to compute the torques.
   \label{IS}
 \begin{algorithmic}
   \For {$i = 0:n_B$}
-  \State $f^G_i = \mathbf{I}^W \mathbf{X}^W_i \mathbf{a}^G - {\mathbf{X}^W_i}^*f_i^{ext}$
+  \State $f^G_i = \mathbf{I}^W {}^i\mathbf{X}_W \mathbf{a}^G - {{}^i\mathbf{X}_W}^*f_i^{ext}$
   \EndFor
   \For {$i = n_J-1:0$}
   \State $\tau_i = {f^G_i}^T S_i$
@@ -650,16 +667,16 @@ The torque limit constraint writes as:
   =
   \mathbf{I}^W
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & \mathbf{0} \\
-    -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & \mathbf{0} \\
+    -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \mathbf{ac} \\ \mathbf{af}
   \end{pmatrix}
   -
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} \\
-    \mathbf{0} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
+    \mathbf{0} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
@@ -691,15 +708,15 @@ The computation of the torque jacobian $\frac{\partial \tau}{\partial q}$ with r
 
 Note the following relations:
 \begin{align}
-  \frac{\partial \mathbf{R}_i^W \mathbf{u}}{\partial q_j}
-  &= \mathbf{R}_i^W \mathbf{u} \wedge \omega_{i,j}
-  = \mathbf{R}_i^W \widehat{\mathbf{u}} \omega_{i,j}
+  \frac{\partial {}^i\mathbf{R}_W \mathbf{u}}{\partial q_j}
+  &= {}^i\mathbf{R}_W \mathbf{u} \wedge \omega_{i,j}
+  = {}^i\mathbf{R}_W \widehat{\mathbf{u}} \omega_{i,j}
   \\
-  \frac{\partial \mathbf{R}_i^W \mathbf{t}^W_i\wedge \mathbf{u}}{\partial q_j}
-  &= \mathbf{R}_i^W \mathbf{v}_{i,j} \wedge \mathbf{u}
-  + \mathbf{R}_i^W \left(\mathbf{t}^W_i\wedge\mathbf{u}\right) \wedge \omega_{i,j}\\
-  &= -\mathbf{R}_i^W \widehat{\mathbf{u}} \mathbf{v}_{i,j}
-  + \mathbf{R}_i^W \widehat{\left(\widehat{\mathbf{t}^W_i}\mathbf{u}\right)} \omega_{i,j}
+  \frac{\partial {}^i\mathbf{R}_W {}^i\mathbf{t}_W\wedge \mathbf{u}}{\partial q_j}
+  &= {}^i\mathbf{R}_W \mathbf{v}_{i,j} \wedge \mathbf{u}
+  + {}^i\mathbf{R}_W \left({}^i\mathbf{t}_W\wedge\mathbf{u}\right) \wedge \omega_{i,j}\\
+  &= -{}^i\mathbf{R}_W \widehat{\mathbf{u}} \mathbf{v}_{i,j}
+  + {}^i\mathbf{R}_W \widehat{\left(\widehat{{}^i\mathbf{t}_W}\mathbf{u}\right)} \omega_{i,j}
 \end{align}
 
 Let's differentiate the first equation of \ref{ISmatrix} w.r.t $q_j$.
@@ -707,16 +724,16 @@ Let's differentiate the first equation of \ref{ISmatrix} w.r.t $q_j$.
 \begin{align}
   A &=
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & \mathbf{0} \\
-    -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & \mathbf{0} \\
+    -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \mathbf{ac} \\ \mathbf{af}
   \end{pmatrix} \\
   B &=
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} \\
-    \mathbf{0} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
+    \mathbf{0} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
@@ -724,21 +741,21 @@ Let's differentiate the first equation of \ref{ISmatrix} w.r.t $q_j$.
   f^G_i &= \mathbf{I}^WA-B\\
   \frac{\partial A}{\partial q_j} &=
   \begin{pmatrix}
-    \mathbf{R}^W_i \widehat{\bf ac} \omega_{i,j}\\
-    -{\mathbf{R}^W_i}\widehat{\left(\widehat{\mathbf{t}^W_i}\bf ac \right)}\omega_{i,j}
-    + {\mathbf{R}^W_i}\widehat{\bf ac} v_{i,j} + \mathbf{R}^W_i \widehat{\bf af} \omega_{i,j}\\
+    {}^i\mathbf{R}_W \widehat{\bf ac} \omega_{i,j}\\
+    -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf ac \right)}\omega_{i,j}
+    + {{}^i\mathbf{R}_W}\widehat{\bf ac} v_{i,j} + {}^i\mathbf{R}_W \widehat{\bf af} \omega_{i,j}\\
   \end{pmatrix}
   \\
   \frac{\partial B}{\partial q_j} &=
   \begin{pmatrix}
-    - {\mathbf{R}^W_i}\widehat{\left(\widehat{\mathbf{t}^W_i}\bf \mathbf{f}^{ext}_i \right)}\omega_{i,j}
-    + {\mathbf{R}^W_i}\widehat{\bf \mathbf{f}^{ext}_i} v_{i,j} + \mathbf{R}^W_i \widehat{\bf \mathbf{m}^{ext}_i} \omega_{i,j}\\
-    \mathbf{R}^W_i \widehat{\bf \mathbf{f}^{ext}_i} \omega_{i,j}\\
+    - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)}\omega_{i,j}
+    + {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} v_{i,j} + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i} \omega_{i,j}\\
+    {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} \omega_{i,j}\\
   \end{pmatrix}
   \\&+
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} \\
-    \mathbf{0} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
+    \mathbf{0} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
@@ -750,22 +767,22 @@ Putting all the pieces of $\omega$ and $v$ allows to group all the j-derivatives
 \begin{align}
   \bf M &=
   \begin{pmatrix}
-    \mathbf{R}^W_i \widehat{\bf ac}  & 0\\
-    -{\mathbf{R}^W_i}\widehat{\left(\widehat{\mathbf{t}^W_i}\bf ac \right)}
-    + \mathbf{R}^W_i \widehat{\bf af}  & {\mathbf{R}^W_i}\widehat{\bf ac} \\
+    {}^i\mathbf{R}_W \widehat{\bf ac}  & 0\\
+    -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf ac \right)}
+    + {}^i\mathbf{R}_W \widehat{\bf af}  & {{}^i\mathbf{R}_W}\widehat{\bf ac} \\
   \end{pmatrix}
   \\
   \bf N &=
   \begin{pmatrix}
-    - {\mathbf{R}^W_i}\widehat{\left(\widehat{\mathbf{t}^W_i}\bf \mathbf{f}^{ext}_i \right)} + \mathbf{R}^W_i \widehat{\bf \mathbf{m}^{ext}_i} & {\mathbf{R}^W_i}\widehat{\bf \mathbf{f}^{ext}_i} \\
-    \mathbf{R}^W_i \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
+    - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)} + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i} & {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} \\
+    {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
   \end{pmatrix}
   \\
   \frac{\partial f^G_i}{\partial q} &= (\mathbf{I}^W \mathbf{M} - \mathbf{N})\mathbf{Jac}^W_i
   +
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} \\
-    \mathbf{0} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
+    \mathbf{0} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
@@ -847,16 +864,16 @@ The entire algorithm for calculating the torque jacobian w.r.t the articular par
   $f^G_i =
   \mathbf{I}^W
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & \mathbf{0} \\
-    -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & \mathbf{0} \\
+    -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \mathbf{ac} \\ \mathbf{af}
   \end{pmatrix}
   -
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} \\
-    \mathbf{0} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
+    \mathbf{0} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
@@ -864,26 +881,26 @@ The entire algorithm for calculating the torque jacobian w.r.t the articular par
   $
   \State $\bf M =
     \begin{pmatrix}
-    \mathbf{R}^W_i \widehat{\bf ac}  & 0\\
-    -{\mathbf{R}^W_i}\widehat{\left(\widehat{\mathbf{t}^W_i}\bf ac \right)}
-    + \mathbf{R}^W_i \widehat{\bf af}  & {\mathbf{R}^W_i}\widehat{\bf ac} \\
+    {}^i\mathbf{R}_W \widehat{\bf ac}  & 0\\
+    -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf ac \right)}
+    + {}^i\mathbf{R}_W \widehat{\bf af}  & {{}^i\mathbf{R}_W}\widehat{\bf ac} \\
     \end{pmatrix}
     $
   \State
   $\bf N =
   \begin{pmatrix}
-    - {\mathbf{R}^W_i}\widehat{\left(\widehat{\mathbf{t}^W_i}\bf \mathbf{f}^{ext}_i \right)}
-    + \mathbf{R}^W_i \widehat{\bf \mathbf{m}^{ext}_i}
-    & {\mathbf{R}^W_i}\widehat{\bf \mathbf{f}^{ext}_i} \\
-    \mathbf{R}^W_i \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
+    - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)}
+    + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i}
+    & {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} \\
+    {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
   \end{pmatrix}
   $
   \State $
   \frac{\partial f^G_i}{\partial q} = (\mathbf{I}^W \mathbf{M} - \mathbf{N})\mathbf{Jac}^W_i
   +
   \begin{pmatrix}
-    {\mathbf{R}^W_i} & -{\mathbf{R}^W_i}\widehat{\mathbf{t}^W_i} \\
-    \mathbf{0} & {\mathbf{R}^W_i} \\
+    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
+    \mathbf{0} & {{}^i\mathbf{R}_W} \\
   \end{pmatrix}
   \begin{pmatrix}
     \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
