@@ -63,7 +63,7 @@ In order to present the principles of optimization, in this chapter we will alwa
 We first consider unconstrained problems, that do not have any constraint and that only goal is to minimize a cost function.
 That type of problem will not be used in the rest of our dissertation, therefore, we will just present them shortly.
 We will then focus on constrained optimization problems and the numerous methods used in their resolution.
-We will particularly detail one specific constrained problem resolution algorithm that is the Sequential Quadratic Program(SQP).
+We will particularly detail one specific constrained problem resolution algorithm that is the Sequential Quadratic Program (SQP).
 The extension of those methods to solving problems on more complex variable spaces that are the non Euclidean manifolds will be the topic of a further chapter of this dissertation.
 
 \section{Unconstrained Optimization}
@@ -92,18 +92,17 @@ Since our knowledge of the objective function is only partial, it would not be p
 Though, we can find a local solution $x^*$ of $\mathcal{P}$ (a local minimizer of $f$) such that:
 
 \begin{equation}
-  \text{There exist a neighborhood } \mathit{N}\text{ of }x^*\text{ such that
-  }\forall x\in \mathit{N}, \ f(x^*) \leq f(x)
+  \text{There exist a neighborhood } \mathit{N}\ \text{of }x^*\ \text{such that }\forall x\in \mathit{N}, \ f(x^*) \leq f(x)
 \end{equation}
 
 That is the kind of solution that we are looking for and that our algorithms should find.
 
-Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}_2$), then we have the following sufficient conditions for the optimality of $x^*$ as presented in \cite{nocedal:book:2006}:
+Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}_2$), then we have the following sufficient conditions for the optimality of $x^*$ as presented in~\cite{nocedal:book:2006}:
 
 \begin{theorem}
   If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$ and that $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite.
   Then $x^*$ is a strict local minimizer of $f$.
-  \label{optimalityTheorem}
+\label{optimalityTheorem}
 \end{theorem}
 
 \subsection{Globalization methods (Section NEEDS TO BE REWRITTEN)}
@@ -150,12 +149,12 @@ order
 Then the chosen descent direction is the optimum of that approximated function,
 the Newton direction.
 \begin{equation}
-  p^N_k = -(\nabla^2 f_k)^{-1} \nabla f_k
+  p^N_k = -{(\nabla^2 f_k)}^{-1} \nabla f_k
 \end{equation}
 The choice of this descent direction implies that the $\nabla^2f_k$ is positive
 definite, in which case an adaptation of the definition of $p_k$ is required. Or
 an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
-used. For example, the symmetric-rank-one(SR1) formula and the BFGS(Broyden,
+used. For example, the symmetric-rank-one (SR1) formula and the BFGS (Broyden,
 Fletcher, Goldfarb, Shanno) formula. Then the step becomes
 
 \begin{equation}
@@ -176,12 +175,12 @@ the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
 constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
 objective function is the quadratic model with approximated Hessian
 \begin{equation}
-  m_k(p) = f(x_k+p) = f_k + p^T\nabla f_k + p^TB_k p
+  m_k(p) = f(x_k+p) = f_k + p^T \nabla f_k + p^T B_k p
 \end{equation}
 And the optimization problem to solve at each step of the optimization is
 
 \begin{align}
-  \min_{p} & \quad f_k + p^T\nabla f_k + p^TB_k p \nonumber\\
+  \min_{p} & \quad f_k + p^T \nabla f_k + p^T B_k p \nonumber\\
 \text{s.t.}&
 \quad \|p\| \leq \rho_k
 \label{eq:trustRegionNLP}
@@ -221,19 +220,19 @@ Where $f$ and $c_i$ are real valued functions on a subset of $\mathbb{R}^n$.
 $f$ is the objective function. And $c_i$ are the constraint functions.
 ${I}$ and ${E}$ are sets of index such that $c_i,\ i\in{E}$ are the equality constraints, and $c_i,\ i\in{I}$ are the inequality constraints.
 
-We define the feasible set $\Omega$ that contains all the feasible points (points satisfying the constraints) of $\mathcal{P}$ \ref{formulation_NLCP}.
+We define the feasible set $\Omega$ that contains all the feasible points (points satisfying the constraints) of $\mathcal{P}$~\ref{formulation_NLCP}.
 
 \begin{equation}
   \Omega = \left\{ x\in \mathbb{R}^n:\ \forall i\in {E},\ c_i=0,\ \forall i\in{I},\ c_i \geq0\right\}
 \end{equation}
 
-The formulation \ref{formulation_NLCP} can then be rewritten as:
+The formulation~\ref{formulation_NLCP} can then be rewritten as:
 \begin{equation}
   \label{formulation_NLCP_compact}
   \mathcal{P} \equiv \min_{x\in\Omega}{f(x)}
 \end{equation}
 
-In the general case, the problem \ref{formulation_NLCP_compact} has multiple local solutions.
+In the general case, the problem~\ref{formulation_NLCP_compact} has multiple local solutions.
 And finding the global minimizer of $f$ in $\Omega$ is a difficult problem that we do not treat in this thesis.
 Our goal is to find a local minimizer $x^*$ of $f$ in $\Omega$.
 
@@ -241,9 +240,9 @@ Our goal is to find a local minimizer $x^*$ of $f$ in $\Omega$.
 
 \paragraph{First-Order Optimality Conditions}
 
-The First Order Optimality Condition (Karush-Kuhn-Tucker Condition) is a necessary condition verified by all solutions of problem \ref{formulation_NLCP}.
+The First Order Optimality Condition (Karush-Kuhn-Tucker Condition) is a necessary condition verified by all solutions of problem~\ref{formulation_NLCP}.
 
-We introduce the Lagrangian function of \ref{formulation_NLCP}:
+We introduce the Lagrangian function of~\ref{formulation_NLCP}:
 \begin{equation}
   \mathcal{L}(x,\lambda) = f(x) + \sum_{i\in E\cup I}\lambda_i c_i(x)
 \end{equation}
@@ -253,7 +252,7 @@ In particular, for any feasible point $x$, all equality constraints $c_i,\ i\in 
 An inequality constraint $c_i,\ i\in I$ is inactive if $c_i(x)>0$ and active if $c_i(x) = 0$
 
 \begin{definition}  
-  \label{active_set}
+\label{active_set}
   The active set $\mathit{A}(x)$ at a feasible point $x$ is the set of all the indexes of active constraint.
   \begin{equation}
     \mathit{A}(x)=E\cup\{i\in I: c_i(x) = 0\}
@@ -269,9 +268,9 @@ Most optimization algorithms make the assumption that at the solution, the const
 In particular, if any gradient of a constraint is null, then the LICQ does not hold. 
 The LICQ should be taken into account during the formulation of a problem.
 
-\begin{theorem}(First-Order Necessary Conditions)\\
-  \label{KKT_conditions}
-  Suppose that $x^*$ is a local solution of \ref{formulation_NLCP}, that the functions $f$ and $c_i$ are continuously differentiable, and that the LICQ holds at $x^*$.
+\begin{theorem}{First-Order Necessary Conditions}\\
+\label{KKT_conditions}
+  Suppose that $x^*$ is a local solution of~\ref{formulation_NLCP}, that the functions $f$ and $c_i$ are continuously differentiable, and that the LICQ holds at $x^*$.
   Then there is a Lagrange multiplier vector $\lambda^*$, with components $\lambda_i^*$, $i\in E\cup I$, such that the following conditions are satisfied at $(x^*,\lambda^*)$
   \begin{equation}
   \begin{array}{ll}
@@ -304,7 +303,7 @@ In many cases, the main goal of an optimization algorithm is to find a point tha
 And at a KKT solution $(x^*,\lambda^*)$ the critical cone $C(x^*, \lambda^*)$ is:
 
 \begin{equation}
-  C(x^*,\lambda^*) = \{w\in F(x^*)|\nabla c_i(x^*)^Tw=0, \forall i\in\mathit{A}(x^*)\cap I \text{ with } \lambda_i^*>0\}
+  C(x^*,\lambda^*) = \{w\in F(x^*)|{\nabla c_i(x^*)}^T w=0, \forall i\in\mathit{A}(x^*)\cap I\ \text{with } \lambda_i^*>0\}
 \end{equation}
 
 The critical cone contains the linearly feasible directions for which it is not clear from first derivative information alone if $f$ will increase or decrease.
@@ -320,7 +319,7 @@ The Second-Order Sufficient Conditions allow to discriminate local solutions fro
   \begin{equation}
     w^T\nabla_{xx}^2\mathcal{L}(x^*,\lambda^*)w>0,\ \forall w\in C(x^*,\lambda^*),\ w\neq 0
   \end{equation}
-  Then $x^*$ is a strict local solution for \ref{formulation_NLCP}
+  Then $x^*$ is a strict local solution for~\ref{formulation_NLCP}
 \end{theorem}
 
 In particular, this condition is always verified if $\nabla_{xx}^2\mathcal{L}(x^*,\lambda^*)$ is positive definite.
@@ -332,18 +331,18 @@ Here we present some methods for actually solving such problems.
 There exists many different algorithms to solve an NLCP.
 But all have in common to be iterative processes.
 In which we start from an initial guess $x_k$ for $x^*$.
-From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem \ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
+From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem~\ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
 And we iterate that operation until a point $x_k$ sufficiently close to a solution is found.
 By sufficiently close to a solution we mean that this point satisfies the optimality conditions with a good enough precision.
 
 The resolutions algorithms differ mostly by the method chosen to generate a satisfactory increment $z$. We will list here some of the most popular methods:
 
-\paragraph {The penalty method} combines the cost and constraints function in a penalty function that, as its name indicates, penalizes the violation of constraints, without completely proscribing it.
-The penalty function can be written as follows, using the notation $[y]^- = \max\{0, -y\}$:
+\paragraph{The penalty method} combines the cost and constraints function in a penalty function that, as its name indicates, penalizes the violation of constraints, without completely proscribing it.
+The penalty function can be written as follows, using the notation ${[y]}^- = \max\{0, -y\}$:
 
 \begin{equation}
   \label{penalty_function}
-  p(\mu, x) = f(x) + \mu \sum_{i\in E}|c_i(x)| + \mu \sum_{i\in I} [c_i(x)]^-
+  p(\mu, x) = f(x) + \mu \sum_{i\in E}|c_i(x)| + \mu \sum_{i\in I} {[c_i(x)]}^-
 \end{equation}
 
 With this approach, an unconstrained optimization approach can be used.
@@ -354,8 +353,8 @@ By increasing $\mu$ to $\infty$, we penalize the violation of the constraints wi
 The problem to solve only contains equality, boundary constraints and a cost function a cost function that prevents the slack variables from getting too close to 0:
 
 \begin{equation}
-  \min_{x,s}{ f(x)- \mu\sum_{i\in I} \log(s_i)}
-  \text{ subject to }
+  \min_{x,s}{f(x)- \mu\sum_{i\in I} \log(s_i)}
+  \text{subject to }
   \left\{
     \begin{array}{l}
      c_i = 0,\ i\in E\\
@@ -366,31 +365,31 @@ The problem to solve only contains equality, boundary constraints and a cost fun
 \end{equation}
 
 \paragraph{The Sequential Quadratic Programming (SQP)} is a method in which, at each iterate $(x_k, \lambda_k)$, the increment $z$ is found by solving a Quadratic Programming (QP).
-The QP is an approximation of the KKT conditions \ref{KKT_conditions} of the actual problem \ref{formulation_NLCP} to the first order:
+The QP is an approximation of the KKT conditions~\ref{KKT_conditions} of the actual problem~\ref{formulation_NLCP} to the first order:
 
 \begin{equation}
-  \label{approx_QP}
+\label{approx_QP}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla f(x_k)^Tz \\
-    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in E \\
-                       & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I
+    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T \nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla {f(x_k)}^T z \\
+    \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in E \\
+                       & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I
   \end{array}
 \end{equation}
 
-Given $z^*$ the solution of \ref{approx_QP}, it can be tempting to directly take the next iterate as $x_{k+1} = x_k + z^*$.
+Given $z^*$ the solution of~\ref{approx_QP}, it can be tempting to directly take the next iterate as $x_{k+1} = x_k + z^*$.
 But using that method as is can be problematic as the length of the iterate needs not be bounded.
 Thus it is possible to generate a very large step that satisfies the QP.
 The QP only approximates the original problem locally.
 So taking a too big step can get us further from the solution than we previously were.
 To palliate to that issue, mainly two methods are used:
 \begin{itemize}
-  \item The line-search method: The solution $z$ of \ref{approx_QP} is viewed as a direction and we search a parameter $\alpha\in [0;1]$ so that the next iterate $x_k + \alpha z$ is optimal for the original problem.
-  \item The trust-region method adds a set of bound constraints to the QP \ref{approx_QP}. So that the length of the step is limited by the trust-region. The size $\rho$ of the trust region is modified along the iterations based on the estimated quality of the QP approximation. In that case, the QP becomes:
+  \item The line-search method: The solution $z$ of~\ref{approx_QP} is viewed as a direction and we search a parameter $\alpha\in [0;1]$ so that the next iterate $x_k + \alpha z$ is optimal for the original problem.
+  \item The trust-region method adds a set of bound constraints to the QP~\ref{approx_QP}. So that the length of the step is limited by the trust-region. The size $\rho$ of the trust region is modified along the iterations based on the estimated quality of the QP approximation. In that case, the QP becomes:
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla f(x_k)^Tz \\
-    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in E \\
-                       & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I\\
+    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T \nabla_{xx}^2 \mathcal{L}(x_k, \lambda_k)z + {\nabla f(x_k)}^T z \\
+    \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in E \\
+                       & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I\\
                        & |z|<\rho
   \end{array}
 \end{equation}
@@ -437,7 +436,7 @@ Its KKT conditions are:
 
 We denote with a subscript $y_k$ the value of the quantity $y$ evaluated at point $(x_k, \lambda_k)$.
 
-The first order linearization of \ref{KKT_equ} gives:
+The first order linearization of~\ref{KKT_equ} gives:
 
 \begin{equation}
   \label{KKT_1st_order}
@@ -507,7 +506,7 @@ Note that this problem has a solution if the following assumptions hold:
 \end{itemize}
 
 Therefore, the problem raised by the linearization of the KKT conditions to the first order can be solved as a QP problem.
-Denoting the solution of the QP problem $(z_x, l_k)$, the solution to \ref{KKT_1st_order} is given by
+Denoting the solution of the QP problem $(z_x, l_k)$, the solution to~\ref{KKT_1st_order} is given by
 
 \begin{equation}
   \begin{pmatrix}
@@ -524,7 +523,7 @@ Denoting the solution of the QP problem $(z_x, l_k)$, the solution to \ref{KKT_1
 This development can easily be extended to treat the case of problems constrained with inequality constraints:
 
 \begin{equation}
-  \min_{x\in\mathbb{R}^n}{f(x)} \text{ subject to }
+  \min_{x\in\mathbb{R}^n}{f(x)}\ \text{subject to }
   \left\{
   \begin{array}{l}
     c_i(x) = 0,\ \forall i\in{E}\\
@@ -533,10 +532,10 @@ This development can easily be extended to treat the case of problems constraine
   \right.
 \end{equation}
 
-By solving the following Inequality-constrained Quadratic Problem(IQP) system at each iteration:
+By solving the following Inequality-constrained Quadratic Problem (IQP) system at each iteration:
 
 \begin{equation}
-  \label{IQP}
+\label{IQP}
   \begin{array}{ll}
     \min\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
     \text{s.t.} & \nabla_x {c_i}_k z_x + {c_i}_k = 0 ,\ \forall i\in E\\
@@ -544,10 +543,10 @@ By solving the following Inequality-constrained Quadratic Problem(IQP) system at
   \end{array}
 \end{equation}
 
-The main difficulty in solving that QP \ref{IQP} comes from finding the optimal active set $\mathit{A}_k$.
+The main difficulty in solving that QP~\ref{IQP} comes from finding the optimal active set $\mathit{A}_k$.
 It is a necessary but costly operation.
 Especially when starting from a random active set $\mathit{A}_0$.
-The process is mostly based on a try and guess approach guided by heuristics(that may vary with different resolution algorithms).
+The process is mostly based on a try and guess approach guided by heuristics (that may vary with different resolution algorithms).
 
 To find the optimal active set, the QP starts from a random active set $\mathit{A}_0$ ignore the non-active constraints and try to solve the QP with the remaining active constraints.
 At a step $k$ of the resolution of the IQP, all the constraints in the active set $\mathit{A}$ are treated as equality constraints and the others are simply ignored, the QP to solve becomes:
@@ -565,14 +564,14 @@ This EQP is solved, and its solution is checked against the constraints that wer
 If some of them are violated then the solution is not satisfactory and the active set is updated by adding one or several of the violated constraints to it.
 This operation is repeated until there is no more constraints to be added.
 Once all the constraints have been added as active constraints to the EQP, the problem may be over constrained.
-To detect that, the Lagrange multipliers are computed and if some of them do not agree with the KKT conditions of the IQP \ref{IQP}, then one of them is removed from the active set and the resulting EQP is solved, and the process continues until a satisfactory solution is found.
+To detect that, the Lagrange multipliers are computed and if some of them do not agree with the KKT conditions of the IQP~\ref{IQP}, then one of them is removed from the active set and the resulting EQP is solved, and the process continues until a satisfactory solution is found.
 The heuristics used to choose which constraints to add or remove from the active set and to avoid cycling between active sets are out of the scope of this dissertation.
 
 Once the SQP gets close to the solution, the set of active constraints should not change much from one iterate $x_k$ to the next one.
 It is often useful to initialize the IQP's active set with the optimal active set of the previous iterate: $\mathit{A}_0(x_{k+1})\leftarrow\mathit{A}^*(x_k)$. Then the ${(k+1)}^{th}$ QP starts from an active set close to optimal and can be solved much faster.
 That method is called the \textit{warm-start}.
 
-The SQP approach to solving the problem \ref{formulation_NLCP} as presented above leans on the assumption that at each step, the QP generated is feasible,
+The SQP approach to solving the problem~\ref{formulation_NLCP} as presented above leans on the assumption that at each step, the QP generated is feasible,
 which requires that the Hessian $\nabla_{xx}^2\mathcal{L}$ is positive definite on the tangent space of the active constraints.
 That property is guarantied to hold near the solution, but not when starting from a remote point on a non-convex problem.
 To cope with that issue, several methods exist.
@@ -588,7 +587,7 @@ Either by multiplying the step found by the QP with a coefficient $\alpha$ in th
 Or by bounding the norm of the step found in the QP by adding a boundary constraint on $z$ directly inside of the QP problem.
 
 \subsubsection{The Line-Search Strategy}
-In the Line-Search strategy, starting from a current iterate $x_k$ with a QP generated step $z$ solution of the linearized problem \ref{IQP}.
+In the Line-Search strategy, starting from a current iterate $x_k$ with a QP generated step $z$ solution of the linearized problem~\ref{IQP}.
 We search a coefficient $\alpha$ such that $x_{k+1}=x_k+\alpha z$ is satisfactory.
 A usual way to decide if a point is satisfactory is to use a Merit function.
 A Merit function is somewhat similar to a penalty function in the sense that it estimates the quality of a point from the value of the cost function, penalized by the violation of the constraints.
@@ -599,7 +598,7 @@ A typical merit function for a problem with only equality constraints can be wri
 
 The goal of the line-search will then be to find a value $\alpha^*$ of $\alpha$ that minimizes the Merit function: $M(\alpha^*) < M(0)$ and $M'(\alpha^*)=0$.
 Many simple and efficient methods exist to minimize a 1-dimensional function but most work better if the function to minimize is smooth.
-If inequality constraints are present, a simple penalty function like \ref{penalty_function} would not be satisfactory because of the non-smoothness of the operator $[.]^-$.
+If inequality constraints are present, a simple penalty function like~\ref{penalty_function} would not be satisfactory because of the non-smoothness of the operator ${[.]}^-$.
 To avoid that problem, slack variables can come in handy to replace the inequality constraints in the problem as follows:
 
 \begin{equation}
@@ -617,7 +616,7 @@ But in fact, finding the optimal value of $\alpha$ is not necessary, not only be
 But also because, $\alpha$ is only used to calculate the next iterate, from which another $p_k$ and $\alpha$ will be calculated.
 And in the end, the imprecision on the computation of $\alpha$ will be erased in the other steps of the resolution.
 Ultimately, the optimality of the result of the line-search does not matter much because our goal is only to solve the SQP problem in its totality.
-Therefore, for the sake of devising a time efficient algorithm, finding an $\alpha$ that generates a 'sufficient' decrease of the merit function is enough.
+Therefore, for the sake of devising a time efficient algorithm, finding an $\alpha$ that generates a `sufficient' decrease of the merit function is enough.
 
 Let $\mu_1$ and $\mu_2$ be 2 real numbers such that: $0<\mu_1<\mu_2<1$.
 A sufficient decrease of the merit function can be depicted by the condition $M(\alpha) \leq M(0) + \mu_1 \alpha M'(0)$.
@@ -629,19 +628,19 @@ The Wolfe Line-Search can be schematically described as algorithm:~\ref{alg:Wolf
 
 \begin{algorithm}
 \begin{algorithmic}
-  \State Init $[\alpha_L,\alpha_R]\leftarrow[0\ ,1]$
-  \Loop Choose $\alpha\in[\alpha_L,\alpha_R]$\\
+  \State{Init $[\alpha_L,\alpha_R]\leftarrow[0\ ,1]$}
+  \Loop{Choose $\alpha\in[\alpha_L,\alpha_R]$\\
   Evaluate $M(\alpha)$ and $M'(\alpha)$
   {\renewcommand\labelenumi{(\theenumi)}
   \begin{enumerate}
     \item {$M(\alpha) \leq M(0) + \mu_1 \alpha M'(0)\text{ and } M'(\alpha)<\mu_2 M'(0)$}: $\alpha$ is too small, $\alpha_L\leftarrow a$
-    \item {$M(\alpha) \leq M(0) + \mu_1 \alpha M'(0) \text{ and } M'(\alpha)\geq\mu_2 M'(0)$}: Terminate, \Return $\alpha$
+    \item {$M(\alpha) \leq M(0) + \mu_1 \alpha M'(0) \text{ and } M'(\alpha)\geq\mu_2 M'(0)$}: Terminate, \Return$\alpha$
     \item {$M(\alpha) > M(0) + \mu_1 \alpha M'(0)$}: $\alpha$ is too big, $\alpha_R\leftarrow \alpha$
   \end{enumerate}
-}
-  \EndLoop
+  }}
+  \EndLoop{}
   \caption{The Wolfe line-search}
-  \label{alg:Wolfe}
+\label{alg:Wolfe}
 \end{algorithmic}
 \end{algorithm}
 
@@ -649,7 +648,7 @@ The Wolfe Line-Search can be schematically described as algorithm:~\ref{alg:Wolf
   \centering
   \includegraphics[width=0.7\textwidth]{line-search.pdf}
   \caption{Illustration of the choice made by the Wolfe line-search for values of $\alpha$}
-  \label{fig:Wolfe}
+\label{fig:Wolfe}
 \end{figure}
 
 The Wolfe line-search is a very popular line-search method, but it suffers from a drawback that can be major in many cases: It requires the computation of the derivative of the merit function.
@@ -657,13 +656,13 @@ Which can be prohibitively expensive in some cases, including in posture generat
 That is why other line-search methods exist that do not require the derivative of $M$ for $\alpha\neq0$. For example the Goldstein and Price, or the Armijo methods.
 
 \subsubsection{The filter method}
-The decision to accept on not a step generated by the QP can be made using a Filter approach instead of a line-search, as introduced by Fletcher in \cite{fletcher:mathprog:2000}.
-The goal of that method is to minimize the cost function $f(x)$ and the constraint violation $h(x) = \sum_{i\in E}{|c_i(x)|} + \sum_{i\in I}{[c_i(x)]^-}$ separately.
+The decision to accept on not a step generated by the QP can be made using a Filter approach instead of a line-search, as introduced by Fletcher in~\cite{fletcher:mathprog:2000}.
+The goal of that method is to minimize the cost function $f(x)$ and the constraint violation $h(x) = \sum_{i\in E}{|c_i(x)|} + \sum_{i\in I}{{[c_i(x)]}^-}$ separately.
 We define the notion of domination as follows:
 
 \begin{definition}
   \begin{equation}
-    p_i \text{ dominates }p_j \equiv \left\{
+    p_i\ \text{dominates }p_j \equiv \left\{
         \begin{array}{l}
     f_i < f_j \\
     h_i < h_j
@@ -676,13 +675,13 @@ When a new point $x$ is submitted to the filter for acceptance, the values $f(x)
 If there is at least one pair $p_i$ in the filter that dominates $p$, the point is refused.
 Otherwise, no pair of the filter dominates $p$, then $p$ is accepted and added to the filter.
 Once $p$ is added to the filter, any pair in the filter that is dominated by $p$ is removed from it to ensure to keep a list of pairs non dominated by each other in the filter.
-In order to ensure global convergence, this method requires several refinements as explained in \cite{fletcher:mathprog:2000}.
-First, it needs to avoid accepting pairs that are excessively close to each other for that, the domination criterion is modified with a sloping envelope, as proposed in Chin \cite{chin:mathprog:2003}.
+In order to ensure global convergence, this method requires several refinements as explained in~\cite{fletcher:mathprog:2000}.
+First, it needs to avoid accepting pairs that are excessively close to each other for that, the domination criterion is modified with a sloping envelope, as proposed in Chin~\cite{chin:mathprog:2003}.
 The sloping envelope definition takes user defined parameters $\beta$ and $\gamma$ in $[0,\ 1]$.
 
 \begin{definition}
   \begin{equation}
-    p_i \text{ dominates }p_j \equiv \left\{
+    p_i\ \text{dominates }p_j \equiv \left\{
         \begin{array}{l}
     f_i < f_j - \gamma h\ \\
     h_i < \beta h_j
@@ -694,12 +693,12 @@ The sloping envelope definition takes user defined parameters $\beta$ and $\gamm
   \centering
   \includegraphics[width=0.7\textwidth]{filter.pdf}
   \caption{Representation of a filter with sloping envelope}
-  \label{fig:Filter}
+\label{fig:Filter}
 \end{figure}
 
 Another basic necessary improvement is to set an upper bound to the constraint violation, to avoid having the algorithm generate points that minimize the cost function while completely violating the constraints.
 
-A representation of the filter method is given in figure \ref{fig:Filter}
+A representation of the filter method is given in figure~\ref{fig:Filter}
 
 The filter method is very convenient because it does not require the same complicated updates as can be found in penalty based methods where the penalty parameter needs to be updated regularly.
 Also, with the filter method, no derivative computation is required.
@@ -716,29 +715,29 @@ At each step, the modified problem writes as:
 
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2Hz + \sum_{i\in\mathcal{U}}\nabla c_i(x_k)^Tz \\
-    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)=0,\ i\in \mathcal{F} \\
-                       & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I\\
+    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2Hz + \sum_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
+    \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in \mathcal{F} \\
+                       & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I\\
                        & |z|<\rho_k
   \end{array}
-  \label{approx_QP_TR}
+\label{approx_QP_TR}
 \end{equation}
 
-Once a solution $z$ of \ref{approx_QP_TR} is found, the potential next iterate $x_{k+1} = x_k + z$ is checked against the acceptance criterion (should it be a merit function or a filter or other).
+Once a solution $z$ of~\ref{approx_QP_TR} is found, the potential next iterate $x_{k+1} = x_k + z$ is checked against the acceptance criterion (should it be a merit function or a filter or other).
 If it is accepted, that means that our current model is good, we move to the next step with $x_{k+1} \leftarrow x_k + z$, and the size of the trust region can be augmented based on some heuristics.
-Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some heuristics( e.g. $\rho\leftarrow\rho/2$) and the problem \ref{approx_QP_TR} is solved again with the new value of $\rho$.
+Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some heuristics (e.g. $\rho\leftarrow\rho/2$) and the problem~\ref{approx_QP_TR} is solved again with the new value of $\rho$.
 This is repeated until a satisfying point is found, or until an infeasible problem is found.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.4\textwidth]{trust_region_incompatible.pdf}
   \caption{Constraint incompatibility generated by trust region approach}
-  \label{fig:TR_incompatible}
+\label{fig:TR_incompatible}
 \end{figure}
 
 With this approach, a problem that is inherent to trust region methods arises: The generation of unfeasible problem.
 The reduction of the size of the trust region can lead to an incompatible set of constraints.
-For example, with a single constraint, as illustrated in figure \ref{fig:TR_incompatible}.
+For example, with a single constraint, as illustrated in figure~\ref{fig:TR_incompatible}.
 The linearisation of the constraint is represented by the plain strait line, and the trust region by the circle.
 If $\rho$ is too small, there is no intersection between the linearization of the constraint and the trust region.
 The QP is then infeasible.
@@ -762,7 +761,7 @@ The goal of the restoration is to find a solution to the following problem:
       |z|<\rho_k
     \end{array}
     \right.
-  \label{eq:resto_NL}
+\label{eq:resto_NL}
 \end{equation}
 
 The restoration phase proceeds in a similar way to the original SQP algorithm described earlier.
@@ -772,36 +771,36 @@ The acceptance criterion must be tailored for the restoration problem, meaning t
 The big difference comes from the way the quadratic problem is constructed during this phase.
 
 During a restoration phase step, the first action is to estimate the sets of feasible $\mathcal{F}$ and infeasible $\mathcal{I}$ constraints.
-This is done by solving the linearization of problem \ref{eq:resto_NL} as presented in \ref{eq:FP}.
+This is done by solving the linearization of problem~\ref{eq:resto_NL} as presented in~\ref{eq:FP}.
 Each equality constraint is cut in 2 inequality constraints.
 
 \begin{equation}
   \text{Find $z\in\mathbb{R}^n$ such that }
   \left\{
   \begin{array}{l}
-    \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in E \\
-    -\nabla c_i(x_k)^Tz-c_i(x_k)\geq 0,\ i\in E \\
-    \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i\in I\\
+    {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in E \\
+    -{\nabla c_i(x_k)}^T z-c_i(x_k)\geq 0,\ i\in E \\
+    {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I\\
     |z|<\rho_k
   \end{array}
   \right.
-  \label{eq:FP}
+\label{eq:FP}
 \end{equation}
 
 The resolution of that FP gives the lists of feasible $\mathcal{F}$ and unfeasible $\mathcal{U}$ constraints.
 If the list of unfeasible constraints is empty, the problem is feasible, so the restoration phase is exited to return to the main SQP algorithm.
 The restoration QP to solve is built based on those lists.
 The unfeasible constraints are removed from the constraint set and the expression of their violation is added to the cost function, while the feasible constraints remain in the constraint list.
-This results in a problem like \ref{rest_SQP} to solve.
+This results in a problem like~\ref{rest_SQP} to solve.
 (Note that the indexes of the constraints are modified to account for the duplication of the equality constraints)
 
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^THz - \sum\limits_{i\in\mathcal{U}}\nabla c_i(x_k)^Tz \\
-    \text{subject to } & \nabla c_i(x_k)^Tz+c_i(x_k)\geq 0,\ i \in \mathcal{F} \\
+    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2} z^T Hz - \sum\limits_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
+    \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i \in \mathcal{F} \\
                        & |z|<\rho_k
   \end{array}
-  \label{rest_SQP}
+\label{rest_SQP}
 \end{equation}
 
 This problem is solved by a QP solver, its result is checked against an acceptance criterion, based on that, the trust region is enlarged or reduced, and we go back to solving the FP.
@@ -833,33 +832,33 @@ BFGS is a rank 2 update while SR1 is rank 1.
 The most basic formulas for the BFGS update is the following:
 
 \begin{equation}
-  \label{BFGS}
+\label{BFGS}
   B_{k+1} = B_k - \frac{B_k s_k s_k^T B_k}{s_k^T B_k s_k} + \frac{y_k y_k^T}{s_k^T y_k}
 \end{equation}
 
-Note that using a BFGS update requires that $s_k$ and $y_k$ satisfy the curvature condition: $s_k^Ty_k>0$.
+Note that using a BFGS update requires that $s_k$ and $y_k$ satisfy the curvature condition: $s_k^T y_k>0$.
 If that condition does not hold, then the value of $y_k$ is modified, which gives rise to the Damped BFGS update, which guarantees to keep $B_k$ definite positive:
 
 \begin{equation}
-  \label{damped_BFGS}
+\label{damped_BFGS}
 \begin{split}
   \theta_k =
   \left\{
       \begin{array}{ll}
-      1 & \text{if } s_k^Ty_k \geq 0.2s_k^TB_ks_k \\
-      \frac{0.8s_k^TB_ks_k}{s_k^TB_ks_k-s_k^Ty_k} & \text{if } s_k^Ty_k \geq 0.2s_k^TB_ks_k \\
+      1 & \text{if } s_k^T y_k \geq 0.2 s_k^T B_k s_k \\
+      \frac{0.8 s_k^T B_k s_k}{s_k^T B_k s_k-s_k^T y_k} & \text{if } s_k^T y_k \geq 0.2s_k^T B_k s_k \\
       \end{array}
       \right.\\
-      r_k = \theta_k y_k + (1-\theta_k)B_ks_k\\
-      B_{k+1} = B_k - \frac{B_k s_k s_k^T B_k}{s_k^T B_k s_k} + \frac{r_k r_k^T}{s_k^T r_k}
+      r_k = \theta_k y_k + (1-\theta_k) B_k s_k\\
+      B_{k+1} = B_k-\frac{B_k s_k s_k^T B_k}{s_k^T B_k s_k} + \frac{r_k r_k^T}{s_k^T r_k}
 \end{split}
 \end{equation}
 
 The SR1 update is computed with the following formula:
 
 \begin{equation}
-  \label{SR1}
-  B_{k+1} = B_k + \frac{(y_k-B_ks_k)(y_k-B_ks_k)^T}{(y_k-B_ks_k)^Ts_k}
+\label{SR1}
+B_{k+1} = B_k + \frac{(y_k-B_k s_k){(y_k-B_k s_k)}^T}{{(y_k-B_k s_k)}^T s_k}
 \end{equation}
 
 Both those formulas proved to be efficient in some cases. It is not yet clear in which cases one is better than the other.
