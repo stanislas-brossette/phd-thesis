@@ -55,16 +55,94 @@
 \section{Problem Definition}
 \label{sec:problem_definition}
 
-In this section, we present a formulation of robotic systems that allows to specify any typical constraints usually encountered in robotics problems.
+We considere the problem where we have a robotic system and we want to have it do some tasks, like for example to make a contact between a point on a body of the robot and a point of the environment.
+This contact task can be modelized as a simple equality, if we denote $q$ the articular parameters of the robot, $g(q)$ is the 3D position of the point of interest on the robot and $P$ is the point of the environment.
+Then our problem comes down to finding a configuration $q^*$ such that $f(q^*) = P$.
+For complicated robots like humanoids, the equations describing its kinematics are quite complicated, and the presence of angular joints in the robotic system imply the non-linearity of those equations.
+In the general case, even for simple tasks, a closed form solution of the problem does not exist.
 
-We considere a robotic system made of $n_B$ bodies and $n_J$ joints.
+We denote $\mathcal{C}$ the configuration space of our robotic system. It is the manifold in which $q$ lives. The dimension of $\mathcal{C}$ for a single robot in equal to the number of degrees of freedom of the robot. Note that if all the joints of the robot are actuated, this is the number of motors of the robot. And if the robot has a free floating basis (is not fixed) then the position in $\mathcal{R}^3$ and rotation in $SO(3)$ of its basis are to be added to $q$.
+
+We can formulate that problem as follows:
+
+\begin{equation}
+  \text{find}\ q\in\mathcal{C}\ \text{such that}\ g(q)=P
+\end{equation}
+
+The space of solution of this problem is a submanifold of $\mathcal{C}$ of lower dimension that we call ${\mathcal{C}}_F$ the feasible configuration space (which can be empty).
+
+In addition to the equality constraint abovementionned, the problem can feature some inequality constraints.
+For example, each joint variable can be limited to a certain range of value: $\forall i,\ q_i\in [q_i^-,\ q_i^+]$. Then the problem becomes a combination of equality and inequality constraints, and can be writen as:
+\begin{equation}
+  \text{find}\ q\in\mathcal{C}\ \text{such that}\left\{
+  \begin{array}{l}
+    g(q)=P \\
+    \forall i,\ q_i^- \leq q_i \leq q_i^+
+  \end{array}
+  \right.
+\end{equation}
+
+Finally we can also require to find the point of $\mathcal{C}_F$ that minimizes a criterion, such as the distance to a goal posture $q_0$ for example.
+Our problem becomes:
+
+\begin{equation}
+  \left\{
+  \begin{array}{l}
+    \min\limits_{q\in\mathcal{C}}{\|q-q_0\|_2}\\
+    \text{ s.t. }
+    \left\{
+    \begin{array}{l}
+      g(q)=P\\
+      \forall i,\ q_i^- \leq q_i \leq q_i^+
+    \end{array}
+    \right.
+  \end{array}
+  \right.
+\end{equation}
+
+This type of problem is called a non linear constrained optimization problem and can be formulated in a more generic fashion as:
+
+\begin{equation}
+\label{eq:optim_form_PG}
+  \left\{
+  \begin{array}{l}
+    \min\limits_{x\in\mathcal{C}}{f(x)}\\
+    \text{ s.t. }
+    \left\{
+    \begin{array}{l}
+      c_i(x) = 0,\ \forall i\in{E}\\
+      c_i(x) \geq 0,\ \forall i\in{I}\\
+    \end{array}
+    \right.
+  \end{array}
+  \right.
+\end{equation}
+
+Where $x$ is the optimization variable in space $\mathcal{C}$ that we want to find, such that it minimizes the cost function $f(x)$ while satisfying all the equality constraints $c_i(x) = 0,\ \forall i\in{E}$ and inequality constraints $c_i(x) \geq 0,\ \forall i\in{I}$
+
+Such problems can be solved by a Non-linear optimization solver. In Appendix~\ref{chapter:optimization} we present some principles of non linear optimization in unconstrained and constrained cases.
+Several off-the-shelf solvers are available and have been widely used in for solving robotics problems.
+The CFSQP solver~\cite{cfsqp:manual} was used in~\cite{escande:iros:2009} and~\cite{escande:ras:2013} where thousands of HRP-2 posture generation queries were made to explore the feasible space.
+The IPOPT solver has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator had been extended to handle multi-robot problems and more complex and vorious contact models.
+In this thesis, we use those off-the shelf solvers a little in the beginning and later we tackle the development of our own non-linear optimization solver.
+
+From this point forward, we formulate and solve posture generation problems as non linear constrained optimization problem. And in the next section we focus on the formulating several robotics constraints and cost function in the formalism of non linear optimisation.
+
+\section{Problem Formulation}
+\label{sec:pg_formulation}
+
+In this section, we present a formulation of robotic systems that allows to specify most of the typical constraints encountered in robotics problems.
+
+We consider a robotic system made of $n_B$ bodies and $n_J$ joints.
 The global structure of the robot is described by an ordered graph called $mbg$ multi body graph.
 The base body (World) has index $0$ and other bodies get different positive integer index, we denote the body of index $i$, $B_i$. And $B_0$ can be called $B_W$.
+Each body $B_i$ has its reference frame $F_i$ attached to it.
+$F_0$ or $F_W$ denotes the World frame.
 Bodies are linked together by joints that also are indexed by positive integers, we denote the joint of index $i$, $J_i$, and the body that comes after it is $B_i$.
 Each joint defines the relation between its predecessor and successor bodies, for joint $J_i$ they are respectively denoted $pred(i)$ and $i$, and $B_{pred(i)}$ is called the parent body of $B_{i}$.
 We denote $\lambda(j)$ the index of the parent body of $B_j$.
 The number of degrees of freedom of $J_i$ is denoted $dof^J_i$ and the number of degrees of freedom of the whole robot is denoted $dof$.
-Figure~\ref{fig:mbg} illustrates the numberings used for a simple robot with 4 joints and 5 bodies (including the basis)
+Figure~\ref{fig:mbg} illustrates this numbering system for a simple robot with 4 joints and 5 bodies (including the basis)
 
 \begin{figure}
   \centering
@@ -73,10 +151,10 @@ Figure~\ref{fig:mbg} illustrates the numberings used for a simple robot with 4 j
 \label{fig:mbg}
 \end{figure}
 
-The geometric relationships between bodies and joints are described through transformations between their bases. Transformations are described in the Spacial Vector Algebra chapter of `Rigid Body Dynamics Algorithm' by Roy Featherstone~\cite{featherstone:book:2007}.
+The geometric relations between bodies and joints are described through transformations between their reference frames. Each body $B_i$ has a reference frame $F_i$ attached to it. Transformations are described in the Spacial Vector Algebra chapter of `Rigid Body Dynamics Algorithm' by Roy Featherstone~\cite{featherstone:book:2007}.
 
 Let A and B be Cartesian frames with origins O and P respectively. Let $\mathbf{t}$ be the coordinate vector expressing $\overrightarrow{OP}$ in A. And $\mathbf{R}$ be the rotation matrix that transforms 3D vectors from A to B coordinates.
-The transformation from A to B for a motion vector is then defined by:
+The transformation from A to B for a motion vector is defined by:
 \begin{equation}
   {}^B X_A =
   \begin{pmatrix}
@@ -109,7 +187,8 @@ Its inverse is:
   \end{pmatrix}
 \end{equation}
 
-Each joint $J_i$ is defined in the referential of its predecessor body by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ from the base of the body to the base of the joint.
+%Each joint $J_i$ is defined in the reference frame of its predecessor body by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ from the base of the body to the base of the joint.
+Each joint $J_i$ is defined by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ between the reference frame of its predecessor body and its own reference frame.
 Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $\mathbf{S}_i$. Each column of $\mathbf{S}_i$ described a degree of freedom of $J_i$ its upper part for the rotations and lower for translations.
 \begin{equation}
   \mathbf{S}_i =
@@ -123,7 +202,7 @@ Each joint $J_i$ is associated with a motion subspace which representation matri
   \end{pmatrix}
 \end{equation}
 
-For a given joint configuration $q$, the transformation due to the joint $J_i$ from its base to the base of its successor body is denoted \\$X^J_i (q) = \{\mathbf{R}^J_i (q), \mathbf{t}^J_i (q)\}$.
+For a given joint configuration $q$, the transformation due to the joint $J_i$ current configuration from its reference frame to the reference frame of its successor body is denoted \\$X^J_i (q) = \{\mathbf{R}^J_i (q), \mathbf{t}^J_i (q)\}$.
 
 The transformation between $B_{\lambda(i)}$ and $B_i$ is denoted $X^{PtS}_i (q) = \{\mathbf{R}^{PtS}_i, \mathbf{t}^{PtS}_i\}$ (PtS stands for `Parent to Son') can then be computed as:
 \begin{equation}
@@ -155,7 +234,7 @@ We obtain the full expression of ${}^i X_W$ as:
   = {}^i X_{\kappa (1)}\ ^{\kappa (1)}X_{\kappa (2)} \dots ^{\kappa (\text{end}-1)}X_{W}
 \end{equation}
 
-Which can be computed recurcively by the following algorithm:
+Which can be computed recurcively by a Forward Kinematics algorithm:
 
 \begin{algorithm}
   \caption{Forward Kinematics}
@@ -169,14 +248,15 @@ Which can be computed recurcively by the following algorithm:
 \end{algorithmic}
 \end{algorithm}
 
-In the following section, we provide some detailed description of how to compute $X_J (q)$ for a variety of usefull joints.
-Using the joint descriptions and the Forward Kinematics algorithm, we are now able to explicit a relationship between the articular parameter of the robot $q$ and the 3D position and orientation of any frame, point, vector, or any geometric quantity defined in the frame of a body of the robot expressed in any other frame.
+In the following section, we provide some detailed description of how to compute $X_J (q)$ for a variety of useful joints.
+Using the joint descriptions and the Forward Kinematics algorithm, we are able to explicit a relation between $q$ the articular parameters of the robot and the 3D position and orientation of  any geometric quantity defined in the reference frame of a body of the robot.
 Given a transformation ${}^p X_i$ defined in the frame of $B_i$, its value in the world frame is given by ${}^p X_W (q) = {}^p X_i\ {}^i X_W (q)$
 
 \subsection{Joints formulations}
 \label{sub:joints_formulations}
 
 The entire geometry of our system is described by the list of static transformations $X^x_j$ and of joint transformations $X^J_j (q)$.
+In this section, we explicit the descriptions and formulations of several useful joints.
 
 Let us considere a joint $J$ that governs the transformation between two frames $F_1=\{O_1, x_1, y_1, z_1\}$ and $F_2=\{O_2, x_2, y_2, z_2\}$.
 The most common types of joint encountered in robotics systems is the revolute joint, that allows a rotation around a fixed axis.
@@ -209,7 +289,7 @@ If $J$ is a revolute joint arount the axis $(O_1,z_1)$ with parameter $q$, its m
 Similar formulas can be devised for rotations around any other axis, provided that $R$ describes the rotation of angle $q$ around that axis.
 
 In the case of a prismatic joint, all rotations are blocked, and only one translation along a given axis is allowed.
-For a prismatic joint along $x_1$, we have the following formulas:
+A prismatic joint along $x_1$ is described by the following formulas:
 
 \begin{table} [ht]
 \centering
@@ -233,7 +313,8 @@ For a prismatic joint along $x_1$, we have the following formulas:
 \end{tabular}
 \end{table}
 
-Planar joints are also often used in robotics. A planar joint describes a plan sliding on another plan, assuming that the normal to both plans is $z_1 = z_2$ this type of joint allows free rotation of $F_2$ around $z_1$ and translations along $x_1$ and $y_1$. We denote $q = \{q_1, q_2, q_3\}$ the joint parameters, $q_1$ corresponding to the rotation and $q_2,\ q_3$ to the translations. We get:
+Planar joints are also frequently used in robotics.
+A planar joint describes a plan sliding on another plan, assuming that the normal to both plans is $z_1 = z_2$ this type of joint allows free rotation of $F_2$ around $z_1$ and translations along $x_1$ and $y_1$. We denote $q = \{q_1, q_2, q_3\}$ the joint parameters, $q_1$ corresponding to the rotation and $q_2,\ q_3$ to the translations. We get:
 
 \begin{table} [ht]
 \centering
@@ -290,7 +371,7 @@ The rotation matrix for such a rotation is given by:
 There are many other possible choices of axes to define the a Euler Angle 3D rotation.
 The advantage of such formulation is its simplicity and intuitivity.
 But they all suffers from singularities like the Gimbal lock, which happens when two of the three rotation axis become aligned.
-In such a configuration, the only rotations possible are around the aligned axis and around another axis.
+In such a configuration, the only rotations possible are one rotation around the two aligned axis and one rotation around the third axis.
 Thus one degree of freedom is lost.
 Those singularities are prohibitive for the use of such a formulation in a posture generation (the optimization algorithm could get stuck in them).
 
@@ -304,7 +385,7 @@ It represents a rotation of angle $\theta$ around an axis ${\bf u}$ such that:
   q_y &= \sin(\theta/2)u_y \\
   q_z &= \sin(\theta/2)u_z \\
 \end{align}
-The rotation matrix associated with this rotation formulation is:
+The rotation matrix associated with this quaternion is:
 \begin{equation}
   {\bf R} = 2 \begin{pmatrix}
     q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
@@ -313,7 +394,7 @@ The rotation matrix associated with this rotation formulation is:
   \end{pmatrix}
 \end{equation}
 
-That formulation does not suffer from singularity, but it requires to maintain 4 parameters for a 3D rotation. And those 4 parameters must satisfy the unit norm constraint.
+That formulation does not suffer from singularity, but it requires to maintain 4 parameters for a 3D rotation. And those 4 parameters must satisfy the unit norm constraint which in turn would become an additional constraint in the optimization formulation.
 Given a parameter set $q = \{ q_w, q_x, q_y, q_z\}$ we get the following table.
 
 \begin{table} [ht]
@@ -433,17 +514,22 @@ We write the jacobian of each body at its origin as follows:
 
 For a robot to interact with the real world, its geometric description is not enough.
 The robot will be subject to forces applied on its bodies by the exterior world, those can be generated by contacts with the environment or with another actor (human, other robot, manipulated object\ldots) by the effect of physical forces like gravitation or magnetism, or by contacts between two bodies of the robot.
-Our posture generator must take those `External forces' into account, be able to estimate the stability of the robot and the internal torques generated in the joints.
+Our posture generator must take those `External forces' into account, be able to estimate the stability of the robot and compute the internal torques generated in the joints.
 
 An external force applied on a rigid body is called a wrench and is composed of a force part and a moment part (sometimes called couple).
 Let $w$ be a wrench, $w|_F^O$ is the expression of $w$ applied on the point $O$ in the frame $F$.
-We denote $f|_F$ the expression of the force of $w$ in $F$ and $m|_F^O$ the expression of its moment part in $F$ calculated at the point $O$.
+We denote $f$ the force part of w, and $f|_F$ the expression of $f$ in $F$.
+$m$ is the moment part of $w$ and $m|_F^O$ the expression of $m$ in $F$ calculated at the point $O$.
 
 \begin{equation}
   w|_F^O = \left\{ \begin{array}{r}
+    m\\
+    f\\
+  \end{array} \right\}^O_F
+  = \left\{ \begin{array}{r}
     m|_F^O\\
     f|_F\\
-  \end{array} \right\}
+  \end{array}\right\}
 \end{equation}
 
 Note that the expression of the moment part on a different point $P$ follows the following formula:
@@ -452,21 +538,24 @@ Note that the expression of the moment part on a different point $P$ follows the
   m|_F^P = m|_F^O + \overrightarrow{PO} \wedge f|_F
 \end{equation}
 
-From here we drop the subscript $F$ for clarity.
+Note that the frame subscript can be dropped in some equations where the choice of the frame does not matter and assuming that all the quantities of the equation are computed in the same frame.
 
 \subsection{Static stability}
 \label{sub:static_stability}
 
-We denote $g$ the acceleration of gravitaty on earth $g = 9.81 m.s^{-2}$.
-The wrench associated with action of the gravity of a body of mass $M$ which center of mass is denoted $G$ with $\vec{z}$ the upward vertical vector in the world frame is:
+We denote $g$ the acceleration of gravity on earth $g = 9.81 m.s^{-2}$.
+The wrench associated with the action of gravity on a body of mass $M$ which center of mass is denoted $G$ with $\vec{z}$ the upward vertical vector in the world frame $F_W$ is:
 \begin{equation}
-  w_g|^G = \left\{ \begin{array}{r}
+  w_g|^G_{F_W} = \left\{ \begin{array}{r}
      0 \\
      -Mg\vec{z} \\
-  \end{array}\right\}
+ \end{array}\right\}^G_{F_W}
 \end{equation}
 
-A solid is statically stable if it satisfy the Euler-Newton Equation. We considere a rigid body on which $m$ external forces $w_i$ are applied. We denote $P$ the application point on which the equation is calculated:
+A solid is statically stable if it satisfy the Euler-Newton Equation. We considere a rigid body on which $m$ external forces $w_i = \left\{ \begin{array}{r}
+    m_i\\
+    f_i\\
+\end{array} \right\}^{P_i}$ are applied. We denote $P$ the application point on which the equation and all its terms are calculated:
 \begin{equation}
   \sum\limits_i w_i|^P + w_g|^P = 0
 \end{equation}
@@ -482,18 +571,52 @@ Which is equivalent to:
 
 This equation can be simplified by applying it on the center of mass of the body as:
 \begin{equation}
-\left\{
-\begin{array}{r}
-  \sum\limits_i m_i|^G = 0 \\
-  \sum\limits_i f_i - Mg\vec{z} = 0 \\
-\end{array}
-\right.
+  \left\{
+  \begin{array}{r}
+    \sum\limits_i m_i|^G = 0 \\
+    \sum\limits_i f_i - Mg\vec{z} = 0 \\
+  \end{array}
+  \right.
 \label{eq:stability}
 \end{equation}
 
 Satisfying~\ref{eq:stability} ensures the stability of a rigid body.
 In some cases, an articulated robot is considered as a rigid body and this equation can be used to ensure its stability.
-It is only valid if the robot can generate infinite torques in its articulations, or at least if we are sure that the robot is able to generate large enough torques.
+It is only valid if the robot can generate infinite torques in its articulations, or at least if we have some guarantees that the robot is able to generate large enough torques.
+
+This equation~\ref{eq:stability} can be used in an optimization problem.
+We considere that each wrench $w_i$ applied on the system is defined by the position of its application point $P_i$ and the values $m_i$ and $f_i$ that represent the moment and force of $w_i$ at $P_i$. $P_i$ depends on $q$ the joint parameter of the robot, $m_i$ and $f_i$ are new variables that need to be added to the problem.
+We denote $f$ the concatenation of all the variables $m_i$ and $f_i$
+
+\begin{equation}
+  \boxed{
+  s(q,f) =
+  \left\{
+  \begin{array}{r}
+    \sum\limits_i m_i + \overrightarrow{P_iG}\wedge \vec{f_i} \\
+    \sum\limits_i f_i - Mg\vec{z} \\
+  \end{array}\right\}
+  = 0}
+\end{equation}
+
+The optimization problem~\ref{eq:optim_form_PG} becomes (we denote m the dimension of the force variables):
+
+\begin{equation}
+\label{eq:optim_form_PG_with_stab}
+  \left\{
+  \begin{array}{l}
+    \min\limits_{q\in\mathcal{C}, f\in \mathbb{R}^m}{f(q)}\\
+    \text{ s.t. }
+    \left\{
+    \begin{array}{l}
+      s(q,f) = 0\\
+      c_i(q) = 0,\ \forall i\in{E}\\
+      c_i(q) \geq 0,\ \forall i\in{I}\\
+    \end{array}
+    \right.
+  \end{array}
+  \right.
+\end{equation}
 
 The derivation of the static stability constraint is fairly straightforward.
 All the terms of equation~\ref{eq:stability} are components of wrenches.

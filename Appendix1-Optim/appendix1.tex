@@ -45,13 +45,13 @@
 
 %********************************** First Section *********************************
 \section{Introduction}
-In modern science, optimization has a very important place.
+In modern science, optimization has an important place.
 Mechanical engineers optimize the shape of structural parts.
 Investors optimize the profit of a portfolio while minimizing the risks of loss.
 Chemists optimize the efficiency and speed of reactions.
 When it comes to robotics, optimization is everywhere.
 From the design of a robot to its actuation.
-Any positioning of a robot requires the computation of the articular parameters of each joint of the robot, finding such parameters might be possible by using analytical methods for very simple robots, but for robots as complex as humanoid robots, it is not possible.
+Any positioning of a robot requires the computation of the articular parameters of each joint of the robot, finding such parameters might be possible by using analytical methods for simple robots, but for robots as complex as humanoid robots, it is not possible.
 Most often, an optimization process is used.
 
 The goal of an optimization algorithm is to find an optimal solution $x^*$ to a problem.
@@ -328,7 +328,7 @@ In particular, this condition is always verified if $\nabla_{xx}^2\mathcal{L}(x^
 
 In the previous section, we presented some theoretical tools to describe the solution of an NLCP that only use the derivative terms of order one and two of the problem's functions.
 Here we present some methods for actually solving such problems.
-There exists many different algorithms to solve an NLCP.
+There exists many different algorithms to solve an NLCP\@.
 But all have in common to be iterative processes.
 In which we start from an initial guess $x_k$ for $x^*$.
 From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem~\ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
@@ -378,7 +378,7 @@ The QP is an approximation of the KKT conditions~\ref{KKT_conditions} of the act
 
 Given $z^*$ the solution of~\ref{approx_QP}, it can be tempting to directly take the next iterate as $x_{k+1} = x_k + z^*$.
 But using that method as is can be problematic as the length of the iterate needs not be bounded.
-Thus it is possible to generate a very large step that satisfies the QP.
+Thus it is possible to generate a very large step that satisfies the QP\@.
 The QP only approximates the original problem locally.
 So taking a too big step can get us further from the solution than we previously were.
 To palliate to that issue, mainly two methods are used:
@@ -466,8 +466,8 @@ The first order linearization of~\ref{KKT_equ} gives:
   \end{pmatrix}
   =
   \begin{pmatrix}
-      - \nabla_{x}f_k\\
-      - C_k\\
+      -\nabla_{x}f_k\\
+      -C_k\\
   \end{pmatrix}
   \end{array}
 \end{equation}
@@ -651,7 +651,7 @@ The Wolfe Line-Search can be schematically described as algorithm:~\ref{alg:Wolf
 \label{fig:Wolfe}
 \end{figure}
 
-The Wolfe line-search is a very popular line-search method, but it suffers from a drawback that can be major in many cases: It requires the computation of the derivative of the merit function.
+The Wolfe line-search is a popular line-search method, but it suffers from a drawback that can be major in many cases: It requires the computation of the derivative of the merit function.
 Which can be prohibitively expensive in some cases, including in posture generation for robotics problems, where the derivatives are always expensive.
 That is why other line-search methods exist that do not require the derivative of $M$ for $\alpha\neq0$. For example the Goldstein and Price, or the Armijo methods.
 
@@ -700,7 +700,7 @@ Another basic necessary improvement is to set an upper bound to the constraint v
 
 A representation of the filter method is given in figure~\ref{fig:Filter}
 
-The filter method is very convenient because it does not require the same complicated updates as can be found in penalty based methods where the penalty parameter needs to be updated regularly.
+The filter method is convenient because it does not require the same complicated updates as can be found in penalty based methods where the penalty parameter needs to be updated regularly.
 Also, with the filter method, no derivative computation is required.
 That method is generally more permissive than merit based method in the sense that it refuses less points.
 
@@ -735,7 +735,7 @@ This is repeated until a satisfying point is found, or until an infeasible probl
 \label{fig:TR_incompatible}
 \end{figure}
 
-With this approach, a problem that is inherent to trust region methods arises: The generation of unfeasible problem.
+With this approach, a problem that is inherent to trust region methods arises: The generation of infeasible problem.
 The reduction of the size of the trust region can lead to an incompatible set of constraints.
 For example, with a single constraint, as illustrated in figure~\ref{fig:TR_incompatible}.
 The linearisation of the constraint is represented by the plain strait line, and the trust region by the circle.
@@ -787,10 +787,10 @@ Each equality constraint is cut in 2 inequality constraints.
 \label{eq:FP}
 \end{equation}
 
-The resolution of that FP gives the lists of feasible $\mathcal{F}$ and unfeasible $\mathcal{U}$ constraints.
-If the list of unfeasible constraints is empty, the problem is feasible, so the restoration phase is exited to return to the main SQP algorithm.
+The resolution of that FP gives the lists of feasible $\mathcal{F}$ and infeasible $\mathcal{U}$ constraints.
+If the list of infeasible constraints is empty, the problem is feasible, so the restoration phase is exited to return to the main SQP algorithm.
 The restoration QP to solve is built based on those lists.
-The unfeasible constraints are removed from the constraint set and the expression of their violation is added to the cost function, while the feasible constraints remain in the constraint list.
+The infeasible constraints are removed from the constraint set and the expression of their violation is added to the cost function, while the feasible constraints remain in the constraint list.
 This results in a problem like~\ref{rest_SQP} to solve.
 (Note that the indexes of the constraints are modified to account for the duplication of the equality constraints)
 
@@ -803,7 +803,7 @@ This results in a problem like~\ref{rest_SQP} to solve.
 \label{rest_SQP}
 \end{equation}
 
-This problem is solved by a QP solver, its result is checked against an acceptance criterion, based on that, the trust region is enlarged or reduced, and we go back to solving the FP.
+This problem is solved by a QP solver, its result is checked against an acceptance criterion, based on that, the trust region is enlarged or reduced, and we go back to solving the FP\@.
 
 In the restoration phase, special care must be taken in the computation of the matrix H, that represents the Hessian of the Lagrangian of a problem that changes at each iteration.
 One possible approach is to compute it as the sum of the Hessians of all the individual constraints, and those can be computed exactly or with a quasi-newton approximation.
