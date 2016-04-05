@@ -32,7 +32,7 @@
   \item Adrien \& Karim's formulations
   \item Formulation of several types of cost/constraints
   \begin{itemize}
-    \item Contact with plane surface
+    \item Contact with planar surface
     \item Collision avoidance
     \item Auto-Collision avoidance
     \item Static equilibrium: Newton/CoM projection
@@ -516,16 +516,83 @@ Most robotic joints have geometric limits which define the range of value that c
 The joint limits for 1D joints like revolute and prismatic joints are trivial to formulate: We denote $q^-$ and $q^+$ the minimum and maximum values accessible and add a boundary constraint to the optimization problem:
 \begin{equation}
 \label{eq:joint_limits}
-  \boxed{
-  q^- \leq q \leq q^+
-  }
+  \boxed{q^- \leq q \leq q^+}
 \end{equation}
 
 Planar joints as well are easy to limit since their 3 variables are independant.
 Each variable can be separately limited.
 Limiting the movements in a spherical joint, and by extension in a free joint is much more complicated and is still an open problem.
 In humanoid robotics, spherical joints can be used to model the shoulder or hip joint of the robot.
-A common approach to limit shoulder inspired from the biomechanics field considers the spherical motion (or swing) and the axial motion (or twist) separately. The spherical motion can be parameterizes by an element of the unit 3D sphere $S2$ and limited so that it lays within a given cone. And the axial motion can be parameterized in $\mathbb{R}$ and can be limited by equation~\ref{eq:joint_limits}.
+A common approach to limit shoulder inspired from the biomechanics field considers the spherical motion (or swing) and the axial motion (or twist) separately. The spherical motion can be parameterizes by an element of the unit 3D sphere $S2$ and limited so that it lays within a given cone. And the axial motion can be parameterized in $\mathbb{R}$ and can be limited by equation~\ref{eq:joint_limits}, this type of formulation is presented in~\cite{baerlocher}.
+
+\subsection{Contact constraints}
+\label{sub:contact_constraints}
+
+Humanoid robots evolve in their environment by making and breaking contacts with it.
+A contact can be defined between 2 surfaces of different bodies of robots (Note that one of the robots can be the environment or that the two robots can be the same).
+The most usual type of contact constraint encountered is the planar contact, where a planar surface of a robot is put in contact with a planar surface of the environment.
+We denote $F_1 = \{O_1, \vec{x_1}, \vec{y_1}, \vec{z_1}\}$ a frame defined on the surface of the first body involved in the contact such that the 3D point $O_1$ is on the surface and the vector $\vec{z_1}$ is normal to the surface and pointing toward the inside the body.
+$F2 = \{O_2, \vec{x_2}, \vec{y_2}, \vec{z_2}\}$ is a frame on the surface of the second body involved, such that $O_2$ is on the surface and the vector $\vec{z_2}$ is normal to the surface and pointing away from the body.
+
+Constraining those two surfaces to be coplanar comes down to aligning $\vec{z_1}$ and $\vec{z_2}$ and to ensure that the projection of the distance between $O_1$ and $O_2$ along $\vec{z_1}$ is null.
+Note that we avoid using the dot product of two vectors that are meant to be aligned e.g. $\vec{z_1}\cdot\vec{z_2} = 1$ because when that constraint is satisfied, its gradient is null, which implies that in the optimization context it is unqualified.
+That is why we prefer imposing orthogonality constraints.
+This translates into adding the following set of constraints to our problem:
+
+\begin{equation}
+\label{eq:coplanarity}
+\boxed{\left\{
+  \begin{array}{l}
+    \overrightarrow{O_1O_2} \cdot \vec{z_1} = 0\\
+    \vec{x_1}\cdot\vec{z_2} = 0\\
+    \vec{y_1}\cdot\vec{z_2} = 0\\
+    \vec{z_1}\cdot\vec{z_2} \geq 0
+  \end{array}
+  \right.}
+\end{equation}
+
+This set of constraints leaves free the displacements of $F_2$ along $\vec{x_1}$ and $\vec{y_1}$ as well as its rotation around $\vec{z_1}$.
+We call this a floating contact, the optimization algorithm will be able to choose the location of $F_2$ in the plan $\{O_1, \vec{x_1}, \vec{y_1}\}$. This contact has 3 degrees of freedom.
+
+If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such that $O_1$ and $O_2$ are at the same position and all the vectors $\{\vec{x_1}, \vec{y_1}, \vec{z_1}\}$ are aligned with those of $\{\vec{x_2}, \vec{y_2}, \vec{z_2}\}$ we obtain a fixed contact with no degree of freedom. This translates into adding the following set of constraints to our problem:
+
+\begin{equation}
+\label{eq:fixed_contact}
+\boxed{\left\{
+  \begin{array}{l}
+    \overrightarrow{O_1O_2} = \vec{0}\\
+    \vec{x_1}\cdot\vec{z_2} = 0\\
+    \vec{y_1}\cdot\vec{z_2} = 0\\
+    \vec{x_1}\cdot\vec{y_2} = 0\\
+    \vec{z_1}\cdot\vec{z_2} \geq 0\\
+    \vec{x_1}\cdot\vec{x_2} \geq 0\\
+  \end{array}
+  \right.}
+\end{equation}
+
+\subsection{Collision avoidance}
+\label{sub:collision_avoidance}
+
+In order to avoid unwanted collisions between bodies of robots, for two bodies $B_1$ and $B_2$, we want to define function $d_{\{B_1, B_2\}}(q)$ that has the properties of a pseudo-distance:
+\begin{itemize}
+  \item $d_{\{B_1, B_2\}}(q) > 0$ when the bodies are not touching eachother
+  \item $d_{\{B_1, B_2\}}(q) = 0$ when the bodies are in collision without interpenetration
+  \item $d_{\{B_1, B_2\}}(q) < 0$ when the bodies are in collision with interpenetration
+\end{itemize}
+And we want $d$ to be a continuous function with a continuous gradient.
+
+Using the cartesian distance between the exact surfaces of $B_1$ and $B_2$ might result in a discontinuous gradient of $d_{\{B_1, B_2\}}$ if the surfaces of $B_1$ and $B_2$ are not strictly convex.
+A conservative approach is to associate to each body, a strictly convex bounding volume and to compute the distance between those volume.
+\cite{escande:humanoids:2007} proposes a method to generate a strictly convex Sphere-Torus-Patch Bounding Volumes (STP-BV) that guarantees the gradient continuity of the proximity distance.
+The distance between the STP-BV of $B_1$ and $B_2$ computed by an enhanced GJK~\cite{gilbert-1988a} collision-detection algorithm is a continuous differentiable pseudo-distance.
+Thus we can use this function in our optimization algorithm as:
+
+\begin{equation}
+  \boxed{d_{\{B_1, B_2\}}(q) > 0}
+\end{equation}
+
+This function can be used to avoid collisions between a robot and the environment as well as auto collisions between bodies of the same robot.
+In many cases, it is possible to avoid the collision between two bodies of a robot by modifying the joint limits and reducing them to an span where the collision of interest cannot happen. That approach is conservative and ad-hoc but can save some precious computation time.
 
 \subsection{External Forces}
 \label{sub:external_forces}
@@ -607,13 +674,12 @@ We considere that each wrench $w_i$ applied on the system is defined by the posi
 We denote $f$ the concatenation of all the variables $m_i$ and $f_i$
 
 \begin{equation}
-  \boxed{
-  s(q,f) =
-  \left\{
+  \boxed{s(q,f) = \left\{
   \begin{array}{r}
-    \sum\limits_i m_i + \overrightarrow{P_iG}\wedge \vec{f_i} \\
+    \sum\limits_i m_i + \overrightarrow{P_i G}\wedge \vec{f_i} \\
     \sum\limits_i f_i - Mg\vec{z} \\
-  \end{array}\right\}
+  \end{array}
+  \right\}
   = 0}
 \end{equation}
 
@@ -656,7 +722,7 @@ We will explicit a method to automatically compute those derivatives in a furthe
 \subsection{Center of mass projection}
 \label{sub:center_of_mass_projection}
 
-In the case where all the wrenches applied to the body are due to unilateral punctual contacts with points that all lay on the same horizontal plan, the stability criterion~\ref{eq:stability} can be simplified.We denote $P_i$ the application point of wrench $w_i$ and $O$ is the origin of the horizontal plane.
+In the case where all the wrenches applied to the body are due to unilateral punctual contacts with points that all lay on the same horizontal plan, the stability criterion~\ref{eq:stability} can be simplified.We denote $P_i$ the application point of wrench $w_i$ and $O$ is the origin of the horizontal plan.
 The wrench generated by a unilateral punctual contact is a pure force, its moment part is null on the contact point.
 
 \begin{equation}
@@ -1023,10 +1089,6 @@ How to write constraints:
 Bounds
 Linear part
 NonLinear part
-
-\subsection{Formulation of joint limits}
-
-\subsection{Formulation of collisions}
 
 \subsection{Force in friction cone}
 
