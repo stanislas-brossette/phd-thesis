@@ -509,6 +509,24 @@ We write the jacobian of each body at its origin as follows:
 \end{equation}
 
 
+\subsection{Joint Limits}
+\label{sub:joint_limits}
+
+Most robotic joints have geometric limits which define the range of value that can be accessed by the joint variables.
+The joint limits for 1D joints like revolute and prismatic joints are trivial to formulate: We denote $q^-$ and $q^+$ the minimum and maximum values accessible and add a boundary constraint to the optimization problem:
+\begin{equation}
+\label{eq:joint_limits}
+  \boxed{
+  q^- \leq q \leq q^+
+  }
+\end{equation}
+
+Planar joints as well are easy to limit since their 3 variables are independant.
+Each variable can be separately limited.
+Limiting the movements in a spherical joint, and by extension in a free joint is much more complicated and is still an open problem.
+In humanoid robotics, spherical joints can be used to model the shoulder or hip joint of the robot.
+A common approach to limit shoulder inspired from the biomechanics field considers the spherical motion (or swing) and the axial motion (or twist) separately. The spherical motion can be parameterizes by an element of the unit 3D sphere $S2$ and limited so that it lays within a given cone. And the axial motion can be parameterized in $\mathbb{R}$ and can be limited by equation~\ref{eq:joint_limits}.
+
 \subsection{External Forces}
 \label{sub:external_forces}
 
