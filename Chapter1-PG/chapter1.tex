@@ -569,7 +569,14 @@ This translates into adding the following set of constraints to our problem:
 This set of constraints leaves free the displacements of $F_2$ along $\vec{x_1}$ and $\vec{y_1}$ as well as its rotation around $\vec{z_1}$.
 We call this a floating contact, the optimization algorithm will be able to choose the location of $F_2$ in the plane $\{O_1, \vec{x_1}, \vec{y_1}\}$. This contact has 3 degrees of freedom.
 
-If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such that $O_1$ and $O_2$ are at the same position and $\vec{x_1}$, $\vec{y_1}$, $\vec{z_1}$ are aligned respectively with $\vec{x_2}$, $\vec{y_2}$, $\vec{z_2}$, we obtain a fixed contact with no degree of freedom. This translates into adding the following set of constraints to our problem:
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{contactConstraint.pdf}
+  \caption{Floating and Fixed Contacts}
+\label{fig:contactConstraint}
+\end{figure}
+
+If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such that $O_1$ and $O_2$ superimposed and $\vec{x_1}$, $\vec{y_1}$, $\vec{z_1}$ are aligned respectively with $\vec{x_2}$, $\vec{y_2}$, $\vec{z_2}$, we obtain a fixed contact with no degree of freedom. This translates into adding the following set of constraints to our problem:
 
 \begin{equation}
 \label{eq:fixed_contact}
@@ -585,6 +592,8 @@ If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such th
   \right.}
 \end{equation}
 
+We illustrate those two types of contacts in figure~\ref{fig:contactConstraint}
+
 
 \subsection{Collision avoidance}
 \label{sub:collision_avoidance}
@@ -598,7 +607,7 @@ In order to avoid unwanted collisions between bodies of robots, for two bodies $
 
 Using the cartesian distance between the exact surfaces of $B_1$ and $B_2$ might result in a discontinuous gradient of $d_{\{B_1, B_2\}}$ if the surfaces of $B_1$ and $B_2$ are not strictly convex.
 A conservative approach is to associate to each body, a strictly convex bounding volume and to compute the distance between those volume.
-\cite{escande:humanoids:2007} proposes a method to generate a strictly convex Sphere-Torus-Patch Bounding Volumes (STP-BV) that guarantees the gradient continuity of the proximity distance.
+\cite{escande:humanoids:2007} and~cite{escande:itro:2014} proposes a method to generate a strictly convex Sphere-Torus-Patch Bounding Volumes (STP-BV) that guarantees the gradient continuity of the proximity distance.
 The distance between the STP-BV of $B_1$ and $B_2$ computed by an enhanced GJK~\cite{gilbert-1988a} collision-detection algorithm is a continuous differentiable pseudo-distance.
 Thus we can use this function in our optimization algorithm as:
 
@@ -620,7 +629,7 @@ The robot is subject to forces applied on its bodies by the exterior world, thos
 Our posture generator must take those `External forces' into account, be able to estimate the stability of the robot and compute the internal torques generated in the joints.
 
 An external force applied on a rigid body is called a wrench and is composed of a force part and a moment part (sometimes called couple).
-Let $w$ be a wrench, $w|_F^O$ is the expression of $w$ applied on the point $O$ in the frame $F$.
+Let $w$ be a wrench, $w|_F^O$ is the expression of $w$ calculated at the point $O$ expressed in the frame $F$.
 We denote $f$ the force part of w, and $f|_F$ the expression of $f$ in $F$.
 $m$ is the moment part of $w$ and $m|_F^O$ the expression of $m$ in $F$ calculated at the point $O$.
 
@@ -635,13 +644,15 @@ $m$ is the moment part of $w$ and $m|_F^O$ the expression of $m$ in $F$ calculat
   \end{array}\right\}
 \end{equation}
 
-Note that the expression of the moment part on a different point $P$ follows the following formula:
+The expression of the moment part on a different point $P$ is given by the following formula:
 
 \begin{equation}
   m|_F^P = m|_F^O + \overrightarrow{PO} \wedge f|_F
 \end{equation}
 
-Note that the frame subscript can be dropped in some equations where the choice of the frame does not matter and assuming that all the quantities of the equation are computed in the same frame.
+Whereas the force part is invariant with respect to the point at which the wrench is calculated.
+
+Note that the frame subscript can be dropped in some equations where the choice of the frame does not matter and assuming that all the quantities of the equations are computed in the same frame.
 
 \subsection{Static stability}
 \label{sub:static_stability}
@@ -655,7 +666,7 @@ The wrench associated with the action of gravity on a body of mass $M$ which cen
  \end{array}\right\}^G_{F_W}
 \end{equation}
 
-A solid is statically stable if it satisfy the Euler-Newton Equation. We considere a rigid body on which $m$ external forces $w_i = \left\{ \begin{array}{r}
+A solid is statically stable if it satisfy the Euler-Newton Equation. We considere a robot on which $m$ external forces $w_i = \left\{ \begin{array}{r}
     m_i\\
     f_i\\
 \end{array} \right\}^{P_i}$ are applied. We denote $P$ the application point on which the equation and all its terms are calculated:
@@ -684,12 +695,13 @@ This equation can be simplified by applying it on the center of mass of the body
 \end{equation}
 
 Satisfying~\ref{eq:stability} ensures the stability of a rigid body.
-In some cases, an articulated robot is considered as a rigid body and this equation can be used to ensure its stability.
-It is only valid if the robot can generate infinite torques in its articulations, or at least if we have some guarantees that the robot is able to generate large enough torques.
+In some cases, an articulated robot is considered as a rigid body and this equation alone can be used to ensure its stability.
+It is only valid if the robot can generate infinite torques in its articulations, or at least if we have some guarantee that the robot is able to generate large enough torques.
+Otherwise it is necessary to verify that the robot's actuators can generate large enough torques to maintain that posture. The details of torque computation are discussed in Section~\ref{sub:torque_limits}
 
 This equation~\ref{eq:stability} can be used in an optimization problem.
-We considere that each wrench $w_i$ applied on the system is defined by the position of its application point $P_i$ and the values $m_i$ and $f_i$ that represent the moment and force of $w_i$ at $P_i$. $P_i$ depends on $q$ the joint parameter of the robot, $m_i$ and $f_i$ are new variables that need to be added to the problem.
-We denote $f$ the concatenation of all the variables $m_i$ and $f_i$
+We considere that each wrench $w_i$ applied on the system is defined by the position of its application point $P_i$ and the values $m_i$ and $f_i$ that represent the moment and force of $w_i$ at $P_i$. $P_i$ depends on $q$ the joint parameter of the robot. $m_i$ and $f_i$ are new variables that need to be added to the problem. In summary, $w_i$ depends on $q$, $m_i$ and $f_i$.
+We denote $f$ the concatenation of all the variables $m_i$ and $f_i$.
 
 \begin{equation}
   \boxed{s(q,f) = \left\{
@@ -720,7 +732,7 @@ The optimization problem~\ref{eq:optim_form_PG} becomes (we denote m the dimensi
   \right.
 \end{equation}
 
-The derivation of the static stability constraint is fairly straightforward.
+The derivation of the static stability constraint is straightforward.
 All the terms of equation~\ref{eq:stability} are components of wrenches.
 A wrench is completely defined by the frame in which it is expressed and its values of force and moment in that frame.
 Deriving the stability condition comes down to deriving each term w.r.t its components values and w.r.t the transformation of its frame.
@@ -740,38 +752,49 @@ We will explicit a method to automatically compute those derivatives in a furthe
 \subsection{Center of mass projection}
 \label{sub:center_of_mass_projection}
 
-In the case where all the wrenches applied to the body are due to unilateral punctual contacts with points that all lay on the same horizontal plan, the stability criterion~\ref{eq:stability} can be simplified.We denote $P_i$ the application point of wrench $w_i$ and $O$ is the origin of the horizontal plan.
-The wrench generated by a unilateral punctual contact is a pure force, its moment part is null on the contact point.
+In the case where all the wrenches applied to the body are due to unilateral punctual contacts on points that all lay on the same horizontal plane $H = \{O, \vec{x}, \vec{y}\}$, the stability criterion~\ref{eq:stability} can be simplified.
+The wrench $w_i$ generated by a unilateral punctual contact is a pure force, its moment part is null on the contact point.
+
+\begin{equation*}
+    \left. w_i \right|^{P_i} =
+    \left\{
+      \begin{array}{r}
+      \vec{0}\\
+      \vec{f_i}\\
+  \end{array} \right\}^{P_i}
+\end{equation*}
+
+\ref{eq:stability} becomes:
 
 \begin{equation}
 \left\{
 \begin{array}{r}
-  \sum\limits_i \overrightarrow{OP_i}\wedge f_i - \overrightarrow{OG} \wedge Mg\vec{z} = 0 \\
-  \sum\limits_i f_i - Mg\vec{z} = 0 \\
+  \sum\limits_i \overrightarrow{OP_i}\wedge \vec{f_i} - \overrightarrow{OG} \wedge Mg\vec{z} = 0 \\
+  \sum\limits_i \vec{f_i} - Mg\vec{z} = 0 \\
 \end{array}
 \right.
 \end{equation}
 
-We can write $\overrightarrow{OG} = \overrightarrow{OG_p} + z_G\vec{z}$ with $G_P$ the projection of $G$ on the horizontal plan. Replacing in the moment equation gives:
+We can write $\overrightarrow{OG} = \overrightarrow{OG_p} + z_G\vec{z}$ with $G_P$ the projection of $G$ on $H$. Replacing in the moment equation gives:
 
 \begin{equation}
-  \sum\limits_i \overrightarrow{OP_i}\wedge f_i - \sum\limits_i\overrightarrow{OG_P} \wedge f_i = 0
+  \sum\limits_i \overrightarrow{OP_i}\wedge \vec{f_i} - \sum\limits_i\overrightarrow{OG_P} \wedge \vec{f_i} = 0
+\label{eq:projCoM}
 \end{equation}
 
-The forces $f_i$ also can be separated into their normal and tangential parts: $f_i = f_i^n\vec{z} + f_i^t$, $G$ and $P_i$ can be written as $\overrightarrow{OG_P} = G_x \vec{x} + G_y\vec{y}$ and $\overrightarrow{OP_i} = P_{ix} \vec{x} + P_{iy} \vec{y}$. We get:
+With $f_i = f_i^x\vec{x} + f_i^y\vec{y} + f_i^z\vec{z}$, $G$ and $P_i$ can be written as $\overrightarrow{OG_P} = G_x \vec{x} + G_y\vec{y}$ and $\overrightarrow{OP_i} = P_{ix} \vec{x} + P_{iy} \vec{y}$. The two first lines of equation~\ref{eq:projCoM} give:
 
 \begin{align}
-  \sum\limits_i \overrightarrow{OP_i}\wedge f_i^n\vec{z} = \sum\limits_i\overrightarrow{OG_P} \wedge f_i^n\vec{z} \\
-\sum\limits_i \left\{\begin{array}{r} P_{iy}f_i^n\\-P_{ix}f_i^n\end{array}\right\}
-= \left\{\begin{array}{r} G_{y}\\-G_{x}\end{array}\right\} \sum\limits_if_i^n\\
-  \overrightarrow{OG_P} = \frac{\sum\limits_i \overrightarrow{OP_i} f_i^n}{\sum\limits_if_i^n}
+\sum\limits_i \left\{\begin{array}{r} P_{iy}f_i^z\\-P_{ix}f_i^z\end{array}\right\}
+= \left\{\begin{array}{r} G_{y}\\-G_{x}\end{array}\right\} \sum\limits_i f_i^z\\
+  \overrightarrow{OG_P} = \frac{\sum\limits_i \overrightarrow{OP_i} f_i^z}{\sum\limits_i f_i^z}
 \end{align}
 
-Since all the contacts are unilateral and with the same plan, all the $f_i^n$ are positive.
-For any set of $f_i^n\geq0$, $G_P$ is a barycenter with positive coefficients of the set of all $P_i$.
+Since all the contacts are unilateral on the same plane, all the $f_i^z$ are positive.
+For any set of $f_i^z\geq0$, $G_P$ is a barycenter with positive coefficients of the set of all $P_i$.
 Any point $G_P$ that is included in the convex hull of all the $P_i$ is a solution.
 
-Thus we have the property: A rigid body that has all its contacts with the environment being punctual, unilateral and all laying on the same horizontal plan $P$ is stable if and only if the projection of its center of mass on $P$ is inside the convex hull of all its contact points.
+Thus we have the property: A rigid body that has all its contacts with the environment being punctual, unilateral and all laying on the same horizontal plane $H$ is stable if and only if the projection of its center of mass on $H$ is inside the convex hull of all its contact points.
 
 \subsection{Torque limits}
 \label{sub:torque_limits}
@@ -784,9 +807,9 @@ For example it is the case with the Atlas robot that is hydraulically actuated.
 
 Featherstone~\cite{featherstone:book:2007} proposes a reccursive algorithm to compute the torques, accelerations and velocites generated in a multi articulated system by a set of external forces called the Inverse Dynamics Algorithm.
 For the purpose of generating statically stable postures, the velocities and accelerations are useless.
-Thus, we simplify the algorithm to fit our needs that we call the Inverse Static Algorithm.
+Thus, we devise a specialized algorithm to fit our needs and call it the Inverse Static Algorithm.
 
-The algorithm first computes the generalized forces $f^G_i$ applied on each body, it is the sum of the action of gravity and of the external forces applied on a body at the origin of the world frame, expressed in the world frame.
+The algorithm first computes the generalized forces $f^G_i$ applied on each body, it is the sum of the action of gravity and of the external forces applied on a body calculated at the origin of the world frame, expressed in the world frame.
 Then, the generalized forces are used to compute the torques.
 
 \begin{algorithm}
@@ -808,296 +831,86 @@ Then, the generalized forces are used to compute the torques.
 We can write the torques as a function of the joint parameters and the external forces $\tau(q,f)$.
 The torque limit constraint writes as:
 \begin{equation}
-  \tau^- \leq \tau(q,f) \leq \tau^+
+  \boxed{\tau^- \leq \tau(q,f) \leq \tau^+}
 \end{equation}
 
-\subsection{Torque derivation}
+We will detail the derivation of this constraint in a further chapter.
 
-The computation of the torque jacobian $\frac{\partial \tau}{\partial q}$ with respect to the articular parameters is done by differenciating algorithm~\ref{IS}.
-We first write algorithm~\ref{IS} in its matrix form.
+\subsection{Contact Forces and Friction Cones}
 
-\begin{algorithm}
-  \caption{Inverse Static Matrix form}
-\label{ISmatrix}
-\begin{algorithmic}
-  \For{$i = 0:n_B$}\\
-  $f^G_i =
-  \begin{pmatrix}
-    \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
-  =
-  \mathbf{I}^W
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & \mathbf{0} \\
-    -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{ac} \\ \mathbf{af}
-  \end{pmatrix}
-  -
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
-    \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
-  \end{pmatrix}
-  $
-  \EndFor{}
-  \For{$i = n_J-1:0$}
-  \State$\tau_i = {f^G_i}^T S_i$
-  \If{$pred(i) \neq -1$}
-  \State$f^G_{pred(i)} =
-  \begin{pmatrix}
-    \mathbf{m}^{G}_{pred(i)} \\ \mathbf{f}^{G}_{pred(i)}
-  \end{pmatrix}
-  +=
-  \begin{pmatrix}
-    {\mathbf{R}^{PtS}_i}^T & \widehat{\mathbf{t}^{PtS}_i}{\mathbf{R}^{PtS}_i}^T \\
-    \mathbf{0} & {\mathbf{R}^{PtS}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
-  $
-  \EndIf{}
-  \EndFor{}
-\end{algorithmic}
-\end{algorithm}
+Here we use the same frames and notations as introduced in Section~\ref{sub:contact_constraints}.
 
-The variables of this algorithm w.r.t which we need to differenciate it are the geometric parameters of the robot $q$ and the variables of the external wrenches which can contain $q$ and some other variables $y$.
-We assume that the derivatives of $m_i^{ext}$ and $f_i^{ext}$: $\frac{\partial m_i^{ext}}{\partial q}$, $\frac{\partial m_i^{ext}}{\partial y}$, $\frac{\partial f_i^{ext}}{\partial q}$ and $\frac{\partial f_i^{ext}}{\partial y}$ are known.
+The contacts involved in a posture generation problem can be separated in two types: Geometric Contacts and Stability Contacts.
 
-Besides $m_i^{ext}$ and $f_i^{ext}$ all the quantities of the algorithm depend only on $q$.
-Therefore, the derivation w.r.t $y$ is trivial and is automatically computed by our final algorithm.
-From here we will focus on the derivation w.r.t $q$.
+The geometry contact is a contact without efforts, the two bodies are touching eachother, but do not apply any efforts on eachother.
+Physically, that correspond to the transition state between a configuration without contact and a configuration with contact on which efforts are applied.
+We defined the Geometric contacts in Section~\ref{sub:contact_constraints}
+The stability contact is a geometry contact that bears interaction efforts.
+We denote $w_{\{B_1\rightarrow B_2\}}$ the effort applied by body $B_1$ on body $B_2$. Then the effort applied by $B_2$ on $B_1$ is $w_{\{B_2\rightarrow B_1\}} = -w_{\{B_1\rightarrow B_2\}}$.
+These interaction efforts must be taken into account in the stability and torque computations of each robot involved in the contact.
 
-Note the following relations:
-\begin{align}
-  \frac{\partial {}^i\mathbf{R}_W \mathbf{u}}{\partial q_j}
-  &= {}^i\mathbf{R}_W \mathbf{u} \wedge \omega_{i,j}
-  = {}^i\mathbf{R}_W \widehat{\mathbf{u}} \omega_{i,j}
-  \\
-  \frac{\partial {}^i\mathbf{R}_W {}^i\mathbf{t}_W\wedge \mathbf{u}}{\partial q_j}
-  &= {}^i\mathbf{R}_W \mathbf{v}_{i,j} \wedge \mathbf{u}
-  + {}^i\mathbf{R}_W \left({}^i\mathbf{t}_W\wedge\mathbf{u}\right) \wedge \omega_{i,j}\\
-  &= -{}^i\mathbf{R}_W \widehat{\mathbf{u}} \mathbf{v}_{i,j}
-  + {}^i\mathbf{R}_W \widehat{\left(\widehat{{}^i\mathbf{t}_W}\mathbf{u}\right)} \omega_{i,j}
-\end{align}
+The interaction effort resulting from a punctual contact on a point $P$ can be modeled as a pure force along the $z_1$ direction $\vec{f_n} = f_z \vec{z_1}$ and the tangential efforts due to friction in that contact can be modeled as $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$. A punctual contact cannot carry moments on its contact point.
+\begin{equation}
+\label{eq:punctual_effort}
+\left. w_{2\rightarrow 1}\right|^P = \left\{
+  \begin{array}{l}
+    \vec{0} \\
+    \overrightarrow{f_{2\rightarrow 1}} = \vec{f_t} + \vec{f_n} \\
+  \end{array}
+  \right\}^P
+\end{equation}
 
-Let's differentiate the first equation of~\ref{ISmatrix} w.r.t $q_j$.
+This formulation of the interaction effort defines a bilateral contact, in the sense that the effort can be in any direction, $B_1$ can push as well as pull on $B_2$.
 
-\begin{align}
-  A &=
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & \mathbf{0} \\
-    -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{ac} \\ \mathbf{af}
-  \end{pmatrix} \\
-  B &=
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
-    \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
-  \end{pmatrix} \\
-  f^G_i &= \mathbf{I}^W A-B\\
-  \frac{\partial A}{\partial q_j} &=
-  \begin{pmatrix}
-    {}^i\mathbf{R}_W \widehat{\bf ac} \omega_{i,j}\\
-    -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}{\bf ac} \right)}\omega_{i,j}
-    + {{}^i\mathbf{R}_W}\widehat{\bf ac} v_{i,j} + {}^i\mathbf{R}_W \widehat{\bf af} \omega_{i,j}\\
-  \end{pmatrix}
-  \\
-  \frac{\partial B}{\partial q_j} &=
-  \begin{pmatrix}
-    - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)}\omega_{i,j}
-    + {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} v_{i,j} + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i} \omega_{i,j}\\
-    {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} \omega_{i,j}\\
-  \end{pmatrix}
-  \\&+
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
-    \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
-  \end{pmatrix}
-\end{align}
+To model a unilateral contact, we must constrain the normal component of $f_{2\rightarrow 1}$ to be oriented toward the inside of $B_1$. Which means that only pushing actions can be generated, not pulling actions.
+This translates into:
+\begin{equation}
+  \overrightarrow{f_{2\rightarrow 1}}\cdot \vec{z_1} = f_z \geq 0
+\end{equation}
 
-Putting all the pieces of $\omega$ and $v$ allows to group all the j-derivatives to obtain the jacobian of $f^G_i$ with a single equation.
+Furthermore, for the contact to be stable, the Coulomb friction law must be respected.
+This law states that the contact force must lay inside a friction cone of angle $\mu$, the friction coefficient.
+Which translates into the following equation:
 
-\begin{align}
-  \bf M &=
-  \begin{pmatrix}
-    {}^i\mathbf{R}_W \widehat{\bf ac}  & 0\\
-    -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf ac \right)}
-    + {}^i\mathbf{R}_W \widehat{\bf af}  & {{}^i\mathbf{R}_W}\widehat{\bf ac} \\
-  \end{pmatrix}
-  \\
-  \bf N &=
-  \begin{pmatrix}
-    - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)} + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i} & {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} \\
-    {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
-  \end{pmatrix}
-  \\
-  \frac{\partial f^G_i}{\partial q} &= (\mathbf{I}^W \mathbf{M} - \mathbf{N})\mathbf{Jac}^W_i
-  +
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
-    \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
-  \end{pmatrix}
-\end{align}
+\begin{equation}
+  \mu\|\vec{f_n}\| \geq \|\vec{f_t}\|
+\end{equation}
 
-The derivation of the second equation is obvious:
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\linewidth]{frictionCone.pdf}
+  \caption{Punctual unilateral stability contact with friction}
+\label{fig:frictionCone}
+\end{figure}
 
-\begin{align}
-  \tau_i &= {f^G_i}^T S_i \\
-  \frac{\partial \tau_i}{\partial q} &= S_i^T \frac{\partial f^G_i}{\partial q} \\
-\end{align}
+Given the decomposition of $f_{2\rightarrow 1}$ in $F_1$, $f_{2\rightarrow 1} = f_x \vec{x_1} + f_y \vec{y_1} + f_z \vec{z_1}$.
+For any punctual contact in a posture generation problem, we can add the following set of constraint to our optimization problem:
 
-Note the following relations:
-\begin{align}
-  \frac{\partial {\mathbf{R}_i^J}^T \mathbf{u}}{\partial q_j}
-  &= - S^R_{i,j} \wedge ({\mathbf{R}_i^J}^T \mathbf{u})
-  = \widehat{({\mathbf{R}_i^J}^T \mathbf{u})} S^R_{i,j}
-  \\
-  \frac{\partial\mathbf{t}^J_i\wedge {\mathbf{R}_i^J}^T  \mathbf{u}}{\partial q_j}
-  &= S^t_{i,j} \wedge \left({\mathbf{R}_i^J}^T \mathbf{u}\right)
-  - \mathbf{t}^J_i \wedge \left( S^R_{i,j} \wedge \left({\mathbf{R}_i^J}^T \mathbf{u}\right)\right) \\
-  &= -\widehat{({\mathbf{R}_i^J}^T \mathbf{u})} S^t_{i,j}
-  + \left(\left({\mathbf{R}_i^J}^T \mathbf{u}\right) \cdot {\mathbf{t}^J_i}^T
-  - \left( {({\mathbf{R}_i^J}^T \mathbf{u})}^T \cdot \mathbf{t}^J_i\right) \mathbf{I}_3\right)S_{i,j}^R\\
-\end{align}
+\begin{equation}
+  \label{eq:unilateralContact}
+  \left\{
+  \begin{array}{l}
+    f_z \geq 0 \\
+    \mu^2 f_z^2 \geq f_x^2 +f_y^2
+  \end{array}
+  \right.
+\end{equation}
 
-The last equation's derivation goes like follows:
+When it comes to planar contacts, the interaction effort can have components of forces and moments in all directions if we considere the efforts intrinsic to the contact: a force normal to the contact surface $\vec{f_n} = f_z \vec{z_1}$ and a moment tangential to it $\vec{m_t} = m_x \vec{x_1} + m_y \vec{y_1}$ and the efforts due to friction: Tangential friction force $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$ and a normal friction moment $\vec{m_n} = m_z \vec{z_1}$.
 
-\begin{align}
-  f^G_{pred(i)} & +=
-  \begin{pmatrix}
-    {\mathbf{R}^{PtS}_i}^T & \widehat{\mathbf{t}^{PtS}_i}{\mathbf{R}^{PtS}_i}^T \\
-    \mathbf{0} & {\mathbf{R}^{PtS}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
-  \\
-  & += \begin{pmatrix}
-    {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
-    \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    {\mathbf{R}^{J}_i}^T & \widehat{\mathbf{t}^{J}_i}{\mathbf{R}^{J}_i}^T \\
-    \mathbf{0} & {\mathbf{R}^{J}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
-  \\
-  K_i &=
-  \begin{pmatrix}
-    \widehat{({\mathbf{R}_i^J}^T \mathbf{m}^{G}_i)}
-    + \left({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i\right) \cdot {\mathbf{t}^J_i}^T
-    - \left( {({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)}^T \cdot \mathbf{t}^J_i\right) \mathbf{I}_3
-    & -\widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} \\
-    \widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} & 0
-  \end{pmatrix}
-  \\
-  \frac{\partial f^G_{pred(i)}}{\partial q} & -=
-  \begin{pmatrix}
-    {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
-    \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
-  \end{pmatrix}
-  K_i S_i
-\end{align}
+This type of effort can be modeled by applying a single unilateral friction punctual effort on each vertex of a polygon describing the contact area. And ensuring that each of them lay in their respective friction cone, thus satisfies the equation~\ref{eq:unilateralContact}. As depicted in figure~\ref{fig:planarContact}
 
+\begin{figure}[htpb]
+  \centering
+  \setlength{\fboxsep}{0pt}%
+  \setlength{\fboxrule}{1pt}%
+  \fbox{\includegraphics[width=0.6\linewidth]{planarContact.pdf}}
+  \caption{Modelization of a Planar Contact between the foot on HRP4 and the ground}
+\label{fig:planarContact}
+\end{figure}
 
-The entire algorithm for calculating the torque jacobian w.r.t the articular parameters comes down to:
-
-\begin{algorithm}
-  \caption{Torque Jacobian Calculation}
-\label{TJC}
-\begin{algorithmic}
-  \For{$i = 0:n_B$}
-  \State{Compute the Jacobian of generalized forces}
-  \State$f^G_i =
-  \mathbf{I}^W
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & \mathbf{0} \\
-    -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{ac} \\ \mathbf{af}
-  \end{pmatrix}
-  -
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
-    \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
-  \end{pmatrix}
-  $
-  \State$\bf M =
-    \begin{pmatrix}
-    {}^i\mathbf{R}_W \widehat{\bf ac}  & 0\\
-    -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf ac \right)}
-    + {}^i\mathbf{R}_W \widehat{\bf af}  & {{}^i\mathbf{R}_W}\widehat{\bf ac} \\
-    \end{pmatrix}
-    $
-  \State$\bf N =
-  \begin{pmatrix}
-    - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)}
-    + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i}
-    & {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} \\
-    {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
-  \end{pmatrix}
-  $
-  \State$
-  \frac{\partial f^G_i}{\partial q} = (\mathbf{I}^W \mathbf{M} - \mathbf{N})\mathbf{Jac}^W_i
-  +
-  \begin{pmatrix}
-    {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
-    \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
-  \end{pmatrix}
-  $
-  \EndFor{}
-  \For{$i = n_J-1:0$}
-  \State{Compute the Jacobian of torques w.r.t q}
-  \State$\frac{\partial \tau_i}{\partial q} = S_i^T \frac{\partial f^G_i}{\partial q}$
-  \If{$pred(i) \neq -1$}
-  \State$\mathbf{K} =
-  \begin{pmatrix}
-    \widehat{({\mathbf{R}_i^J}^T \mathbf{m}^{G}_i)}
-    + \left({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i\right) \cdot {\mathbf{t}^J_i}^T
-    - \left( {({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)}^T \cdot \mathbf{t}^J_i\right) \mathbf{I}_3
-    & -\widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} \\
-    \widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} & 0
-  \end{pmatrix}$
-  \State$f^G_{pred(i)} += {\mathbf{X}^{PtS}_i(q)}^{-*} f^G_i$
-  \State$\frac{\partial f^G_{pred(i)}}{\partial q} -=
-  \begin{pmatrix}
-    {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
-    \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
-  \end{pmatrix}
-  \mathbf{K} S_i$
-  \EndIf{}
-  \EndFor{}
-\end{algorithmic}
-\end{algorithm}
-
-
-\section{Use all those quantities to write an optimization problem}
-\label{sec:use_all_those_quantities_to_write_an_optimization_problem}
+\section{Conclusion}
+\label{sec:Ch1_Conclusion}
 
 Variable q,f,tau
 
@@ -1107,24 +920,6 @@ How to write constraints:
 Bounds
 Linear part
 NonLinear part
-
-\subsection{Force in friction cone}
-
-\section{Contact with the environment}
-\label{sec:contact_with_the_environment}
-
-\subsection{Frame contact}
-\label{sub:frame_contact}
-
-\subsection{stability constact vs geometry contact}
-\label{sub:stability_constact_vs_geometry_contact}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%
-%  SECTION FORMULATION  %
-%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Formulation}
 
 Here we present the basic formulation of a PG problem.
 
