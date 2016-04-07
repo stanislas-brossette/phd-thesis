@@ -15,9 +15,9 @@
 \nomenclature[z-mbg]{mbg}{Multibody Graph}
 \nomenclature[a-F]{F}{a frame}
 \nomenclature[a-W]{W}{the world frame}
-\nomenclature[a-w]{w}{a wrench}
-\nomenclature[a-f]{f}{a force}
-\nomenclature[a-m]{m}{a moment}
+\nomenclature[a-w]{w}{a wrench or a force}
+\nomenclature[a-f]{f}{a force resultant}
+\nomenclature[a-m]{m}{a force moment}
 
 
 \graphicspath{{Chapter1-PG/Figs/Vector/}{Chapter1-PG/Figs/}}
@@ -55,13 +55,14 @@
 \section{Problem Definition}
 \label{sec:problem_definition}
 
-We considere the problem where we have a robotic system and we want to have it do some tasks, like for example to make a contact between a point on a body of the robot and a point of the environment.
-This contact task can be modelized as a simple equality, if we denote $q$ the articular parameters of the robot, $g(q)$ is the 3D position of the point of interest on the robot and $P$ is the point of the environment.
+We consider the problem where we have a robotic system and we want to have it do some tasks, like for example to make a contact between a point on a body of the robot and a point of the environment.
+This contact task can be modelized as a simple equality.
+We denote $q$ the joint parameters of the robot, $g(q)$ is the 3D position of the point of interest on the robot and $P$ is the point of the environment.
 Then our problem comes down to finding a configuration $q^*$ such that $f(q^*) = P$.
 For complicated robots like humanoids, the equations describing its kinematics are quite complicated, and the presence of angular joints in the robotic system imply the non-linearity of those equations.
 In the general case, even for simple tasks, a closed form solution of the problem does not exist.
 
-We denote $\mathcal{C}$ the configuration space of our robotic system. It is the manifold in which $q$ lives. The dimension of $\mathcal{C}$ for a single robot in equal to the number of degrees of freedom of the robot. Note that if all the joints of the robot are actuated, this is the number of motors of the robot. And if the robot has a free floating basis (is not fixed) then the position in $\mathcal{R}^3$ and rotation in $SO(3)$ of its basis are to be added to $q$.
+We denote $\mathcal{C}$ the configuration space of our robotic system. It is the manifold in which $q$ lives. The dimension of $\mathcal{C}$ for a single robot in equal to the number of degrees of freedom of the robot. Note that if all the joints of the robot are actuated, this is the number of motors of the robot. And if the robot has a free-floating basis (is not fixed) then the position in $\mathcal{R}^3$ and rotation in $SO(3)$ of its basis are to be added to $q$.
 
 We can formulate that problem as follows:
 
@@ -71,8 +72,8 @@ We can formulate that problem as follows:
 
 The space of solution of this problem is a submanifold of $\mathcal{C}$ of lower dimension that we call ${\mathcal{C}}_F$ the feasible configuration space (which can be empty).
 
-In addition to the equality constraint abovementionned, the problem can feature some inequality constraints.
-For example, each joint variable can be limited to a certain range of value: $\forall i,\ q_i\in [q_i^-,\ q_i^+]$. Then the problem becomes a combination of equality and inequality constraints, and can be writen as:
+In addition to the equality constraint abovementioned, the problem can feature some inequality constraints.
+For example, each joint variable can be limited to a certain range of value: $\forall i,\ q_i\in [q_i^-,\ q_i^+]$. Then the problem becomes a combination of equality and inequality constraints, and can be written as:
 \begin{equation}
   \text{find}\ q\in\mathcal{C}\ \text{such that}\left\{
   \begin{array}{l}
@@ -82,7 +83,7 @@ For example, each joint variable can be limited to a certain range of value: $\f
   \right.
 \end{equation}
 
-Finally we can also require to find the point of $\mathcal{C}_F$ that minimizes a criterion, such as the distance to a goal posture $q_0$ for example.
+Finally, we can also require finding the point of $\mathcal{C}_F$ that minimizes a criterion, such as the distance to a goal posture $q_0$ for example.
 Our problem becomes:
 
 \begin{equation}
@@ -100,7 +101,7 @@ Our problem becomes:
   \right.
 \end{equation}
 
-This type of problem is called a non linear constrained optimization problem and can be formulated in a more generic fashion as:
+This type of problem is called a nonlinear constrained optimization problem and can be formulated in a more generic fashion as:
 
 \begin{equation}
 \label{eq:optim_form_PG}
@@ -120,13 +121,14 @@ This type of problem is called a non linear constrained optimization problem and
 
 Where $x$ is the optimization variable in space $\mathcal{C}$ that we want to find, such that it minimizes the cost function $f(x)$ while satisfying all the equality constraints $c_i(x) = 0,\ \forall i\in{E}$ and inequality constraints $c_i(x) \geq 0,\ \forall i\in{I}$
 
-Such problems can be solved by a Non-linear optimization solver. In Appendix~\ref{chapter:optimization} we present some principles of non linear optimization in unconstrained and constrained cases.
+Such problems can be solved by a Non-linear optimization solver.
+In Appendix~\ref{chapter:optimization}, we present some principles of nonlinear optimization in unconstrained and constrained cases.
 Several off-the-shelf solvers are available and have been widely used in for solving robotics problems.
 The CFSQP solver~\cite{cfsqp:manual} was used in~\cite{escande:iros:2009} and~\cite{escande:ras:2013} where thousands of HRP-2 posture generation queries were made to explore the feasible space.
-The IPOPT solver has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator had been extended to handle multi-robot problems and more complex and vorious contact models.
-In this thesis, we use those off-the shelf solvers a little in the beginning and later we tackle the development of our own non-linear optimization solver.
+The IPOPT solver has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator had been extended to handle multi-robot problems and more complex and various contact models.
+In this thesis, we use those off-the-shelf solvers a little in the beginning and later we tackle the development of our own non-linear optimization solver.
 
-From this point forward, we formulate and solve posture generation problems as non linear constrained optimization problem. And in the next section we focus on the formulating several robotics constraints and cost function in the formalism of non linear optimisation.
+From this point forward, we formulate and solve posture generation problems as nonlinear constrained optimization problem. And in the next sections, we focus on the formulating several robotics constraints and cost function in the formalism of nonlinear optimization.
 
 
 \section{Problem Formulation}
@@ -135,10 +137,10 @@ From this point forward, we formulate and solve posture generation problems as n
 \subsection{Forward Kinematics}
 \label{sub:forward_kinematics}
 
-In this section, we present a formulation of robotic systems that allows to specify most of the typical constraints encountered in robotics problems.
+In this section, we present a formulation of robotic systems that allows specifying most of the typical constraints encountered in robotics problems.
 
 We consider a robotic system made of $n_B$ bodies and $n_J$ joints.
-The global structure of the robot is described by an ordered graph called $mbg$ multi body graph.
+The global structure of the robot is described by an ordered graph called $mbg$ multi-body graph.
 The base body (World) has index $0$ and other bodies get different positive integer index, we denote the body of index $i$, $B_i$. And $B_0$ can be called $B_W$.
 Each body $B_i$ has its reference frame $F_i$ attached to it.
 $F_0$ or $F_W$ denotes the World frame.
@@ -238,7 +240,7 @@ We obtain the full expression of ${}^i X_W$ as:
   = {}^i X_{\kappa (1)}\ ^{\kappa (1)}X_{\kappa (2)} \dots ^{\kappa (\text{end}-1)}X_{W}
 \end{equation}
 
-Which can be computed recurcively by a Forward Kinematics algorithm:
+Which can be computed recursively by a Forward Kinematics algorithm:
 
 \begin{algorithm}
   \caption{Forward Kinematics}
@@ -253,7 +255,7 @@ Which can be computed recurcively by a Forward Kinematics algorithm:
 \end{algorithm}
 
 In the following section, we provide some detailed description of how to compute $X_J (q)$ for a variety of useful joints.
-Using the joint descriptions and the Forward Kinematics algorithm, we are able to explicit a relation between $q$ the articular parameters of the robot and the 3D position and orientation of  any geometric quantity defined in the reference frame of a body of the robot.
+Using the joint descriptions and the Forward Kinematics algorithm, we are able to explicit a relation between $q$ the joint parameters of the robot and the 3D position and orientation of  any geometric quantity defined in the reference frame of a body of the robot.
 Given a transformation ${}^p X_i$ defined in the frame of $B_i$, its value in the world frame is given by ${}^p X_W (q) = {}^p X_i\ {}^i X_W (q)$
 
 \subsection{Joints formulations}
@@ -616,6 +618,14 @@ Thus we can use this function in our optimization algorithm as:
 \end{equation}
 
 This function can be used to avoid collisions between a robot and the environment as well as auto collisions between bodies of the same robot.
+We denote $Coll$ the list of triplets $\{B_i, B_j, \epsilon_{ij}\}$ defining each collision that we want to avoid by using this function in our problem, as a pair of bodies $B_i$ and $B_j$ and a minimal distance that we want to keep between them (usually for security reasons).
+
+Then the set of constraints to add to our problem is:
+
+\begin{equation}
+  \boxed{\forall \{B_i, B_j, \epsilon_{ij}\} \in Coll,\ d_{\{B_i, B_j\}}(q) > \epsilon_{ij}}
+\end{equation}
+
 In many cases, it is possible to avoid the collision between two bodies of a robot by modifying the joint limits and reducing them to a span where the collision of interest cannot happen. That approach is conservative and ad-hoc but can save some precious computation time.
 
 \section{Static constraints}
@@ -625,32 +635,32 @@ In many cases, it is possible to avoid the collision between two bodies of a rob
 \label{sub:external_forces}
 
 For a robot to interact with the real world, its geometric description is not enough.
-The robot is subject to forces applied on its bodies by the exterior world, those can be generated by contacts with the environment or with another actor (human, other robot, manipulated object\ldots) by the effect of physical forces like gravitation or magnetism, or by contacts between two bodies of the robot.
+The robot is subject to forces applied on its bodies by the exterior world, those can be generated by contacts with the environment or with another actor (human, other robot, manipulated object\ldots), by the effect of physical forces like gravitation or magnetism, or by contacts between two bodies of the robot.
 Our posture generator must take those `External forces' into account, be able to estimate the stability of the robot and compute the internal torques generated in the joints.
 
-An external force applied on a rigid body is called a wrench and is composed of a force part and a moment part (sometimes called couple).
+An external force applied on a rigid body can also be called a wrench and is composed of a resultant part $f$(sometimes abbusively called force) and a moment part (sometimes abusively called couple).
 Let $w$ be a wrench, $w|_F^O$ is the expression of $w$ calculated at the point $O$ expressed in the frame $F$.
-We denote $f$ the force part of w, and $f|_F$ the expression of $f$ in $F$.
-$m$ is the moment part of $w$ and $m|_F^O$ the expression of $m$ in $F$ calculated at the point $O$.
+We denote $\vec{f}$ the resultant part of w, and $\vec{f}|_F$ the expression of $\vec{f}$ in $F$.
+$\vec{m}$ is the moment part of $w$ and $\vec{m}|_F^O$ the expression of $\vec{m}$ in $F$ calculated at the point $O$.
 
 \begin{equation}
   w|_F^O = \left\{ \begin{array}{r}
-    m\\
-    f\\
+    \vec{m}\\
+    \vec{f}\\
   \end{array} \right\}^O_F
   = \left\{ \begin{array}{r}
-    m|_F^O\\
-    f|_F\\
+    \vec{m}|_F^O\\
+    \vec{f}|_F\\
   \end{array}\right\}
 \end{equation}
 
 The expression of the moment part on a different point $P$ is given by the following formula:
 
 \begin{equation}
-  m|_F^P = m|_F^O + \overrightarrow{PO} \wedge f|_F
+  \vec{m}|_F^P = \vec{m}|_F^O + \overrightarrow{PO} \wedge \vec{f}|_F
 \end{equation}
 
-Whereas the force part is invariant with respect to the point at which the wrench is calculated.
+Whereas the resultant part is invariant with respect to the point at which the wrench is calculated.
 
 Note that the frame subscript can be dropped in some equations where the choice of the frame does not matter and assuming that all the quantities of the equations are computed in the same frame.
 
@@ -661,14 +671,14 @@ We denote $g$ the acceleration of gravity on earth $g = 9.81 m.s^{-2}$.
 The wrench associated with the action of gravity on a body of mass $M$ which center of mass is denoted $G$ with $\vec{z}$ the upward vertical vector in the world frame $F_W$ is:
 \begin{equation}
   w_g|^G_{F_W} = \left\{ \begin{array}{r}
-     0 \\
+     \vec{0} \\
      -Mg\vec{z} \\
  \end{array}\right\}^G_{F_W}
 \end{equation}
 
 A solid is statically stable if it satisfy the Euler-Newton Equation. We considere a robot on which $m$ external forces $w_i = \left\{ \begin{array}{r}
-    m_i\\
-    f_i\\
+    \vec{m_i}\\
+    \vec{f_i}\\
 \end{array} \right\}^{P_i}$ are applied. We denote $P$ the application point on which the equation and all its terms are calculated:
 \begin{equation}
   \sum\limits_i w_i|^P + w_g|^P = 0
@@ -677,8 +687,8 @@ Which is equivalent to:
 \begin{equation}
 \left\{
 \begin{array}{r}
-  \sum\limits_i m_i|^P + \overrightarrow{GP}\wedge Mg\vec{z} = 0 \\
-  \sum\limits_i f_i - Mg\vec{z} = 0 \\
+  \sum\limits_i \vec{m_i}|^P + \overrightarrow{GP}\wedge Mg\vec{z} = 0 \\
+  \sum\limits_i \vec{f_i} - Mg\vec{z} = 0 \\
 \end{array}
 \right.
 \end{equation}
@@ -687,8 +697,8 @@ This equation can be simplified by applying it on the center of mass of the body
 \begin{equation}
   \left\{
   \begin{array}{r}
-    \sum\limits_i m_i|^G = 0 \\
-    \sum\limits_i f_i - Mg\vec{z} = 0 \\
+    \sum\limits_i \vec{m_i}|^G = 0 \\
+    \sum\limits_i \vec{f_i} - Mg\vec{z} = 0 \\
   \end{array}
   \right.
 \label{eq:stability}
@@ -700,14 +710,15 @@ It is only valid if the robot can generate infinite torques in its articulations
 Otherwise it is necessary to verify that the robot's actuators can generate large enough torques to maintain that posture. The details of torque computation are discussed in Section~\ref{sub:torque_limits}
 
 This equation~\ref{eq:stability} can be used in an optimization problem.
-We considere that each wrench $w_i$ applied on the system is defined by the position of its application point $P_i$ and the values $m_i$ and $f_i$ that represent the moment and force of $w_i$ at $P_i$. $P_i$ depends on $q$ the joint parameter of the robot. $m_i$ and $f_i$ are new variables that need to be added to the problem. In summary, $w_i$ depends on $q$, $m_i$ and $f_i$.
+We considere that each wrench $w_i$ applied on the system is defined by the position of its application point $P_i$ and the values $m_i$ and $f_i$ that represent the moment and resultant of $w_i$ at $P_i$. $P_i$ depends on $q$ the joint parameter of the robot.
+$m_i$ and $f_i$ are new variables that need to be added to the problem. In summary, $w_i$ depends on $q$, $m_i$ and $f_i$.
 We denote $f$ the concatenation of all the variables $m_i$ and $f_i$.
 
 \begin{equation}
   \boxed{s(q,f) = \left\{
   \begin{array}{r}
-    \sum\limits_i m_i + \overrightarrow{P_i G}\wedge \vec{f_i} \\
-    \sum\limits_i f_i - Mg\vec{z} \\
+    \sum\limits_i \vec{m_i} + \overrightarrow{P_i G}\wedge \vec{f_i} \\
+    \sum\limits_i \vec{f_i} - Mg\vec{z} \\
   \end{array}
   \right\}
   = 0}
@@ -734,7 +745,7 @@ The optimization problem~\ref{eq:optim_form_PG} becomes (we denote m the dimensi
 
 The derivation of the static stability constraint is straightforward.
 All the terms of equation~\ref{eq:stability} are components of wrenches.
-A wrench is completely defined by the frame in which it is expressed and its values of force and moment in that frame.
+A wrench is completely defined by the frame in which it is expressed and its values of resultant and moment in that frame.
 Deriving the stability condition comes down to deriving each term w.r.t its components values and w.r.t the transformation of its frame.
 
 \begin{equation}
@@ -753,7 +764,7 @@ We will explicit a method to automatically compute those derivatives in a furthe
 \label{sub:center_of_mass_projection}
 
 In the case where all the wrenches applied to the body are due to unilateral punctual contacts on points that all lay on the same horizontal plane $H = \{O, \vec{x}, \vec{y}\}$, the stability criterion~\ref{eq:stability} can be simplified.
-The wrench $w_i$ generated by a unilateral punctual contact is a pure force, its moment part is null on the contact point.
+The wrench $w_i$ generated by a unilateral punctual contact is a pure force resultant, its moment part is null on the contact point.
 
 \begin{equation*}
     \left. w_i \right|^{P_i} =
@@ -802,7 +813,7 @@ Thus we have the property: A rigid body that has all its contacts with the envir
 In general, satisfying equation~\ref{eq:stability} is not enough to ensure that a robot can be statically stable.
 The joint torques that are required to hold the posture must be within the physical capabilities of the robot, namely, its torque limits.
 We denote $\tau_i^-$ and $\tau_i^+$ the minimal and maximal torques that can be generated by the robot's actuators on joint $J_i$.
-Note that in some cases, the torque limits are not constant and can depend on the joint articular parameters $\tau_i^-(q)$ and $\tau_i^+(q)$.
+Note that in some cases, the torque limits are not constant and can depend on the joint parameters $\tau_i^-(q)$ and $\tau_i^+(q)$.
 For example it is the case with the Atlas robot that is hydraulically actuated.
 
 Featherstone~\cite{featherstone:book:2007} proposes a reccursive algorithm to compute the torques, accelerations and velocites generated in a multi articulated system by a set of external forces called the Inverse Dynamics Algorithm.
@@ -842,16 +853,17 @@ Here we use the same frames and notations as introduced in Section~\ref{sub:cont
 
 The contacts involved in a posture generation problem can be separated in two types: Geometric Contacts and Stability Contacts.
 
-The geometry contact is a contact without efforts, the two bodies are touching eachother, but do not apply any efforts on eachother.
-Physically, that correspond to the transition state between a configuration without contact and a configuration with contact on which efforts are applied.
-We defined the Geometric contacts in Section~\ref{sub:contact_constraints}
-The stability contact is a geometry contact that bears interaction efforts.
-We denote $w_{\{B_1\rightarrow B_2\}}$ the effort applied by body $B_1$ on body $B_2$. Then the effort applied by $B_2$ on $B_1$ is $w_{\{B_2\rightarrow B_1\}} = -w_{\{B_1\rightarrow B_2\}}$.
-These interaction efforts must be taken into account in the stability and torque computations of each robot involved in the contact.
+The Geometric Contact is a contact without forces, the two bodies are touching eachother, but do not apply any force on eachother.
+Physically, that correspond to the transition state between a configuration without contact and a configuration with contact on which forces are applied.
+We defined the Geometric Contacts in Section~\ref{sub:contact_constraints}.
+The Stability Contact is a Geometric Contact that bears interaction forces.
+We denote $w_{1\rightarrow 2}$ the force applied by body $B_1$ on body $B_2$. Then the force applied by $B_2$ on $B_1$ is $w_{2\rightarrow 1} = -w_{1\rightarrow 2}$.
+These interaction forces must be taken into account in the stability and torque computations of each robot involved in the contact.
 
-The interaction effort resulting from a punctual contact on a point $P$ can be modeled as a pure force along the $z_1$ direction $\vec{f_n} = f_z \vec{z_1}$ and the tangential efforts due to friction in that contact can be modeled as $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$. A punctual contact cannot carry moments on its contact point.
+The interaction force resulting from a punctual contact (see figure~\ref{fig:frictionCone}) on a point $P$ can be modeled as a pure force resultant along the $z_1$ direction $\vec{f_n} = f_z \vec{z_1}$ and the tangential efforts due to the friction in that contact can be modeled as $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$. A punctual contact cannot carry moments on its contact point.
+
 \begin{equation}
-\label{eq:punctual_effort}
+\label{eq:punctual_force}
 \left. w_{2\rightarrow 1}\right|^P = \left\{
   \begin{array}{l}
     \vec{0} \\
@@ -860,7 +872,14 @@ The interaction effort resulting from a punctual contact on a point $P$ can be m
   \right\}^P
 \end{equation}
 
-This formulation of the interaction effort defines a bilateral contact, in the sense that the effort can be in any direction, $B_1$ can push as well as pull on $B_2$.
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.6\linewidth]{frictionCone.pdf}
+  \caption{Punctual unilateral Stability contact with friction}
+\label{fig:frictionCone}
+\end{figure}
+
+This formulation of the interaction force defines a bilateral contact, in the sense that the force can be in any direction, $B_1$ can push as well as pull on $B_2$.
 
 To model a unilateral contact, we must constrain the normal component of $f_{2\rightarrow 1}$ to be oriented toward the inside of $B_1$. Which means that only pushing actions can be generated, not pulling actions.
 This translates into:
@@ -869,19 +888,12 @@ This translates into:
 \end{equation}
 
 Furthermore, for the contact to be stable, the Coulomb friction law must be respected.
-This law states that the contact force must lay inside a friction cone of angle $\mu$, the friction coefficient.
+This law states that the contact force resultant must lay inside a friction cone of angle $\mu$, the friction coefficient.
 Which translates into the following equation:
 
 \begin{equation}
   \mu\|\vec{f_n}\| \geq \|\vec{f_t}\|
 \end{equation}
-
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.6\linewidth]{frictionCone.pdf}
-  \caption{Punctual unilateral stability contact with friction}
-\label{fig:frictionCone}
-\end{figure}
 
 Given the decomposition of $f_{2\rightarrow 1}$ in $F_1$, $f_{2\rightarrow 1} = f_x \vec{x_1} + f_y \vec{y_1} + f_z \vec{z_1}$.
 For any punctual contact in a posture generation problem, we can add the following set of constraint to our optimization problem:
@@ -891,14 +903,17 @@ For any punctual contact in a posture generation problem, we can add the followi
   \left\{
   \begin{array}{l}
     f_z \geq 0 \\
-    \mu^2 f_z^2 \geq f_x^2 +f_y^2
+    \mu^2 f_z^2 - f_x^2 +f_y^2 \geq 0
   \end{array}
   \right.
 \end{equation}
 
-When it comes to planar contacts, the interaction effort can have components of forces and moments in all directions if we considere the efforts intrinsic to the contact: a force normal to the contact surface $\vec{f_n} = f_z \vec{z_1}$ and a moment tangential to it $\vec{m_t} = m_x \vec{x_1} + m_y \vec{y_1}$ and the efforts due to friction: Tangential friction force $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$ and a normal friction moment $\vec{m_n} = m_z \vec{z_1}$.
+When it comes to planar contacts on surface $S$ with $\vec{n}$ the outbound normal to $S$, the interaction force can have components of forces and moments in all directions.
+The forces components intrinsic to the planar contact model are a resultant part aligned with $\vec{n}$ $\vec{f_n} = f_z \vec{z_1}$ and a moment part tangential to $S$: $\vec{m_t} = m_x \vec{x_1} + m_y \vec{y_1}$.
+The forces due to friction are a tangential friction resultant part $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$ and a normal friction moment $\vec{m_n} = m_z \vec{z_1}$.
 
-This type of effort can be modeled by applying a single unilateral friction punctual effort on each vertex of a polygon describing the contact area. And ensuring that each of them lay in their respective friction cone, thus satisfies the equation~\ref{eq:unilateralContact}. As depicted in figure~\ref{fig:planarContact}
+This type of force can be modeled by a set of unilateral punctual efforts applied on each vertex of a polygon describing the contact area.
+And ensuring that each of them lay in their respective friction cone, thus satisfying the equation~\ref{eq:unilateralContact}. As depicted in figure~\ref{fig:planarContact}
 
 \begin{figure}[htpb]
   \centering
@@ -909,28 +924,71 @@ This type of effort can be modeled by applying a single unilateral friction punc
 \label{fig:planarContact}
 \end{figure}
 
+\section{Cost Functions}
+\label{sec:cost_functions}
+
+In addition to constraints, it is often useful to add a cost function to our optimization problem.
+The submanifold of feasible configutations $\mathcal{C}_F$ can contain an inifinity of solutions, and even some continuous solution areas in which all points are solutions.
+The cost function helps choosing the "best" candidate solution.
+Various types of cost functions can be chosen, for example we can minimize the distance to a reference posture $q_R$:
+
+\begin{equation*}
+  f_\text{posture}(q) = \|q-q_R\|
+\end{equation*}
+
+The effect of that type of cost function is illustrated in figure~\ref{fig:cost}. On both images the HRP-2 Kai robot is stable, respects its joints and torques limits. The only difference is that the right one mimimizes the distance to a reference posture (standing straight with bent knees) while the left result does not use a cost function.
+
+\begin{figure}[htpb]
+  \centering
+  \setlength{\fboxsep}{0pt}%
+  \setlength{\fboxrule}{1pt}%
+  \fbox{\includegraphics[width=0.5\linewidth]{cost.pdf}}
+  \caption{Effect of cost function. Left: no cost function. Right: Distance to posture}
+  \label{fig:cost}
+\end{figure}
+
+We can also want to minimize the sum of norms of contact forces:
+\begin{equation*}
+  f_\text{forces}(f) = \sum\limits_i \|f_i(f)\|
+\end{equation*}
+Or the torques in the robot's joints:
+\begin{equation*}
+  f_\text{torques}(q,f) = \sum\limits_i \|\tau_i(q,f)\|
+\end{equation*}
+Some more custom cost functions can also be considered, for example we can want a point $P_i$ on body $B_i$ with to be as far as possible in a direction $\vec{d}$
+\begin{equation*}
+  f_\text{point} (q) = -{\overrightarrow{O_W P_i}}\cdot{\vec{d}}
+\end{equation*}
+
+Any positively weighted combination of cost function can be used. In which case it is important to choose the weights carefully to scale all the costs so that they all can influence the result and none is completely dominated by another.
+\begin{equation}
+  f_\text{cost}(q,f) = \sum\limits_i{w_if_i(q,f)} = w_0 f_\text{posture}(q) + w_1 f_\text{forces}(f) + w_2f_\text{torques}(q,f) + \cdots
+\end{equation}
+
 \section{Conclusion}
 \label{sec:Ch1_Conclusion}
 
-Variable q,f,tau
+In this section we have seen how to formulate a robotics problem with several different tasks and objectives as an optimization problem.
 
-Cost function
+We denote $\mathcal{T}_i$ the additional tasks added to the problem, which is described by the set of equations $g_i(q,f) = 0$ and inequations $h_i(q,f) \geq 0$.
+The contact tasks are included in those and the equations describing them must encompass the geometric contact constraint equation like~\ref{eq:coplanarity} as well as the unilaterality and friction equations~\ref{eq:unilateralContact} in the case of a unilateral contact.
 
-How to write constraints:
-Bounds
-Linear part
-NonLinear part
+A typical robotics problem can be written as a combination of all those costs and constraints:
+\begin{align}
+\min_{q, f} & \quad f_\text{cost}(q,f) \nonumber\\
+\text{s.t.}&
+\left\{
+\begin{array}{lr}
+q^- \le q \le q^+\\
+s(q,f) = 0 \\
+\tau^- \le \tau(f,q) \le \tau^+\\
+\forall \{B_i, B_j, \epsilon_{ij}\} \in Coll,\ d_{\{B_i, B_j\}}(q) > \epsilon_{ij}\\
+g_i(q,f) = 0\ \ \forall\mathcal{T}_i,\\
+h_i(q,f) \geq 0\ \ \forall\mathcal{T}_i.
+\end{array}\right.
+\label{eq:PG}
+\end{align}
 
-Here we present the basic formulation of a PG problem.
 
-The free-flyer, the articular space and the forces being the usual variables.
 
-Presentation of all the constraints and their formulation
-\begin{itemize}
-  \item Joint limits
-  \item Auto-collision
-  \item Collisions with environment
-  \item Contacts with environment
-  \item Stability
-  \item Torque limits
-\end{itemize}
+
