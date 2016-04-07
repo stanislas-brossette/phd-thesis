@@ -30,3 +30,25 @@
   \item{Several scenarios, including Airbus}
 \end{itemize}
 
+\section{Application to contact planning on real environment}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  SECTION APPLICATION TO CONTACT PLANNING ON REAL ENVIRONMENT  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Understanding the environment through a point-cloud}
+Segmentation pipeline:
+\begin{itemize}
+  \item Acquisition
+  \item Filtering
+  \item Region growing segmentation
+  \item Planar Extraction
+  \item Planar projection and Hull convex generation
+  \item Re-orientation and transfer to the planner
+\end{itemize}
+
+\subsection{Contact generation with convex surface inclusions}
+Usual methods for generating surface contact are based on point-to-point sampling, on rectangular inclusion, or other limiting methods. We proposed to extend that to the inclusion of convex surfaces.
+
+\subsection{Simulated scenarios planned on real-environment}
+We present 2 planned scenarios with the HRP-2 robot

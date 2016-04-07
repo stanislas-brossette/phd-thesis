@@ -22,7 +22,13 @@
 
 \graphicspath{{Chapter1-PG/Figs/Vector/}{Chapter1-PG/Figs/}}
 
+
 \section{List of contributions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   SECTION LIST OF CONTRIBUTIONS                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{itemize}
   \item Generalities, introduction
   \item Presentation of the existing methods
@@ -52,8 +58,13 @@
   \item Utilization of posture generation in planning
 \end{itemize}
 
+
 \section{Problem Definition}
 \label{sec:problem_definition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                     SECTION PROBLEM DEFINITION                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 We consider the problem where we have a robotic system and we want to have it do some tasks, like for example to make a contact between a point on a body of the robot and a point of the environment.
 This contact task can be modelized as a simple equality.
@@ -134,8 +145,16 @@ From this point forward, we formulate and solve posture generation problems as n
 \section{Problem Formulation}
 \label{sec:pg_formulation}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                    SECTION PROBLEM FORMULATION                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Forward Kinematics}
 \label{sub:forward_kinematics}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   SUBSECTION FORWARD KINEMATICS                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section, we present a formulation of robotic systems that allows specifying most of the typical constraints encountered in robotics problems.
 
@@ -258,8 +277,13 @@ In the following section, we provide some detailed description of how to compute
 Using the joint descriptions and the Forward Kinematics algorithm, we are able to explicit a relation between $q$ the joint parameters of the robot and the 3D position and orientation of  any geometric quantity defined in the reference frame of a body of the robot.
 Given a transformation ${}^p X_i$ defined in the frame of $B_i$, its value in the world frame is given by ${}^p X_W (q) = {}^p X_i\ {}^i X_W (q)$
 
+
 \subsection{Joints formulations}
 \label{sub:joints_formulations}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   SUBSECTION JOINTS FORMULATIONS                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The entire geometry of our system is described by the list of static transformations $X^x_j$ and of joint transformations $X^J_j (q)$.
 In this section, we explicit the descriptions and formulations of several useful joints.
@@ -454,8 +478,14 @@ Given a parameter set $q = \{ q_w, q_x, q_y, q_z, t_x, t_y, t_z\}$, we get the f
   \bottomrule
 \end{tabular}
 
+
+
 \subsection{Jacobian computation}
 \label{sub:jacobian_computation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                  SUBSECTION JACOBIAN COMPUTATION                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 For the sake of solving our problem with a non-linear optimization algorithm, it is necessary to compute the derivatives of every function used as constraint or cost with respect to any variable of the problem.
 The transformations ${}^i X_W$ are used in many functions, therefore, having an efficient algorithm to compute their derivatives and the derivatives of any transformation defined in $B_i$ is necessary.
@@ -514,11 +544,21 @@ We write the jacobian of each body at its origin as follows:
   \end{pmatrix}
 \end{equation}
 
+
+
 \section{Geometric constraints}
 \label{sec:geometric_constraints}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%          SECTION GEOMETRIC CONSTRAINTS                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Joint Limits}
 \label{sub:joint_limits}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                      SUBSECTION JOINT LIMITS                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Most robotic joints have geometric limits which define the range of value that can be accessed by the joint variables.
 The joint limits for 1D joints like revolute and prismatic joints are trivial to formulate: We denote $q^-$ and $q^+$ the lower and upper values accessible and add a boundary constraint to the optimization problem:
@@ -542,8 +582,14 @@ A common approach to limit shoulder joint, inspired from the biomechanics field,
 
 The spherical motion can be parameterized by a vector of the unit 3D sphere $S2$ and constrained to lay within a limit cone. And the axial motion can be parameterized in $\mathbb{R}$ and be limited by equation~\ref{eq:joint_limits}, this type of formulation is presented in~\cite{baerlocher}.
 
+
+
 \subsection{Contact constraints}
 \label{sub:contact_constraints}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   SUBSECTION CONTACT CONSTRAINTS                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Humanoid robots evolve in their environment by making and breaking contacts with it.
 A contact can be defined between 2 surfaces of different bodies of robots (Note that one of the robots can be the environment or that the two robots can be the same).
@@ -600,6 +646,10 @@ We illustrate those two types of contacts in figure~\ref{fig:contactConstraint}
 \subsection{Collision avoidance}
 \label{sub:collision_avoidance}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                   SUBSECTION COLLISION AVOIDANCE                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 In order to avoid unwanted collisions between bodies of robots, for two bodies $B_1$ and $B_2$, we want to define a continuously differentiable function $d_{\{B_1, B_2\}}(q)$ that has the properties of a pseudo-distance:
 \begin{itemize}
   \item $d_{\{B_1, B_2\}}(q) > 0$ when the bodies are not touching each other
@@ -628,17 +678,27 @@ Then the set of constraints to add to our problem is:
 
 In many cases, it is possible to avoid the collision between two bodies of a robot by modifying the joint limits and reducing them to a span where the collision of interest cannot happen. That approach is conservative and ad-hoc but can save some precious computation time.
 
+
+
 \section{Static constraints}
 \label{sec:static_constraints}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                SECTION STATIC CONSTRAINTS                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{External Forces}
 \label{sub:external_forces}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                     SUBSECTION EXTERNAL FORCES                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 For a robot to interact with the real world, its geometric description is not enough.
 The robot is subject to forces applied on its bodies by the exterior world, those can be generated by contacts with the environment or with another actor (human, another robot, manipulated object\ldots), by the effect of physical forces like gravitation or magnetism, or by contacts between two bodies of the robot.
 Our posture generator must take those `External forces' into account, be able to estimate the stability of the robot and compute the internal torques generated in the joints.
 
-An external force applied on a rigid body can also be called a wrench and is composed of a resultant part $f$(sometimes abusively called force) and a moment part (sometimes abusively called couple).
+An external force applied on a rigid body can also be called a wrench and is composed of a resultant part $f$ (sometimes abusively called force) and a moment part (sometimes abusively called couple).
 Let $w$ be a wrench, $w|_F^O$ is the expression of $w$ calculated at the point $O$ expressed in the frame $F$.
 We denote $\vec{f}$ the resultant part of w, and $\vec{f}|_F$ the expression of $\vec{f}$ in $F$.
 $\vec{m}$ is the moment part of $w$ and $\vec{m}|_F^O$ the expression of $\vec{m}$ in $F$ calculated at the point $O$.
@@ -664,8 +724,14 @@ Whereas the resultant part is invariant with respect to the point at which the w
 
 Note that the frame subscript can be dropped in some equations where the choice of the frame does not matter and assuming that all the quantities of the equations are computed in the same frame.
 
+
+
 \subsection{Static stability}
 \label{sub:static_stability}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                    SUBSECTION STATIC STABILITY                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 We denote $g$ the acceleration of gravity on earth $g = 9.81 m.s^{-2}$.
 The wrench associated with the action of gravity on a body of mass $M$ which center of mass is denoted $G$ with $\vec{z}$ the upward vertical vector in the world frame $F_W$ is:
@@ -760,8 +826,14 @@ Deriving the stability condition comes down to deriving each term w.r.t its comp
 
 We will explicit a method to automatically compute those derivatives in a further chapter.
 
+
+
 \subsection{Center of mass projection}
 \label{sub:center_of_mass_projection}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                SUBSECTION CENTER OF MASS PROJECTION                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In the case where all the wrenches applied to the body are due to unilateral punctual contacts on points that all lay on the same horizontal plane $H = \{O, \vec{x}, \vec{y}\}$, the stability criterion~\ref{eq:stability} can be simplified.
 The wrench $w_i$ generated by a unilateral punctual contact is a pure force resultant, its moment part is null on the contact point.
@@ -807,8 +879,14 @@ Any point $G_P$ that is included in the convex hull of all the $P_i$ is a soluti
 
 Thus, we have the property: A rigid body that has all its contacts with the environment being punctual, unilateral and all laying on the same horizontal plane $H$ is stable if and only if the projection of its center of mass on $H$ is inside the convex hull of all its contact points.
 
+
+
 \subsection{Torque limits}
 \label{sub:torque_limits}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                      SUBSECTION TORQUE LIMITS                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In general, satisfying equation~\ref{eq:stability} is not enough to ensure that a robot can be statically stable.
 The joint torques that are required to hold the posture must be within the physical capabilities of the robot, namely, its torque limits.
@@ -847,7 +925,14 @@ The torque limit constraint writes as:
 
 We will detail the derivation of this constraint in a further chapter.
 
+
+
 \subsection{Contact Forces and Friction Cones}
+\label{subsec:contact_forces_and_friction_cones}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%            SUBSECTION CONTACT FORCES AND FRICTION CONES             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Here we use the same frames and notations as introduced in Section~\ref{sub:contact_constraints}.
 
@@ -924,12 +1009,18 @@ And ensuring that each of them lay in their respective friction cone, thus satis
 \label{fig:planarContact}
 \end{figure}
 
+
+
 \section{Cost Functions}
 \label{sec:cost_functions}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                       SECTION COST FUNCTIONS                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 In addition to constraints, it is often useful to add a cost function to our optimization problem.
 The submanifold of feasible configurations $\mathcal{C}_F$ can contain an infinity of solutions and even some continuous solution areas in which all points are solutions.
-The cost function helps to choose the "best" candidate solution.
+The cost function helps to choose the `best' candidate solution.
 Various types of cost functions can be chosen, for example, we can minimize the distance to a reference posture $q_R$:
 
 \begin{equation*}
@@ -944,7 +1035,7 @@ The effect of that type of cost function is illustrated in figure~\ref{fig:cost}
   \setlength{\fboxrule}{1pt}%
   \fbox{\includegraphics[width=0.5\linewidth]{cost.pdf}}
   \caption{Effect of cost function. Left: no cost function. Right: Distance to posture}
-  \label{fig:cost}
+\label{fig:cost}
 \end{figure}
 
 We can also want to minimize the sum of norms of contact forces:
@@ -962,11 +1053,17 @@ Some more custom cost functions can also be considered, for example, we can want
 
 Any positively weighted combination of cost function can be used. In which case it is important to choose the weights carefully to scale all the costs so that they all can influence the result and none is completely dominated by another.
 \begin{equation}
-  f_\text{cost}(q,f) = \sum\limits_i{w_if_i(q,f)} = w_0 f_\text{posture}(q) + w_1 f_\text{forces}(f) + w_2f_\text{torques}(q,f) + \cdots
+  f_\text{cost}(q,f) = \sum\limits_i{w_i f_i(q,f)} = w_0 f_\text{posture}(q) + w_1 f_\text{forces}(f) + w_2 f_\text{torques}(q,f) + \cdots
 \end{equation}
+
+
 
 \section{Conclusion}
 \label{sec:Ch1_Conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         SECTION CONCLUSION                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section, we have seen how to formulate a robotics problem with several different tasks and objectives as an optimization problem.
 
