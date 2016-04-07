@@ -96,9 +96,13 @@ Usual methods for generating surface contact are based on point-to-point samplin
 %  SECTION INTEGRATION ON NON-INCLUSIVE CONTACTS IN POSTURE GENERATION  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{abstract}
-In this paper we propose a simple way to formulate geometric contact formation to have an arbitrary intersection shape in a robotic (humanoid) posture generation problem.
-The contact shape is the outcome of our posture generator that is formulated as a non-linear optimization programming to fulfill a large variety of robot intrinsic limitations (e.g.\ joint and torque limits) and tasks (e.g.\ desired contact).
+In Section~\ref{sub:contact_constraints}, we defined a set of constraints (equations~\ref{eq:coplanarity}) that ensures the coplanarity of two planar surfaces in geometric planar contact.
+Those equations guarantee the coplanarity of two infinite planar surfaces.
+Another set of constraints needs be added to ensure the validity of a contact between two finite surfaces $S_1$ and $S_2$.
+That is, to ensure that the intersection of those two surfaces is not empty and that its big enough to support the contact.
+
+In this chapter we propose a simple way to formulate geometric contact formation to have an arbitrary intersection shape in a robotic (humanoid) posture generation problem.
+%The contact shape is the outcome of our posture generator that is formulated as a non-linear optimization programming to fulfill a large variety of robot intrinsic limitations (e.g.\ joint and torque limits) and tasks (e.g.\ desired contact).
 Starting by defining convex areas of contact on the robot's body and the environment, that we call contact patches, we can generate contacts with arbitrary intersection of a pair of any of these predefined patches.
 Our geometric contact modeling writes very simply as additional constraints and variables added to the optimization problem, translating the search for an ellipse inscribed in the intersection of the pair of patches we want in contact.
 The result of our posture generator is then a configuration where contact patches are not necessarily included in one another.
@@ -112,19 +116,19 @@ We illustrate the efficiency of our method in multi-contact posture generation w
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Introduction}
-\label{subsec:intro}
+%\subsection{Introduction}
+%\label{subsec:intro}
 
-Generating viable robotic postures is a common problem encountered in sampling-based planning techniques and simulation of virtual characters.
-Generating desired initial, intermediary or finale posture configurations requires defining static task goals (e.g.\ reach a target point in 6D) to be done under intrinsic constraints such as joint limits, torque limits, avoiding non-desired self-collisions\ldots and perceptual or extrinsic ones such as keeping an object in the embedded camera field-of-view, avoiding non-desired collisions with surrounding objects, etc.
+%Generating viable robotic postures is a common problem encountered in sampling-based planning techniques and simulation of virtual characters.
+%Generating desired initial, intermediary or finale posture configurations requires defining static task goals (e.g.\ reach a target point in 6D) to be done under intrinsic constraints such as joint limits, torque limits, avoiding non-desired self-collisions\ldots and perceptual or extrinsic ones such as keeping an object in the embedded camera field-of-view, avoiding non-desired collisions with surrounding objects, etc.
 A common task objective assigned to virtual characters, avatars, or humanoid robots is to contact one or more of its links with the environment (e.g.\ feet touching the ground).
-Since our main applications target humanoid robots, we consider here posture generation problems inherent to these robots.
-However, the formalism applies to any kind of robots achieving contacts with its surroundings or itself.
+%Since our main applications target humanoid robots, we consider here posture generation problems inherent to these robots.
+%However, the formalism applies to any kind of robots achieving contacts with its surroundings or itself.
 
-Our problem is to generate multi-contact viable postures.
-As far as humanoids are concerned, we may add to the previously cited constraints, equilibrium and non-sliding.
-This paper is dedicated to the focused issue of how contact constraints can be written geometrically.
-Generating postures often uses state-of-the-art enhanced inverse kinematics or general-purpose non-linear optimization programming (where inverse kinematics can be seen as a particular solver case).
+%Our problem is to generate multi-contact viable postures.
+%As far as humanoids are concerned, we may add to the previously cited constraints, equilibrium and non-sliding.
+%This paper is dedicated to the focused issue of how contact constraints can be written geometrically.
+%Generating postures often uses state-of-the-art enhanced inverse kinematics or general-purpose non-linear optimization programming (where inverse kinematics can be seen as a particular solver case).
 
 %\begin{figure}
 %\centering
@@ -175,6 +179,62 @@ To enforce this, we require this intersection to contain an ellipse whose surfac
 Convex patches allow writing the inscription constraints easily by means of half-spaces.
 We finally implement our solution and present some examples for complex multi-contact posture generations with the HRP-2 and ATLAS robots, as shown in~\Figref{fig:hrp2_jrl_complete}.
 
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{ c m{8cm} }
+    \toprule
+    \begin{minipage}{.4\textwidth}
+      \includegraphics[width=0.9\linewidth]{contact1.pdf}
+    \end{minipage}
+    &
+    %\begin{minipage}[t]{5cm}
+    The center point of $P_1$ is included
+    in $P_2$
+    \begin{itemize}
+      \item Easy and cheap to compute
+      \item False negative exist
+    \end{itemize}
+    %\end{minipage}
+    \\ \midrule
+    \begin{minipage}{.4\textwidth}
+      \includegraphics[width=0.8\linewidth]{contact2.pdf}
+    \end{minipage}
+    &
+    %\begin{minipage}[t]{5cm}
+    $P_1$ is fully included in $P_2$
+    \begin{itemize}
+      \item Eliminates many valid solutions
+    \end{itemize}
+    %\end{minipage}
+    \\ \midrule
+    \begin{minipage}{.4\textwidth}
+      \includegraphics[width=\linewidth]{contact3.pdf}
+    \end{minipage}
+    &
+    %\begin{minipage}[t]{5cm}
+    $P_1$ contains a set of sampled points, the center of $P_2$ has to match one of them
+    \begin{itemize}
+      \item Discrete set of possible solutions
+      \item Eliminates many valid solutions
+      \item Requires discrete optimization routines
+    \end{itemize}
+    %\end{minipage}
+    \\ \midrule
+    \begin{minipage}{.4\textwidth}
+      \includegraphics[width=0.9\linewidth]{contact4.pdf}
+    \end{minipage}
+    &
+    %\begin{minipage}[t]{5cm}
+    The contact is valid if an ellipse of sufficient size is found in
+    the $P_1 \cap P_2$
+    \begin{itemize}
+      \item Does not eliminate valid solutions
+    \end{itemize}
+    %\end{minipage}
+    \\ \bottomrule
+  \end{tabular}
+  \caption{Contact descriptions}\label{tbl:contact_description}
+\end{table}
 
 \subsection{Contact geometry formulation}
 \label{subsec:contact_geometry_formulation}
@@ -283,8 +343,8 @@ The next section presents a more general formulation
 
 \subsection{Non inclusive contact constraints}
 \label{subsec:ellipse}
-\subsection{Main Idea}
-\label{subsec:idea}
+\subsubsection{Main Idea}
+\label{subsubsec:idea}
 We present our main contribution: a smooth formulation of the non empty intersection between two contact surfaces.
 We assume that co-planarity of $S_1$ and $S_2$ is obtained by using the constraints presented in the previous section.
 Here we focus on the intersection of the two polygons $P_1$ and $P_2$, respectively describing the contours of $S_1$ and $S_2$.
