@@ -23,40 +23,40 @@
 \graphicspath{{Chapter1-PG/Figs/Vector/}{Chapter1-PG/Figs/}}
 
 
-\section{List of contributions}
+%\section{List of contributions}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                   SECTION LIST OF CONTRIBUTIONS                     %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                   SECTION LIST OF CONTRIBUTIONS                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{itemize}
-  \item Generalities, introduction
-  \item Presentation of the existing methods
-  \item From Inverse Kinematics to Generalized IK/posture Generation/pose estimation (addition of articular limits, forces, stability etc).
-  \item Topology of the parametrization space (Free-flyer, q, f, other)
-  \item Formulation as a non-linear constrained optimization problem
-  \item Adrien \& Karim's formulations
-  \item Formulation of several types of cost/constraints
-  \begin{itemize}
-    \item Contact with planar surface
-    \item Collision avoidance
-    \item Auto-Collision avoidance
-    \item Static equilibrium: Newton/CoM projection
-    \item Forces in friction cones
-    \item Articular limits
-    \item Torque limits
-    \item Torque minimization
-    \item Goal Posture
-  \end{itemize}
-  \item Reasons why it is not enough and why we needed a new PG
-    \begin{itemize}
-      \item Having an easier way to formulate problems
-      \item Avoid having to de some gymnastic to remain on manifolds
-      \item Automatic variable management
-      \item Robustness
-    \end{itemize}
-  \item Utilization of posture generation in planning
-\end{itemize}
+%\begin{itemize}
+  %\item Generalities, introduction
+  %\item Presentation of the existing methods
+  %\item From Inverse Kinematics to Generalized IK/posture Generation/pose estimation (addition of articular limits, forces, stability etc).
+  %\item Topology of the parametrization space (Free-flyer, q, f, other)
+  %\item Formulation as a non-linear constrained optimization problem
+  %\item Adrien \& Karim's formulations
+  %\item Formulation of several types of cost/constraints
+  %\begin{itemize}
+    %\item Contact with planar surface
+    %\item Collision avoidance
+    %\item Auto-Collision avoidance
+    %\item Static equilibrium: Newton/CoM projection
+    %\item Forces in friction cones
+    %\item Articular limits
+    %\item Torque limits
+    %\item Torque minimization
+    %\item Goal Posture
+  %\end{itemize}
+  %\item Reasons why it is not enough and why we needed a new PG
+    %\begin{itemize}
+      %\item Having an easier way to formulate problems
+      %\item Avoid having to de some gymnastic to remain on manifolds
+      %\item Automatic variable management
+      %\item Robustness
+    %\end{itemize}
+  %\item Utilization of posture generation in planning
+%\end{itemize}
 
 
 \section{Problem Definition}
@@ -571,7 +571,7 @@ Planar joints are easy to limit because their 3 variables are independent.
 Each variable can be separately limited.
 Limiting the movements of a spherical joint, and by extension, of a free joint, is more complicated.
 In humanoid robotics, spherical joints can be used to model the shoulder or hip joint of the robot.
-A common approach to limit shoulder joint, inspired from the biomechanics field, considers the spherical motion (or swing) and the axial motion (or twist) separately as shown in figure~\ref{fig:ballAndSocket}.
+A common approach to limit shoulder joint, inspired from the biomechanics field, considers the spherical motion (or swing) and the axial motion (or twist) separately as shown in~\Figref{fig:ballAndSocket}.
 
 \begin{figure}[htpb]
   \centering
@@ -640,7 +640,7 @@ If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such th
   \right.}
 \end{equation}
 
-We illustrate those two types of contacts in figure~\ref{fig:contactConstraint}
+We illustrate those two types of contacts in~\Figref{fig:contactConstraint}
 
 
 \subsection{Collision avoidance}
@@ -770,12 +770,12 @@ This equation can be simplified by applying it at the center of mass of the body
 \label{eq:stability}
 \end{equation}
 
-Satisfying~\ref{eq:stability} ensures the stability of a rigid body.
+Satisfying~\Eqref{eq:stability} ensures the stability of a rigid body.
 In some cases, an articulated robot is considered as a rigid body and this equation alone can be used to ensure its stability.
 It is only valid if the robot can generate infinite torques in its articulations, or at least if we have some guarantee that the robot is able to generate large enough torques.
 Otherwise, it is necessary to verify that the robot's actuators can generate large enough torques to maintain that posture. The details of torque computation are discussed in Section~\ref{sub:torque_limits}
 
-This equation~\ref{eq:stability} can be used in an optimization problem.
+Equation~\ref{eq:stability} can be used in an optimization problem.
 We consider that each wrench $w_i$ applied on the system is defined by the position of its application point $P_i$ and the values $m_i$ and $f_i$ that represent the moment and resultant of $w_i$ at $P_i$. $P_i$ depends on $q$ the joint parameter of the robot.
 $m_i$ and $f_i$ are new variables that need to be added to the problem. In summary, $w_i$ depends on $q$, $m_i$ and $f_i$.
 We denote $f$ the concatenation of all the variables $m_i$ and $f_i$.
@@ -847,7 +847,7 @@ The wrench $w_i$ generated by a unilateral punctual contact is a pure force resu
   \end{array} \right\}^{P_i}
 \end{equation*}
 
-\ref{eq:stability} becomes:
+\Eqref{eq:stability} becomes:
 
 \begin{equation}
 \left\{
@@ -938,14 +938,21 @@ Here we use the same frames and notations as introduced in Section~\ref{sub:cont
 
 The contacts involved in a posture generation problem can be separated into two types: Geometric Contacts and Stability Contacts.
 
-The Geometric Contact is a contact without forces, the two bodies are touching each other, but do not apply any force on each other.
+The Geometric Contact is a contact where the position of contact is reached, but that contact does not support any contact forces (this is a necessary step to generate a sequence of quasi-static transitions).
 Physically, that correspond to the transition state between a configuration without contact and a configuration with contact on which forces are applied.
 We defined the Geometric Contacts in Section~\ref{sub:contact_constraints}.
 The Stability Contact is a Geometric Contact that bears interaction forces.
+
+In planning, contacts are added or removed one by one between successive postures.
+In order to add or remove a stability contact, it is necessary to go through a geometric contact (That guarantees the continuity on contact forces).
+First a geometric contact configuration is found, then on the next posture, that geometric contact is fixed ond forces are added on it, it becomes a stability contact.
+Similarly, to remove a stability contact, we first look for a posture with a fixed geometric contact in place of the stability contact to remove.
+And on the next posture, the contact can be removed.
+
 We denote $w_{1\rightarrow 2}$ the force applied by body $B_1$ on body $B_2$. Then the force applied by $B_2$ on $B_1$ is $w_{2\rightarrow 1} = -w_{1\rightarrow 2}$.
 These interaction forces must be taken into account in the stability and torque computations of each robot involved in the contact.
 
-The interaction force resulting from a punctual contact (see figure~\ref{fig:frictionCone}) on a point $P$ can be modeled as a pure force resultant along the $z_1$ direction $\vec{f_n} = f_z \vec{z_1}$ and the tangential efforts due to the friction in that contact can be modeled as $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$. A punctual contact cannot carry moments on its contact point.
+The interaction force resulting from a punctual contact (see~\Figref{fig:frictionCone}) on a point $P$ can be modeled as a pure force resultant along the $z_1$ direction $\vec{f_n} = f_z \vec{z_1}$ and the tangential efforts due to the friction in that contact can be modeled as $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$. A punctual contact cannot carry moments on its contact point.
 
 \begin{equation}
 \label{eq:punctual_force}
@@ -998,7 +1005,7 @@ The forces components intrinsic to the planar contact model are a resultant part
 The forces due to friction are a tangential friction resultant part $\vec{f_t} = f_x \vec{x_1} + f_y \vec{y_1}$ and a normal friction moment $\vec{m_n} = m_z \vec{z_1}$.
 
 This type of force can be modeled by a set of unilateral punctual efforts applied on each vertex of a polygon describing the contact area.
-And ensuring that each of them lay in their respective friction cone, thus satisfying the equation~\ref{eq:unilateralContact}. As depicted in figure~\ref{fig:planarContact}
+And ensuring that each of them lay in their respective friction cone, thus satisfying the equation~\ref{eq:unilateralContact}. As depicted in~\Figref{fig:planarContact}
 
 \begin{figure}[htpb]
   \centering
@@ -1027,7 +1034,7 @@ Various types of cost functions can be chosen, for example, we can minimize the 
   f_\text{posture}(q) = \|q-q_R\|
 \end{equation*}
 
-The effect of that type of cost function is illustrated in figure~\ref{fig:cost}. On both images, the HRP-2 Kai robot is stable, respects its joints and torques limits. The only difference is that the right one mimimizes the distance to a reference posture (standing straight with bent knees) while the left result does not use a cost function.
+The effect of that type of cost function is illustrated in~\Figref{fig:cost}. On both images, the HRP-2 Kai robot is stable, respects its joints and torques limits. The only difference is that the right one mimimizes the distance to a reference posture (standing straight with bent knees) while the left result does not use a cost function.
 
 \begin{figure}[htpb]
   \centering
