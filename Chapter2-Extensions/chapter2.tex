@@ -14,9 +14,11 @@ First we present a novel method called Integration of Non-Inclusive Contacts in 
 Second we present a generic algorithm to compute efficiently the derivative of the joint torques of a robot.
 Third we present our endeavour to apply an optimization method called `Lifted Newton Method', presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472}, to problems of inverse kinematics.
 
-%\section{List of contributions}
+%{{{ SECTION: List of contributions
 
+%\section{List of contributions}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %%                  SECTION LIST OF CONTRIBUTIONS                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -87,7 +89,8 @@ Third we present our endeavour to apply an optimization method called `Lifted Ne
     %\end{itemize}
 %\end{itemize}
 
-
+%}}}
+%{{{SECTION: Integration on Non-Inclusive Contacts in Posture Generation
 
 \section{Integration on Non-Inclusive Contacts in Posture Generation}
 
@@ -335,20 +338,20 @@ Now let us consider a single segment $p_i p_j$ and an ellipse $\mathcal{E}$ defi
 The expression of a vector ${{\bf v}_{F_0}}^T = {[v_x, v_y]}_{F_0}$ in $F_\mathcal{E}$ is obtained by applying the formula~(\ref{eq:F0-to-FE})
 \begin{equation}
 {\bf v}_{F_\mathcal{E}} =
-\begin{pmatrix}
+\begin{bmatrix}
 \frac{1}{r_x} & 0 \\
 0 & \frac{1}{r_y}
-\end{pmatrix}
-\cdot \begin{pmatrix}
+\end{bmatrix}
+\cdot \begin{bmatrix}
 \cos(\theta) & \sin(\theta) \\
 -\sin(\theta) & \cos(\theta)
-\end{pmatrix}
+\end{bmatrix}
 \cdot {\bf v}_{F_0}
 \label{eq:F0-to-FE}
 \end{equation}
 In $F_\mathcal{E}$, the distance between the circumference of $\mathcal{E}$ and the segment $p_i p_j$ is:
 \begin{equation}
-	d_s(\mathcal{E}, p_i p_j) = \frac{{\left.\overrightarrow{p_i p_j}\right|}_{F_\mathcal{E}} \wedge {\left.\overrightarrow{p_i O_\mathcal{E}}\right|}_{F_\mathcal{E}}}{\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E}}}-r_{\mathcal{E}}
+	d_s(\mathcal{E}, p_i p_j) = \frac{{\left.\overrightarrow{p_i p_j}\right|}_{F_\mathcal{E}} \wedge {\left.\overrightarrow{p_i O_\mathcal{E}}\right|}_{F_\mathcal{E} } }{\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E} } }-r_{\mathcal{E}}
 \end{equation}
 where $\wedge$ denotes the cross product and $O_{\mathcal{E}}$ is the center of the ellipse.
 
@@ -679,6 +682,8 @@ This methods extends straightforwardly to point cloud data as far as polygonal p
 %Finally, on a planning point of view, ~\Figref{fig:ladder} shows us a new challenge: while the posture found is perfectly correct as the robot is stable, not colliding with its environment and the contacts are where we asked them to be, the posture is obviously difficult to attain, if possible at all.
 %We will need to investigate what type of heuristic to use to avoid this kind of results in the middle of a plan.
 
+%}}}
+%{{{SECTION: Torque derivation
 
 \section{Torque derivation}
 \label{sec:torque_derivation}
@@ -687,52 +692,56 @@ This methods extends straightforwardly to point cloud data as far as polygonal p
 %                     SECTION TORQUE DERIVATION                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The computation of the torque jacobian $\frac{\partial \tau}{\partial q}$ with respect to the articular parameters is done by differenciating algorithm~\ref{IS}.
-We first write algorithm~\ref{IS} in its matrix form.
+In this section, we present an efficient algorithm to compute the Jacobian of the joint torques in a robot with respect to all the articular variables of the robot and the variables involved in the expression of the external forces applied on the robot.
+The evaluation of the joint torques Jacobian is necessary to conduct an optimization algorithm in which the torques are involved in constraints or cost functions.
+The computation of the joint torques jacobian is done by differenciating algorithm~\ref{alg:IS}.
+In most cases, the acceleration of gravity could be replaced by its value on earth $\mathbf{a_c} = \vec{0}$ and $\mathbf{a_f} = g \vec{z}$.
+For the sake of genericity, we keep it as $\mathbf{a_c}$ and $\mathbf{a_f}$ in the algorithm description, which could be useful if the robot is in an accelerating vehicle, for example.
+We first write algorithm~\ref{alg:IS} in its matrix form.
 
 \begin{algorithm}
-  \caption{Inverse Static Matrix form}
+  \caption{Inverse Static algorithm on Matrix Form}
 \label{ISmatrix}
 \begin{algorithmic}
   \For{$i = 0:n_B$}\\
   $f^G_i =
-  \begin{pmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
+  \end{bmatrix}
   =
   \mathbf{I}^W
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & \mathbf{0} \\
     -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{ac} \\ \mathbf{af}
-  \end{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{a_c} \\ \mathbf{a_f}
+  \end{bmatrix}
   -
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
     \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
-  \end{pmatrix}
+  \end{bmatrix}
   $
   \EndFor{}
   \For{$i = n_J-1:0$}
   \State$\tau_i = {f^G_i}^T S_i$
   \If{$pred(i) \neq -1$}
   \State$f^G_{pred(i)} =
-  \begin{pmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{G}_{pred(i)} \\ \mathbf{f}^{G}_{pred(i)}
-  \end{pmatrix}
+  \end{bmatrix}
   +=
-  \begin{pmatrix}
+  \begin{bmatrix}
     {\mathbf{R}^{PtS}_i}^T & \widehat{\mathbf{t}^{PtS}_i}{\mathbf{R}^{PtS}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{PtS}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
+  \end{bmatrix}
   $
   \EndIf{}
   \EndFor{}
@@ -740,13 +749,37 @@ We first write algorithm~\ref{IS} in its matrix form.
 \end{algorithm}
 
 The variables of this algorithm w.r.t which we need to differenciate it are the geometric parameters of the robot $q$ and the variables of the external wrenches which can contain $q$ and some other variables $y$.
+We denote $\text{dim(q)}$ and $\text{dim(y)}$ the dimensions of $q$ and $y$ respectively.
 We assume that the derivatives of $m_i^{ext}$ and $f_i^{ext}$: $\frac{\partial m_i^{ext}}{\partial q}$, $\frac{\partial m_i^{ext}}{\partial y}$, $\frac{\partial f_i^{ext}}{\partial q}$ and $\frac{\partial f_i^{ext}}{\partial y}$ are known.
+The external forces can depend on a number of variables other than $q$, for example, in the case of a contact with another robot, the application point and value of those forces depend on $q$ and also on the articular values of the other robot.
 
 Besides $m_i^{ext}$ and $f_i^{ext}$ all the quantities of the algorithm depend only on $q$.
 Therefore, the derivation w.r.t $y$ is trivial and is automatically computed by our final algorithm.
 From here we will focus on the derivation w.r.t $q$.
 
-Note the following relations:
+Recall the expression of the Jacobian of a robot's body:
+\begin{equation}
+  \mathbf{Jac}^W_i =
+  \begin{bmatrix}
+    \frac{\partial {}^i\mathbf{R}_W}{\partial q_0} & \cdots &
+    \frac{\partial {}^i\mathbf{R}_W}{\partial q_j} & \cdots &
+    \frac{\partial {}^i\mathbf{R}_W}{\partial q_{dof}} \\
+    \frac{\partial {}^i\mathbf{t}_W}{\partial q_0} & \cdots &
+    \frac{\partial {}^i\mathbf{t}_W}{\partial q_j} & \cdots &
+    \frac{\partial {}^i\mathbf{t}_W}{\partial q_{dof}}
+  \end{bmatrix}
+=
+  \begin{bmatrix}
+    \omega_{i,0} & \cdots &
+    \omega_{i,j} & \cdots &
+    \omega_{i,dof} \\
+    v_{i,0} & \cdots &
+    v_{i,j} & \cdots &
+    v_{i,dof}
+  \end{bmatrix}
+\end{equation}
+
+Note the following relations that make use of the robot's Jacobian to compute derived quantities:
 \begin{align}
   \frac{\partial {}^i\mathbf{R}_W \mathbf{u}}{\partial q_j}
   &= {}^i\mathbf{R}_W \mathbf{u} \wedge \omega_{i,j}
@@ -763,70 +796,71 @@ Let's differentiate the first equation of~\ref{ISmatrix} w.r.t $q_j$.
 
 \begin{align}
   A &=
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & \mathbf{0} \\
     -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{ac} \\ \mathbf{af}
-  \end{pmatrix} \\
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{a_c} \\ \mathbf{a_f}
+  \end{bmatrix} \\
   B &=
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
     \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
-  \end{pmatrix} \\
+  \end{bmatrix} \\
   f^G_i &= \mathbf{I}^W A-B\\
   \frac{\partial A}{\partial q_j} &=
-  \begin{pmatrix}
+  \begin{bmatrix}
     {}^i\mathbf{R}_W \widehat{\bf ac} \omega_{i,j}\\
     -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}{\bf ac} \right)}\omega_{i,j}
     + {{}^i\mathbf{R}_W}\widehat{\bf ac} v_{i,j} + {}^i\mathbf{R}_W \widehat{\bf af} \omega_{i,j}\\
-  \end{pmatrix}
+  \end{bmatrix}
   \\
   \frac{\partial B}{\partial q_j} &=
-  \begin{pmatrix}
+  \begin{bmatrix}
     - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)}\omega_{i,j}
     + {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} v_{i,j} + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i} \omega_{i,j}\\
     {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} \omega_{i,j}\\
-  \end{pmatrix}
+  \end{bmatrix}
   \\&+
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
     \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
-  \end{pmatrix}
+  \end{bmatrix}
 \end{align}
 
-Putting all the pieces of $\omega$ and $v$ allows to group all the j-derivatives to obtain the jacobian of $f^G_i$ with a single equation.
+We rearrange the equations in order to make the jacobian appear.
+Putting all the pieces of $\omega$ and $v$ allows to group all the j-derivatives to obtain the derivative of $f^G_i$ with a single equation.
 
 \begin{align}
   \bf M &=
-  \begin{pmatrix}
+  \begin{bmatrix}
     {}^i\mathbf{R}_W \widehat{\bf ac}  & 0\\
     -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf ac \right)}
     + {}^i\mathbf{R}_W \widehat{\bf af}  & {{}^i\mathbf{R}_W}\widehat{\bf ac} \\
-  \end{pmatrix}
+  \end{bmatrix}
   \\
   \bf N &=
-  \begin{pmatrix}
+  \begin{bmatrix}
     - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)} + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i} & {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} \\
     {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
-  \end{pmatrix}
+  \end{bmatrix}
   \\
   \frac{\partial f^G_i}{\partial q} &= (\mathbf{I}^W \mathbf{M} - \mathbf{N})\mathbf{Jac}^W_i
   +
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
     \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
-  \end{pmatrix}
+  \end{bmatrix}
 \end{align}
 
 The derivation of the second equation is obvious:
@@ -854,121 +888,151 @@ The last equation's derivation goes like follows:
 
 \begin{align}
   f^G_{pred(i)} & +=
-  \begin{pmatrix}
+  \begin{bmatrix}
     {\mathbf{R}^{PtS}_i}^T & \widehat{\mathbf{t}^{PtS}_i}{\mathbf{R}^{PtS}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{PtS}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
+  \end{bmatrix}
   \\
-  & += \begin{pmatrix}
+  & += \begin{bmatrix}
     {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     {\mathbf{R}^{J}_i}^T & \widehat{\mathbf{t}^{J}_i}{\mathbf{R}^{J}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{J}_i}^T \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
-  \end{pmatrix}
+  \end{bmatrix}
   \\
-  K_i &=
-  \begin{pmatrix}
+\end{align}
+
+\begin{equation}
+  K_i =
+  \begin{bmatrix}
     \widehat{({\mathbf{R}_i^J}^T \mathbf{m}^{G}_i)}
     + \left({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i\right) \cdot {\mathbf{t}^J_i}^T
     - \left( {({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)}^T \cdot \mathbf{t}^J_i\right) \mathbf{I}_3
     & -\widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} \\
     \widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} & 0
-  \end{pmatrix}
-  \\
-  \frac{\partial f^G_{pred(i)}}{\partial q} & -=
-  \begin{pmatrix}
+  \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+  \frac{\partial f^G_{pred(i)}}{\partial q} -=
+  \begin{bmatrix}
     {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
-  \end{pmatrix}
-  K_i S_i
-\end{align}
+  \end{bmatrix}
+  K_i \mathbf{S_i}
+\end{equation}
+
+In the following algorithm, we use the following notation $x$ to combine the the variables $q$ and $y$:
+\begin{equation}
+  x = \begin{bmatrix}
+    q & y
+  \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+  \frac{\partial f_{ext}}{\partial x} =
+  \begin{bmatrix}
+    \frac{\partial \mathbf{m}^{ext}_i}{\partial q} & \frac{\partial \mathbf{m}^{ext}_i}{\partial y}
+    \\
+    \frac{\partial \mathbf{f}^{ext}_i}{\partial q} & \frac{\partial \mathbf{f}^{ext}_i}{\partial y}
+  \end{bmatrix}
+\end{equation}
 
 
-The entire algorithm for calculating the torque jacobian w.r.t the articular parameters comes down to:
+The entire algorithm for calculating the torque jacobian is presented in Algorithm~\ref{TJC}.
 
-\begin{algorithm}
-  \caption{Torque Jacobian Calculation}
+\begin{algorithm}[ht]
+\caption{Torque Jacobian Calculation}
 \label{TJC}
 \begin{algorithmic}
-  \For{$i = 0:n_B$}
   \State{Compute the Jacobian of generalized forces}
+  \For{$i = 0:n_B$}
   \State$f^G_i =
   \mathbf{I}^W
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & \mathbf{0} \\
     -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \mathbf{ac} \\ \mathbf{af}
-  \end{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{a_c} \\ \mathbf{a_f}
+  \end{bmatrix}
   -
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
     \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
+  \end{bmatrix}
+  \begin{bmatrix}
     \mathbf{m}^{ext}_i \\ \mathbf{f}^{ext}_i
-  \end{pmatrix}
+  \end{bmatrix}
   $
   \State$\bf M =
-    \begin{pmatrix}
+    \begin{bmatrix}
     {}^i\mathbf{R}_W \widehat{\bf ac}  & 0\\
     -{{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf ac \right)}
     + {}^i\mathbf{R}_W \widehat{\bf af}  & {{}^i\mathbf{R}_W}\widehat{\bf ac} \\
-    \end{pmatrix}
+    \end{bmatrix}
     $
   \State$\bf N =
-  \begin{pmatrix}
+  \begin{bmatrix}
     - {{}^i\mathbf{R}_W}\widehat{\left(\widehat{{}^i\mathbf{t}_W}\bf \mathbf{f}^{ext}_i \right)}
     + {}^i\mathbf{R}_W \widehat{\bf \mathbf{m}^{ext}_i}
     & {{}^i\mathbf{R}_W}\widehat{\bf \mathbf{f}^{ext}_i} \\
     {}^i\mathbf{R}_W \widehat{\bf \mathbf{f}^{ext}_i} & 0\\
-  \end{pmatrix}
+  \end{bmatrix}
   $
   \State$
-  \frac{\partial f^G_i}{\partial q} = (\mathbf{I}^W \mathbf{M} - \mathbf{N})\mathbf{Jac}^W_i
+  \frac{\partial f^G_i}{\partial x} = (\mathbf{I}^W \mathbf{M} - \mathbf{N})\begin{bmatrix}
+      \mathbf{Jac_i^W} & \mathbf{0}_{6\times \text{dim(y)}}
+        \end{bmatrix}
   +
-  \begin{pmatrix}
+  \begin{bmatrix}
     {{}^i\mathbf{R}_W} & -{{}^i\mathbf{R}_W}\widehat{{}^i\mathbf{t}_W} \\
     \mathbf{0} & {{}^i\mathbf{R}_W} \\
-  \end{pmatrix}
-  \begin{pmatrix}
-    \frac{\partial \mathbf{m}^{ext}_i}{\partial q} \\ \frac{\partial \mathbf{f}^{ext}_i}{\partial q}
-  \end{pmatrix}
+  \end{bmatrix}
+  \frac{\partial f_{ext}}{\partial x}
   $
   \EndFor{}
+  \State{Compute the Jacobian of torques}
   \For{$i = n_J-1:0$}
-  \State{Compute the Jacobian of torques w.r.t q}
-  \State$\frac{\partial \tau_i}{\partial q} = S_i^T \frac{\partial f^G_i}{\partial q}$
+  \State$\frac{\partial \tau_i}{\partial x} =
+  \begin{bmatrix}
+    \mathbf{S_i} & \mathbf{0}_{6\times \text{dim(y)}}
+  \end{bmatrix}^T \frac{\partial f^G_i}{\partial x}$
   \If{$pred(i) \neq -1$}
   \State$\mathbf{K} =
-  \begin{pmatrix}
+  \begin{bmatrix}
     \widehat{({\mathbf{R}_i^J}^T \mathbf{m}^{G}_i)}
     + \left({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i\right) \cdot {\mathbf{t}^J_i}^T
     - \left( {({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)}^T \cdot \mathbf{t}^J_i\right) \mathbf{I}_3
     & -\widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} \\
     \widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} & 0
-  \end{pmatrix}$
+  \end{bmatrix}$
   \State$f^G_{pred(i)} += {\mathbf{X}^{PtS}_i(q)}^{-*} f^G_i$
-  \State$\frac{\partial f^G_{pred(i)}}{\partial q} -=
-  \begin{pmatrix}
+  \State$\frac{\partial f^G_{pred(i)}}{\partial x} -=
+  \begin{bmatrix}
     {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
-  \end{pmatrix}
-  \mathbf{K} S_i$
+  \end{bmatrix}
+  \mathbf{K} \cdot \begin{bmatrix}
+    \mathbf{S_i} & \mathbf{0}_{6\times \text{dim(y)}}
+  \end{bmatrix}$
   \EndIf{}
   \EndFor{}
 \end{algorithmic}
 \end{algorithm}
 
+This algorithm efficiently computes the exact joint torques Jacobian for a robotic system subject to any type of external forces.
+
+%}}}
+%{{{SECTION: On the use of lifted variables for Robotics Posture Generation
 
 \section{On the use of lifted variables for Robotics Posture Generation}
 \label{sec:liftedVariables}
@@ -994,6 +1058,8 @@ The entire algorithm for calculating the torque jacobian w.r.t the articular par
 
 \subsection{conclusion}
 \label{subsec:conclusion}
+
+%}}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %  SECTION CONCLUSION  %

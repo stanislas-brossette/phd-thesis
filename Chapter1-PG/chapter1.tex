@@ -178,38 +178,40 @@ Figure~\ref{fig:mbg} illustrates this numbering system for a simple robot with 4
 
 The geometric relations between bodies and joints are described through transformations between their reference frames. Each body $B_i$ has a reference frame $F_i$ attached to it. Transformations are described in the Spacial Vector Algebra chapter of `Rigid Body Dynamics Algorithm' by Roy Featherstone~\cite{featherstone:book:2007}.
 
+For any 3D vector $v\in\mathbb{R}^3$, $\hat(v)$ denotes the $3\times 3$ skew-symmetric matrix such that $\hat{v}u = v\wedge u$. Where $\wedge$ denotes the cross product operator.
+
 Let A and B be Cartesian frames with origins O and P respectively. Let $\mathbf{t}$ be the coordinate vector expressing $\overrightarrow{OP}$ in A. And $\mathbf{R}$ be the rotation matrix that transforms 3D vectors from A to B coordinates.
 The transformation from A to B for a motion vector is defined by:
 \begin{equation}
   {}^B X_A =
-  \begin{pmatrix}
+  \begin{bmatrix}
     \mathbf{R} & \mathbf{0} \\
     -\mathbf{R}\hat{\mathbf{t}} & \mathbf{R} \\
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 Its inverse is:
 \begin{equation}
   {{}^B X_A}^{-1} = {}^A X_B =
-  \begin{pmatrix}
+  \begin{bmatrix}
     \mathbf{R}^T & \mathbf{0} \\
     \hat{\mathbf{t}}\mathbf{R}^T & \mathbf{R}^T \\
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 The transformation from A to B for a force vector is defined by:
 \begin{equation}
   {}^B X_A^* =
-  \begin{pmatrix}
+  \begin{bmatrix}
     \mathbf{R} & -\mathbf{R}\hat{\mathbf{t}} \\
     \mathbf{0} & \mathbf{R} \\
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 Its inverse is:
 \begin{equation}
   {}^B X_A^{-*} = {}^A X_B^* =
-  \begin{pmatrix}
+  \begin{bmatrix}
     \mathbf{R}^T & \hat{\mathbf{t}}\mathbf{R}^T \\
     \mathbf{0} & \mathbf{R}^T \\
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 
 %Each joint $J_i$ is defined in the reference frame of its predecessor body by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ from the base of the body to the base of the joint.
@@ -217,14 +219,14 @@ Each joint $J_i$ is defined by a static transformation $X^x_i = \{\mathbf{R}^x_i
 Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $\mathbf{S}_i$. Each column of $\mathbf{S}_i$ described a degree of freedom of $J_i$ its upper part for the rotations and lower for translations.
 \begin{equation}
   \mathbf{S}_i =
-  \begin{pmatrix}
+  \begin{bmatrix}
     S^R_{i,0} & \cdots &
     S^R_{i,j} & \cdots &
     S^R_{i,dof} \\
     S^t_{i,0} & \cdots &
     S^t_{i,j} & \cdots &
     S^t_{i,dof}
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 
 For a given joint configuration $q$, the transformation due to the joint $J_i$ current configuration from its reference frame to the reference frame of its successor body is denoted \\$X^J_i (q) = \{\mathbf{R}^J_i (q), \mathbf{t}^J_i (q)\}$.
@@ -300,15 +302,15 @@ If $J$ is a revolute joint around the axis $(O_1,z_1)$ with parameter $q$, its m
   \midrule
   Revolute $(O_1,z_1)$
   &
-  $\begin{pmatrix}
+  $\begin{bmatrix}
     0 \\ 0 \\ 1 \\ 0 \\ 0 \\ 0
-  \end{pmatrix}$
+  \end{bmatrix}$
   &
-  $\begin{pmatrix}
+  $\begin{bmatrix}
     1 & 0 & 0 \\
     0 & \cos (q) & \sin (q) \\
     0 & -\sin (q) & \cos (q) \\
-  \end{pmatrix}$
+  \end{bmatrix}$
   &
   ${\bf 0}_{3\times1}$
   \\
@@ -329,15 +331,15 @@ A prismatic joint along $x_1$ is described by the following formulas:
   \midrule
   Prismatic $(x_1)$
   &
-  $\begin{pmatrix}
+  $\begin{bmatrix}
     0 \\ 0 \\ 0 \\ 1 \\ 0 \\ 0
-  \end{pmatrix}$
+  \end{bmatrix}$
   &
   ${\bf 1}_{3\times3} $
   &
-  $\begin{pmatrix}
+  $\begin{bmatrix}
     q \\ 0 \\ 0
-  \end{pmatrix}$
+  \end{bmatrix}$
   \\
   \bottomrule
 \end{tabular}
@@ -354,19 +356,19 @@ A planar joint describes a plan sliding on another plan, assuming that the norma
   \midrule
   Planar $(z_1)$
   &
-  $\begin{pmatrix}
+  $\begin{bmatrix}
     0 & 0 & 0 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0
-  \end{pmatrix}$
+  \end{bmatrix}$
   &
-  $\begin{pmatrix}
+  $\begin{bmatrix}
     1 & 0 & 0 \\
     0 & \cos(q_1) & \sin(q_1) \\
     0 & -\sin(q_1) & \cos(q_1) \\
-  \end{pmatrix}$
+  \end{bmatrix}$
   &
-  $\begin{pmatrix}
+  $\begin{bmatrix}
     \cos(q_1)q_2 - \sin(q_1)q_3 \\ \sin(q_1)q_2 + \cos(q_1)q_3 \\ 0
-  \end{pmatrix}$
+  \end{bmatrix}$
   \\
   \bottomrule
 \end{tabular}
@@ -379,23 +381,23 @@ For example, the roll, pitch, yaw is a succession of a rotation of $F_1$ around 
 The rotation matrix for such a rotation is given by:
 \begin{equation}
   {\bf R} =
-  \begin{pmatrix}
+  \begin{bmatrix}
     1 & 0 & 0 \\
     0 & \cos(q_3) & \sin(q_3) \\
     0 & -\sin(q_3) & \cos(q_3) \\
-  \end{pmatrix}
+  \end{bmatrix}
   +
-  \begin{pmatrix}
+  \begin{bmatrix}
     \cos(q_2) & 0 & -\sin(q_2) \\
     0 & 1 & 0 \\
     \sin(q_2) & 0 & \cos(q_2) \\
-  \end{pmatrix}
+  \end{bmatrix}
   +
-  \begin{pmatrix}
+  \begin{bmatrix}
     \cos(q_1) & \sin(q_1) & 0 \\
     -\sin(q_1) & \cos(q_1) & 0 \\
     0 & 0 & 1
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 
 There are many other possible choices of axes to define the a Euler Angle 3D rotation.
@@ -417,40 +419,40 @@ It represents a rotation of angle $\theta$ around an axis ${\bf u}$ such that:
 \end{align}
 The rotation matrix associated with this quaternion is:
 \begin{equation}
-  {\bf R} = 2 \begin{pmatrix}
+  {\bf R} = 2 \begin{bmatrix}
     q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
     q_x q_y - q_w q_z & q_w^2 +q_y^2-\frac{1}{2} & q_y q_z + q_w q_x \\
     q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 
 That formulation does not suffer from singularities, but it requires to maintain 4 parameters for a 3D rotation. And those 4 parameters must satisfy the unit norm constraint which in turn would become an additional constraint in the optimization formulation.
 Given a parameter set $q = \{ q_w, q_x, q_y, q_z\}$, we get the following table.
 
-\begin{table} [ht]
-\centering
-\begin{tabular}{cccc}
-  \toprule
-  Joint type & $S$ & $Rotation$ & $translation$ \\
-  \midrule
-  Spherical
-  &
-  $\begin{pmatrix}
-    1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 0
-  \end{pmatrix}$
-  &
-  $2 \begin{pmatrix}
-    q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
-    q_x q_y - q_w q_z & q_w^2 +q_y^2-\frac{1}{2} & q_y q_z + q_w q_x \\
-    q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
-  \end{pmatrix}$
-  &
-  $\begin{pmatrix}
-    0 \\ 0 \\ 0
-  \end{pmatrix}$
-  \\
-  \bottomrule
-\end{tabular}
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{cccc}
+    \toprule
+    Joint type & $S$ & $Rotation$ & $translation$ \\
+    \midrule
+    Spherical
+    &
+    $\begin{bmatrix}
+      1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 0
+    \end{bmatrix}$
+    &
+    $2 \begin{bmatrix}
+      q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
+      q_x q_y - q_w q_z & q_w^2 +q_y^2-\frac{1}{2} & q_y q_z + q_w q_x \\
+      q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
+    \end{bmatrix}$
+    &
+    $\begin{bmatrix}
+      0 \\ 0 \\ 0
+    \end{bmatrix}$
+    \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 Finally, a free joint allows free motion of its successor body with respect to its predecessor body.
@@ -465,18 +467,19 @@ Given a parameter set $q = \{ q_w, q_x, q_y, q_z, t_x, t_y, t_z\}$, we get the f
   &
   ${\bf 1}_{6\times 6}$
   &
-  $2 \begin{pmatrix}
+  $2 \begin{bmatrix}
     q_w^2 +q_x^2-\frac{1}{2} & q_x q_y + q_w q_z & q_x q_z - q_w q_y \\
     q_x q_y - q_w q_z & q_w^2 +q_y^2-\frac{1}{2} & q_y q_z + q_w q_x \\
     q_x q_z + q_w q_y & q_y q_z - q_w q_x & q_w^2 +q_z^2-\frac{1}{2} \\
-  \end{pmatrix}$
+  \end{bmatrix}$
   &
-  ${\bf R}^{-1}\begin{pmatrix}
+  ${\bf R}^{-1}\begin{bmatrix}
     t_x \\ t_y \\ t_z
-  \end{pmatrix}$
+  \end{bmatrix}$
   \\
   \bottomrule
 \end{tabular}
+
 
 
 
@@ -519,29 +522,26 @@ The algorithm that we use to compute $\text{Jac}_i({}{}^p X_i)$ writes as follow
 \end{algorithmic}
 \end{algorithm}
 
-%We denote $.^\^$ the hat operator that associate to any vector its skewsimmetric matrix \afweef
-
-
 We write the jacobian of each body at its origin as follows:
 \begin{equation}
   \mathbf{Jac}^W_i = 
-  \begin{pmatrix}
+  \begin{bmatrix}
     \frac{\partial {}^i\mathbf{R}_W}{\partial q_0} & \cdots &
     \frac{\partial {}^i\mathbf{R}_W}{\partial q_j} & \cdots &
     \frac{\partial {}^i\mathbf{R}_W}{\partial q_{dof}} \\
     \frac{\partial {}^i\mathbf{t}_W}{\partial q_0} & \cdots &
     \frac{\partial {}^i\mathbf{t}_W}{\partial q_j} & \cdots &
     \frac{\partial {}^i\mathbf{t}_W}{\partial q_{dof}}
-  \end{pmatrix}
+  \end{bmatrix}
 = 
-  \begin{pmatrix}
+  \begin{bmatrix}
     \omega_{i,0} & \cdots &
     \omega_{i,j} & \cdots &
     \omega_{i,dof} \\
     v_{i,0} & \cdots &
     v_{i,j} & \cdots &
     v_{i,dof}
-  \end{pmatrix}
+  \end{bmatrix}
 \end{equation}
 
 
@@ -898,15 +898,27 @@ Featherstone~\cite{featherstone:book:2007} proposes a recursive algorithm to com
 For the purpose of generating statically stable postures, the velocities and accelerations are useless.
 Thus, we devise a specialized algorithm to fit our needs and call it the Inverse Static Algorithm.
 
+We denote $a_g$ the gravity acceleration vector with $\vec{a_c}$ its rotation part and $\vec{a_f}$ its translation part:
+\begin{equation}
+  a_g = \left\{ \begin{array}{r}
+    \vec{a_c} \\
+    \vec{a_f} \\
+  \end{array} \right\}
+  = \left\{ \begin{array}{r}
+    \vec{0} \\
+    g\vec{z}\\
+  \end{array} \right\}
+\end{equation}
+
 The algorithm first computes the generalized forces $f^G_i$ applied to each body, it is the sum of the action of gravity and of the external forces applied on a body calculated at the origin of the world frame, expressed in the world frame.
 Then, the generalized forces are used to compute the torques.
 
 \begin{algorithm}
   \caption{Inverse Static Algorithm}
-\label{IS}
+\label{alg:IS}
 \begin{algorithmic}
   \For{$i = 0:n_B$}
-  \State$f^G_i = \mathbf{I}^W {}^i\mathbf{X}_W \mathbf{a}^G - {{}^i\mathbf{X}_W}^*f_i^{ext}$
+  \State$f^G_i = \mathbf{I}^W {}^i\mathbf{X}_W a_g - {{}^i\mathbf{X}_W}^*f_i^{ext}$
   \EndFor{}
   \For{$i = n_J-1:0$}
   \State$\tau_i = {f^G_i}^T S_i$
