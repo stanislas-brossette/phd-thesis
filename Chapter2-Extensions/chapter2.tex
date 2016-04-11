@@ -9,11 +9,12 @@
 
 \graphicspath{{Chapter2-Extensions/Figs/}{Chapter2-Extensions/Figs/IROS14/}}
 
+%{{{Intro
 In this chapter we present three different and unrelated contributions to the state of the art of posture generation.
 First we present a novel method called Integration of Non-Inclusive Contacts in Posture Generation that was published in~\cite{brossette:iros:2014}.
 Second we present a generic algorithm to compute efficiently the derivative of the joint torques of a robot.
 Third we present our endeavour to apply an optimization method called `Lifted Newton Method', presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472}, to problems of inverse kinematics.
-
+%}}}
 %{{{ SECTION: List of contributions
 
 %\section{List of contributions}
@@ -597,7 +598,7 @@ On~\Figref{fig:atlas_SmallStairs}, we present 3 postures generated on this envir
 On each of those postures, we see that the ellipse's size is maximized until the foot enters in collision with the vertical wall behind each step.
 And when possible, like on the last step, the contact area is maximized without collision limitation and the foot is positioned as fully included in the support surface.
 We can see here that even when the size of the ellipse is maximized while competing with other non-linear constraints like collision avoidance, our method still works well and leads us to a satisfactory solution.
-It has been used to actually make the robot climb a vertical ladder and presented in~\cite{vaillant:autonomousrobots:2016} and ~\cite{vaillant:humanoids:2014}.
+It has been used to actually make the robot climb a vertical ladder and presented in~\cite{vaillant:autonomousrobots:2016} and~\cite{vaillant:humanoids:2014}.
 
 %Under each simulation result, an image presents the disposition of the foot (in green) that is in geometrical non inclusive contact with a step (in blue) and the optimal ellipse that has been found.
 %It has to be noted that the green contact surface under a foot of the robot (green rectangle) is actually smaller than the actual foot due to our use of security margin for stability reason when experimenting with real robot and take into account an un-modeled flexibility at the ankle.
@@ -664,7 +665,7 @@ Under each simulation result, an image presents the disposition of the foot (in 
 Generating arbitrarily shaped contact areas proved to be doable very simply in an optimization based posture generation module.
 We focused on writing constraints that have continuous gradients, since the posture generation problem is dominantly smooth.
 Hence, our geometric contact model can be useful for other optimization based purposes, for example control or trajectory optimization, and any gradient based descent scheme which handles inequalities (e.g.~\cite{escande:icra:2010}).
-While we were expecting an increase of computation time due to the addition of new variables in the problem (5 more for a total of 80-100 variables)
+While we were expecting an increase of computation time due to the addition of new variables in the problem (5 more for a total of 80--100 variables)
 we noticed that the timings obtained with this method are sensibly the same that our previous version of the posture generator with full contact surface inclusion.
 Consequently, this method offering a richer contact search (exploration) during planning comes without degrading computation time.
 In fact, it truly allows us to substantially reduce the time spent by the user in ad-hoc tuning the shapes of the contact patches, or fixing the contact positions that were previously done by hand.
@@ -749,7 +750,7 @@ We first write algorithm~\ref{alg:IS} in its matrix form.
 \end{algorithm}
 
 The variables of this algorithm w.r.t which we need to differenciate it are the geometric parameters of the robot $q$ and the variables of the external wrenches which can contain $q$ and some other variables $y$.
-We denote $\text{dim(q)}$ and $\text{dim(y)}$ the dimensions of $q$ and $y$ respectively.
+We denote $\dim(q)$ and $\dim(y)$ the dimensions of $q$ and $y$ respectively.
 We assume that the derivatives of $m_i^{ext}$ and $f_i^{ext}$: $\frac{\partial m_i^{ext}}{\partial q}$, $\frac{\partial m_i^{ext}}{\partial y}$, $\frac{\partial f_i^{ext}}{\partial q}$ and $\frac{\partial f_i^{ext}}{\partial y}$ are known.
 The external forces can depend on a number of variables other than $q$, for example, in the case of a contact with another robot, the application point and value of those forces depend on $q$ and also on the articular values of the other robot.
 
@@ -949,7 +950,7 @@ In the following algorithm, we use the following notation $x$ to combine the the
 
 The entire algorithm for calculating the torque jacobian is presented in Algorithm~\ref{TJC}.
 
-\begin{algorithm}[ht]
+\begin{algorithm}[htpb*]
 \caption{Torque Jacobian Calculation}
 \label{TJC}
 \begin{algorithmic}
@@ -990,7 +991,7 @@ The entire algorithm for calculating the torque jacobian is presented in Algorit
   $
   \State$
   \frac{\partial f^G_i}{\partial x} = (\mathbf{I}^W \mathbf{M} - \mathbf{N})\begin{bmatrix}
-      \mathbf{Jac_i^W} & \mathbf{0}_{6\times \text{dim(y)}}
+      \mathbf{Jac_i^W} & \mathbf{0}_{6\times \dim(y)}
         \end{bmatrix}
   +
   \begin{bmatrix}
@@ -1004,7 +1005,7 @@ The entire algorithm for calculating the torque jacobian is presented in Algorit
   \For{$i = n_J-1:0$}
   \State$\frac{\partial \tau_i}{\partial x} =
   \begin{bmatrix}
-    \mathbf{S_i} & \mathbf{0}_{6\times \text{dim(y)}}
+    \mathbf{S_i} & \mathbf{0}_{6\times \dim(y)}
   \end{bmatrix}^T \frac{\partial f^G_i}{\partial x}$
   \If{$pred(i) \neq -1$}
   \State$\mathbf{K} =
@@ -1015,14 +1016,14 @@ The entire algorithm for calculating the torque jacobian is presented in Algorit
     & -\widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} \\
     \widehat{({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i)} & 0
   \end{bmatrix}$
-  \State$f^G_{pred(i)} += {\mathbf{X}^{PtS}_i(q)}^{-*} f^G_i$
-  \State$\frac{\partial f^G_{pred(i)}}{\partial x} -=
+  \State$f^G_{pred(i)} \leftarrow f^G_{pred(i)} + {\mathbf{X}^{PtS}_i(q)}^{-*} f^G_i$
+  \State$\frac{\partial f^G_{pred(i)}}{\partial x} \leftarrow \frac{\partial f^G_{pred(i)}}{\partial x} -
   \begin{bmatrix}
     {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
   \end{bmatrix}
   \mathbf{K} \cdot \begin{bmatrix}
-    \mathbf{S_i} & \mathbf{0}_{6\times \text{dim(y)}}
+    \mathbf{S_i} & \mathbf{0}_{6\times \dim(y)}
   \end{bmatrix}$
   \EndIf{}
   \EndFor{}
@@ -1033,7 +1034,7 @@ This algorithm efficiently computes the exact joint torques Jacobian for a robot
 
 %}}}
 %{{{SECTION: On the use of lifted variables for Robotics Posture Generation
-
+\newpage
 \section{On the use of lifted variables for Robotics Posture Generation}
 \label{sec:liftedVariables}
 
