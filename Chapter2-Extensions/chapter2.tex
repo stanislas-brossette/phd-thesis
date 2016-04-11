@@ -352,14 +352,14 @@ The expression of a vector ${{\bf v}_{F_0}}^T = {[v_x, v_y]}_{F_0}$ in $F_\mathc
 \end{equation}
 In $F_\mathcal{E}$, the distance between the circumference of $\mathcal{E}$ and the segment $p_i p_j$ is:
 \begin{equation}
-	d_s(\mathcal{E}, p_i p_j) = \frac{{\left.\overrightarrow{p_i p_j}\right|}_{F_\mathcal{E}} \wedge {\left.\overrightarrow{p_i O_\mathcal{E}}\right|}_{F_\mathcal{E} } }{\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E} } }-r_{\mathcal{E}}
+  d_s(\mathcal{E}, p_i p_j) = \frac{{\left.\overrightarrow{p_i p_j}\right|}_{F_\mathcal{E}} \wedge {\left.\overrightarrow{p_i O_\mathcal{E}}\right|}_{F_\mathcal{E} } }{\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E} } }-r_{\mathcal{E}}
 \end{equation}
 where $\wedge$ denotes the cross product and $O_{\mathcal{E}}$ is the center of the ellipse.
 
 To avoid numerical problems when the segment $p_i p_j$ is small, (see sec.~\ref{subsubsec:singular_cases}), it is preferable to multiply this distance by $\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E}}$ before using it as a constraint.
 Then we get the following constraint:
 \begin{equation}
-	-{\left.\overrightarrow{p_i p_j}\right|}_{F_\mathcal{E}} \wedge {\left.\overrightarrow{p_i O_\mathcal{E}}\right|}_{F_\mathcal{E}}+\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E}} r_{\mathcal{E}} \leq 0
+  -{\left.\overrightarrow{p_i p_j}\right|}_{F_\mathcal{E}} \wedge {\left.\overrightarrow{p_i O_\mathcal{E}}\right|}_{F_\mathcal{E}}+\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E}} r_{\mathcal{E}} \leq 0
 \label{eq:pseudo-distance}
 \end{equation}
 
@@ -1101,6 +1101,118 @@ The transformation of a body is used in almost all the constraints and cost func
 
 \subsection{Lifting Algorithm}
 \label{subsec:LiftingAlgorithm}
+
+In order to explore the capabilities of optimization on lifted problems, we developped and studied several lifting approaches.
+Let us consider a simple planar 2 axis robot, with 2 successive links of length 1 attached by revolute joints.
+Its articular variables are denoted $q = (q_1, q_2)$ and the expression of the end-effector's (EE) position is the following:
+\begin{equation}
+  \left(\begin{array}{c}
+    \cos\!\left(q_{1}\right) + \cos\!\left(q_{1}\right)\, \cos\!\left(q_{2}\right) - \sin\!\left(q_{1}\right)\, \sin\!\left(q_{2}\right)\\
+    \sin\!\left(q_{1}\right) + \cos\!\left(q_{1}\right)\, \sin\!\left(q_{2}\right) + \cos\!\left(q_{2}\right)\, \sin\!\left(q_{1}\right)
+  \end{array}\right)
+  =
+  \left(\begin{array}{c}
+    \text{EE}_{x}(q)\\
+    \text{EE}_{y}(q)
+  \end{array}\right)
+\label{eq:direct_position}
+\end{equation}
+
+Those equations are polynomials in the variables $\cos(q_1)$, $\sin(q_1)$, $\cos(q_2)$, $\sin(q_2)$.
+Furthermore they are polynomials of degree $1$ in each of those variables separately.
+This observation extends to the case of any robot composed of the joints presented in Section~\ref{sub:joints_formulations} and that does not contain kinematic loops (kinematic loops are not considered in this thesis).
+The operators `addition', `substraction', `multiplication', `sinus' and `cosinus' are enough to describe the kinematics of a robot.
+
+We developped a generic lifting algorithm that allows to automatically lift polynomials of trigonometric functions based on a given criterion.
+To do so, we used symbolic variables, a symbolic equation can be seen as a graph of atomic operations (addition, multiplication and other functions), which can in turn be explored and cut at appropriate places where we can insert our additional variables.
+Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\ref{eq:direct_position}, where the green circles represent the variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that leads to the final expressions.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.55\textwidth]{graphDirectEEPos.png}
+  \caption{Computation graph for end effector position of a 2 axis planar robotic arm}
+\label{fig:graph_direct}
+\end{figure}
+
+To lift our equations, we explore the graph from left to right, and at each node of the graph, we consider the sub-graph that lies on its left and if this sub-graph violates our criterion, it is lifted, a lifting variable is added and replaces the sub-graph.
+Then we start again and explore the graph from left to right.
+Given that the equations that we want to solve are polynomials of trigonometric functions, we decided to lift them based on the two following criteria (other criteria would be acceptable as well):
+\begin{itemize}
+  \item Maximum degree of the lifted polynomial.
+  \item Eliminating or not the trigonometric functions.
+\end{itemize}
+We define the degree function as the degree of a polynomial with the difference that trigonometric functions are considered to be polynomials of infinite degree (And thus are always lifted, no matter the maximum degree).
+By eliminating the trigonometric functions, we mean that we reformulate the problem so that, given a variable $x$ that appears in our equations in the forms $\cos(x)$ or $\sin(x)$, we introduce 2 new variables $s_x$ and $c_x$, replace all the occurrences of $\cos(x)$ by $c_x$ and all the occurrences of $\sin(x)$ by $s_x$, and to ensure the equivalence of the two formulations, we add the equation ${c_x}^2 + {s_x}^2=1$ to our problem.
+
+For example, if we lift the set of equation~\ref{eq:direct_position} with a maximum degree of 2 and without eliminating the trigonometric functions we get the following system, with all the $w_{i_j}$ being the additional lifted variables:
+\begin{equation}
+  \begin{array}{c}
+  \textbf{Lifted Equations}\\
+  \left(
+    \begin{array}{c}
+      \cos(q_1) = w_{1_1}\\
+      \sin(q_1) = w_{1_2}\\
+      \cos(q_2) = w_{1_3}\\
+      \sin(q_2) = w_{1_4}\\
+      w_{1_1}.w_{1_3} = w_{2_1}\\
+      w_{1_2}.w_{1_3} = w_{2_2}\\
+      w_{1_1}.w_{1_4} = w_{2_3}\\
+      w_{1_2}.w_{1_4} = w_{2_4}
+    \end{array}
+  \right)\\
+  \textbf{End-effector's position}\\
+  \left(\begin{array}{c}
+      w_{1_1} + w_{2_1} - w_{2_4} = EE_x\\
+      w_{1_2} + w_{2_2} + w_{2_3} = EE_y
+    \end{array}
+  \right)\\
+  \end{array}
+\end{equation}
+\label{eq:lifted_equations}
+
+Adding to it the elimination of trigonometric functions gives the following system.
+Note that here, all the equations are polynomials of degree at most 2, no trigonometric function is present, and the optimization variables are $\left(c_{q_1}, c_{q_2}, s_{q_1}, s_{q_2}\right)$ instead of $\left(q_1, q_2\right)$.
+
+\begin{equation}
+\begin{array}{c}
+  \textbf{Lifted Equations}\\
+  \left(\begin{array}{cc}
+    c_{q_1}.c_{q_2} = w_{2_1}\\
+    s_{q_1}.c_{q_2} = w_{2_2}\\
+    c_{q_1}.s_{q_2} = w_{2_3}\\
+    s_{q_1}.s_{q_2} = w_{2_4}\\
+  \end{array}\right)\\
+  \textbf{Additional equations}\\
+  \left(\begin{array}{c}
+    {c_{q_1}}^2 + {s_{q_1}}^2 = 1\\
+    {c_{q_2}}^2 + {s_{q_2}}^2 = 1
+  \end{array}\right)\\
+  \textbf{End-effector's position}\\
+  \left(\begin{array}{c}
+    c_{q_1} + w_{2_1} - w_{2_4} = EE_x\\
+    s_{q_1} + w_{2_2} + w_{2_3} = EE_y
+  \end{array}\right)\\
+  \textbf{Eliminated equations (Not used in further calculations)}\\
+  \left(\begin{array}{c}
+    \cos(q_1)  =  c_{q_1} \\
+    \sin(q_1)  =  s_{q_1} \\
+    \cos(q_2)  =  c_{q_2} \\
+    \sin(q_2)  =  s_{q_2}
+  \end{array}\right)\\
+\end{array}
+\label{eq:lifted_equations_trigo}
+\end{equation}
+
+This lifting methodology can be extended to most robotic systems.
+In this study, we focused on fixed base robots with only revolute joints.
+Also, to make it simpler to study the influence of the number of degrees of freedom of a robot on the optimization performance, we mostly studied planar robots composed of $n$ successive links of length 1 attached to one another by revolute joints.
+We also studied a 7 axis 3D arm robot and a torso robot with 2 arms.
+Illustration of those different types of robots are given in figure~\ref{fig:robots}
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.95\textwidth]{robots.png}
+  \caption{Examples of robots used}
+\label{fig:robots}
+\end{figure*}
 
 \subsection{Optimization on lifted variables}
 \label{subsec:optimization_on_lifted_variables}
