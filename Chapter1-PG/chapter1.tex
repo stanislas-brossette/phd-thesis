@@ -243,7 +243,7 @@ It can easily be computed by adding iteratively the parent of the current body:
 
 \begin{algorithm}
   \caption{Joint Path to $B_i$}
-\label{JP}
+\label{alg:JP}
 \begin{algorithmic}
   \State{$j \leftarrow i$, $\kappa(i)=[i]$}
   \While{$j \neq 0$}
@@ -266,7 +266,7 @@ Which can be computed recursively by a Forward Kinematics algorithm:
 
 \begin{algorithm}
   \caption{Forward Kinematics}
-\label{FK}
+\label{alg:FK}
 \begin{algorithmic}
   \For{$i = 0:n_J$}
   \If{$\lambda (i) \neq -1$} ${}^i X_W = {}^i X_{\lambda (i)}\ ^{\lambda (i)}X_W$

@@ -1042,8 +1042,62 @@ This algorithm efficiently computes the exact joint torques Jacobian for a robot
 % SECTION ON THE USE OF LIFTED VARIABLES FOR ROBOTICS POSTURE GENERATION  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Introduction}
-\label{subsec:Introduction}
+In this section, we present our work on the use of lifted variables for robotics posture generation.
+The main goal of this thesis is to extend the state of the art of posture generation by in one hand improve the range of problems that it can solve through extending its formulation and on the other hand, improve and adapt the methods used to solve those problems.
+This section focuses on the later.
+We formulate posture generation problems in an optimization friendly way in order to solve them using non-linear constrained optimization routines.
+In the following, we propose to apply the methods presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to our posture generation problems.
+The idea of lifting variables consists in taking a complicated equation $F(u) = 0$ and separating the complicated function $F$ into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on $u$ and on the output of functions of lower index:
+
+\begin{equation}
+  x_i = f_i(u, x_1, x_2, \ldots,x_{i-1}),\ \forall i\in[1,\ldots, m]
+\end{equation}
+
+Such that they can be used in a chain to recompose $F$:
+
+\begin{align}
+  F(u) &= f_F\left(u, x_1, x_2, \ldots, x_m\right)\\
+       &= f_F\left(u, f_1(u), f_2(u,x_1), f_3(u,x_1,x_2), \ldots, f_m(u, x_1, \ldots, x_m-1)\right)
+\end{align}
+
+With this formulation and the additional variables $x_i,\ i\in[1,\ldots, m]$, the problem $F(u) = 0$ can be rewritten as the lifted problem:
+
+\begin{equation}
+  \textbf{G}(u,x) =
+  \begin{pmatrix}
+  f_1(u) - x_1 \\
+  f_2(u,x_1) - x_2 \\
+  f_3(u,x_1,x_2) - x_3 \\
+  \vdots \\
+  f_m(u,x_1,\ldots, x_{m-1}) - x_m \\
+  f_F(u,x_1,\ldots, x_{m-1}, x_m)
+  \end{pmatrix}
+  =0
+\end{equation}
+
+This modified formulation can be used for any function of our optimization problem to reduce the complexity of individual equations at the cost of adding extra variables and constraints.
+One obvious drawback of this approach for solving a non-linear problem is the increased size of the approached problem to solve at each iteration.
+Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the jacobian of $\mathbf{G}(u,x)$ to condense the lifted problem to have the same size as the original one.
+Thus the resolution of each iteration should take approximately the same time as with the original problem.
+The lifted variable approach is known to be superior to the non-lifted in the problem of shooting methods for boundary value problems~\cite{osborne:1969:shooting}.
+With good intuition, the author of~\cite{Albersmeyer:2010:LNM:1958447.1958472} states that the lifting idea could be directly transfered in the context of kinematic chain arising in robotics.
+Indeed, as we stated in Section~\ref{sub:forward_kinematics} the equations that governs the transformation of a robot's end effector on body $i$ ${}^i X_W(q)$ is constructed iteratively and seems like a good candidate for lifting.
+If we considere a single chain robot with $m$ bodies, such that $\kappa (m) = \{0, 1, 2, \ldots m\}$ the constraint ${}^m X_W(q) = X_\text{goal}$ can naturally be lifted as follows:
+
+\begin{equation}
+  \textbf{G}(u,x) =
+  \begin{pmatrix}
+  {}^1 X_W(q) - x_1 \\
+  {}^2 X_1(q)\cdot x_1 - x_2\\
+  {}^3 X_2(q)\cdot x_2 - x_3 \\
+  \vdots \\
+  {}^m X_{m-1}(q)\cdot x_{m-1} - x_{m-1} \\
+  x_{m-1} - X_\text{goal}
+  \end{pmatrix}
+  =0
+\end{equation}
+
+The transformation of a body is used in almost all the constraints and cost functions of posture generation problems, thus we could use this lifting approach on almost all of them.
 
 \subsection{Lifting Algorithm}
 \label{subsec:LiftingAlgorithm}
