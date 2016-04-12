@@ -58,7 +58,6 @@
   %\item Utilization of posture generation in planning
 %\end{itemize}
 %}}}
-%{{{SECTION:PROBLEM DEFINITION
 \section{Problem Definition}
 \label{sec:problem_definition}
 
@@ -140,8 +139,9 @@ The IPOPT solver has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant
 In this thesis, we use those off-the-shelf solvers a little in the beginning and later we tackle the development of our own non-linear optimization solver.
 
 From this point forward, we formulate and solve posture generation problems as nonlinear constrained optimization problem. And in the next sections, we focus on the formulating several robotics constraints and cost function in the formalism of nonlinear optimization.
-%}}}
-%{{{SECTION:PROBLEM FORMULATION
+
+
+
 \section{Problem Formulation}
 \label{sec:pg_formulation}
 
@@ -149,7 +149,6 @@ From this point forward, we formulate and solve posture generation problems as n
 %                    SECTION PROBLEM FORMULATION                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%{{{SUBSECTION:FORWARD KINEMATICS
 \subsection{Forward Kinematics}
 \label{sub:forward_kinematics}
 
@@ -279,8 +278,9 @@ Which can be computed recursively by a Forward Kinematics algorithm:
 In the following section, we provide some detailed description of how to compute $X_J (q)$ for a variety of useful joints.
 Using the joint descriptions and the Forward Kinematics algorithm, we are able to explicit a relation between $q$ the joint parameters of the robot and the 3D position and orientation of  any geometric quantity defined in the reference frame of a body of the robot.
 Given a transformation ${}^p X_i$ defined in the frame of $B_i$, its value in the world frame is given by ${}^p X_W (q) = {}^p X_i\ {}^i X_W (q)$
-%}}}
-%{{{SUBSECTION:JOINTS FORMULATIONS
+
+
+
 \subsection{Joints formulations}
 \label{sub:joints_formulations}
 
@@ -481,8 +481,7 @@ Given a parameter set $q = \{ q_w, q_x, q_y, q_z, t_x, t_y, t_z\}$, we get the f
   \bottomrule
 \end{tabular}
 
-%}}}
-%{{{SUBSECTION:JACOBIAN COMPUTATION
+
 
 \subsection{Jacobian computation}
 \label{sub:jacobian_computation}
@@ -544,9 +543,9 @@ We write the jacobian of each body at its origin as follows:
     v_{i,dof}
   \end{bmatrix}
 \end{equation}
-%}}}
-%}}}
-%{{{SECTION:GEOMETRIC CONSTRAINTS
+
+
+
 \section{Geometric constraints}
 \label{sec:geometric_constraints}
 
@@ -554,7 +553,6 @@ We write the jacobian of each body at its origin as follows:
 %          SECTION GEOMETRIC CONSTRAINTS                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%{{{SUBSECTION:JOINT LIMITS
 \subsection{Joint Limits}
 \label{sub:joint_limits}
 
@@ -584,8 +582,8 @@ A common approach to limit shoulder joint, inspired from the biomechanics field,
 
 The spherical motion can be parameterized by a vector of the unit 3D sphere $S2$ and constrained to lay within a limit cone. And the axial motion can be parameterized in $\mathbb{R}$ and be limited by equation~\ref{eq:joint_limits}, this type of formulation is presented in~\cite{baerlocher}.
 
-%}}}
-%{{{SUBSECTION:CONTACT CONSTRAINTS
+
+
 \subsection{Contact constraints}
 \label{sub:contact_constraints}
 
@@ -643,8 +641,9 @@ If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such th
 \end{equation}
 
 We illustrate those two types of contacts in~\Figref{fig:contactConstraint}
-%}}}
-%{{{SUBSECTION:COLLISION AVOIDANCE
+
+
+
 \subsection{Collision avoidance}
 \label{sub:collision_avoidance}
 
@@ -679,9 +678,9 @@ Then the set of constraints to add to our problem is:
 \end{equation}
 
 In many cases, it is possible to avoid the collision between two bodies of a robot by modifying the joint limits and reducing them to a span where the collision of interest cannot happen. That approach is conservative and ad-hoc but can save some precious computation time.
-%}}}
-%}}}
-%{{{SECTION:STATIC CONSTRAINTS
+
+
+
 \section{Static constraints}
 \label{sec:static_constraints}
 
@@ -689,7 +688,6 @@ In many cases, it is possible to avoid the collision between two bodies of a rob
 %                SECTION STATIC CONSTRAINTS                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%{{{SUBSECTION:EXTERNAL FORCES
 \subsection{External Forces}
 \label{sub:external_forces}
 
@@ -727,8 +725,8 @@ Whereas the resultant part is invariant with respect to the point at which the w
 
 Note that the frame subscript can be dropped in some equations where the choice of the frame does not matter and assuming that all the quantities of the equations are computed in the same frame.
 
-%}}}
-%{{{SUBSECTION:STATIC STABILITY
+
+
 \subsection{Static stability}
 \label{sub:static_stability}
 
@@ -829,8 +827,8 @@ Deriving the stability condition comes down to deriving each term w.r.t its comp
 
 We will explicit a method to automatically compute those derivatives in a further chapter.
 
-%}}}
-%{{{SUBSECTION:CENTER OF MASS PROJECTION
+
+
 \subsection{Center of mass projection}
 \label{sub:center_of_mass_projection}
 
@@ -882,8 +880,8 @@ Any point $G_P$ that is included in the convex hull of all the $P_i$ is a soluti
 
 Thus, we have the property: A rigid body that has all its contacts with the environment being punctual, unilateral and all laying on the same horizontal plane $H$ is stable if and only if the projection of its center of mass on $H$ is inside the convex hull of all its contact points.
 
-%}}}
-%{{{SUBSECTION:TORQUE LIMITS
+
+
 \subsection{Torque limits}
 \label{sub:torque_limits}
 
@@ -940,8 +938,8 @@ The torque limit constraint writes as:
 
 We will detail the derivation of this constraint in a further chapter.
 
-%}}}
-%{{{SUBSECTION:CONTACT FORCES AND FRICTION CONES
+
+
 \subsection{Contact Forces and Friction Cones}
 \label{subsec:contact_forces_and_friction_cones}
 
@@ -1030,9 +1028,9 @@ And ensuring that each of them lay in their respective friction cone, thus satis
   \caption{Modelization of a Planar Contact between the foot on HRP4 and the ground}
 \label{fig:planarContact}
 \end{figure}
-%}}}
-%}}}
-%{{{SECTION:COST FUNCTIONS
+
+
+
 \section{Cost Functions}
 \label{sec:cost_functions}
 
@@ -1077,8 +1075,9 @@ Any positively weighted combination of cost function can be used. In which case 
 \begin{equation}
   f_\text{cost}(q,f) = \sum\limits_i{w_i f_i(q,f)} = w_0 f_\text{posture}(q) + w_1 f_\text{forces}(f) + w_2 f_\text{torques}(q,f) + \cdots
 \end{equation}
-%}}}
-%{{{SECTION:CONCLUSION
+
+
+
 \section{Conclusion}
 \label{sec:Ch1_Conclusion}
 
@@ -1106,5 +1105,4 @@ h_i(q,f) \geq 0\ \ \forall\mathcal{T}_i.
 \end{array}\right.
 \label{eq:PG}
 \end{align}
-%}}}
 

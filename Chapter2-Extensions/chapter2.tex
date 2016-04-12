@@ -9,12 +9,12 @@
 
 \graphicspath{{Chapter2-Extensions/Figs/}{Chapter2-Extensions/Figs/IROS14/}}
 
-%{{{Intro
+%Intro
 In this chapter we present three different and unrelated contributions to the state of the art of posture generation.
 First we present a novel method called Integration of Non-Inclusive Contacts in Posture Generation that was published in~\cite{brossette:iros:2014}.
 Second we present a generic algorithm to compute efficiently the derivative of the joint torques of a robot.
 Third we present our endeavour to apply an optimization method called `Lifted Newton Method', presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472}, to problems of inverse kinematics.
-%}}}
+
 %{{{ SECTION: List of contributions
 
 %\section{List of contributions}
@@ -89,10 +89,7 @@ Third we present our endeavour to apply an optimization method called `Lifted Ne
         %\end{itemize}
     %\end{itemize}
 %\end{itemize}
-
 %}}}
-%{{{SECTION: Integration on Non-Inclusive Contacts in Posture Generation
-
 \section{Integration on Non-Inclusive Contacts in Posture Generation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -226,7 +223,7 @@ This allows to consider contacts between surfaces that do not necessarily includ
 An important remark is that the number of sides of the intersection polygon is not known a priori and, as shown on~\Figref{fig:polygon-inter}{}, this number can change depending on the configuration.
 Each time this number changes, the gradient of the area of the intersection is discontinuous.
 This is an issue for integrating any constraint or objective based on the area because we use a solver for smooth optimization problems.
-This issue could be dealt with by using non-smooth optimization routines, but such algorithms are slower and less available, and our posture generator is not designed to use them.
+This issue could be dealt with by using non-smooth optimization algorithms, but such algorithms are slower and less available, and our posture generator is not designed to use them.
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.4\columnwidth]{polygon-inter.pdf}
@@ -683,8 +680,6 @@ This methods extends straightforwardly to point cloud data as far as polygonal p
 %Finally, on a planning point of view, ~\Figref{fig:ladder} shows us a new challenge: while the posture found is perfectly correct as the robot is stable, not colliding with its environment and the contacts are where we asked them to be, the posture is obviously difficult to attain, if possible at all.
 %We will need to investigate what type of heuristic to use to avoid this kind of results in the middle of a plan.
 
-%}}}
-%{{{SECTION: Torque derivation
 
 \section{Torque derivation}
 \label{sec:torque_derivation}
@@ -1032,8 +1027,6 @@ The entire algorithm for calculating the torque jacobian is presented in Algorit
 
 This algorithm efficiently computes the exact joint torques Jacobian for a robotic system subject to any type of external forces.
 
-%}}}
-%{{{SECTION: On the use of lifted variables for Robotics Posture Generation
 \newpage
 \section{On the use of lifted variables for Robotics Posture Generation}
 \label{sec:liftedVariables}
@@ -1043,10 +1036,11 @@ This algorithm efficiently computes the exact joint torques Jacobian for a robot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section, we present our work on the use of lifted variables for robotics posture generation.
-The main goal of this thesis is to extend the state of the art of posture generation by in one hand improve the range of problems that it can solve through extending its formulation and on the other hand, improve and adapt the methods used to solve those problems.
+The main goal of this thesis is to extend the state of the art of posture generation by in one hand improving the formulation of problems to enable describing more complex and various problems in simpler ways and on the other hand, improve and adapt the resolution methods for those problems.
 This section focuses on the later.
-We formulate posture generation problems in an optimization friendly way in order to solve them using non-linear constrained optimization routines.
-In the following, we propose to apply the methods presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to our posture generation problems.
+We formulate posture generation problems in an optimization friendly way in order to solve them using non-linear constrained optimization algorithms.
+In the following, we propose to apply the methods of lifted optimization presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to our posture generation problems.
+
 The idea of lifting variables consists in taking a complicated equation $F(u) = 0$ and separating the complicated function $F$ into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on $u$ and on the output of functions of lower index:
 
 \begin{equation}
@@ -1057,7 +1051,8 @@ Such that they can be used in a chain to recompose $F$:
 
 \begin{align}
   F(u) &= f_F\left(u, x_1, x_2, \ldots, x_m\right)\\
-       &= f_F\left(u, f_1(u), f_2(u,x_1), f_3(u,x_1,x_2), \ldots, f_m(u, x_1, \ldots, x_m-1)\right)
+       &= f_F\left(u, f_1(u), f_2(u,x_1), f_3(u,x_1,x_2), \ldots, f_m(u, x_1, \ldots, x_m-1)\right) \\
+       &= f_F\left(u, f_1(u), f_2(u,f_1(u)), f_3(u,f_1(u),f_2(u,f_1(u))), \ldots, f_m(u, \ldots, f_{m-1}(u,\cdots))\right)
 \end{align}
 
 With this formulation and the additional variables $x_i,\ i\in[1,\ldots, m]$, the problem $F(u) = 0$ can be rewritten as the lifted problem:
@@ -1076,15 +1071,17 @@ With this formulation and the additional variables $x_i,\ i\in[1,\ldots, m]$, th
 \end{equation}
 
 This modified formulation can be used for any function of our optimization problem to reduce the complexity of individual equations at the cost of adding extra variables and constraints.
-One obvious drawback of this approach for solving a non-linear problem is the increased size of the approached problem to solve at each iteration.
+One obvious drawback of this approach for solving a non-linear problem is the increased size of the linearized problem to solve at each iteration of the optimization.
 Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the jacobian of $\mathbf{G}(u,x)$ to condense the lifted problem to have the same size as the original one.
 Thus the resolution of each iteration should take approximately the same time as with the original problem.
+
 The lifted variable approach is known to be superior to the non-lifted in the problem of shooting methods for boundary value problems~\cite{osborne:1969:shooting}.
-With good intuition, the author of~\cite{Albersmeyer:2010:LNM:1958447.1958472} states that the lifting idea could be directly transfered in the context of kinematic chain arising in robotics.
-Indeed, as we stated in Section~\ref{sub:forward_kinematics} the equations that governs the transformation of a robot's end effector on body $i$ ${}^i X_W(q)$ is constructed iteratively and seems like a good candidate for lifting.
+With good intuition, the authors of~\cite{Albersmeyer:2010:LNM:1958447.1958472} state that the lifting idea could be directly transfered in the context of kinematic chain arising in robotics.
+Indeed, as we state in Section~\ref{sub:forward_kinematics} the equations that governs the transformation of a robot's end effector on body $i$, ${}^i X_W(q)$ is constructed iteratively and seems to be a good candidate for lifting.
 If we considere a single chain robot with $m$ bodies, such that $\kappa (m) = \{0, 1, 2, \ldots m\}$ the constraint ${}^m X_W(q) = X_\text{goal}$ can naturally be lifted as follows:
 
 \begin{equation}
+\label{eq:robot_lift}
   \textbf{G}(u,x) =
   \begin{pmatrix}
   {}^1 X_W(q) - x_1 \\
@@ -1097,7 +1094,7 @@ If we considere a single chain robot with $m$ bodies, such that $\kappa (m) = \{
   =0
 \end{equation}
 
-The transformation of a body is used in almost all the constraints and cost functions of posture generation problems, thus we could use this lifting approach on almost all of them.
+The transformation of a body is used in almost all the constraints and cost functions of posture generation problems, thus we can use this lifting approach in most functions of our problems.
 
 \subsection{Lifting Algorithm}
 \label{subsec:LiftingAlgorithm}
@@ -1124,26 +1121,23 @@ This observation extends to the case of any robot composed of the joints present
 The operators `addition', `substraction', `multiplication', `sinus' and `cosinus' are enough to describe the kinematics of a robot.
 
 We developped a generic lifting algorithm that allows to automatically lift polynomials of trigonometric functions based on a given criterion.
-To do so, we used symbolic variables, a symbolic equation can be seen as a graph of atomic operations (addition, multiplication and other functions), which can in turn be explored and cut at appropriate places where we can insert our additional variables.
+To do so, we use symbolic variables, a symbolic equation can be seen as a graph of atomic operations (addition, multiplication and other functions), which can in turn be explored and truncated at appropriate places where we insert additional variables.
 Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\ref{eq:direct_position}, where the green circles represent the variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that leads to the final expressions.
 \begin{figure}
   \centering
-  \includegraphics[width=0.55\textwidth]{graphDirectEEPos.png}
+  \includegraphics[width=0.55\textwidth]{graphDirectEEPos.pdf}
   \caption{Computation graph for end effector position of a 2 axis planar robotic arm}
 \label{fig:graph_direct}
 \end{figure}
 
-To lift our equations, we explore the graph from left to right, and at each node of the graph, we consider the sub-graph that lies on its left and if this sub-graph violates our criterion, it is lifted, a lifting variable is added and replaces the sub-graph.
-Then we start again and explore the graph from left to right.
-Given that the equations that we want to solve are polynomials of trigonometric functions, we decided to lift them based on the two following criteria (other criteria would be acceptable as well):
-\begin{itemize}
-  \item Maximum degree of the lifted polynomial.
-  \item Eliminating or not the trigonometric functions.
-\end{itemize}
-We define the degree function as the degree of a polynomial with the difference that trigonometric functions are considered to be polynomials of infinite degree (And thus are always lifted, no matter the maximum degree).
-By eliminating the trigonometric functions, we mean that we reformulate the problem so that, given a variable $x$ that appears in our equations in the forms $\cos(x)$ or $\sin(x)$, we introduce 2 new variables $s_x$ and $c_x$, replace all the occurrences of $\cos(x)$ by $c_x$ and all the occurrences of $\sin(x)$ by $s_x$, and to ensure the equivalence of the two formulations, we add the equation ${c_x}^2 + {s_x}^2=1$ to our problem.
+To lift a set of equations, we explore the graph from left to right. At each node of the graph, we consider the sub-graph that lies on its left and if this sub-graph violates our criterion, it is lifted, a lifting variable is added and replaces the sub-graph.
+Then we iterate this process on the remaining graph until it does not violate the criterion.
+Given that the equations to solve are polynomials of trigonometric functions, we decided to lift them based on a criterion of the maximum degree of the lifted polynomials.
+We define the degree function as the degree of a polynomial with the difference that trigonometric functions are considered to be polynomials of infinite degree (And thus are always lifted, no matter the maximum degree criterion).
+We also considere the option of eliminating or not the trigonometric functions.
+By eliminating the trigonometric functions, we mean that we reformulate the problem so that, given a variable $x$ that appears in our equations in the forms $\cos(x)$ and/or $\sin(x)$, we introduce 2 new variables $s_x$ and $c_x$, replace all the occurrences of $\cos(x)$ by $c_x$ and all the occurrences of $\sin(x)$ by $s_x$, and to ensure the equivalence of the two formulations, we add the equation ${c_x}^2 + {s_x}^2=1$ to our problem.
 
-For example, if we lift the set of equation~\ref{eq:direct_position} with a maximum degree of 2 and without eliminating the trigonometric functions we get the following system, with all the $w_{i_j}$ being the additional lifted variables:
+For example, lifting the set of equation~\ref{eq:direct_position} with a maximum degree of 2 and without eliminating the trigonometric functions gives the following system, with all the $w_{i_j}$ being the additional lifted variables:
 \begin{equation}
   \begin{array}{c}
   \textbf{Lifted Equations}\\
@@ -1203,10 +1197,99 @@ Note that here, all the equations are polynomials of degree at most 2, no trigon
 \end{equation}
 
 This lifting methodology can be extended to most robotic systems.
-In this study, we focused on fixed base robots with only revolute joints.
-Also, to make it simpler to study the influence of the number of degrees of freedom of a robot on the optimization performance, we mostly studied planar robots composed of $n$ successive links of length 1 attached to one another by revolute joints.
+We also developped a lifting method that follows the principle described in~\ref{eq:robot_lift}, in which case, we get another set of equations similar to~\ref{eq:lifted_equations}.
+
+\subsection{Optimization on lifted variables}
+\label{subsec:optimization_on_lifted_variables}
+
+We want to estimate the gain of performances yielded by the use of a lifted formulation of a posture generation problem.
+In order to do so, we implemented and/or used several optimization algorithms.
+
+Given the lifted equations and their derivatives, it is straightforward to solve and compare the results obtained by the different solvers provided in Matlab (trust-region-reflective; interior-point; active-set and SQP) for the set of equations with or without lifting.
+A limitation of that approach is that it does not allow us to easily use the condensed approach presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} in the resolution of the problems, because it is necessary to de-condensate and then update the problem between 2 iterations of the optimization.
+The lifted condensed problem is meant to be equivalent to the lifted full-space problem (lifted non condensed problem), in the sense that they generate the same optimization steps.
+Solving lifted problems with or without using the condensation trick gives the same result in the same number of iterations.
+The only difference is that with the lifted full-space problem (non condensed case) each iteration takes more time to compute.
+In our study, this is not a problem, we want to evaluate the performances in terms of number of iterations first, and if it shows that the lifted problem resolution outperforms the non lifted, then we will implement the condensation trick for our problems and solvers which will bring the per iteration time to approximately the same as in the direct problem case.
+Therefore, we only tried those algorithms on the direct problems (non lifted problem) and the lifted full-space problems.
+
+In addition to the matlab solvers, we implemented the optimization algorithms proposed in~\cite{Albersmeyer:2010:LNM:1958447.1958472}:
+\begin{itemize}
+  \item Lifted Newton
+  \item Lifter Gauss-Newton
+  \item Lifted SQP
+\end{itemize}
+With the only difference that we use the symbolic expressions of all our function and compute the symbolic expressions of the Jacobians and Hessians of our problems, instead of using auto-differentiation methods.
+
+We implemented the Newton and Gauss-Newton methods for condensed lifted problems and obtained the same results as the ones presented in paragraph 5.2 of~\cite{Albersmeyer:2010:LNM:1958447.1958472} that show the efficiency of a lifted approach in a specific kind of root finding problems.
+Our problems require the use of nonlinear cost and constraints, thus a Newton method is not sufficient to solve them, whereas an SPQ method is.
+
+We implemented the lifted and direct SQP approach as described in paragraph 3.2.3 of~\cite{Albersmeyer:2010:LNM:1958447.1958472}.
+The hessian matrices in our problems are usually not symmetric positive definite, so we need to use a globalization method as well as a regularisation of the Hessian to enforce convergence.
+For globalization, we implemented some line search methods with Armijo and Wolfe conditions, as well as a filter with backtracking line search. Those method are presented in~\cite{bonnans:springer:2002}.
+And for regularization, we approximate the full-space hessian matrix through BFGS updates (with Powell's correction) or SR1 updates as presented in~\cite{bonnans:springer:2002}.
+All those methods are applied on the full-space iteration, during the update process of the optimization, the lifted and final equations are treated the same way.
+
+\subsection{Condensed BFGS update}
+\label{subsec:condensed_bfgs_update}
+In appendix, we propose a formulation of the condensed version of the BFGS algorithm.
+
+\subsection{Results, experimentation}
+\label{subsec:Results}
+
+In order to evaluate the performances of the lifting approach in the resolution of posture generation problems, we realized many experimentations of solving simple inverse kinematics problems with the different solvers and lifting methods available.
+
+A difficulty that arises in that endeavour lays in the inherent combinatorial aspect on the choice of formulation and resolution method.
+Indeed, we need to choose one item amongst each or the categories cited below:
+\begin{itemize}
+  \item Type of lifting method
+  \begin{itemize}
+    \item None, direct problem
+    \item Lifted with maximum degree of 2
+    \item Lifted based on Joint
+  \end{itemize}
+  \item Treatment of trigononetric equations
+  \begin{itemize}
+    \item Keep trigonometric equations
+    \item Eliminate trigonometric equations
+  \end{itemize}
+  \item Type of Solver
+  \begin{itemize}
+    \item Our custom SQP
+    \item fmincon(active-set, interior point, SQP)
+    \item Gauss Newton
+  \end{itemize}
+  \item Type of initialization of the lifted variables
+  \begin{itemize}
+    \item Zeros
+    \item Random
+    \item Satisfying the lifted equations
+  \end{itemize}
+  \item Type of Regularization of the Hessian
+  \begin{itemize}
+    \item None
+    \item BFGS
+    \item SR1
+  \end{itemize}
+  \item Type of globalization
+  \begin{itemize}
+    \item Wolfe
+    \item Armijo
+    \item Filter
+  \end{itemize}
+  \item Cost function
+  \begin{itemize}
+    \item None
+    \item Norm 2 of articular parameters
+  \end{itemize}
+\end{itemize}
+The number of possible combination of choices is large and grows with any new possibility added.
+
+We devised a set of simple robots that will be the basis of our experimentation.
+For simplicity, we focused on fixed base robots with only revolute joints.
+To study the influence of the number of degrees of freedom of a robot on the optimization performance, we studied planar robots composed of $n$ successive links of length 1 attached to one another by revolute joints.
 We also studied a 7 axis 3D arm robot and a torso robot with 2 arms.
-Illustration of those different types of robots are given in figure~\ref{fig:robots}
+Illustration of those different types of robots are given in figure~\ref{fig:robots}, where blue lines represent the links, red circles represent the revolute joints, green square represent the origin of links, the biggest green square represents the origin of the base link of the robot, and the red cross is the end effector.
 \begin{figure*}
   \centering
   \includegraphics[width=0.95\textwidth]{robots.png}
@@ -1214,19 +1297,24 @@ Illustration of those different types of robots are given in figure~\ref{fig:rob
 \label{fig:robots}
 \end{figure*}
 
-\subsection{Optimization on lifted variables}
-\label{subsec:optimization_on_lifted_variables}
+We studied many of the possible configurations, but not all of them.
+Still, it seems possible to draw some conclusions out of it.
 
-\subsection{Condensed BFGS update}
-\label{subsec:condensed_bfgs_update}
+Since we do not use the condensation trick, we only focused on getting the lowest number of iterations for a resolution, the highest rate of successful optimizations and did not focus much on their duration.
+From here on, an experiment in which we made a combination of choice and during which the problem is solved numerous times for different initial points and/or goals to study the performances of the solver will be called a "bench".
+We gathered the results of our benches in terms of average number of iterations per optimization in the annexed document.
+To get an idea of the influence of the dimensionality of the problem on the performances of the solver, we made benches on several planar robots with successive links as described in Section ?? with number of links going from 2 to 12.
+Unfortunately, in most cases, the direct approach outperforms the lifted one.
+The only case where we observed a neat advantage of the lifted methods compared to the direct one was when using the interior point method that is built-in in fmincon in Matlab with a randomized initialization and the norm 2 of the articular parameters vector as a cost function.
+But then, the direct method was showing very bad performances and even though the lifted was better here, the average number of iterations before convergence was much higher than with other optimization method (up to twice more than for most other solvers).
 
-\subsection{Results, experimentation}
-\label{subsec:Results}
+The overall results we extracted from those bench is that the most performing method is: Solving the direct problem, using BFGS regularization and either Armijo or filter line searches, with random initial lifted variables and no cost function.
+
+We also started doing some benches with an initial guesses close to the solution. We observed that when the lifted variables are initialized randomly the direct problem is solved faster. And when the lifted variables are initialized so that the lifted equations are satisfied, the results are sensibly the same for lifted and direct approaches.
 
 \subsection{conclusion}
 \label{subsec:conclusion}
 
-%}}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %  SECTION CONCLUSION  %

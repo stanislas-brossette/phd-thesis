@@ -75,15 +75,6 @@
 % `PageStyleII': Chapter Name on Even Side (Left Even) in Header. Section Number
 % and Section Name in Header on Odd Side (Right Odd). Page numbering in footer
 
-\usepackage{amsmath}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-\usepackage{graphicx}
-\usepackage{url}
-\usepackage{color}
-\usepackage{flushend}
-\usepackage{ulem}
-
 \input{./theorem.tex}
 
 % ********************************** Preamble **********************************
@@ -113,19 +104,6 @@
 \ifdefineChapter
  \includeonly{Chapter3/chapter3}
 \fi
-
-
-%%%%%%%%%%%%%%%%%%%%%
-%  Custom Commands  %
-%%%%%%%%%%%%%%%%%%%%%
-\def\note{\textcolor{red}}
-
-\newcommand{\Figref}[2]{Fig.~\ref{#1}#2}
-\newcommand{\Eqref}[2]{Eq.~\ref{#1}#2}
-\newcommand{\compare}[2]{\textcolor{red}{#1} \textcolor{blue}{#2}}
-\newcommand{\diff}[2]{\dfrac{\partial #1}{\partial #2}}
-\newcommand{\norm}[1]{\left\| #1 \right\|}
-\DeclareMathOperator*{\minimize}{min.}
 
 
 % ******************************** Front Matter ********************************
