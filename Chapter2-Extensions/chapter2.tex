@@ -1215,7 +1215,7 @@ The only difference is that with the lifted full-space problem, each iteration t
 In our study, this is not a problem, we want to evaluate the performances in terms of number of iterations first, and if it appears that the lifted problem resolution outperforms the non-lifted, then we will implement the condensation trick for our problems and solvers, which will bring the per iteration time to approximately the same as in the direct problem case.
 Therefore, we only tried those algorithms on the direct problems (non-lifted problem) and the lifted full-space problems.
 
-In addition to the Matlab solvers, we implemented the optimization algorithms proposed in~\cite{Albersmeyer:2010:LNM:1958447.1958472}, namely: the Lifted Newton, the Lifted Gauss-Newton and the Lifted SQP.
+In addition to the Matlab solvers, we implemented the optimization algorithms proposed in~\cite{Albersmeyer:2010:LNM:1958447.1958472}, namely: the Lifted Newton, the Lifted Gauss-Newton and the Lifted SQP\@.
 With the only difference that we use the symbolic expressions of all our function and compute the symbolic expressions of the Jacobians and Hessians of our problems, instead of using auto-differentiation methods.
 
 We implemented the Newton and Gauss-Newton methods for condensed lifted problems and obtained the same results as the ones presented in paragraph 5.2 of~\cite{Albersmeyer:2010:LNM:1958447.1958472} that show the efficiency of a lifted approach in a specific kind of root finding problems.
@@ -1232,7 +1232,7 @@ Those methods are presented in~\cite{bonnans:springer:2002}.
 \label{subsec:condensed_bfgs_update}
 In appendix, we propose a formulation of the condensed version of the BFGS algorithm.
 
-TODO: Because it has not been used much and we didn't get any good results out of it, I'm not sure if I should present it or not...
+TODO Because it has not been used much and we didn't get any good results out of it, I'm not sure if I should present it or not\ldots
 
 \subsection{Results, experimentation}
 \label{subsec:Results}
@@ -1256,7 +1256,7 @@ Indeed, we need to choose one item amongst each or the categories cited below:
   \item Type of Solver
   \begin{itemize}
     \item Our custom SQP
-    \item fmincon(active-set, interior point, SQP)
+    \item fmincon (active-set, interior point, SQP)
     \item Gauss-Newton
   \end{itemize}
   \item Type of initialization of the lifted variables
@@ -1334,21 +1334,13 @@ In figure~\ref{fig:lift_results2} we present the results obtained for the resolu
     grid style=dashed,
 ]
 \addplot[color=blue,mark=x]
-    coordinates {
-    (2,8.3)(3,10.05)(4,9.79)(5,8.224)(6,8.99)(7,8.19)(8,8.909)(9,8.8)(10,7.83)(11,8.42)(12,7.949)
-    };
+    coordinates {(2,8.3)(3,10.05)(4,9.79)(5,8.224)(6,8.99)(7,8.19)(8,8.909)(9,8.8)(10,7.83)(11,8.42)(12,7.949)};
 \addplot[color=yellow,mark=o]
-    coordinates {
-    (2,10.12)(3,10.42)(4,10.54)(5,9.9)(6,9.35)(7,10.68)(8,11.25)(9,10.13)(10,10.45)(11,10.7)(12,11.31)
-    };
+    coordinates {(2,10.12)(3,10.42)(4,10.54)(5,9.9)(6,9.35)(7,10.68)(8,11.25)(9,10.13)(10,10.45)(11,10.7)(12,11.31)};
 \addplot[color=green,mark=diamond]
-    coordinates {
-    (2,10.49)(3,11.7)(4,10.46)(5,10.67)(6,10.7)(7,10.85)(8,13.38)(9,12.75)(10,14.23)(11,13.53)(12,15.41)
-    };
+    coordinates {(2,10.49)(3,11.7)(4,10.46)(5,10.67)(6,10.7)(7,10.85)(8,13.38)(9,12.75)(10,14.23)(11,13.53)(12,15.41)};
 \addplot[color=purple,mark=star]
-    coordinates {
-    (2,11.2)(3,8.927)(4,8.904)(5,9.816)(6,9.362)(7,9.961)(8,9.697)(9,10.28)(10,10.36)(11,10.89)(12,10.93)
-    };
+    coordinates {(2,11.2)(3,8.927)(4,8.904)(5,9.816)(6,9.362)(7,9.961)(8,9.697)(9,10.28)(10,10.36)(11,10.89)(12,10.93)};
 \legend{Direct, Lifted, Lifted trigo, Listed joints}
 \end{axis}
 \end{tikzpicture}
@@ -1373,29 +1365,17 @@ In figure~\ref{fig:lift_results2} we present the results obtained for the resolu
     grid style=dashed,
 ]
 \addplot[color=blue,mark=x]
-    coordinates {
-(2,8.628)(3,8.637)(4,7.655)(5,6.982)(6,7.19)(7,7.749)(8,6.856)(9,6.962)
-    };
+    coordinates {(2,8.628)(3,8.637)(4,7.655)(5,6.982)(6,7.19)(7,7.749)(8,6.856)(9,6.962)};
 \addplot[color=orange,mark=+]
-    coordinates {
-(2,12.05)(3,11.28)(4,9.388)(5,8.331)(6,8.878)(7,8.687)(8,7.862)(9,8.637)
-    };
+    coordinates {(2,12.05)(3,11.28)(4,9.388)(5,8.331)(6,8.878)(7,8.687)(8,7.862)(9,8.637)};
 \addplot[color=yellow,mark=o]
-    coordinates {
-(2,11.84)(3,10.79)(4,8.805)(5,7.766)(6,8.402)(7,7.368)(8,7.404)(9,7.54)
-    };
+    coordinates {(2,11.84)(3,10.79)(4,8.805)(5,7.766)(6,8.402)(7,7.368)(8,7.404)(9,7.54)};
 \addplot[color=green,mark=diamond]
-    coordinates {
-(2,12.61)(3,11.11)(4,9.096)(5,7.898)(6,8.44)(7,7.468)(8,7.568)(9,8.158)
-    };
+    coordinates {(2,12.61)(3,11.11)(4,9.096)(5,7.898)(6,8.44)(7,7.468)(8,7.568)(9,8.158)};
 \addplot[color=purple,mark=star]
-    coordinates {
-(2,9.557)(3,8.714)(4,7.818)(5,7.39)(6,7.938)(7,7.58)(8,8.552)(9,9.048)
-    };
+    coordinates {(2,9.557)(3,8.714)(4,7.818)(5,7.39)(6,7.938)(7,7.58)(8,8.552)(9,9.048)};
 \addplot[color=cyan,mark=square]
-    coordinates {
-(2,13.56)(3,12.51)(4,9.638)(5,8.426)(6,10.17)(7,9.264)(8,9.624)(9,10.73)
-    };
+    coordinates {(2,13.56)(3,12.51)(4,9.638)(5,8.426)(6,10.17)(7,9.264)(8,9.624)(9,10.73)};
 \legend{Direct, Direct trigo , Lifted, Lifted trigo, Lifted joint, Lifted joint trigo }
 \end{axis}
 \end{tikzpicture}
