@@ -7,97 +7,291 @@
 \chapter{
 Optimization on non-Euclidean Manifolds
 }
-\section{List of contributions}
+
+\graphicspath{{Chapter3-Manifolds/Figs/}{Chapter3-Manifolds/Figs/Humanoids2015}}
+
+%{{{ LIST OF CONTRIBUTIONS
+%\section{List of contributions}
+%\begin{itemize}
+  %\item{Optimisation on Manifolds}
+    %\begin{itemize}
+      %\item Definition and examples of non-Euclidean manifolds
+        %\begin{itemize}
+          %\item $\mathbb{R}^n$
+          %\item $SO(3)$
+          %\item $S2$
+          %\item Cartesian Products
+        %\end{itemize}
+      %\item Representation space vs Tangent space vs manifold
+      %\item Local parametrization, notion of retractation
+      %\item Computation of function's derivatives, differentiation of retractation
+      %\item Hessian update on manifolds, notion of vector transport and application to BFGS and SR1 updates
+      %\item Computation of distances, notion of logarithm
+    %\end{itemize}
+  %\item{Practical Implementation: PGSolver}
+    %\begin{itemize}
+      %\item General SQP algorithm adapted to local parametrization of manifolds.
+      %\item Local QP and resolution with LSSOL
+      %\item Feasibility problems and resolution with LSSOL
+      %\item Acceptance criterion:
+        %\begin{itemize}
+          %\item Merit function
+          %\item Filter
+        %\end{itemize}
+      %\item Globalization method:
+        %\begin{itemize}
+          %\item Line-Search
+          %\item Trust-Region
+            %\begin{itemize}
+              %\item Notions of limit-Map vs trust-region vs problem's boundaries
+              %\item Decisions of increase or decrease of trust region's size
+              %\item Anisotrope trust-region
+            %\end{itemize}
+        %\end{itemize}
+      %\item Hessian Update:
+        %\begin{itemize}
+          %\item BFGS
+          %\item SR1
+          %\item Fletcher LQNU
+          %\item Individual vs grouped updates
+          %\item Limited memory updates
+        %\end{itemize}
+      %\item Termination conditions:
+        %\begin{itemize}
+          %\item Satisfaction of KKT constraints
+          %\item Null step
+          %\item Failure of QP, FP, other\dots
+        %\end{itemize}
+      %\item Restoration Phase:
+        %\begin{itemize}
+          %\item Problem to solve: minimization of violation, relaxation of violated cstr
+          %\item Exit condition: Feasible problem
+          %\item Second-order correction phase
+        %\end{itemize}
+    %\end{itemize}
+  %\item{Applications and testings of PGSolver on non-robotic problems}
+    %\begin{itemize}
+      %\item Point cloud fitting
+      %\item Surface parametrisation
+      %\item Cube stacks
+      %\item Schitkowsky
+    %\end{itemize}
+%\end{itemize}
+%}}}
+
+%{{{INTRODUCTION TO OPTIMIZATION ON MANIFOLDS
+\section{Introduction to optimization on Manifolds}
+\label{sec:introduction_to_optimization_on_manifolds}
+
+Posture generation has been formulated as a problem over a Euclidean space.
+Robots variable may however be more naturally expressed over non-Euclidean manifolds.
+The archetypes for this are the rotation part of the root body for a humanoid robot, and ball joints, whose variables live in $SO(3)$.
+Some typical tasks are also naturally formulated on different manifolds.
+For example for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$.
+Human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
+
+Formulating the problem over $\mathbb{R}^n$ leads either to discontinuities that can prevent the convergence of the optimization solver, or to cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
+
+For example, let us consider an optimization problem over the manifold $SO(3)$:
+
+\begin{align}
+\label{eq:pb_on_SO3}
+  \minimize_{x \in SO(3)} & \quad f(x)\\
+  \text{subject to}&
+  \begin{array}{rcl}
+    {l} \leq & \reduce{c(x)}{8}& \leq {u} \nonumber
+  \end{array}
+\end{align}
+
+$SO(3)$ is a 3-dimensional manifold.
+As such, it can be parametrized \emph{locally} by $3$ variables, for example a choice of Euler angles, but any such parametrization necessarily exhibits singularities when taken as a global map (e.g. gimbal lock for Euler angles), which can be detrimental to our optimization process.
+
+For this reason, when addressing $SO(3)$ with classical optimization algorithms, it is often preferred to use one of the two following parametrizations:
 \begin{itemize}
-  \item{Optimisation on Manifolds}
-    \begin{itemize}
-      \item Definition and examples of non-Euclidean manifolds
-        \begin{itemize}
-          \item Rn
-          \item SO(3)
-          \item S2
-          \item Cartesian Products
-        \end{itemize}
-      \item Representation space vs Tangent space vs manifold
-      \item Local parametrization, notion of retractation
-      \item Computation of function's derivatives, differentiation of retractation
-      \item Hessian update on manifolds, notion of vector transport and application to BFGS and SR1 updates
-    \end{itemize}
-  \item{Practical Implementation: PGSolver}
-    \begin{itemize}
-      \item General SQP algorithm adapted to local parametrization of manifolds.
-      \item Local QP and resolution with LSSOL
-      \item Feasibility problems and resolution with LSSOL
-      \item Acceptance criterion:
-        \begin{itemize}
-          \item Merit function
-          \item Filter
-        \end{itemize}
-      \item Globalization method:
-        \begin{itemize}
-          \item Line-Search
-          \item Trust-Region
-            \begin{itemize}
-              \item Notions of limit-Map vs trust-region vs problem's boundaries
-              \item Decisions of increase or decrease of trust region's size
-              \item Anisotrope trust-region
-            \end{itemize}
-        \end{itemize}
-      \item Hessian Update:
-        \begin{itemize}
-          \item BFGS
-          \item SR1
-          \item Fletcher LQNU
-          \item Individual vs grouped updates
-          \item Limited memory updates
-        \end{itemize}
-      \item Termination conditions:
-        \begin{itemize}
-          \item Satisfaction of KKT constraints
-          \item Null step
-          \item Failure of QP, FP, other\dots
-        \end{itemize}
-      \item Restoration Phase:
-        \begin{itemize}
-          \item Problem to solve: minimization of violation, relaxation of violated cstr
-          \item Exit condition: Feasible problem
-          \item Second-order correction phase
-        \end{itemize}
-    \end{itemize}
-  \item{Applications and testings of PGSolver on non-robotic problems}
-    \begin{itemize}
-      \item Point cloud fitting
-      \item Surface parametrisation
-      \item Cube stacks
-      \item Schitkowsky
-    \end{itemize}
+    \item unit quaternion, \emph{i.e.} an element $q$ of $\mathbb{R}^4$ with the additional constraint $\left\|q\right\| = 1$,
+    \item rotation matrix, \emph{i.e.} an element $R$ of $\mathbb{R}^{3 \times 3}$ (or equivalently $\mathbb{R}^9$) with the additional constraints $R^T R = I$ and $\det{R} \geq 0$.
 \end{itemize}
 
-\section{Introduction}
-\label{sec:Introduction}
+Then, if we use the unit quaternion parametrization, the problem~\ref{eq:pb_on_SO3} becomes:
+\begin{align}
+\label{eq:pb_on_SO3_quaternion}
+  \minimize_{x \in \mathbb{R}^4} & \quad f(x)\\
+  \text{subject to}&
+  \left\{\begin{array}{lr}
+    {l} \leq c(x) \leq {u} \nonumber\\
+    \|x\| - 1 = 0
+  \end{array}\right.
+\end{align}
 
-\section{Optimisation on Manifolds Theory}
-\label{sec:Optimisation on Manifolds Theory}
+The problem to solve has 4 dimensions instead of 3, and has an additional constraint.
+Furthermore, this guarantees that $x$ is a unit norm quaternion only at the solution, not during the iteration of the optimization process.
+During the optimization process, at each iteration, an increment $\delta$ is computed by solving a quadratic problem that approximates~\ref{eq:pb_on_SO3_quaternion} locally.
+In particular, this quadratic problem approximates the constraints linearly, thus, for any step $\delta$ not null, the next iterate $(x+\delta)$ will not respect the unit norm constraint.
+So the quaternion $(x+\delta)$ will not represent a rotation, except if some additional treatment is implemented.
+For example, normalizing the quaternion at each iteration, then it represents a rotation, but this normalization must be taken into account in the derivation of the constraints and cost functions.
+Which is an additional programming burden.
+Similar issues can be found with the $3\times 3$ matrix representation.
 
-\section{Practical Implementation: PGSolver}
-\label{sec:Practical Implementation}
+The alternative is to use optimization software working natively with manifolds~\cite{brossette:Humanoids:2015}\cite{absil:book:2008} and solve the optimization problem as written in~\ref{eq:pb_on_SO3}.
+It has an immediate advantage: we can write directly the problem without the need to add any parametrization-related constraints.
+Working directly with manifolds has also has the advantage that at each iteration, the variables of the problem represent an element of the manifold.
+This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
+Having intermediate values naturally staying on the manifold can be useful to evaluate additional functions that pre-suppose it (additional constraints, external monitoring $\ldots$).
+It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the optimization, so that when the optimization process is stopped after a few iterations, the output is valid in the sense that it is always a point of the manifold.
+With non-manifold formulations, at any given iteration, the parametrization-related constraints can be violated, thus, the variables might not lie in the manifold. It is then needed to project them on it. Denoting $\pi$ the projection (for example $\pi = \frac{q}{\left\|q\right\|}$ in the unit quaternion formulation), to evaluate a function $f$ on a manifold, we need to compute $f \circ \pi$. If further the gradient is needed, that projection must also be accounted for (authors in~\cite{bouyarmane:humanoids:2012} explain that issue in great details for robotics problems with free-floating bases).
 
-\section{Posture Generation, variables and architecture}
-\label{sec:posture_generation_variables_and_architecture}
+In this chapter, we present a new nonlinear constrained optimization solver able to work on generic smooth manifolds.
+We take inspiration from the approach used for unconstrained optimization on manifold~\cite{absil:book:2008} and adapt it to constrained optimization.
+To the best of our knowledge, constrained optimization on manifold has drawn few research for now.
+This is likely due to the fact that in most problems the only constraint is to be on the manifold.
+We are only aware of the work of Schulman \emph{et al.}~\cite{Schulman2014}, where the authors explain the adaptation of their solver to work on $SE(3)$.
+This adaptation is however not valid for general manifolds without more care about hessian computation.
 
-\section{Problem Formulation}
-\label{sec:problem_formulation}
+A background motivation for this work is to have our own optimization solver, instead of a black box.
+We will now be able to specialize the solver specifically to robotic problems, by leveraging modeling properties and approximations, for a gain in time and robustness.
+%We also look forward to using this solver for problems with a varying number of constraints along the iterations (such as when complex collision constraints are considered).
 
-\section{Simulation Results}
-\label{sec:simulation_results}
+%}}}
+%{{{OPTIMIZATION ON MANIFOLDS
+\section{Optimization on Manifolds}
+\label{sec:optimization_on_manifolds}
 
-\section{Parametrization of complex solids on S2}
-\label{sec:parametrization_of_complex_solids_on_s2}
+In this section, we describe a Sequential Quadratic Programming (SQP) approach~\cite{nocedal:book:2006} to solve the following non-linear constrained optimization program
 
-\section{Potential contacts}
-\label{sec:potential_contacts}
+\begin{align}
+\label{eq:optim_problem}
+  \minimize_{x \in \mathcal{M}} & \quad f(x)\\
+  \text{subject to}&
+  \begin{array}{rcl}
+    {l} \leq & \reduce{c(x)}{8}& \leq {u} \nonumber
+  \end{array}
+\end{align}
 
-\section{Optimization of the solvers parameter for a class of problems}
-\label{sec:optimization_of_the_solvers_parameter_for_a_class_of_problems}
+where $\mathcal{M}$ is a $n$-dimensional smooth manifold and $c$ is a $m$-dimensional real-valued function.
 
+\subsection{Representation problem}
+When $\mathcal{M} = \mathbb{R}^n$, the problem~(\ref{eq:optim_problem}) is solved iteratively, starting from an initial guess $x_0$ and performing successive steps $x_{i+1} = x_i + {\bf p_i}$ where ${\bf p_i}$ is the increment found at the $i$-th iteration, until convergence is achieved. The strategy to compute ${\bf p_i}$ depends on the solver.
+
+This classical scheme cannot be readily applied to optimization over non-Euclidean manifolds. First of all, only (a subset of) the real numbers can be stored in computers. To manipulate elements of $\mathcal{M}$ we need to choose a way to represent them in memory. This boils down to choosing a representation space $\mathbb{E} = \mathbb{R}^r$ (with $r \geq n$) and a map
+\begin{equation}
+  \psi\ :\
+  \begin{array}{ccc}
+    x & \reduce{\mapsto}{6} & \mathbf{x} \\
+    \mathcal{M} & \reduce{\rightarrow}{6} & \mathbb{E}
+  \end{array} \nonumber
+\end{equation}
+In the following, we identify $\mathcal{M}$ with the set $\psi(\mathcal{M}) \subseteq \mathbb{E}$.
+
+With this representation, it is tempting to simply transform problem~(\ref{eq:optim_problem}) as an optimization over $\mathbb{R}^r$ with objective $f \circ \psi^{-1}$ and constraint $c \circ \psi^{-1}$, and solve it with a usual solver. But depending on the representation choice, one of the two following problems arises:\\
+(i) $r=n$, then it is not possible in the general non-Euclidean case to find $\psi$ without derivative discontinuities. This can lead to critical convergence problems, \\
+(ii) $r>n$, then most elements of $\mathbb{E}$ do not represent an element of $\mathcal{M}$ %($\psi(\mathcal{M})$ is a measure-zero subset of $\mathbb{E}$)
+and $\psi$ cannot be surjective. Constraints need to be added to force the solution on $\mathcal{M}$. As a result, the problem has more variables and constraints w.r.t (i). Moreover, the additional constraints are unlikely to be met along the iteration process (even if $x_i$ is an element of $\mathcal{M}$, $x_i+{\bf p_i}$ is likely not, as nothing enforces it). This means that in order to evaluate $f \circ \psi^{-1}$ and $c \circ \psi^{-1}$ at a given $x_i$, one has to project it on $\psi(\mathcal{M})$ first, effectively computing $f \circ \psi^{-1} \circ \pi$ and $c \circ \psi^{-1} \circ \pi$, where $\pi$ is the projection. The composition by $\pi$ is an additional burden in programming (see e.g. in~\cite{bouyarmane:humanoids:2012a}).
+
+As a simple example, the set of 3D-rotations $SO(3)$ is a manifold of dimension $3$. The following (classical) choices can be made
+\begin{itemize}
+  \item Rotation matrix ${\bf R} \in \mathbb{R}^{3\times 3} \approx \mathbb{R}^9$, additional constraints: $\{{\bf R}^t{\bf R} = I\ ,\ \det({\bf R})=1\}$, projection by orthogonalization,
+  \item Quaternion ${\bf q} \in \mathbb{R}^4$, additional constraints: $\{ \left\|{\bf q}\right\|=1\}$, projection $\pi({\bf x}) = {\bf x}/\left\|{\bf x}\right\|$,
+  \item Euler angles ($\mathbb{E} = \mathbb{R}^3$), singularities when reaching gimbal lock.
+\end{itemize}
+
+
+\subsection{Local parametrization}
+By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}$, the tangent space to $\mathcal{M}$ at $x$, and a neighborhood of $x$, with $\varphi_x(0) = x$. $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$. This gives us a local parametrization for $\mathcal{M}$. The driving idea of the optimization on manifolds is to change the parametrization at each iteration. Applying this idea, we can reformulate Problem~(\ref{eq:optim_problem}) around $x_i$ as
+\begin{align}
+\label{eq:local_problem}
+\minimize_{{\bf z} \in T_{x_i}\mathcal{M}} & \quad f \circ \varphi_{x_i}({\bf z}) \\
+  \text{subject to}&
+  \begin{array}{rcl}
+    {l} \leq & \reduce{c \circ \varphi_{x_i}({\bf z})}{8}& \leq {b} \nonumber
+  \end{array}
+\end{align}
+This is an optimization problem on $\mathbb{R}^n$. If we perform one iteration of a classical solver starting from ${\bf z_0} = 0$, we get an iterate ${\bf z_1}$, which corresponds to the iterate $x_{i+1} = \varphi_{x_i}({\bf z_1})$. We can then reformulate Problem~(\ref{eq:optim_problem}) around $x_{i+1}$, perform a new iteration and repeat the process until convergence.
+
+\begin{figure}[!htb]
+	\centering
+  \includegraphics[width=.9\linewidth]{papers/Humanoids2015/figure/manifold.pdf}
+    \caption{There are many possible choices for $\varphi_{x}$ but not all yield a curve $\varphi_{x}(t{\bf z})$ which is going in the same direction as ${\bf z}$: $\varphi_{1}$ and $\varphi_{2}$ are correct choices, $\varphi_{3}$ is not.}
+	\label{fig:phimap}
+\end{figure}
+
+
+However, convergence cannot be achieved without care on the choice of $\varphi_{x_i}$: it must be such that for any ${\bf z}$, the curve $t \mapsto \varphi_{x_i}(tz)$ is tangent to ${\bf z}$, see Fig.~\ref{fig:phimap}, so that the update $x_{i+1} = \varphi_{x_i}({\bf z_1})$ is made in the direction given by ${\bf z_1}$.
+
+The exponential map is a good theoretical candidate, but it is often impractical or expensive to compute. Depending on the manifold, cheaper maps can be chosen.
+
+With the iterative formulation approach described above, we do not have any parametrization issue, do not need additional constraints, and have the minimum number of optimization parameters. But we still need a map $\psi$ and real space $\mathbb{E}$ to represent the $x_i$ and keep track of them in a global way. The ${\bf x_i}$ are guaranteed to be on $\mathcal{M}$ so we can choose a representation with $r>n$ where $\psi$ is singularity-free without any drawback.
+Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it was a function from $\mathbb{E}$ to $\mathbb{R}$ without the need to project on $\psi(\mathcal{M})$ first (same goes for $c' = c \circ \psi^{-1}$).
+For example if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}$ is automatically a rotation matrix and can be used directly as such when writing the function.
+
+\subsection{Local SQP on manifolds}
+We choose to adopt an SQP approach to solve our problem. We first define the Lagrangian function
+\begin{equation}
+  \mathcal{L}_x ({\bf z}, \lambda) = f\circ \varphi_x({\bf z}) - \lambda^T c \circ \varphi_x({\bf z})
+\end{equation}
+with $\lambda \in \mathbb{R}^m$ the vector of Lagrange multipliers, and note $H_k$ the Hessian matrix $\nabla_{zz}^2 \mathcal{L}_{x_k}$. Taking ${\bf z_0} = 0$, the first SQP step for Problem~(\ref{eq:local_problem}) is computed by solving the following quadratic program
+
+\begin{align}
+	\label{eq:SQPStep}
+  \minimize_{\bf z \in \mathbb{R}^n } & \quad \frac{\partial f\circ \varphi_{x_k}}{\partial {\bf z}}(0)^T {\bf z } + \frac{1}{2} {\bf z }^T H_k{\bf z }\\
+  \text{subject to}&
+  \begin{array}{lr}
+    \text{l} \leq c\circ \varphi_{x_k}(0) + \frac{\partial c\circ \varphi_{x_k}}{\partial {\bf z}}(0) {\bf z }\leq \text{u}\\
+  \end{array} \nonumber
+\end{align}
+
+The basic SQP approach adapted to manifolds can be summarized as follows
+\begin{enumerate}
+	\item set $k=0$ and $x_k$ to the initial value
+  \item compute ${\bf z}$ from Problem~(\ref{eq:SQPStep}) for current $x_k$
+  \item set $x_k = \varphi_{x_k}({\bf z})$
+	\item if convergence is not yet achieved go-to step 2
+\end{enumerate}
+
+Computations of function values and derivatives are based on the fact that $f \circ \varphi = f' \circ \psi \circ \varphi$ (and same for $c$), and
+\begin{align}
+  f'\ :\
+  \begin{array}{ccc}
+    \mathbb{E} & \reduce{\rightarrow}{6} & \mathbb{R}
+  \end{array} \nonumber \\
+	\psi \circ \varphi\ :\
+  \begin{array}{ccc}
+    \mathbb{R}^n & \reduce{\rightarrow}{6} & \mathbb{E}
+  \end{array} \nonumber
+\end{align}
+are representable functions. The gradient of $f \circ \varphi$ is
+\begin{align}
+  \frac{\partial f\circ\varphi_x}{\partial {\bf z}}=
+  \frac{\partial f'}{\partial y}(\psi\circ\varphi_x)\times
+  \frac{\partial (\psi\circ\varphi_x)}{\partial {\bf z}}
+\end{align}
+
+\subsection{Practical implementation}
+The above SQP algorithm works locally, \emph{i.e.} when starting close enough to the solution. In practice, various possible refinements are made to ensure convergence from any starting point. We detail hereafter our choices.
+
+Maps $\varphi_{x_i}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by Problem~(\ref{eq:SQPStep}) should not be outside the validity region of the map. We could enforce this by adding a constraint ${\bf z}_{\text{map}}^- \leq {\bf z} \leq {\bf z}_{\text{map}}^+$ in~(\ref{eq:SQPStep}). This leads naturally to trust region methods that we therefore favor over line-search approaches.
+
+To know if a step ${\bf z}$ is acceptable or not, one usually uses a penalty-based merit function. In our early tests, the update of the penalty parameters proved to be difficult with our types of problems. We now use a filter instead.
+
+Our algorithm is an adaptation of Fletcher's filter SQP~\cite{fletcher:mathprog:2000} to the case of manifolds: we use an adaptive trust-region that is intersected with the validity region of $\varphi_{x_i}$, and a new iterate $x_{i+1} = \varphi_{x_i}({\bf z})$ is accepted if either the cost function or the sum of constraint violations is made better than for any previous iterates.
+
+Aside from the manifold adaptation, our main departure from Fletcher is in the Hessian computation where we used an approximation, since the exact one is too expensive to compute in our problems. After testing several possibilities, we settled for a self-scaling damped BFGS update~\cite{nocedal:mp:1993,nocedal:book:2006}, adapted to the manifold framework. More precisely, given the Hessian approximation $H_k$ at iteration $k$, we compute the approximation $H_{k+1}$ as follows
+\begin{align}
+	&s_k = \mathcal{T}_z(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_z(\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
+	&\theta_k = \left\{\begin{array}{ll}
+		1 & \mbox{if} \; s_k^T y_k \geq 0.2 s_k^T \tilde{H}_k s_k \\
+		\frac{0.8 s_k^T \tilde{H}_k s_k}{s_k^T \tilde{H}_k s_k - s_k^T y_k} & \mbox{otherwise}
+	\end{array}\right. \nonumber \\
+	&r_k = \theta_k y_k + \left(1-\theta_k\right) \tilde{H}_k s_k \quad \mbox{(damped update)} \nonumber \\
+	&\tau_k = \min\left(1, \frac{s_k^T r_k}{s_k^T \tilde{H}_k s_k} \right) \quad \mbox{(self-scaling)} \nonumber \\
+	&H_{k+1} = \tau_k \left(\tilde{H}_k - \frac{\tilde{H}_k s_k s_k^T \tilde{H}_k}{s_k^T \tilde{H}_k s_k} \right) + \frac{r_k r_k^T}{s_k^T r_k} \nonumber
+\end{align}
+where $\mathcal{T}_{\bf z}$ is a vector transport along ${\bf z}$ (see~\cite{absil:book:2008}) and $\tilde{H}_k$ is such that for ${\bf u} \in T_{x_{k+1}} \mathcal{M}$, $\tilde{H}_k {\bf u} = \mathcal{T}_{\bf z}\left(H_k \mathcal{T}_{\bf z}^{-1}({\bf u}) \right)$.
+
+Despite Powell's update, $H_{k}$ might not be positive definite (but still symmetric). We regularize it as follows: we first perform a Bunch-Kaufman factorization $P_k H_k P_k^T= L_k B_k L_k^T$ where $P_k$ is a permutation matrix, $L_k$ is unit lower triangular and $B_k$ is block diagonal with blocks of size $1 \times 1$ or $2\times 2$ (obtaining $B_k$ as a diagonal matrix is not numerically stable for Cholesky-like decomposition of indefinite matrices), see~\cite{golub:book:1996}.
+The eigenvalue decomposition $B_k = Q_k D_k Q_k^T$ is immediate and cheap to compute. From the diagonal matrix $D_k$ we form $D'_k$ such that $d'_{ii} = \max\left(d_{ii},\mu_{\min}\right)$ where $\mu_{\min}>0$ is user-defined (we typically set it to $0.1$).
+Defining $L'_k = L_k Q_k (D'_k)^{1/2}$, we get a regularized matrix $H'_k = P_k^T L_k L_k^T P_k$. In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~(\ref{eq:SQPStep}), which directly accepts the factorized form $(P_k, L'_k)$. This avoids an internal Cholesky factorization so that our regularization does not add too much time to the overall process of building and solving the QP.
+
+The code for $\psi\circ\varphi$, its gradient and the vector transport needs only to be implemented once for each elementary manifold (it is then trivial to get those functions for Cartesian products of manifolds). The composition with $f'$ and $c'$ is done automatically. The expression of those functions is adapted from~\cite{boumal:jmlr:2014}.
+
+%}}}
 

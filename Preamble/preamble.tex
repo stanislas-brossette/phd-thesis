@@ -43,13 +43,14 @@
 % ************************* Algorithms and Pseudocode **************************
 
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{color}
 \usepackage{flushend}
-\usepackage{ulem}
+%\usepackage{ulem}
 
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.9}
@@ -161,7 +162,11 @@
 \newcommand{\compare}[2]{\textcolor{red}{#1} \textcolor{blue}{#2}}
 \newcommand{\diff}[2]{\dfrac{\partial #1}{\partial #2}}
 \newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\reduce}[2]{\hspace{-#2pt} #1 \hspace{-#2pt}}
 \DeclareMathOperator*{\minimize}{min.}
+
+% Reset MathCal to default
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 
 % ********************** TOC depth and numbering depth *************************
 
