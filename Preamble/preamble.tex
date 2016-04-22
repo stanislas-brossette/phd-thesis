@@ -164,10 +164,26 @@
 \newcommand{\norm}[1]{\left\| #1 \right\|}
 \newcommand{\reduce}[2]{\hspace{-#2pt} #1 \hspace{-#2pt}}
 \DeclareMathOperator*{\minimize}{min.}
+\DeclareMathOperator{\plog}{plog}
+\DeclareMathOperator{\dist}{dist}
 
 % Reset MathCal to default
 \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 
+% define widecheck
+%% code from mathabx.sty and mathabx.dcl
+\DeclareFontFamily{U}{mathx}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathx}{m}{n}{
+      <5> <6> <7> <8> <9> <10>
+      <10.95> <12> <14.4> <17.28> <20.74> <24.88>
+      mathx10
+      }{}
+\DeclareSymbolFont{mathx}{U}{mathx}{m}{n}
+\DeclareFontSubstitution{U}{mathx}{m}{n}
+\DeclareMathAccent{\widecheck}{0}{mathx}{"71}
+\DeclareMathAccent{\wideparen}{0}{mathx}{"75}
+
+\def\cs#1{\texttt{\char`\\#1}}
 % ********************** TOC depth and numbering depth *************************
 
 \setcounter{secnumdepth}{2}
