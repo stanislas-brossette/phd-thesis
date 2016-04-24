@@ -1,0 +1,134 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                          Thesis Appendix B                          %
+%                       Manifolds Descriptions                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Manifolds Descriptions}
+\label{appendix:manifolds}
+
+\graphicspath{{Appendix2-Manifolds/Figs/}}
+
+\section{Intro}
+This appendix chapter comes as a complement for chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
+
+%{{{REALSPACE
+\subsubsection{RealSpace}
+\label{ssub:RealSpace}
+
+Extensions to Realspace manifold
+
+%}}}
+%{{{SO(3) MATRIX REPRESENTATION
+\subsubsection{SO(3) Matrix representation}
+\label{ssub:so(3)_matrix_representation}
+
+We considere a point $x\in\mathcal{M}$ and its representation matrix with the following storing order:
+\begin{equation}
+\mathbf{x}=\psi(x)
+= \begin{pmatrix}
+  x_0 & x_3 & x_6 \\
+  x_1 & x_4 & x_7 \\
+  x_2 & x_5 & x_8 \\
+\end{pmatrix}
+= \begin{pmatrix}
+  x_{00} & x_{01} & x_{02} \\
+  x_{10} & x_{11} & x_{12} \\
+  x_{20} & x_{21} & x_{22} \\
+\end{pmatrix}
+\end{equation}
+
+The derivative of retractation operation writes as:
+
+\begin{align}
+\label{eq:diffRetrSO3Matrix}
+  \frac{\partial \varphi_x}{\partial z}(0) = 
+  \begin{bmatrix}
+    0 & -x_6 & x_3 \\
+    0 & -x_7 & x_4 \\
+    0 & -x_8 & x_5 \\
+    x_6 & 0 & -x_0 \\
+    x_7 & 0 & -x_1 \\
+    x_8 & 0 & -x_2 \\
+    -x_3 & x_0 & 0 \\
+    -x_4 & x_1 & 0 \\
+    -x_5 & x_2 & 0 \\
+  \end{bmatrix}
+\end{align}
+
+And the derivation of the logarithm operation writes as:
+
+\begin{align}
+\label{eq:diffLogSO3Matrix}
+  \mathbf{v} &= \begin{pmatrix}
+    \frac{x_{21} - x_{12}}{2}\\
+    \frac{x_{02} - x_{20}}{2}\\
+    \frac{x_{10} - x_{01}}{2}\\
+  \end{pmatrix} \\
+  f &= \frac{\arccos \left( \frac{Tr(\mathbf{x})-1}{2} \right)}{2 \sin \left( \arccos \left( \frac{Tr(\mathbf{x})-1}{2} \right) \right) } \\
+  df &= \frac{\left(Tr(\mathbf{x})-1\right)f-1}{2 \left( 1- \left( \frac{Tr(\mathbf{x})-1}{2} \right)^2 \right)} \\
+  \frac{\partial \zeta_x}{\partial y}(\mathbf{x}) &= \begin{bmatrix}
+      & 0 & 0 & 0 &  & f & 0 & -f &  \\ 
+    df.\mathbf{v} & 0 & -f & 0 & df.\mathbf{v} & 0 & f & 0 & df.\mathbf{v}  \\ 
+      & f & 0 & -f &  & 0 & 0 & 0 &  \\ 
+  \end{bmatrix}
+\end{align}
+
+%}}}
+%{{{SO(3): QUATERNION REPRESENTATION
+\subsubsection{SO(3): Quaternion representation}
+\label{ssub:so(3)_quaternion_representation}
+
+We considere a point $q\in\mathcal{M}$ and its representation quaternion with the following storing order:
+\begin{equation}
+\mathbf{q}=\psi(q)
+= \begin{pmatrix}
+  q_w \\
+  q_x \\
+  q_y \\
+  q_z \\
+\end{pmatrix}
+\end{equation}
+
+The derivative of retractation operation writes as:
+
+\begin{align}
+\label{eq:diffRetrSO3Quat}
+  \frac{\partial \varphi_q}{\partial z}(0) = \frac{1}{2}
+  \begin{bmatrix}
+    -q_x & -q_y & -q_z \\
+     q_w & -q_z &  q_y \\
+     q_z &  q_w & -q_x \\
+    -q_y &  q_x &  q_w \\
+  \end{bmatrix}
+\end{align}
+
+And the derivation of the logarithm operation writes as:
+
+\begin{align}
+\label{eq:diffLogSO3Quat}
+  f &= \frac{\arctan \left( \frac{2 \|\mathbf{q_{vec}}\| q_w}{q_w^2 - {\|\mathbf{q_{vec}}\|}^2} \right)}{n}\\
+  g &= \frac{2 q_w - f}{{\|\mathbf{q_{vec}}\|}^2} \\
+  \frac{\partial \zeta_x}{\partial y}(\mathbf{x}) &= \begin{bmatrix}
+  \begin{pmatrix}
+    \\
+    -2\mathbf{q_{vec}}\\
+    \\
+  \end{pmatrix} &
+  \begin{pmatrix}
+    \\
+    f\mathbb{I}_3 + g\mathbf{q_{vec}}\mathbf{q_{vec}}^T\\
+    \\
+  \end{pmatrix}
+  \end{bmatrix}
+\end{align}
+
+%}}}
+%{{{S2
+\subsubsection{S2}
+\label{ssub:S2}
+Extensions to S2 manifold
+
+%}}}
+
+

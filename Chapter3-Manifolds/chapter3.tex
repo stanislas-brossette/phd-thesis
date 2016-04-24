@@ -5,6 +5,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Optimization on non-Euclidean Manifolds}
+\label{chapter:optimization_on_noneuclidean_manifolds}
 
 \nomenclature[x-M]{$\mathcal{M}$}{A manifold}
 \nomenclature[x-TxM]{$T_x\mathcal{M}$}{The tangent space to $\mathcal{M}$ at point $x$}
@@ -174,6 +175,7 @@ In this section, we describe a Sequential Quadratic Programming (SQP) approach~\
 
 where $\mathcal{M}$ is a $n$-dimensional smooth manifold and $c$ is a $m$-dimensional real-valued function.
 
+%{{{REPRESENTATION PROBLEM
 \subsection{Representation problem}
 When $\mathcal{M} = \mathbb{R}^n$, the problem~(\ref{eq:optim_problem}) is solved iteratively, starting from an initial guess $x_0$ and performing successive steps $x_{i+1} = x_i + {\bf p_i}$ where ${\bf p_i}$ is the increment found at the $i$-th iteration, until convergence is achieved.
 The strategy to compute ${\bf p_i}$ depends on the solver.
@@ -219,7 +221,8 @@ The following (classical) choices can be made
   \item Euler angles ($\mathbb{E} = \mathbb{R}^3$), singularities when reaching gimbal lock.
 \end{itemize}
 
-
+%}}}
+%{{{LOCAL PARAMETRIZATION
 \subsection{Local parametrization}
 By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}$, the tangent space to $\mathcal{M}$ at $x$, and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
 $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$.
@@ -266,6 +269,8 @@ The ${\bf x_i}$ are guaranteed to be on $\mathcal{M}$ so we can choose a represe
 Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it was a function from $\mathbb{E}$ to $\mathbb{R}$ without the need to project on $\psi(\mathcal{M})$ first (same goes for $c' = c \circ \psi^{-1}$).
 For example if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}$ is automatically a rotation matrix and can be used directly as such when writing the function.
 
+%}}}
+%{{{LOCAL SQP ON MANIFOLDS
 \subsection{Local SQP on manifolds}
 We choose to adopt an SQP approach to solve our problem.
 We first define the Lagrangian function
@@ -313,6 +318,8 @@ The gradient of $f \circ \varphi_x$ is
 
 $\frac{\partial f'}{\partial y}$ denotes the gradient of $f'$ with respect to an element of $\mathbb{E}$, which is the derivative that is usually calculated for use in classical optimization schemes.
 
+%}}}
+%{{{DESCRIPTION OF NON-EUCLIDEAN MANIFOLDS
 \subsection{Description of non-Euclidean manifolds}
 \label{sub:examples_on_non_euclidean_manifolds}
 
@@ -364,6 +371,7 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
   \item Limits of the tangent map
 \end{itemize}
 
+%{{{THE REAL SPACE MANIFOLD $\MATHBB{R^N$}
 \subsubsection{The Real Space manifold $\mathbb{R}^n$}
 \label{ssub:the_real_space}
 
@@ -389,19 +397,20 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
   \midrule
   $\zeta(x,y)$ & $y - x$ \\
   \midrule
-  $\frac{\partial \zeta_x(y)}{\partial y}$ & ??? \\
+  $\frac{\partial \zeta_x(y)}{\partial y}$ & $\mathbb{I}_n$ \\
   \midrule
   $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & $\mathbf{x}$ \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{x})$ & $\mathbf{x}$ \\
-  \midrule
-  $Limit Map$ & $\mathbb{R}^n$ \\
+  %\midrule
+  %$\pi_\mathcal{M}(\mathbf{x})$ & $\mathbf{x}$ \\
+  %\midrule
+  %$\pi_{T_x\mathcal{M}}(\mathbf{x})$ & $\mathbf{x}$ \\
+  %\midrule
+  %$Limit Map$ & $\mathbb{R}^n$ \\
   \bottomrule
 \end{tabular}
 \end{table}
-
+%}}}
+%{{{THE 3D ROTATION MANIFOLD $SO(3)$: MATRIX REPRESENTATION
 \subsubsection{The 3D Rotation manifold $SO(3)$: Matrix representation}
 \label{ssub:the_3d_rotation_manifold_matrix_representation}
 
@@ -414,7 +423,7 @@ An element $x$ of $SO(3)$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^
   \end{bmatrix}
 \end{equation}
 
-we recall the operators
+We recall the operators
 \begin{equation}
 \widehat{.}: \begin{bmatrix}
   \omega_0\\\omega_1\\\omega_2\\
@@ -422,7 +431,7 @@ we recall the operators
 \rightarrow
 \begin{bmatrix}
   0 & -\omega_2 & \omega_1 \\
-  -\omega_2 & 0 & -\omega_0 \\
+  \omega_2 & 0 & -\omega_0 \\
   -\omega_1 & \omega_0 & 0\\
 \end{bmatrix}
 \end{equation}
@@ -479,27 +488,66 @@ And the logarithm as follows~\cite{merlhiot:thesis:2009}:
     x_{31} & x_{32} & x_{33} \\
   \end{bmatrix} $ \\
   \midrule
-  $\varphi(x,\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
+  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
   \midrule
-  $\partial \varphi(x)$ & see appendix \\
+  $\partial \varphi_x(0)$ & see appendix~\ref{eq:diffRetrSO3Matrix} \\
   \midrule
   $\zeta(x,y)$ & $\log(\mathbf{x}^T\mathbf{y})$ \\
   \midrule
-  $\frac{\partial \zeta_x(y)}{\partial y}$ & see appendix \\
+  $\frac{\partial \zeta_x}{\partial y}(x)$ & see appendix~\ref{eq:diffLogSO3Matrix} \\
   \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & ??? \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & ??? \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{x})$ & ??? \\
-  \midrule
-  $Limit Map$ & ??? \\
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
+  %\midrule
+  %$\pi_\mathcal{M}(\mathbf{x})$ & ??? \\
+  %\midrule
+  %$\pi_{T_x\mathcal{M}}(\mathbf{x})$ & ??? \\
+  %\midrule
+  %$Limit Map$ & ??? \\
   \bottomrule
 \end{tabular}
 \end{table}
 
+%}}}
+%{{{THE 3D ROTATION MANIFOLD $SO(3)$: QUATERNION REPRESENTATION
 \subsubsection{The 3D Rotation manifold $SO(3)$: Quaternion representation}
 \label{ssub:the_3d_rotation_manifold_quaternion_representation}
+An element $x$ of $SO(3)$ is represented by $\mathbf{q}=\psi(x)$ in $\mathbb{R}^{4}$ by:
+\begin{equation}
+  x\in SO(3),\ \mathbf{q} =\begin{bmatrix}
+    q_{w}\\
+    q_{x}\\
+    q_{y}\\
+    q_{z}\\
+  \end{bmatrix}
+  =\begin{bmatrix}
+    q_{w}\\
+    \mathbf{q_{vec}}\\
+  \end{bmatrix}
+\end{equation}
+
+The exponential map is:
+\begin{equation}
+  \exp\ :\left|
+  \begin{array}{ccc}
+    \mathbb{R}^3 & \rightarrow & \mathbb{R}^4 \\
+    \mathbf{z} & \mapsto & \begin{bmatrix}
+      \cos \left( \frac{\|\mathbf{z}\|}{2} \right)\\
+      \sin \left( \frac{\|\mathbf{z}\|}{2} \right) \frac{\mathbf{z}}{\|\mathbf{z}\|}\\
+    \end{bmatrix} \\
+  \end{array} \nonumber
+  \right.
+\end{equation}
+
+And the logarithm is:
+\begin{equation}
+  \log\ :\left|
+  \begin{array}{ccc}
+    \mathbb{R}^4 & \rightarrow & \mathbb{R}^3 \\
+    q & \mapsto & \arctan \left( \frac{2 \|\mathbf{q_{vec}}\| q_w}{q_w^2 - {\|\mathbf{q_{vec}\|}^2}} \right) \frac{\mathbf{q_{vec}}}{\|\mathbf{q_{vec}}\|} \\
+  \end{array}
+  \right.
+\end{equation}
+
 
 \begin{table} [H]
 \centering
@@ -517,25 +565,27 @@ And the logarithm as follows~\cite{merlhiot:thesis:2009}:
   \midrule
   $\dim(T_x\mathcal{M})$ & $3$ \\
   \midrule
-  $\varphi(x,\mathbf{z})$ & ??? \\
+  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
   \midrule
-  $\partial \varphi(x)$ & ??? \\
+  $\partial \varphi_x(0)$ & see appendix~\ref{eq:diffRetrSO3Quat} \\
   \midrule
-  $\zeta(x,y)$ & ??? \\
+  $\zeta(x,y)$ & $\log(\mathbf{x}^{-1}\mathbf{y})$ \\
   \midrule
-  $\frac{\partial \zeta_x(y)}{\partial y}$ & ??? \\
+  $\frac{\partial \zeta_x}{\partial y}(x)$ & see appendix~\ref{eq:diffLogSO3Quat} \\
   \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & ??? \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & ??? \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{x})$ & ??? \\
-  \midrule
-  $Limit Map$ & ??? \\
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
+  %\midrule
+  %$\pi_\mathcal{M}(\mathbf{x})$ & ??? \\
+  %\midrule
+  %$\pi_{T_x\mathcal{M}}(\mathbf{x})$ & ??? \\
+  %\midrule
+  %$Limit Map$ & ??? \\
   \bottomrule
 \end{tabular}
 \end{table}
 
+%}}}
+%{{{THE UNIT SPHERE MANIFOLD $S2$
 \subsubsection{The Unit Sphere manifold $S2$}
 \label{ssub:The Unit Sphere manifold S2}
 
@@ -575,7 +625,9 @@ And the logarithm as follows~\cite{merlhiot:thesis:2009}:
 \end{table}
 
 
-
+%}}}
+%}}}
+%{{{PRACTICAL IMPLEMENTATION
 \section{Practical implementation}
 \label{sec:practical_implementation}
 
