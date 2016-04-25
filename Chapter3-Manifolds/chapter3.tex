@@ -87,7 +87,7 @@
 
 Posture generation has been formulated as a problem over a Euclidean space.
 Robots variable may however be more naturally expressed over non-Euclidean manifolds.
-The archetypes for this are the rotation part of the root body for a humanoid robot, and ball joints, whose variables live in $SO(3)$.
+The archetypes for this are the rotation part of the root body of a humanoid robot, and ball joints, whose variables live in $SO(3)$.
 Some typical tasks are also naturally formulated on different manifolds.
 For example for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$~\cite{escande:icra:2016}.
 Human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
@@ -125,13 +125,13 @@ Then, if we use the unit quaternion parametrization, the problem~\ref{eq:pb_on_S
   \end{array}\right.
 \end{align}
 
-The problem to solve has 4 dimensions (to represent a 3-dimensional manifold), and has an additional constraint.
+The problem to solve has 4 dimensions (to represent a 3-dimensional manifold), and has an additional constraint that is entirely due to our formulation choice.
 With this formulation, it is guaranteed that the solution $q^*$ is a unit quaternion, but not that all the iterates $q_k$ along the optimization process have a unit norm.
 During the optimization process, at each iteration, an increment $\delta$ is computed by solving a quadratic problem that approximates~\ref{eq:pb_on_SO3_quaternion} locally around $q_k$.
-In particular, this quadratic problem approximates the constraints linearly, thus, for any step $\delta$ not null, the next iterate $q_{k+1} = q_k + \delta$ does not respect the unit-norm constraint (even though it respects the linearization of the unit-norm constraint).
+In particular, this quadratic problem approximates the constraints linearly, thus, for any step $\delta$ not null, from a unit-norm quaternion iterate $q_k$, the next iterate $q_{k+1} = q_k + \delta$ does not respect the unit-norm constraint (it respects the \emph{linearization} of the unit-norm constraint).
 So the quaternion $q_{k+1}$ does not represent a rotation.
 Some additional treatment needs to be implemented.
-For example, normalizing the quaternion at each iteration, then it represents a rotation, but this normalization must be taken into account in the derivation of the constraints and cost functions, which is an additional programming burden.
+For example, normalizing the quaternion at each iteration, then it represents a rotation, but this normalization must be taken into account in the constraints, cost functions, and their differentiations, which is an additional programming burden.
 Similar issues can be found with the $3\times 3$ matrix representation.
 
 The alternative is to use optimization software working natively with manifolds~\cite{brossette:Humanoids:2015}\cite{absil:book:2008} and solve the optimization problem as it is written in~\ref{eq:pb_on_SO3}.
@@ -225,9 +225,6 @@ The following (classical) choices can be made
 %{{{LOCAL PARAMETRIZATION
 \subsection{Local parametrization}
 By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}\approx \mathbb{R}^n$, the tangent space to $\mathcal{M}$ at $x$, and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
-$T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered an a hyperplan of a higher dimensionality space.
-For example in figure~\ref{fig:phimap} $T_x\mathcal{M}$ is a 2-dimensional hyperplan of $\mathbb{R}^3$.
-We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 
 \begin{equation}
   \varphi_x\ :\
@@ -237,6 +234,9 @@ We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
   \end{array} \nonumber%
 \end{equation}
 
+$T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplan of a higher dimensionality space.
+For example in figure~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplan embedded in $\mathbb{R}^3$.
+We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 This gives us a local parametrization for $\mathcal{M}$.
 The driving idea of the optimization on manifolds is to change the parametrization at each iteration.
 Applying this idea, we can reformulate Problem~(\ref{eq:optim_problem}) around $x_i$ as
@@ -331,13 +331,13 @@ The expression of those functions is adapted from~\cite{boumal:jmlr:2014}.
 
 We need a retractation operation $\psi\circ\varphi_x$ (that we denote simply $\varphi_x$) and its derivative.
 During the optimization process, we need the expression of the derivatives of $\varphi_x$ in order to compute the gradients of the cost function and constraints at the beginning of each iteration to later compute the approximated quadratic problem to be solved in that iteration.
-Because we change the parametrization of our problem to be centered on $x_k$ at each iteration, we only ever need to evaluate the gradient of $\varphi_x$ for $z=0$, $\varphi_x(0)$.
+Because we change the parametrization of our problem to be centered on $x_k$ at each iteration, we only ever need to evaluate the gradient of $\varphi_x$ for $\mathbf{z}=0$, $\frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$.
 
 It is necessary to be able to compute distances on manifolds.
 For that, we define the pseudo-logarithm (aka pseudolog), which is the inverse of the retractation operator.
 Note that the logarithm map is the inverse of the exponential map.
 \begin{equation*}
-  \forall (x,y)\in \mathcal{M}\times\mathcal{M},\ z:=\zeta_x(y)\ \text{is such that}\ \varphi_x(z) = y
+  \forall (x,y)\in \mathcal{M}\times\mathcal{M},\ \mathbf{z}:=\zeta_x(y)\ \text{is such that}\ \varphi_x(\mathbf{z}) = y
 \end{equation*}
 The pseudolog operator gives the vector of $T_x\mathcal(M)$ to go from $x$ to $y$.
 It is used to compute the (pseudo-) distance between two points of $\mathcal{M}$
@@ -359,13 +359,12 @@ This operation will come in handy for the computation of Hessian approximations 
 
 To summarize, for each elementary manifold $\mathcal{M}$, we need to implement the following elements:
 \begin{itemize}
-  \item Embedding space $\mathbb{E}$
   \item Tangent Space at point $x$, $T_x\mathcal{M}$
-  \item Dimensions of $\mathcal{M}$, $\mathbb{E}$ and $T_x\mathcal{M}$
+  \item Embedding spaces $\mathbb{E}$ and $T_x\mathcal{M}$
   \item Retractation operator $\varphi:\ (x,\mathbf{z}) \rightarrow \varphi_x(\mathbf{z})$
   \item Gradient of the retractation operator $\partial \varphi(x):\rightarrow \frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$
   \item Pseudo-logarithm operator $\zeta:\ (x,y) \rightarrow \zeta_x(y)$
-  \item Gradient of pseudo-logarithm operator $\frac{\partial \zeta_x(y)}{\partial y}$
+  \item Gradient of pseudo-logarithm operator $\frac{\partial \zeta_x}{\partial y}(y)$
   \item Transport operator $\mathcal{T}:\ (x,\mathbf{z}, \mathbf{v})\rightarrow \mathcal{T}_{x,\mathbf{z}}(v)$
   \item Projection from $\mathbb{E}$ on $\mathcal{M}$, $\pi_\mathcal{M}$
   \item Projection on $T_x\mathcal{M}$, $\pi_{T_x\mathcal{M}}$
@@ -413,7 +412,7 @@ Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it a
 \end{tabular}
 \end{table}
 %}}}
-%{{{THE 3D ROTATION MANIFOLD $SO(3)$: MATRIX REPRESENTATION
+%{{{THE 3D ROTATION MANIFOLD SO(3): MATRIX REPRESENTATION
 \subsubsection{The 3D Rotation manifold $SO(3)$: Matrix representation}
 \label{ssub:the_3d_rotation_manifold_matrix_representation}
 
@@ -457,7 +456,7 @@ The exponential map is known as the Rodrigues formula:
   \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 + \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}} + \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}}^2\\
 \end{equation}
 
-And the logarithm as follows~\cite{merlhiot:thesis:2009}:
+And the logarithm is computes as follows (see~\cite{merlhiot:thesis:2009}):
 \begin{align}
 \begin{split}
   \forall R\in\psi(SO(3)),\ f(R) &=
@@ -605,17 +604,18 @@ An element $x$ of $S2$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3}
 
 With this manifold, the tangent space at $x$ is the tangent plane to the unit-sphere at $x$.
 Thus, $T_x\mathcal{M}$ it is a 2-dimensional space, and its representation space is $\mathbb{R}^3$.
-But the representation of a tangent vector is more conveniently expressed in $\mathbb{R}^3$.
-A tangent vector to $x$, $\mathbf{z}$, is such that $\mathbf{x}\cdot \mathbf{z} = \mathbf{x}^T\mathbf{z}=0$.
+%A tangent vector to $x$, $\mathbf{z}$, is such that $\mathbf{x}\cdot \mathbf{z} = \mathbf{x}^T\mathbf{z}=0$.
+
 For the retractation we simply use a normalized sum:
 \begin{equation}
   \varphi_x(\mathbf{z}) = \frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}
 \end{equation}
 
-We define the distance operation on $S2$ as:
+We define a distance operation on $S2$ as:
 \begin{equation}
   \dist(x, y) = 1-\mathbf{x}\cdot \mathbf{y}
 \end{equation}
+
 And the projection on the tangent space:
 \begin{equation}
   \pi_{T_x\mathcal{M}}(\mathbf{z}) = \mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}
