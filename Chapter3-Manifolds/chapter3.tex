@@ -224,8 +224,8 @@ The following (classical) choices can be made
 %}}}
 %{{{LOCAL PARAMETRIZATION
 \subsection{Local parametrization}
-By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}$, the tangent space to $\mathcal{M}$ at $x$, and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
-$T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$.
+By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}\approx \mathbb{R}^n$, the tangent space to $\mathcal{M}$ at $x$, and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
+$T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered an a hyperplan of a higher dimensionality space. For example in figure~\ref{fig:phimap} $T_x\mathcal{M}$ is a 2-dimensional hyperplan of $\mathbb{R}^3$. We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 
 \begin{equation}
   \varphi_x\ :\
@@ -278,10 +278,10 @@ We first define the Lagrangian function
   \mathcal{L}_x ({\bf z}, \lambda) = f\circ \varphi_x({\bf z}) - \lambda^T c \circ \varphi_x({\bf z})
 \end{equation}
 with $\lambda \in \mathbb{R}^m$ the vector of Lagrange multipliers, and note $H_k$ the Hessian matrix $\nabla_{zz}^2 \mathcal{L}_{x_k}$.
-Taking ${\bf z_0} = 0$, the $k$-th SQP step for Problem~(\ref{eq:local_problem}) is computed by solving the following quadratic program
+Taking ${\bf z_0} = 0$, the $k$-th SQP step for Problem~(\ref{eq:local_problem}) is computed by solving the following quadratic program:
 
 \begin{align}
-	\label{eq:SQPStep}
+  \label{eq:SQPStep}
   \minimize_{\bf z \in \mathbb{R}^n } & \quad {\frac{\partial f\circ \varphi_{x_k}}{\partial {\bf z}}(0)}^T {\bf z } + \frac{1}{2} {\bf z }^T H_k{\bf z }\\
   \text{subject to}&
   \begin{array}{lr}
@@ -291,10 +291,10 @@ Taking ${\bf z_0} = 0$, the $k$-th SQP step for Problem~(\ref{eq:local_problem})
 
 The basic SQP approach adapted to manifolds can be summarized as follows
 \begin{enumerate}
-	\item set $k=0$ and $x_k$ to the initial value
+  \item set $k=0$ and $x_k$ to the initial value
   \item compute ${\bf z}$ from Problem~(\ref{eq:SQPStep}) for current $x_k$
   \item set $x_k = \varphi_{x_k}({\bf z})$
-	\item if convergence is not yet achieved go-to step 2
+  \item if convergence is not yet achieved go-to step 2
 \end{enumerate}
 
 Computations of function values and derivatives are based on the fact that $f \circ \varphi = f' \circ \psi \circ \varphi$ (and same for $c$), and
@@ -303,7 +303,7 @@ Computations of function values and derivatives are based on the fact that $f \c
   \begin{array}{ccc}
     \mathbb{E} & \reduce{\rightarrow}{6} & \mathbb{R}
   \end{array} \nonumber \\
-	\psi \circ \varphi\ :\
+  \psi \circ \varphi\ :\
   \begin{array}{ccc}
     \mathbb{R}^n & \reduce{\rightarrow}{6} & \mathbb{E}
   \end{array} \nonumber
@@ -374,8 +374,10 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
 %{{{THE REAL SPACE MANIFOLD $\MATHBB{R^N$}
 \subsubsection{The Real Space manifold $\mathbb{R}^n$}
 \label{ssub:the_real_space}
+Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it are straightforward.
 
 \begin{table} [H]
+\caption{Description of the $\mathbb{R}^n$ manifold}
 \centering
 \begin{tabular}{cc}
   \toprule
@@ -385,19 +387,19 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
   \midrule
   $T_x\mathcal{M}$ & $\mathbb{R}^n$ \\
   \midrule
-  $\dim(\mathcal{M})$ & $n$ \\
+  $T_x\mathbb{E}$ & $\mathbb{R}^n$ \\
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
+  $\varphi_x(\mathbf{z})$ & $\mathbf{x} + \mathbf{z}$ \\
   \midrule
-  $\dim(\mathbb{E})$ & $n$ \\
+  $\partial \varphi_x(0)$ & $\mathbb{I}_n$ \\
   \midrule
-  $\dim(T_x\mathcal{M})$ & $n$ \\
+  $\zeta(x,y)$ & $\mathbf{y} - \mathbf{x}$ \\
   \midrule
-  $\varphi(x,\mathbf{z})$ & $x + \mathbf{z}$ \\
-  \midrule
-  $\partial \varphi(x)$ & $\mathbb{I}_n$ \\
-  \midrule
-  $\zeta(x,y)$ & $y - x$ \\
-  \midrule
-  $\frac{\partial \zeta_x(y)}{\partial y}$ & $\mathbb{I}_n$ \\
+  $\frac{\partial \zeta_x}{\partial y}(x)$ & $\mathbb{I}_n$ \\
   \midrule
   $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
   %\midrule
@@ -451,7 +453,7 @@ And its inverse:
 
 The exponential map is known as the Rodrigues formula:
 \begin{equation}
-  \forall v\in\mathbb{R}^3,\ \exp(v) = \mathbb{I}_3 + \frac{1-\cos \|v\|}{\|v\|^2} \hat{v} + \frac{\sin \|v\|}{\|v\|} \hat{v}^2\\
+  \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 + \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}} + \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}}^2\\
 \end{equation}
 
 And the logarithm as follows~\cite{merlhiot:thesis:2009}:
@@ -467,6 +469,7 @@ And the logarithm as follows~\cite{merlhiot:thesis:2009}:
 \end{align}
 
 \begin{table} [H]
+\caption{Description of the $SO(3)$ manifold with matrix representation}
 \centering
 \begin{tabular}{cc}
   \toprule
@@ -476,18 +479,18 @@ And the logarithm as follows~\cite{merlhiot:thesis:2009}:
   \midrule
   $T_x\mathcal{M}$ & $\mathbb{R}^3$ \\
   \midrule
-  $\dim(\mathcal{M})$ & $3$ \\
-  \midrule
-  $\dim(\mathbb{E})$ & $9$ \\
-  \midrule
-  $\dim(T_x\mathcal{M})$ & $3$ \\
+  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
   \midrule
   $\psi(x) = \mathbf{x}$ & $ \begin{bmatrix}
-    x_{11} & x_{12} & x_{13} \\
-    x_{21} & x_{22} & x_{23} \\
-    x_{31} & x_{32} & x_{33} \\
+    x_{00} & x_{01} & x_{02} \\
+    x_{10} & x_{11} & x_{12} \\
+    x_{20} & x_{21} & x_{22} \\
   \end{bmatrix} $ \\
-  \midrule
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
   $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
   \midrule
   $\partial \varphi_x(0)$ & see appendix~\ref{eq:diffRetrSO3Matrix} \\
@@ -508,7 +511,7 @@ And the logarithm as follows~\cite{merlhiot:thesis:2009}:
 \end{table}
 
 %}}}
-%{{{THE 3D ROTATION MANIFOLD $SO(3)$: QUATERNION REPRESENTATION
+%{{{THE 3D ROTATION MANIFOLD SO3 QUATERNION REPRESENTATION
 \subsubsection{The 3D Rotation manifold $SO(3)$: Quaternion representation}
 \label{ssub:the_3d_rotation_manifold_quaternion_representation}
 An element $x$ of $SO(3)$ is represented by $\mathbf{q}=\psi(x)$ in $\mathbb{R}^{4}$ by:
@@ -543,13 +546,14 @@ And the logarithm is:
   \log\ :\left|
   \begin{array}{ccc}
     \mathbb{R}^4 & \rightarrow & \mathbb{R}^3 \\
-    q & \mapsto & \arctan \left( \frac{2 \|\mathbf{q_{vec}}\| q_w}{q_w^2 - {\|\mathbf{q_{vec}\|}^2}} \right) \frac{\mathbf{q_{vec}}}{\|\mathbf{q_{vec}}\|} \\
+    q & \mapsto & \arctan \left( \frac{2 \|\mathbf{q_{vec}}\| q_w}{q_w^2 - {\|\mathbf{q_{vec}\|}^2}} \right) \frac{\mathbf{q_{vec} } }{\|\mathbf{q_{vec}}\|} \\
   \end{array}
   \right.
 \end{equation}
 
 
 \begin{table} [H]
+\caption{Description of the $SO(3)$ manifold with quaternion representation}
 \centering
 \begin{tabular}{cc}
   \toprule
@@ -559,12 +563,12 @@ And the logarithm is:
   \midrule
   $T_x\mathcal{M}$ & $\mathbb{R}^3$ \\
   \midrule
-  $\dim(\mathcal{M})$ & $3$ \\
-  \midrule
-  $\dim(\mathbb{E})$ & $4$ \\
-  \midrule
-  $\dim(T_x\mathcal{M})$ & $3$ \\
-  \midrule
+  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
   $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
   \midrule
   $\partial \varphi_x(0)$ & see appendix~\ref{eq:diffRetrSO3Quat} \\
@@ -589,7 +593,47 @@ And the logarithm is:
 \subsubsection{The Unit Sphere manifold $S2$}
 \label{ssub:The Unit Sphere manifold S2}
 
+An element $x$ of $S2$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3}$ by:
+\begin{equation}
+  x\in S2,\ \mathbf{x} =\begin{bmatrix}
+    x_0\\
+    x_1\\
+    x_2\\
+  \end{bmatrix}
+\end{equation}
+
+With this manifold, the tangent space at $x$ is the tangent plane to the unit-sphere at $x$.
+Thus, $T_x\mathcal{M}$ it is a 2-dimensional space, and its representation space is $\mathbb{R}^3$.
+But the representation of a tangent vector is more conveniently expressed in $\mathbb{R}^3$.
+A tangent vector to $x$, $\mathbf{z}$, is such that $\mathbf{x}\cdot \mathbf{z} = \mathbf{x}^T\mathbf{z}=0$.
+For the retractation we simply use a normalized sum:
+\begin{equation}
+  \varphi_x(\mathbf{z}) = \frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}
+\end{equation}
+
+We define the distance operation on $S2$ as:
+\begin{equation}
+  \dist(x, y) = 1-\mathbf{x}\cdot \mathbf{y}
+\end{equation}
+And the projection on the tangent space:
+\begin{equation}
+  \pi_{T_x\mathcal{M}}(\mathbf{z}) = \mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}
+\end{equation}
+
+The pseudo-logarithm operation is the following:
+\begin{equation}
+  \zeta_x(y) = \dist(x,y)\frac{\pi_{T_x\mathcal{M}}(\mathbf{z})}{\|\pi_{T_x\mathcal{M}}(\mathbf{z})\|}
+\end{equation}
+
+The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $T_y\mathcal{M}$ with $y = \varphi_x(\mathbf{v})$, corresponds to rotating $\mathbf{v}$ by the rotation that transforms $x$ into $y$:
+\begin{align}
+  &\mathbf{y} = \varphi_x(\mathbf{z}) \\
+  &R = \mathbb{I}_3 + \widehat{\mathbf{x} \wedge \mathbf{y}} + \frac{{\widehat{\mathbf{x} \wedge \mathbf{y}}}^2}{1+\mathbf{x}\cdot\mathbf{y}} \\
+  &\mathcal{T}(x,\mathbf{z}, \mathbf{v}) = R\mathbf{v}
+\end{align}
+
 \begin{table} [H]
+\caption{Description of the S2 manifold}
 \centering
 \begin{tabular}{cc}
   \toprule
@@ -599,33 +643,53 @@ And the logarithm is:
   \midrule
   $T_x\mathcal{M}$ & $\mathbb{R}^2$ \\
   \midrule
-  $\dim(\mathcal{M})$ & $2$ \\
+  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
   \midrule
-  $\dim(\mathbb{E})$ & $3$ \\
+  $\varphi_x(\mathbf{z})$ & $\frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}$ \\
   \midrule
-  $\dim(T_x\mathcal{M})$ & $2$ \\
+  $\partial \varphi_x(0)$ & $\mathbb{I}_3 - \mathbf{x}\cdot\mathbf{x}^T$ \\
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
+  $\zeta(x,y)$ & $\mathbf{y} - (\mathbf{x} \cdot \mathbf{y}) \mathbf{x}$ \\
   \midrule
-  $\varphi(x,\mathbf{z})$ & ??? \\
+  $\frac{\partial \zeta_x(x)}{\partial y}$ & $\mathbb{I}_3 -\mathbf{x}\cdot\mathbf{x}^T$ \\
   \midrule
-  $\partial \varphi(x)$ & ??? \\
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbb{I}_3 + \widehat{\mathbf{x} \wedge \varphi_x(\mathbf{z})} + \frac{{\widehat{\mathbf{x} \wedge \varphi_x(\mathbf{z})}}^2}{1+\mathbf{x}\cdot\varphi_x(\mathbf{z})}$ \\
   \midrule
-  $\zeta(x,y)$ & ??? \\
+  $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
   \midrule
-  $\frac{\partial \zeta_x(y)}{\partial y}$ & ??? \\
-  \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & ??? \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & ??? \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{x})$ & ??? \\
-  \midrule
-  $Limit Map$ & ??? \\
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}$ \\
+  %\midrule
+  %$Limit Map$ & ??? \\
   \bottomrule
 \end{tabular}
 \end{table}
 
+%}}}
+%{{{CARTESIAN PRODUCT OF MANIFOLDS}
+\subsubsection{Cartesian Product of Manifolds}
+\label{ssub:Cartesian Product of Manifolds}
+Given two manifolds $\mathcal{M}_1$ and $\mathcal{M}_2$, we denote $\mathcal{M}=\mathcal{M}_1\times\mathcal{M}_2$ their cartesian product.
+Any operation on an element of $\mathcal{M}$ can simply be computed term by term for each manifold composing $\mathcal{M}$. For example, the retractation is computed as follows, and that scheme can be reproduced for all other operations:
+
+\begin{align}
+  &x_1\in \mathcal{M}_1,\ \mathbf{z_1}\in T_{x_1}\mathcal{M}_1,\ x_2\in \mathcal{M}_2,\ \mathbf{z_2}\in T_{x_2}\mathcal{M}_2\\
+  &x=\begin{bmatrix}
+    x_1\\x_2\\
+  \end{bmatrix}\in \mathcal{M},\ \mathbf{z}=\begin{bmatrix}
+    \mathbf{z_1}\\ \mathbf{z_2}\\
+  \end{bmatrix}\in T_x\mathcal{M}\\
+  &\varphi_x(z) = \begin{bmatrix}
+    \varphi_{x_1}(\mathbf{z_1})\\
+    \varphi_{x_2}(\mathbf{z_2})\\
+  \end{bmatrix}
+\end{align}
 
 %}}}
+
 %}}}
 %{{{PRACTICAL IMPLEMENTATION
 \section{Practical implementation}
@@ -649,14 +713,14 @@ Aside from the manifold adaptation, our main departure from Fletcher is in the H
 After testing several possibilities, we settled for a self-scaling damped BFGS update~\cite{nocedal:mp:1993,nocedal:book:2006}, adapted to the manifold framework.
 More precisely, given the Hessian approximation $H_k$ at iteration $k$, we compute the approximation $H_{k+1}$ as follows
 \begin{align}
-	&s_k = \mathcal{T}_z(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_z(\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
-	&\theta_k = \left\{\begin{array}{ll}
-		1 & \mbox{if} \; s_k^T y_k \geq 0.2 s_k^T \tilde{H}_k s_k \\
-		\frac{0.8 s_k^T \tilde{H}_k s_k}{s_k^T \tilde{H}_k s_k - s_k^T y_k} & \mbox{otherwise}
-	\end{array}\right. \nonumber \\
-	&r_k = \theta_k y_k + \left(1-\theta_k\right) \tilde{H}_k s_k \quad \mbox{(damped update)} \nonumber \\
-	&\tau_k = \min\left(1, \frac{s_k^T r_k}{s_k^T \tilde{H}_k s_k} \right) \quad \mbox{(self-scaling)} \nonumber \\
-	&H_{k+1} = \tau_k \left(\tilde{H}_k - \frac{\tilde{H}_k s_k s_k^T \tilde{H}_k}{s_k^T \tilde{H}_k s_k} \right) + \frac{r_k r_k^T}{s_k^T r_k} \nonumber
+  &s_k = \mathcal{T}_z(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_z(\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
+  &\theta_k = \left\{\begin{array}{ll}
+    1 & \mbox{if} \; s_k^T y_k \geq 0.2 s_k^T \tilde{H}_k s_k \\
+    \frac{0.8 s_k^T \tilde{H}_k s_k}{s_k^T \tilde{H}_k s_k - s_k^T y_k} & \mbox{otherwise}
+  \end{array}\right. \nonumber \\
+  &r_k = \theta_k y_k + \left(1-\theta_k\right) \tilde{H}_k s_k \quad \mbox{(damped update)} \nonumber \\
+  &\tau_k = \min\left(1, \frac{s_k^T r_k}{s_k^T \tilde{H}_k s_k} \right) \quad \mbox{(self-scaling)} \nonumber \\
+  &H_{k+1} = \tau_k \left(\tilde{H}_k - \frac{\tilde{H}_k s_k s_k^T \tilde{H}_k}{s_k^T \tilde{H}_k s_k} \right) + \frac{r_k r_k^T}{s_k^T r_k} \nonumber
 \end{align}
 where $\mathcal{T}_{\bf z}$ is a vector transport along ${\bf z}$ (see~\cite{absil:book:2008}) and $\tilde{H}_k$ is such that for ${\bf u} \in T_{x_{k+1}} \mathcal{M}$, $\tilde{H}_k {\bf u} = \mathcal{T}_{\bf z}\left(H_k \mathcal{T}_{\bf z}^{-1}({\bf u}) \right)$.
 
