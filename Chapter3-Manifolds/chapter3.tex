@@ -413,7 +413,7 @@ Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it a
 \end{table}
 %}}}
 %{{{THE 3D ROTATION MANIFOLD SO(3): MATRIX REPRESENTATION
-\subsubsection{The 3D Rotation manifold $SO(3)$: Matrix representation}
+\subsubsection{The 3D Rotation manifold $\mathbf{SO(3)}$: Matrix representation}
 \label{ssub:the_3d_rotation_manifold_matrix_representation}
 
 An element $x$ of $SO(3)$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3\times 3}$ by:
@@ -456,7 +456,7 @@ The exponential map is known as the Rodrigues formula:
   \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 + \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}} + \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}}^2\\
 \end{equation}
 
-And the logarithm is computes as follows (see~\cite{merlhiot:thesis:2009}):
+And the logarithm is computed as follows (see~\cite{merlhiot:thesis:2009}):
 \begin{align}
 \begin{split}
   \forall R\in\psi(SO(3)),\ f(R) &=
@@ -512,7 +512,7 @@ And the logarithm is computes as follows (see~\cite{merlhiot:thesis:2009}):
 
 %}}}
 %{{{THE 3D ROTATION MANIFOLD SO3 QUATERNION REPRESENTATION
-\subsubsection{The 3D Rotation manifold $SO(3)$: Quaternion representation}
+\subsubsection{The 3D Rotation manifold $\mathbf{SO(3)}$: Quaternion representation}
 \label{ssub:the_3d_rotation_manifold_quaternion_representation}
 An element $x$ of $SO(3)$ is represented by $\mathbf{q}=\psi(x)$ in $\mathbb{R}^{4}$ by:
 \begin{equation}
@@ -553,7 +553,7 @@ And the logarithm is:
 
 
 \begin{table} [H]
-\caption{Description of the $SO(3)$ manifold with quaternion representation}
+\caption{Description of the $\mathbf{SO(3)}$ manifold with quaternion representation}
 \centering
 \begin{tabular}{cc}
   \toprule
@@ -590,7 +590,7 @@ And the logarithm is:
 
 %}}}
 %{{{THE UNIT SPHERE MANIFOLD $S2$
-\subsubsection{The Unit Sphere manifold $S2$}
+\subsubsection{The Unit Sphere manifold $\mathbf{S2}$}
 \label{ssub:the_unit_sphere_manifold_s2}
 
 An element $x$ of $S2$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3}$ by:
@@ -691,6 +691,27 @@ For example, the retractation is computed as follows, and that scheme can be rep
 \end{align}
 
 %}}}
+
+\subsection{Implementation of Manifolds}
+\label{sub:implementation_of_manifolds}
+
+In order to use the manifold formulation described above in other softwares, and particularly in a numerical solver, we needed to write an independant C++ project that handles all the formulations without the user having to worry about it.
+This implementation is open-source and available at \href{https://github.com/stanislas-brossette/manifolds}{https://github.com/stanislas-brossette/manifolds}.
+The implementation consists in 3 types of classes: the Manifold class, the elementary manifold classes and the Point class.
+The Manifold class describes the abstract mathematical structure of a non-Euclidean manifolds and defines a common interface for all elementary manifolds to implement (retractation, pseudoLog,\ldots).
+Elementary Manifold classes ($\mathbb{R}^n$, $SO(3)$, $S2$, and the Cartesian Product) are the concrete manifolds.
+They inherit from the Manifold class and implement all their mathematical operations.
+The Cartesian Product class is used to build compound manifolds by being `multiplied' with other elementary manifolds.
+The Point class represents a point on a manifold, it contains the data that represents its numerical value.
+It can only be constructed by a manifold, and provides some proxy to its manifolds operations, in particular, it is equipped with an increment method, that applied a retractation on it.
+Figure~\ref{fig:uml_manifold} presents a simplified class diagram of this project, ommiting all the settors, accessors, bookkeeping mechanics and accessory functions.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=\linewidth]{uml/manifolds-1.pdf}
+  \caption{Simplified class diagram of the Manifold project}
+\label{fig:uml_manifold}
+\end{figure}
 
 %}}}
 %{{{PRACTICAL IMPLEMENTATION
