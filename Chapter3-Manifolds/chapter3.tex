@@ -81,7 +81,7 @@
 %\end{itemize}
 %}}}
 
-%{{{INTRODUCTION TO OPTIMIZATION ON MANIFOLDS
+%{{{ INTRODUCTION TO OPTIMIZATION ON MANIFOLDS
 \section{Introduction to optimization on Manifolds}
 \label{sec:introduction_to_optimization_on_manifolds}
 
@@ -89,7 +89,7 @@ Posture generation has been formulated as a problem over a Euclidean space.
 Robots variable may however be more naturally expressed over non-Euclidean manifolds.
 The archetypes for this are the rotation part of the root body of a humanoid robot, and ball joints, whose variables live in $SO(3)$.
 Some typical tasks are also naturally formulated on different manifolds.
-For example for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$~\cite{escande:icra:2016}.
+For example, for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$~\cite{escande:icra:2016}.
 Human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
 
 Formulating the problem over $\mathbb{R}^n$ leads either to discontinuities that can prevent the convergence of the optimization solver, or to cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
@@ -106,7 +106,7 @@ For example, let us consider an optimization problem over the $SO(3)$ manifold:
 \end{align}
 
 $SO(3)$ is a 3-dimensional manifold.
-As such, it can be parametrized \emph{locally} by $3$ variables, for example a choice of Euler angles, but any such parametrization necessarily exhibits singularities when taken as a global map (e.g.\ gimbal lock for Euler angles), which can be detrimental to our optimization process.
+As such, it can be parametrized \emph{locally} by $3$ variables, for example, a choice of Euler angles, but any such parametrization necessarily exhibits singularities when taken as a global map (e.g.\ gimbal lock for Euler angles), which can be detrimental to our optimization process.
 
 For this reason, when addressing $SO(3)$ with classical optimization algorithms, it is often preferred to use one of the two following parametrizations:
 \begin{itemize}
@@ -132,7 +132,7 @@ In particular, this quadratic problem approximates the constraints linearly, thu
 So the quaternion $q_{k+1}$ does not represent a rotation.
 Some additional treatment needs to be implemented.
 For example, normalizing the quaternion at each iteration, then it represents a rotation, but this normalization must be taken into account in the constraints, cost functions, and their differentiations, which is an additional programming burden.
-Similar issues can be found with the $3\times 3$ matrix representation.
+Similar issues can be found with the $\mathbb{R}^{3\times 3}$ matrix representation.
 
 The alternative is to use optimization software working natively with manifolds~\cite{brossette:Humanoids:2015}\cite{absil:book:2008} and solve the optimization problem as it is written in~\ref{eq:pb_on_SO3}.
 It has an immediate advantage: we can write directly the problem without the need to add any parametrization-related constraints.
@@ -154,11 +154,11 @@ We are only aware of the work of Schulman \emph{et al.}~\cite{Schulman2014}, whe
 This adaptation is however not valid for general manifolds without more care about hessian computation.
 
 A background motivation for this work is to have our own optimization solver, instead of a black box.
-We will now be able to specialize the solver specifically to robotic problems, by leveraging modeling properties and approximations, for a gain in time and robustness.
+We will now be able to specialize the solver for robotic problems, by leveraging modeling properties and approximations, for a gain in time and robustness.
 %We also look forward to using this solver for problems with a varying number of constraints along the iterations (such as when complex collision constraints are considered).
 
 %}}}
-%{{{OPTIMIZATION ON MANIFOLDS
+%{{{ OPTIMIZATION ON MANIFOLDS
 \section{Optimization on Manifolds}
 \label{sec:optimization_on_manifolds}
 
@@ -175,7 +175,7 @@ In this section, we describe a Sequential Quadratic Programming (SQP) approach~\
 
 where $\mathcal{M}$ is a $n$-dimensional smooth manifold and $c$ is a $m$-dimensional real-valued function.
 
-%{{{REPRESENTATION PROBLEM
+%{{{ REPRESENTATION PROBLEM
 \subsection{Representation problem}
 When $\mathcal{M} = \mathbb{R}^n$, the problem~(\ref{eq:optim_problem}) is solved iteratively, starting from an initial guess $x_0$ and performing successive steps $x_{i+1} = x_i + {\bf p_i}$ where ${\bf p_i}$ is the increment found at the $i$-th iteration, until convergence is achieved.
 The strategy to compute ${\bf p_i}$ depends on the solver.
@@ -222,7 +222,7 @@ The following (classical) choices can be made
 \end{itemize}
 
 %}}}
-%{{{LOCAL PARAMETRIZATION
+%{{{ LOCAL PARAMETRIZATION
 \subsection{Local parametrization}
 By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}\approx \mathbb{R}^n$, the tangent space to $\mathcal{M}$ at $x$, and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
 
@@ -235,7 +235,7 @@ By definition, there is always, at a point $x$ of a smooth $n$-dimensional manif
 \end{equation}
 
 $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplan of a higher dimensionality space.
-For example in figure~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplan embedded in $\mathbb{R}^3$.
+For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplan embedded in $\mathbb{R}^3$.
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 This gives us a local parametrization for $\mathcal{M}$.
 The driving idea of the optimization on manifolds is to change the parametrization at each iteration.
@@ -271,7 +271,7 @@ Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it wa
 For example if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}$ is automatically a rotation matrix and can be used directly as such when writing the function.
 
 %}}}
-%{{{LOCAL SQP ON MANIFOLDS
+%{{{ LOCAL SQP ON MANIFOLDS
 \subsection{Local SQP on manifolds}
 We choose to adopt an SQP approach to solve our problem.
 We first define the Lagrangian function
@@ -320,7 +320,7 @@ The gradient of $f \circ \varphi_x$ is
 $\frac{\partial f'}{\partial y}$ denotes the gradient of $f'$ with respect to an element of $\mathbb{E}$, which is the derivative that is usually calculated for use in classical optimization schemes.
 
 %}}}
-%{{{DESCRIPTION OF NON-EUCLIDEAN MANIFOLDS
+%{{{ DESCRIPTION OF NON-EUCLIDEAN MANIFOLDS
 \subsection{Description of non-Euclidean manifolds}
 \label{sub:examples_on_non_euclidean_manifolds}
 
@@ -329,22 +329,29 @@ Those need only to be implemented once for each elementary manifold (it is then 
 The composition with $f'$ and $c'$ is done automatically.
 The expression of those functions is adapted from~\cite{boumal:jmlr:2014}.
 
+\paragraph{Retractation:}
 We need a retractation operation $\psi\circ\varphi_x$ (that we denote simply $\varphi_x$) and its derivative.
 During the optimization process, we need the expression of the derivatives of $\varphi_x$ in order to compute the gradients of the cost function and constraints at the beginning of each iteration to later compute the approximated quadratic problem to be solved in that iteration.
 Because we change the parametrization of our problem to be centered on $x_k$ at each iteration, we only ever need to evaluate the gradient of $\varphi_x$ for $\mathbf{z}=0$, $\frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$.
+In many cases, this quantity is invariant w.r.t $x$ and can be computed once and for all for each manifold.
 
+\paragraph{Pseudo-Logarithm and distances:}
 It is necessary to be able to compute distances on manifolds.
 For that, we define the pseudo-logarithm (aka pseudolog), which is the inverse of the retractation operator.
 Note that the logarithm map is the inverse of the exponential map.
 \begin{equation*}
+  \zeta_x:\mathcal{M}\rightarrow T_x\mathcal{M}
+\end{equation*}
+\begin{equation*}
   \forall (x,y)\in \mathcal{M}\times\mathcal{M},\ \mathbf{z}:=\zeta_x(y)\ \text{is such that}\ \varphi_x(\mathbf{z}) = y
 \end{equation*}
-The pseudolog operator gives the vector of $T_x\mathcal(M)$ to go from $x$ to $y$.
+The pseudolog operator gives the vector of $T_x\mathcal{M}$ to go from $x$ to $y$.
 It is used to compute the (pseudo-) distance between two points of $\mathcal{M}$
 \begin{equation*}
   \dist(x,y) = \|\zeta_x(y)\|
 \end{equation*}
 
+\paragraph{Vector Transport:}
 To compare two vectors $\mathbf{v}_1$ and $\mathbf{v}_2$ defined in tangent spaces of different points, respectively, $T_{x_1}\mathcal{M}$ and $T_{x_2}\mathcal{M}$, it is necessary to transport $\mathbf{v}_1$ into $T_{x_2}\mathcal{M}$.
 Figure~\ref{fig:transport} illustrates the transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
 $\mathbf{v}_2$ can then be compared to the transported $\mathbf{v}_1$: $\mathcal{T}_{x_1,\mathbf{z}}(\mathbf{v}_1)$.
@@ -353,9 +360,13 @@ This operation will come in handy for the computation of Hessian approximations 
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\linewidth]{transport.pdf}
-  \caption{Transport}
+  \caption{Vector transport on a non-Euclidean manifold}
 \label{fig:transport}
 \end{figure}
+
+%\paragraph{Projections:} A projection operator on $\mathcal{M}$, as well as one on $T_x\mathcal{M}$ can come in handy, especially to help eliminate some numerical errors when necessary.
+
+\paragraph{Limits on tangent map:} The tangent map can present some singularities, thus it is necessary to limit the length of steps made through retractation to the validity region of each manifold.
 
 To summarize, for each elementary manifold $\mathcal{M}$, we need to implement the following elements:
 \begin{itemize}
@@ -367,11 +378,11 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
   \item Gradient of pseudo-logarithm operator $\frac{\partial \zeta_x}{\partial y}(y)$
   \item Transport operator $\mathcal{T}:\ (x,\mathbf{z}, \mathbf{v})\rightarrow \mathcal{T}_{x,\mathbf{z}}(v)$
   \item Projection from $\mathbb{E}$ on $\mathcal{M}$, $\pi_\mathcal{M}$
-  \item Projection on $T_x\mathcal{M}$, $\pi_{T_x\mathcal{M}}$
-  \item Limits of the tangent map
+  \item Projection from $T_x\mathbb{E}$ on $T_x\mathcal{M}$, $\pi_{T_x\mathcal{M}}$
+  \item Limits of the tangent map, $lim$
 \end{itemize}
 
-%{{{THE REAL SPACE MANIFOLD $\MATHBB{R^N$}
+%{{{ THE REAL SPACE MANIFOLD $\MATHBB{R^N$}
 \subsubsection{The Real Space manifold $\mathbb{R}^n$}
 \label{ssub:the_real_space}
 Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it are straightforward.
@@ -388,31 +399,31 @@ Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it a
   $T_x\mathcal{M}$ & $\mathbb{R}^n$ \\
   \midrule
   $T_x\mathbb{E}$ & $\mathbb{R}^n$ \\
+  \midrule
+  $\varphi_x(\mathbf{z})$ & $\mathbf{x} + \mathbf{z}$ \\
+  \midrule
+  $\partial \varphi_x(0)$ & $\mathbb{I}_n$ \\
   \bottomrule
 \end{tabular}
 \quad
 \begin{tabular}{cc}
   \toprule
-  $\varphi_x(\mathbf{z})$ & $\mathbf{x} + \mathbf{z}$ \\
-  \midrule
-  $\partial \varphi_x(0)$ & $\mathbb{I}_n$ \\
-  \midrule
   $\zeta(x,y)$ & $\mathbf{y} - \mathbf{x}$ \\
   \midrule
   $\frac{\partial \zeta_x}{\partial y}(x)$ & $\mathbb{I}_n$ \\
   \midrule
   $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
-  %\midrule
-  %$\pi_\mathcal{M}(\mathbf{x})$ & $\mathbf{x}$ \\
-  %\midrule
-  %$\pi_{T_x\mathcal{M}}(\mathbf{x})$ & $\mathbf{x}$ \\
-  %\midrule
-  %$Limit Map$ & $\mathbb{R}^n$ \\
+  \midrule
+  $\pi_\mathcal{M}(\mathbf{x})$ & $\mathbf{x}$ \\
+  \midrule
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
+  \midrule
+  $lim$ & $\|\mathbf{v}\| \leq \infty$ \\
   \bottomrule
 \end{tabular}
 \end{table}
 %}}}
-%{{{THE 3D ROTATION MANIFOLD SO(3): MATRIX REPRESENTATION
+%{{{ THE 3D ROTATION MANIFOLD SO(3): MATRIX REPRESENTATION
 \subsubsection{The 3D Rotation manifold $\mathbf{SO(3)}$: Matrix representation}
 \label{ssub:the_3d_rotation_manifold_matrix_representation}
 
@@ -453,8 +464,18 @@ And its inverse:
 
 The exponential map is known as the Rodrigues formula:
 \begin{equation}
-  \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 + \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}} + \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}}^2\\
+  \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 +
+  \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}} +
+  \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}}^2
 \end{equation}
+
+Note that when $\|\mathbf{v}\|$ is small, we make the following replacements to avoid numerical instability.
+It is important to ensure the precision of the retractation near zero because in an optimization process, many small steps are taken, especially when close to the solution.
+
+\begin{align}
+ \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} & = 1-\frac{\|\mathbf{v}\|}{6}\\
+ \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} & = 0.5 - \frac{\|\mathbf{v}\|}{24}
+\end{align}
 
 And the logarithm is computed as follows (see~\cite{merlhiot:thesis:2009}):
 \begin{align}
@@ -486,13 +507,13 @@ And the logarithm is computed as follows (see~\cite{merlhiot:thesis:2009}):
     x_{10} & x_{11} & x_{12} \\
     x_{20} & x_{21} & x_{22} \\
   \end{bmatrix} $ \\
+  \midrule
+  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
   \bottomrule
 \end{tabular}
 \quad
 \begin{tabular}{cc}
   \toprule
-  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
-  \midrule
   $\partial \varphi_x(0)$ & see Appendix~\ref{eq:diffRetrSO3Matrix} \\
   \midrule
   $\zeta(x,y)$ & $\log(\mathbf{x}^T\mathbf{y})$ \\
@@ -500,18 +521,18 @@ And the logarithm is computed as follows (see~\cite{merlhiot:thesis:2009}):
   $\frac{\partial \zeta_x}{\partial y}(x)$ & see Appendix~\ref{eq:diffLogSO3Matrix} \\
   \midrule
   $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
-  %\midrule
-  %$\pi_\mathcal{M}(\mathbf{x})$ & ??? \\
-  %\midrule
-  %$\pi_{T_x\mathcal{M}}(\mathbf{x})$ & ??? \\
-  %\midrule
-  %$Limit Map$ & ??? \\
+  \midrule
+  $\pi_\mathcal{M}(\mathbf{x})$ & Q from QR decomposition of $\mathbf{x}$ \\
+  \midrule
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
+  \midrule
+  $lim$ & $\|\mathbf{v}\| \leq \pi$ \\
   \bottomrule
 \end{tabular}
 \end{table}
 
 %}}}
-%{{{THE 3D ROTATION MANIFOLD SO3 QUATERNION REPRESENTATION
+%{{{ THE 3D ROTATION MANIFOLD SO3 QUATERNION REPRESENTATION
 \subsubsection{The 3D Rotation manifold $\mathbf{SO(3)}$: Quaternion representation}
 \label{ssub:the_3d_rotation_manifold_quaternion_representation}
 An element $x$ of $SO(3)$ is represented by $\mathbf{q}=\psi(x)$ in $\mathbb{R}^{4}$ by:
@@ -541,6 +562,15 @@ The exponential map is:
   \right.
 \end{equation}
 
+Note that when $\|\mathbf{v}\|$ is small, we make the following replacements to avoid numerical instability.
+
+\begin{equation}
+  \exp(\mathbf{z}) = \begin{bmatrix}
+    1 -\frac{\|\mathbf{z}\|}{8} + \frac{{\|\mathbf{z}\|}^2}{384}\\
+    \left(0.5 - \frac{\|\mathbf{z}\|}{48} + \frac{{\|\mathbf{z}\|}^2}{3840}\right)\mathbf{z}
+  \end{bmatrix}
+\end{equation}
+
 And the logarithm is:
 \begin{equation}
   \log\ :\left|
@@ -564,32 +594,32 @@ And the logarithm is:
   $T_x\mathcal{M}$ & $\mathbb{R}^3$ \\
   \midrule
   $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
+  \midrule
+  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
+  \midrule
+  $\partial \varphi_x(0)$ & see Appendix~\ref{eq:diffRetrSO3Quat} \\
   \bottomrule
 \end{tabular}
 \quad
 \begin{tabular}{cc}
   \toprule
-  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
-  \midrule
-  $\partial \varphi_x(0)$ & see Appendix~\ref{eq:diffRetrSO3Quat} \\
-  \midrule
   $\zeta(x,y)$ & $\log(\mathbf{x}^{-1}\mathbf{y})$ \\
   \midrule
   $\frac{\partial \zeta_x}{\partial y}(x)$ & see Appendix~\ref{eq:diffLogSO3Quat} \\
   \midrule
   $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
-  %\midrule
-  %$\pi_\mathcal{M}(\mathbf{x})$ & ??? \\
-  %\midrule
-  %$\pi_{T_x\mathcal{M}}(\mathbf{x})$ & ??? \\
-  %\midrule
-  %$Limit Map$ & ??? \\
+  \midrule
+  $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
+  \midrule
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
+  \midrule
+  $lim$ & $\|\mathbf{v}\| \leq \pi$ \\
   \bottomrule
 \end{tabular}
 \end{table}
 
 %}}}
-%{{{THE UNIT SPHERE MANIFOLD $S2$
+%{{{ THE UNIT SPHERE MANIFOLD $S2$
 \subsubsection{The Unit Sphere manifold $\mathbf{S2}$}
 \label{ssub:the_unit_sphere_manifold_s2}
 
@@ -629,7 +659,7 @@ The pseudo-logarithm operation is the following:
 The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $T_y\mathcal{M}$ with $y = \varphi_x(\mathbf{v})$, corresponds to rotating $\mathbf{v}$ by the rotation that transforms $x$ into $y$:
 \begin{align}
   &\mathbf{y} = \varphi_x(\mathbf{z}) \\
-  &R = \mathbb{I}_3 + \widehat{\mathbf{x} \wedge \mathbf{y}} + \frac{{\widehat{\mathbf{x} \wedge \mathbf{y}}}^2}{1+\mathbf{x}\cdot\mathbf{y}} \\
+  &R = \mathbb{I}_3 + \widehat{\mathbf{x} \wedge \mathbf{y}} + \frac{{\widehat{\mathbf{x} \wedge \mathbf{y} } }^2}{1+\mathbf{x}\cdot\mathbf{y}} \\
   &\mathcal{T}(x,\mathbf{z}, \mathbf{v}) = R\mathbf{v}
 \end{align}
 
@@ -663,14 +693,14 @@ The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $
   $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
   \midrule
   $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}$ \\
-  %\midrule
-  %$Limit Map$ & ??? \\
+  \midrule
+  $lim$ & $\|\mathbf{v}\| \leq \infty$ \\
   \bottomrule
 \end{tabular}
 \end{table}
 
 %}}}
-%{{{CARTESIAN PRODUCT OF MANIFOLDS}
+%{{{ CARTESIAN PRODUCT OF MANIFOLDS
 \subsubsection{Cartesian Product of Manifolds}
 \label{ssub:cartesian_product_of_manifolds}
 Given two manifolds $\mathcal{M}_1$ and $\mathcal{M}_2$, we denote $\mathcal{M}=\mathcal{M}_1\times\mathcal{M}_2$ their cartesian product.
@@ -714,12 +744,12 @@ Figure~\ref{fig:uml_manifold} presents a simplified class diagram of this projec
 \end{figure}
 
 %}}}
-%{{{PRACTICAL IMPLEMENTATION
+%{{{ PRACTICAL IMPLEMENTATION
 \section{Practical implementation}
 \label{sec:practical_implementation}
 
 The above SQP algorithm works locally, \emph{i.e.} when starting close enough to the solution.
-In practice, various possible refinements are made to ensure convergence from any starting point.
+In practice, various refinements are made to ensure convergence from any starting point.
 We detail hereafter our choices.
 
 Maps $\varphi_{x_i}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by Problem~(\ref{eq:SQPStep}) should not be outside the validity region of the map.
