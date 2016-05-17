@@ -762,11 +762,11 @@ LSSOL provides resolution methods for several types of problems and we are inter
 The LSSOL framework formulates problems as follows (Note that there are no equality constraints in this formulation):
 
 \begin{align}
-  \min_{x\in \mathbb{R}^n}\ &{F(x)}\\
-  \text{subject to}\  & l\leq \begin{bmatrix}
+  \minimize_{x\in \mathbb{R}^n}\ &{F(x)}\\
+  \text{subject to}\  & l\leq \begin{Bmatrix}
     x\\
     Cx
-  \end{bmatrix}
+  \end{Bmatrix}
   \leq u
 \end{align}
 
@@ -786,10 +786,113 @@ With the $F$ function taking different forms depending on the problem to solve:
 
 The QP4 type of problem is used when a decomposition of the matrix $A$ of QP2, $A=B^T B$ is available.
 
+\subsection{Problem Definition}
+\label{sub:problem_definition}
+
+As stated in Eq~\ref{eq:pb_on_SO3} we want to solve a non-linear constrained optimizarion problem on manifold that takes the following form:
+
+\begin{align}
+  \minimize_{x \in \mathcal{M}} & \quad f(x)\\
+  \text{subject to}&
+  \begin{array}{lr}
+    l \leq c(x) \leq u \nonumber
+  \end{array}
+\end{align}
+
+The list of constraints can be separated in 3 categories: Bounds, Linear and Nonlinear.
+For convenience, we formulate our optimization problem in a way that is compatible with LSSOL by changing all equality constraints into inequality constraints:
+
+\begin{equation}
+  c(x) = 0 \Leftrightarrow 0 \leq c(x) \leq 0
+\end{equation}
+
+Our problem can be written:
+\begin{align}
+\label{eq:optim_problem_on_manifold}
+  \minimize_{x \in \mathcal{M}} & \quad f(x)\\ \nonumber
+  \text{subject to}&\left\{
+  \begin{array}{lr}
+    L_B \leq x \leq U_B \\
+    L_L \leq Ax \leq U_L \\
+    L_N \leq c(x) \leq U_N
+  \end{array}\right.
+\end{align}
+
+With $L_B$ and $U_B$ being respectively the lower and upper bounds for Bounds constraints, $L_L$ and $U_L$ the lower and upper bounds for Linear constraints, and $L_N$ and $U_N$ the lower and upper bounds for Nonlinear constraints.
+That formulation is convenient and used to define our problem, but since we are solving this problem on a non-Euclidean manifold, we need to re-formulate the problem around the current iterate $x_i$ at each iteration.
+This is done automatically behind the scene and the user only has to provide the informations to build problem~\ref{eq:optim_problem_on_manifold}.
+
+At iteration $i$, the problem becomes(for clarity, we drop the subscript $i$ that goes with each appearance of $x$):
+\begin{align}
+\label{eq:optim_problem_on_txm}
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}} & \quad f(\varphi_x(\mathbf{z}))\\ \nonumber
+  \text{subject to}&\left\{
+  \begin{array}{lr}
+    {\bf z}_{\text{map}}^- \leq \mathbf{z} \leq {\bf z}_{\text{map}}^+ \\
+    L_B \leq \varphi_x(\mathbf{z}) \leq U_B \\
+    L_L \leq A\varphi_x(\mathbf{z}) \leq U_L \\
+    L_N \leq c(\varphi_x(\mathbf{z})) \leq U_N
+  \end{array}\right.
+\end{align}
+
+With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively the lower and upper bounds of validity of the tangent map of $\mathcal{M}$ around $x$.
+After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\ref{eq:optim_problem_on_manifold} became nonlinear in problem~\ref{eq:optim_problem_on_txm}.
+It is then necessary to treat the problem and evaluate which constraint is linear and which is not in order to go back to a formulation of the same type as in problem~\ref{eq:optim_problem_on_manifold}.
+Basically, for each constraint $c_j$ in problem~\ref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a realspace $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint.
+Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
+Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
+For example, a linear constraint on the elements of a unit-quaternion, although one can obviously be devised, does not seem to make much sense.
+\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}
+
+In the particular case of linear constraints (and by extension bound constraints) on a submanifold that is a realspace, the constraints on $x$ are transformed into constraints on $z$ as follows:
+\begin{equation}
+  L_L \leq Ax \leq U_L \ \Rightarrow \ L_L - Ax \leq A\mathbf{z} \leq U_L-Ax
+\end{equation}
+For bounds constraints, the same goes with $A$ as the identity matrix on the submanifold.
+
+Once those substitutions are done, we obtain a problem of the following form (note that $L_B$, $L_L$, $L_N$, $U_B$, $U_L$, $U_N$, $A$ and $c$ are not the same as in problem~\ref{eq:optim_problem_on_manifold}):
+
+\begin{align}
+\label{eq:optim_txm_final}
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}} & \quad f \circ \varphi_x(\mathbf{z})\\ \nonumber
+  \text{subject to}&\left\{
+  \begin{array}{lr}
+    L_B \leq \mathbf{z} \leq U_B \\
+    L_L \leq A \mathbf{z} \leq U_L \\
+    L_N \leq c \circ \varphi_x(\mathbf{z}) \leq U_N
+  \end{array}\right.
+\end{align}
+
+This problem is an exact reformulation of problem~\ref{eq:optim_problem_on_manifold} on $T_x\mathcal{M}$.
+At each step of the optimization process, we solve the quadratic problem approximating this problem~\ref{eq:optim_txm_final} around $\mathbf{z}=0$.
+The Taylor development of $c\circ\varphi_x(z)$ to the first order around $\mathbf{z} = 0$ gives:
+\begin{equation}
+  c \circ \varphi_x(\mathbf{z}) \approx c\circ \varphi_{x_k}(0) + \frac{\partial c\circ \varphi_{x_k}}{\partial {\bf z}}(0) {\bf z } = c(x_k) + \left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)^T\mathbf{z}
+\end{equation}
+
+The QP to solve at each iteration is the following:
+
+\begin{align}
+  \label{eq:QP_txm}
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}=\mathbb{R}^n } & \quad \left(\nabla\varphi_{x_k}(0) \nabla f (x_k)\right)^T\mathbf{z} + \frac{1}{2} {\bf z }^T H_k{\bf z }\\
+  \text{subject to}&\left\{
+  \begin{array}{lr}
+    L_B \leq \mathbf{z} \leq U_B \\
+    L_L \leq A \mathbf{z} \leq U_L \\
+    L_N \leq c(x_k) + \left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)^T\mathbf{z}\leq U_N\\
+  \end{array}\right. \nonumber
+\end{align}
+
+The resolution of this QP~\ref{eq:QP_txm} (with LSSOL) gives the optimal solution $\mathbf{z}^*$ and Lagrange multipliers $\lambda^*$.
+The new iterate that will be considered is:
+\begin{equation}
+  x_{k+1}\leftarrow \varphi_{x_k}(\mathbf{z}^*)
+\end{equation}
+
 \subsection{Trust-region and limit map}
 \label{sub:trust_region_and_limit_map}
 
-Maps $\varphi_{x_i}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by Problem~(\ref{eq:SQPStep}) should not be outside the validity region of the map.
+Maps $\varphi_{x}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by Problem~(\ref{eq:SQPStep}) should not be outside the validity region of the map.
 We could enforce this by adding a constraint ${\bf z}_{\text{map}}^- \leq {\bf z} \leq {\bf z}_{\text{map}}^+$ in~(\ref{eq:SQPStep}).
 This leads naturally to trust region methods that we therefore favor over line-search approaches.
 
