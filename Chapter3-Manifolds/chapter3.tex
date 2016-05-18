@@ -914,11 +914,146 @@ Finally, the constraints related to the trust-region added to the problem come d
 \subsection{Filter method}
 \label{sub:filter_method}
 
-To know if a step ${\bf z}$ is acceptable or not, one usually uses a penalty-based merit function.
+To know if a step ${\bf z}$ is acceptable or not, one usually uses a penalty-based merit function as we present in Section~\ref{sec:resolution_of_a_non_linear_constrained_optimization_problem}.
 In our early tests, the update of the penalty parameters proved to be difficult with our types of problems.
-We now use a filter instead.
+We now use a filter approach instead as presented in Section~\ref{ssub:the_filter_method}.
 
 Our algorithm is an adaptation of Fletcher's filter SQP~\cite{fletcher:mathprog:2000} to the case of manifolds: we use an adaptive trust-region that is intersected with the validity region of $\varphi_{x_i}$, and a new iterate $x_{i+1} = \varphi_{x_i}({\bf z})$ is accepted if either the cost function or the sum of constraint violations is made better than for any previous iterates.
+
+\subsection{Convergence criterion}
+\label{sub:convergence_criterion}
+
+An iterate $\{x,\lambda\}$ is considered as the solution of the optimization problem is it satisfies the first-order optimality conditions (presented in Section~\ref{sub:optimality_conditions}) to within certain tolerances.
+We use the same criterion as the one presented in~\cite{gill:techrep:1986}.
+It has the advantage of using two different tolerance constants: $\tau_P$ monitores the primal optimality conditions, which means the satisfaction of the constraints, and $\tau_D$ monitores the dual conditions, which means the optimality of the cost function and of the Lagrange multipliers.
+
+Dropping the distinction between Linear and NonLinear Constraints,
+the problem can be rewritten as:
+
+\begin{align}
+\label{eq:problem}
+  \min_{\bf x \in \mathcal{M}} & \quad \mbox{\emph{f}}({\bf x}) \nonumber\\
+  \text{subject to }&
+  l \leq c({\bf x}) \leq u \\
+\end{align}
+
+Each constraint is considered as a double inequality, thus, is associated with two Lagrange multipliers: $\lambda_l$ for the lower bound and $\lambda_u$ for the upper bound.
+The basic KKT conditions for that problem writes as:
+
+\begin{equation}
+\label{KKT}
+\left\{
+\begin{array}{lr}
+  \nabla \mathcal{L} = \nabla f({\bf x}) + \lambda_l.\nabla c({\bf x}) + \lambda_u.\nabla
+c({\bf x}) = 0 \\
+  c({\bf x}) - l \geq 0 \\
+  c({\bf x}) - u \leq 0 \\
+  \lambda_l \leq 0 \\
+  \lambda_u \geq 0 \\
+  \lambda_l.(c({\bf x})-l) = 0 \\
+  \lambda_u.(c({\bf x})-u) = 0
+\end{array}
+\right.
+\end{equation}
+
+For each constraint, there are 3 possible situations:
+
+\begin{tabular}{cccc}
+  \toprule
+  Lower bound violated or active & $c(x)-l\leq0$ & $\lambda_l\leq0$ & $\lambda_u=0$ \\
+  \midrule
+  Constraint satisfied & $l\leq c(x) \leq u$ & $\lambda_l=0$ & $\lambda_u=0$ \\
+  \midrule
+  Upper bound violated or active & $c(x)-u\geq0$ & $\lambda_l=0$ & $\lambda_u\geq0$ \\
+  \bottomrule
+\end{tabular}
+
+So for each constraint, we can use a single Lagrange multiplier that is negative when the lower bound is violated or active, null when the constraint is satisfied, and positive when the upper bound is active or violated.
+This allows to reduce the KKT system to the following:
+
+\begin{equation}
+\label{KKTmodified}
+\left\{
+\begin{array}{lr}
+  \nabla \mathcal{L} = \nabla f({\bf x}) + \lambda.\nabla c({\bf x}) = 0 \\
+  \begin{cases}
+  c({\bf x}) = l & \text{ and } \lambda \leq 0 \\
+  \text{OR}\\
+  l \leq c({\bf x}) \leq u & \text{ and } \lambda = 0 \\
+  \text{OR}\\
+  c({\bf x}) = u & \text{ and } \lambda \geq 0
+  \end{cases}
+\end{array}
+\right.
+\end{equation}
+
+To evaluate the satisfaction of this system, we approximate it with the tolerance constants.
+First we scale the tolerance constants with respect to the values of the iterate $x$ and $\lambda$:
+
+\begin{align}
+  \begin{split}
+    \tau_x = \tau_P(1+\|x\|_\infty)\\
+    \tau_\lambda =\tau_D(1+\|\lambda\|_\infty)\\
+  \end{split}
+\end{align}
+
+And we get the following convergence criterion:
+
+\begin{equation}
+\label{KKTfinal}
+\left\{
+\begin{array}{lr}
+  \|\nabla \mathcal{L}\|_\infty \leq \tau_\lambda \\
+  \forall i\
+  \left\{
+  \begin{array}{lll}
+  |c_i({\bf x}) - l_i| \leq \tau_x & \text{and } \lambda_i \leq -\tau_\lambda\\
+  \text{OR}\\
+  -(c_i({\bf x}) - l_i) \leq -\tau_x &\text{and } -(c_i({\bf x}) - u_i) \geq -\tau_x & \text{and } |\lambda| \leq \tau_\lambda \\
+  \text{OR}\\
+  |c_i({\bf x}) - u_i| \leq \tau_x & \text{and } \lambda_i \geq \tau_\lambda\\
+  \end{array}
+  \right.
+\end{array}
+\right.
+\end{equation}
+
+\subsection{Feasibility restoration}
+\label{sub:feasibility_restoration}
+
+Along the optimization process, the set of linearized constraints in the QP Problem~\ref{eq:QP_txm} becomes infeasible.
+For example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
+In that case the QP~\ref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
+To quope with that issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
+The basic idea is the following: At the beginning of an iteration, we estimate a list of infeasible constraints.
+The infeasible constraints are removed from the restoration problems constraints list and their violation is added to its cost function (that is the sum of all constraints violation).
+Then the restoration problem only contains feasible constraints and has to minimize the sum of constraint violation.
+That is done by iterating just like in the SQPs main loop with the difference that at each iteration, we update the problem based on the new list of infeasible constraints.
+The restoration phase has its own filter and trust region.
+For more details on the restoration phase, see Section~\ref{sub:restoration_phase}.
+
+Note that each iteration of the main SQP algorithm starts with the resolution of an FP (Feasibility Problem), that consists of the same linearized constraints as the QP problem~\ref{eq:QP_txm} without cost function.
+
+\begin{align}
+  \label{eq:FP_txm}
+  \begin{split}
+  \text{find } \mathbf{z} \text{ such that:}&\left\{
+  \begin{array}{lr}
+    L_B \leq \mathbf{z} \leq U_B \\
+    L_L \leq A \mathbf{z} \leq U_L \\
+    L_N \leq c(x_k) + {\left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}\leq U_N\\
+  \end{array}\right.
+  \end{split}
+\end{align}
+
+Its role is to determine whether the set of linearized constraints is feasible.
+If it is, the main SQP continues, otherwise, a list of infeasible constraint is provided and the restoration phase is entered.
+This feasibility problem is also solved at the beginning of each restoration iteration to determine whether or not to exit the restoration phase. As soon as a feasible point is found, the restoration is exited.
+
+Once a feasible point $x_F$ is found by the restoration phase, it is used as the new iterate in the main SQP phase.
+But since during the restoration, no care is taken about the value of the cost function, it is possible that $x_F$ is refused by the main filter, which cannot be accepted.
+So $x_F$ is forced inside the filter, and any pair dominating it is removed.
+Then the optimization can continue.
 
 \subsection{Hessian update on manifolds}
 \label{sub:hessian_update_on_manifolds}
