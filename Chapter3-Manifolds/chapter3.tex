@@ -1021,7 +1021,7 @@ And we get the following convergence criterion:
 \subsection{Feasibility restoration}
 \label{sub:feasibility_restoration}
 
-Along the optimization process, the set of linearized constraints in the QP Problem~\ref{eq:QP_txm} becomes infeasible.
+Along the optimization process, the set of linearized constraints in the QP Problem~\ref{eq:QP_txm} can become infeasible.
 For example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
 In that case the QP~\ref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
 To quope with that issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
@@ -1054,6 +1054,48 @@ Once a feasible point $x_F$ is found by the restoration phase, it is used as the
 But since during the restoration, no care is taken about the value of the cost function, it is possible that $x_F$ is refused by the main filter, which cannot be accepted.
 So $x_F$ is forced inside the filter, and any pair dominating it is removed.
 Then the optimization can continue.
+
+\subsection{Second Order Correction}
+\label{sub:second_order_correction}
+
+In the event where a step proposed in the restoration process by the resolution of the restoration QP is refused by the restoration filter, instead of immediately reducing the size of the trust region, we can perform a Second Order Correction Step.
+
+The idea is to re-solve a QP after its solution $\mathbf{z}$ has not been accepted by the algorithm, but with a better approximation (second order) of the constraints:
+
+\begin{equation}
+  c_i(x+{\bf z}) = c_i(x) + {\nabla c_i(x)}^T {\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z}
+\end{equation}
+
+The restoration QP problem becomes:
+
+\begin{align}
+  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^TH{\bf z}} \nonumber
+  \\ \text{s.t.}&
+  \left\{
+  \begin{array}{lr}
+    { L_B \leq {\bf z} \leq U_B}
+    \\ \forall i \in \mathcal{F} &\ {LB_i - c_i(x)\leq {\nabla c_i(x)}^T.{\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z} \leq UB_i - c_i(x)}
+  \\ \end{array} \nonumber
+  \right.
+\end{align}
+
+Using $ \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z} \approx c_i(x+{\bf z}) - c_i(x) - {\nabla c_i(x)}^T {\bf z} $
+we get:
+
+\begin{align}
+  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^TH{\bf z}} \nonumber
+  \\ \text{s.t.}&
+  \left\{
+  \begin{array}{lr}
+    L_B \leq {\bf z} \leq U_B \\
+    \forall i \in \mathcal{F},\quad {LB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z} \leq {\nabla c_i(x)}^T{\bf z} \leq UB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z}}
+  \\ \end{array} \nonumber
+  \right.
+\end{align}
+
+This system is solved iteratively with updating $\bf z$ with the solution of
+the previous system and updating the values in $c_i(x+\mathbf{z})$ until a
+satisfactory solution is found
 
 \subsection{Hessian update on manifolds}
 \label{sub:hessian_update_on_manifolds}
