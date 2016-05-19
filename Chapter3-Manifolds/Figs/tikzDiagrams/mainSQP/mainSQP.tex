@@ -1,15 +1,11 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
-\title{mainSQP}
-\author{stanislas.brossette }
-\date{May 2016}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows}
 \begin{document}
 
 \tikzstyle{startstop} = [rectangle, rounded corners, text centered, draw=black, fill=red!30]
-\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, text centered, draw=black, fill=blue!30]
 \tikzstyle{process} = [rectangle, text centered, draw=black, fill=orange!30]
 \tikzstyle{decision} = [rectangle, text centered, draw=black, fill=green!30]
 \tikzstyle{arrow} = [thick,->,>=stealth]
@@ -18,7 +14,7 @@
 
 \node (init) [startstop] {Init $x$ and filter};
 \node (update) [process, below of=init] {Update $c$, $\nabla c$, $f$, $\nabla f$, $H$\ldots};
-\node (KKT) [decision, below of=update] {Is KKT satisfied?};
+\node (KKT) [decision, below of=update, yshift=0.5cm] {Is KKT satisfied?};
 \node (success) [startstop, below of=KKT, xshift=3cm, text width=2cm] {Convergence Success};
 \node (FP) [decision, below of=KKT, text width=3cm] {Solve FP. Is problem feasible?};
 \node (QP) [process, below of=FP, xshift=-1cm] {Solve QP};
@@ -28,11 +24,11 @@
 \node (success2) [startstop, below of=zeroStep, xshift=-1cm, text width=2cm] {Null step Success};
 \node (filterTest) [decision, below of=zeroStep, text width=4cm, yshift=-1.5cm, xshift=1cm] {Is $\{f(\varphi_x(z)),c(\varphi_x(z))\}$ accepted by filter};
 \node (reduceTR) [process, below of=filterTest, xshift=-2cm] {\begin{tabular}{c}Reduce trust region\\ $\rho\leftarrow\frac{\rho}{2}$\end{tabular}};
-\node (smallStepTest) [decision, below of=reduceTR] {Is $\rho \leq \rho_{min}$ };
-\node (fail) [startstop, below of=smallStepTest, xshift=1.5cm] {\begin{tabular}{c}Too small step\\
+\node (smallStepTest) [decision, below of=reduceTR, yshift=3mm] {Is $\rho \leq \rho_{min}$ };
+\node (fail) [startstop, below of=smallStepTest, xshift=1.7cm, yshift=3mm] {\begin{tabular}{c}Too small step\\
 Failure\end{tabular}};
 \node (addToFilter) [process, below of=filterTest, xshift=2cm] {$x\leftarrow\varphi_x(z)$ Add to filter};
-\node (limitedStep) [decision, below of=addToFilter, xshift=1cm] {Is step limited by trust region};
+\node (limitedStep) [decision, below of=addToFilter, xshift=1cm, yshift=5mm] {Is step limited by trust region};
 \node (increaseTR) [process, below of=limitedStep, xshift=-1cm] {$\rho\leftarrow 2 \rho$};
 
 
@@ -43,7 +39,6 @@ Failure\end{tabular}};
 \draw [arrow] (FP) -- node[anchor=east] {yes} (QP);
 \draw [arrow] (FP) -- node[anchor=west] {no} (restoration);
 \draw [arrow] (restoration) -- node[anchor=west] {$x$} (forceAdd);
-\draw [arrow] (forceAdd) -- (update);
 \draw [arrow] (QP) -- node[anchor=west] {$\bf z$} (zeroStep);
 \draw [arrow] (zeroStep) -- node[anchor=east] {yes} (success2);
 \draw [arrow] (zeroStep) -- node[anchor=west] {no} (filterTest);
@@ -53,9 +48,10 @@ Failure\end{tabular}};
 \draw [arrow] (addToFilter) -- (limitedStep);
 \draw [arrow] (smallStepTest) -- (fail);
 \draw [arrow] (limitedStep) -- (increaseTR);
-\draw [arrow] (increaseTR) -- (update);
-\draw [arrow] (limitedStep) -- (update);
-\draw [arrow] (smallStepTest) -- (update);
+\draw [arrow] (forceAdd) |-([shift={(6mm,-3mm)}]forceAdd.south east)-- ([shift={(20mm,3mm)}]update.north east)-|(update);
+\draw [arrow] (increaseTR) |-([shift={(-54mm,-7mm)}]increaseTR.south west)-- ([shift={(-19mm,3mm)}]update.north west)-| (update);
+\draw [arrow] (limitedStep) |-([shift={(-54mm,-7mm)}]increaseTR.south west)-- ([shift={(-19mm,3mm)}]update.north west)-| (update);
+\draw [arrow] (smallStepTest) |-([shift={(-54mm,-7mm)}]increaseTR.south west)-- ([shift={(-19mm,3mm)}]update.north west)-| (update);
 
 \end{tikzpicture}
 
