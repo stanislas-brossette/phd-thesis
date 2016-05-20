@@ -756,7 +756,7 @@ We detail hereafter our choices.
 \subsection{Linear and quadratic problems resolution}
 \label{sub:linear_and_quadratic_problems_resolution}
 
-The central idea of an SQP algorithm is that it solves a series of QP problems iteratively.
+The central idea of an SQP algorithm is that it solves a series of QP iteratively.
 There are many off-the-shelf QP solvers available and the state of the art is mature in that field, thus, we decided to use the LSSOL solver~\cite{gill:techrep:1986}.
 LSSOL provides resolution methods for several types of problems and we are interested in using the FP (Feasibility Problem) and QP.\@
 The LSSOL framework formulates problems as follows (Note that there are no equality constraints in this formulation):
@@ -1125,6 +1125,28 @@ From the diagonal matrix $D_k$ we form $D'_k$ such that $d'_{ii} = \max\left(d_{
 Defining $L'_k = L_k Q_k {(D'_k)}^{1/2}$, we get a regularized matrix $H'_k = P_k^T L_k L_k^T P_k$.
 In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~(\ref{eq:SQPStep}), which directly accepts the factorized form $(P_k, L'_k)$.
 This avoids an internal Cholesky factorization so that our regularization does not add too much time to the overall process of building and solving the QP.\@
+
+\begin{figure}[htpb]
+  \centering
+  \input{Chapter3-Manifolds/Figs/tikzDiagrams/mainSQP}
+  \caption{Main SQP Loop}
+  \label{fig:main_sqp_loop}
+\end{figure}
+
+\begin{figure}[htpb]
+  \begin{minipage}{.5\textwidth}
+    \centering
+    \input{Chapter3-Manifolds/Figs/tikzDiagrams/restoration}
+    \caption{Restoration Loop}
+    \label{fig:restoration_loop}
+  \end{minipage}%
+  \begin{minipage}{.5\textwidth}
+    \centering
+    \input{Chapter3-Manifolds/Figs/tikzDiagrams/secondOrder}
+    \caption{Second Order Correction}
+    \label{fig:second_order_correction}
+  \end{minipage}%
+\end{figure}
 
 %}}}
 
