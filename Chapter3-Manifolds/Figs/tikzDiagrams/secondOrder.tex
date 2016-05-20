@@ -17,7 +17,7 @@
 \node (tooSlowTest) [decision, below of=updateBest, xshift=10mm] {Is $\|c_I\|_\infty\leq \frac{previous \|c_I\|_\infty}{4}$?};
 \node (almostFeasibleTest) [decision, below of=tooSlowTest, xshift=-10mm] {Is $\|c_I\|_\infty\leq\epsilon$?};
 \node (tooSlowFail) [startstop, below of=tooSlowTest, xshift=25mm] {\begin{tabular}{c}SOC too slow\\Exit no solution\end{tabular}};
-\node (almostFeasible) [startstop, below of=almostFeasibleTest, xshift=10mm] { \begin{tabular}{c}Almost Feasible Point Found\\Exit no solution\end{tabular} };
+\node (almostFeasible) [startstop, below of=almostFeasibleTest, xshift=10mm] {\begin{tabular}{c}Almost Feasible Point Found\\Exit no solution\end{tabular} };
 
 \draw [arrow] (init) -- (FPTest);
 \draw [arrow] (FPTest) -- node[anchor=west] {no}  (noSolution);
@@ -33,4 +33,5 @@
 \draw [arrow] (almostFeasibleTest.342) --node[anchor=east] {yes} (almostFeasible);
 \draw [arrow] (almostFeasibleTest.220) node[anchor=west, shift={(-14mm,-1mm)}] {no}|-([shift={(-6mm,-3mm)}]almostFeasibleTest.south west)-- ([shift={(-23mm,3mm)}]FPTest.north west)-| (FPTest);
 
-\end{tikzpicture}}
+\end{tikzpicture}
+}

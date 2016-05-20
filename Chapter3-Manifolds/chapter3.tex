@@ -777,9 +777,9 @@ With the $F$ function taking different forms depending on the problem to solve:
   \toprule
   FP:\@ & None & (find a feasible point for the constraints)\\
   \midrule
-  QP2: & $c^T+\frac{1}{2} x^T A x$ & A symmetric and positive semi-definite \\
+  QP2: & $F(x)=c^T+\frac{1}{2} x^T A x$ & $A$ symmetric and positive semi-definite \\
   \midrule
-  QP4: & $c^T+\frac{1}{2} x^T B^T B x$ & A $m\times n$ upper-trapezoidal \\
+  QP4: & $F(x)=c^T+\frac{1}{2} x^T B^T B x$ & $B$ $m\times n$ upper-trapezoidal \\
   \bottomrule
 \end{tabular}
 \end{table}
@@ -806,7 +806,7 @@ For convenience, we formulate our optimization problem in a way that is compatib
   c(x) = 0 \Leftrightarrow 0 \leq c(x) \leq 0
 \end{equation}
 
-Our problem can be written:
+Our problem can be written as:
 \begin{align}
 \label{eq:optim_problem_on_manifold}
   \minimize_{x \in \mathcal{M}} & \quad f(x)\\ \nonumber
@@ -836,7 +836,7 @@ At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ th
 \end{align}
 
 With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively the lower and upper bounds of validity of the tangent map of $\mathcal{M}$ around $x$.
-After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\ref{eq:optim_problem_on_manifold} became nonlinear in problem~\ref{eq:optim_problem_on_txm}.
+After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\ref{eq:optim_problem_on_manifold} become nonlinear in problem~\ref{eq:optim_problem_on_txm}.
 It is then necessary to treat the problem and evaluate which constraint is linear and which is not in order to go back to a formulation of the same type as in problem~\ref{eq:optim_problem_on_manifold}.
 Basically, for each constraint $c_j$ in problem~\ref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a realspace $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
 Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
@@ -899,11 +899,11 @@ In fact, this comes down to intersecting the original problem's bounds with the 
 This leads naturally to trust region methods that we therefore favor over line-search approaches.
 We present the classical trust-region strategy in Section~\ref{ssec:the_trust_region_strategy}.
 In the case of a robotics problem, different variables often have different orders of magnitude, for example, contact forces can be of the order of $100N$ while joint angles are of the order of $1rad$.
-Let $x$ be the variable vector of such problem with $x=[\theta_0, \theta_1, f_0, f_1, f_2]^T$ where $\theta$ represents an angular variables and $f$ a force.
+Let $x$ be the variable vector of such problem with $x={[\theta_0, \theta_1, f_0, f_1, f_2]}^T$ where $\theta$ represents an angular variables and $f$ a force.
 The shape of the trust-region should reflect those differences, but we want to keep the simplicity of the classical trust-region strategy.
 For that, we propose to separate the trust-region $\rho$ in two parts: its scale $\rho_\text{scale}$ which is a scalar, and its shape $\rho_\text{shape}$ which in a vector of dimension $n$, the dimension of $\mathcal{M}$ (that value is actually stored in the instance of manifold).
 $\rho_\text{shape}$ is set at the beginning of the optimization and is a constant, it represents the size of the trust-region in every directions.
-In the previous example, we'd get ${\rho_\text{shape}} = [1,1,100,100,100]^T$
+In the previous example, we'd get ${\rho_\text{shape}} = {[1,1,100,100,100]}^T$
 And $\rho_\text{scale}$ is the scalar that gets updated during the trust-region strategy.
 
 Finally, the constraints related to the trust-region added to the problem come down to:
@@ -977,11 +977,11 @@ This allows to reduce the KKT system to the following:
 \begin{array}{lr}
   \nabla \mathcal{L} = \nabla f({\bf x}) + \lambda.\nabla c({\bf x}) = 0 \\
   \begin{cases}
-  c({\bf x}) = l & \text{ and } \lambda \leq 0 \\
+  c({\bf x}) = l & \text{and } \lambda \leq 0 \\
   \text{OR}\\
-  l \leq c({\bf x}) \leq u & \text{ and } \lambda = 0 \\
+  l \leq c({\bf x}) \leq u & \text{and } \lambda = 0 \\
   \text{OR}\\
-  c({\bf x}) = u & \text{ and } \lambda \geq 0
+  c({\bf x}) = u & \text{and } \lambda \geq 0
   \end{cases}
 \end{array}
 \right.
@@ -1037,7 +1037,7 @@ Note that each iteration of the main SQP algorithm starts with the resolution of
 \begin{align}
   \label{eq:FP_txm}
   \begin{split}
-  \text{find } \mathbf{z} \text{ such that:}&\left\{
+  \text{find } \mathbf{z}\ \text{such that:}&\left\{
   \begin{array}{lr}
     L_B \leq \mathbf{z} \leq U_B \\
     L_L \leq A \mathbf{z} \leq U_L \\
@@ -1069,13 +1069,13 @@ The idea is to re-solve a QP after its solution $\mathbf{z}$ has not been accept
 The restoration QP problem becomes:
 
 \begin{align}
-  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^TH{\bf z}} \nonumber
+  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^T H{\bf z}} \nonumber
   \\ \text{s.t.}&
   \left\{
   \begin{array}{lr}
-    { L_B \leq {\bf z} \leq U_B}
-    \\ \forall i \in \mathcal{F} &\ {LB_i - c_i(x)\leq {\nabla c_i(x)}^T.{\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z} \leq UB_i - c_i(x)}
-  \\ \end{array} \nonumber
+    { L_B \leq {\bf z} \leq U_B}\\
+    \forall i \in \mathcal{F} &\ {LB_i - c_i(x)\leq {\nabla c_i(x)}^T.{\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z} \leq UB_i - c_i(x)}\\
+  \end{array}
   \right.
 \end{align}
 
@@ -1083,13 +1083,13 @@ Using $ \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z} \approx c_i(x+{\bf z}) - c_i
 we get:
 
 \begin{align}
-  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^TH{\bf z}} \nonumber
-  \\ \text{s.t.}&
+  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^T H{\bf z}} \nonumber\\
+  \text{s.t.}&
   \left\{
   \begin{array}{lr}
     L_B \leq {\bf z} \leq U_B \\
-    \forall i \in \mathcal{F},\quad {LB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z} \leq {\nabla c_i(x)}^T{\bf z} \leq UB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z}}
-  \\ \end{array} \nonumber
+    \forall i \in \mathcal{F},\quad {LB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z} \leq {\nabla c_i(x)}^T{\bf z} \leq UB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z}}\\
+  \end{array}
   \right.
 \end{align}
 
@@ -1130,7 +1130,7 @@ This avoids an internal Cholesky factorization so that our regularization does n
   \centering
   \input{Chapter3-Manifolds/Figs/tikzDiagrams/mainSQP}
   \caption{Main SQP Loop}
-  \label{fig:main_sqp_loop}
+\label{fig:main_sqp_loop}
 \end{figure}
 
 \begin{figure}[htpb]
@@ -1138,13 +1138,13 @@ This avoids an internal Cholesky factorization so that our regularization does n
     \centering
     \input{Chapter3-Manifolds/Figs/tikzDiagrams/restoration}
     \caption{Restoration Loop}
-    \label{fig:restoration_loop}
+\label{fig:restoration_loop}
   \end{minipage}%
   \begin{minipage}{.5\textwidth}
     \centering
     \input{Chapter3-Manifolds/Figs/tikzDiagrams/secondOrder}
     \caption{Second Order Correction}
-    \label{fig:second_order_correction}
+\label{fig:second_order_correction}
   \end{minipage}%
 \end{figure}
 
