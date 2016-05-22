@@ -753,12 +753,14 @@ The SQP algorithm presented in Section~\ref{local_sqp_on_manifolds} works locall
 In practice, various refinements are made to ensure convergence from any starting point.
 We detail hereafter our choices.
 
+We summarize the entire SQP algorithm in Diagrams~\ref{fig:main_sqp_loop},~\ref{fig:restoration_loop} and~\ref{fig:second_order_correction}, which represent respectively the main SQP loop, the restoration phase and the second order correction algorithm.
+
 \subsection{Linear and quadratic problems resolution}
 \label{sub:linear_and_quadratic_problems_resolution}
 
-The central idea of an SQP algorithm is that it solves a series of QP iteratively.
+The central idea of an SQP algorithm is that it solves a series of QP iteratively until a solution is reached.
 There are many off-the-shelf QP solvers available and the state of the art is mature in that field, thus, we decided to use the LSSOL solver~\cite{gill:techrep:1986}.
-LSSOL provides resolution methods for several types of problems and we are interested in using the FP (Feasibility Problem) and QP.\@
+LSSOL provides resolution methods for several types of problems and we are interested in using the FP (Feasibility Problem) and QP ones.\@
 The LSSOL framework formulates problems as follows (Note that there are no equality constraints in this formulation):
 
 \begin{align}
@@ -819,7 +821,7 @@ Our problem can be written as:
 \end{align}
 
 With $L_B$ and $U_B$ being respectively the lower and upper bounds for Bounds constraints, $L_L$ and $U_L$ the lower and upper bounds for Linear constraints, and $L_N$ and $U_N$ the lower and upper bounds for Nonlinear constraints.
-That formulation is convenient and used to define our problem, but since we are solving this problem on a non-Euclidean manifold, we need to re-formulate the problem around the current iterate $x_i$ at each iteration.
+That formulation is convenient and used to define our problem, but since we are solving this problem on a non-Euclidean manifold, we need to re-formulate it around the current iterate $x_i$ at each iteration.
 This is done automatically behind the scene and the user only has to provide the informations to build problem~\ref{eq:optim_problem_on_manifold}.
 
 At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ that goes with each appearance of $x$):
@@ -837,7 +839,7 @@ At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ th
 
 With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively the lower and upper bounds of validity of the tangent map of $\mathcal{M}$ around $x$.
 After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\ref{eq:optim_problem_on_manifold} become nonlinear in problem~\ref{eq:optim_problem_on_txm}.
-It is then necessary to treat the problem and evaluate which constraint is linear and which is not in order to go back to a formulation of the same type as in problem~\ref{eq:optim_problem_on_manifold}.
+It is then necessary to treat the problem and evaluate which constraint is linear and which is not, in order to go back to a formulation of the same type as in problem~\ref{eq:optim_problem_on_manifold}.
 Basically, for each constraint $c_j$ in problem~\ref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a realspace $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
 Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
 Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
@@ -847,7 +849,7 @@ In the particular case of linear constraints (and by extension bound constraints
 \begin{equation}
   L_L \leq Ax \leq U_L \ \Rightarrow \ L_L - Ax \leq A\mathbf{z} \leq U_L-Ax
 \end{equation}
-For bounds constraints, the same goes with $A$ as the identity matrix on the submanifold.
+For bounds constraints, the same goes with $A$ being the identity matrix on the submanifold.
 
 Once those substitutions are done, we obtain a problem of the following form (note that $L_B$, $L_L$, $L_N$, $U_B$, $U_L$, $U_N$, $A$ and $c$ are not the same as in problem~\ref{eq:optim_problem_on_manifold}):
 
@@ -863,7 +865,7 @@ Once those substitutions are done, we obtain a problem of the following form (no
 \end{align}
 
 This problem is an exact reformulation of problem~\ref{eq:optim_problem_on_manifold} on $T_x\mathcal{M}$.
-At each step of the optimization process, we solve the quadratic problem approximating this problem~\ref{eq:optim_txm_final} around $\mathbf{z}=0$.
+At each step of the optimization process, we solve the QP approximating this problem~\ref{eq:optim_txm_final} around $\mathbf{z}=0$.
 The Taylor development of $c\circ\varphi_x(z)$ to the first order around $\mathbf{z} = 0$ gives:
 \begin{equation}
   c \circ \varphi_x(\mathbf{z}) \approx c\circ \varphi_{x_k}(0) + \frac{\partial c\circ \varphi_{x_k}}{\partial {\bf z}}(0) {\bf z } = c(x_k) + {\left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}
@@ -890,21 +892,25 @@ The new iterate that will be considered is:
   x_{k+1}\leftarrow \varphi_{x_k}(\mathbf{z}^*)
 \end{equation}
 
+Note that the only additional computation due to the formulation on manifold is the multiplication of the gradients of constraints and cost by the map's gradient at $0$.
+The computation time related to those products can be reduced by taking advantage of the fact that $\nabla \varphi_x(0)$ is block diagonal.
+
 \subsection{Trust-region and limit map}
 \label{sub:trust_region_and_limit_map}
 
-Maps $\varphi_{x}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by Problem~(\ref{eq:QP_txm}) should not be outside the validity region of the map.
-We could enforce this by adding the limits of the manifold map to the problem as bound constraints.
+Maps $\varphi_{x}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by solving Problem~(\ref{eq:QP_txm}) should not be outside the validity region of the map.
+We can enforce this by adding the limits of the manifold map to the problem as bound constraints.
 In fact, this comes down to intersecting the original problem's bounds with the limits of the map and imposing the resulting bounds as constraints.
 This leads naturally to trust region methods that we therefore favor over line-search approaches.
 We present the classical trust-region strategy in Section~\ref{ssec:the_trust_region_strategy}.
+
 In the case of a robotics problem, different variables often have different orders of magnitude, for example, contact forces can be of the order of $100N$ while joint angles are of the order of $1rad$.
 Let $x$ be the variable vector of such problem with $x={[\theta_0, \theta_1, f_0, f_1, f_2]}^T$ where $\theta$ represents an angular variables and $f$ a force.
 The shape of the trust-region should reflect those differences, but we want to keep the simplicity of the classical trust-region strategy.
-For that, we propose to separate the trust-region $\rho$ in two parts: its scale $\rho_\text{scale}$ which is a scalar, and its shape $\rho_\text{shape}$ which in a vector of dimension $n$, the dimension of $\mathcal{M}$ (that value is actually stored in the instance of manifold).
-$\rho_\text{shape}$ is set at the beginning of the optimization and is a constant, it represents the size of the trust-region in every directions.
+For that, we propose to separate the trust-region $\rho$ in two parts: its scale $\rho_\text{scale}$ which is a scalar, and its shape $\rho_\text{shape}$ which in a vector of dimension $n$ (that value is actually stored in the instance of manifold).
+$\rho_\text{shape}$ is set at the beginning of the optimization and remains constant, it represents the size of the trust-region in every directions.
 In the previous example, we'd get ${\rho_\text{shape}} = {[1,1,100,100,100]}^T$
-And $\rho_\text{scale}$ is the scalar that gets updated during the trust-region strategy.
+And $\rho_\text{scale}$ is the scalar that gets updated in the trust-region strategy.
 
 Finally, the constraints related to the trust-region added to the problem come down to:
 \begin{equation}
@@ -916,25 +922,28 @@ Finally, the constraints related to the trust-region added to the problem come d
 
 To know if a step ${\bf z}$ is acceptable or not, one usually uses a penalty-based merit function as we present in Section~\ref{sec:resolution_of_a_non_linear_constrained_optimization_problem}.
 In our early tests, the update of the penalty parameters proved to be difficult with our types of problems.
-We now use a filter approach instead as presented in Section~\ref{ssub:the_filter_method}.
+We now use a filter approach instead, as presented in Section~\ref{ssub:the_filter_method}.
 
 Our algorithm is an adaptation of Fletcher's filter SQP~\cite{fletcher:mathprog:2000} to the case of manifolds: we use an adaptive trust-region that is intersected with the validity region of $\varphi_{x_i}$, and a new iterate $x_{i+1} = \varphi_{x_i}({\bf z})$ is accepted if either the cost function or the sum of constraint violations is made better than for any previous iterates.
 
 \subsection{Convergence criterion}
 \label{sub:convergence_criterion}
 
-An iterate $\{x,\lambda\}$ is considered as the solution of the optimization problem is it satisfies the first-order optimality conditions (presented in Section~\ref{sub:optimality_conditions}) to within certain tolerances.
-We use the same criterion as the one presented in~\cite{gill:techrep:1986}.
+An iterate $\{x,\lambda\}$ is considered to be a solution of the optimization problem is it satisfies the first-order optimality conditions (presented in Section~\ref{sub:optimality_conditions}) to within certain tolerances.
+We use the same criterion as the one presented in~\cite{gill:snopt:2002}.
 It has the advantage of using two different tolerance constants: $\tau_P$ monitores the primal optimality conditions, which means the satisfaction of the constraints, and $\tau_D$ monitores the dual conditions, which means the optimality of the cost function and of the Lagrange multipliers.
+That gives the user more control over the quality of the solution.
 
 Dropping the distinction between Linear and NonLinear Constraints,
 the problem can be rewritten as:
 
 \begin{align}
+\begin{split}
 \label{eq:problem}
-  \min_{\bf x \in \mathcal{M}} & \quad \mbox{\emph{f}}({\bf x}) \nonumber\\
+  \min_{\bf x \in \mathcal{M}} & \quad \mbox{\emph{f}}({\bf x}) \\
   \text{subject to }&
   l \leq c({\bf x}) \leq u \\
+\end{split}
 \end{align}
 
 Each constraint is considered as a double inequality, thus, is associated with two Lagrange multipliers: $\lambda_l$ for the lower bound and $\lambda_u$ for the upper bound.
@@ -968,7 +977,7 @@ For each constraint, there are 3 possible situations:
   \bottomrule
 \end{tabular}
 
-So for each constraint, we can use a single Lagrange multiplier that is negative when the lower bound is violated or active, null when the constraint is satisfied, and positive when the upper bound is active or violated.
+Both $\lambda_l$ and $\lambda_u$ cannot be non null at the same time. So for each constraint, we can use a single Lagrange multiplier that is negative when the lower bound is violated or active, null when the constraint is satisfied, and positive when the upper bound is active or violated.
 This allows to reduce the KKT system to the following:
 
 \begin{equation}
@@ -991,10 +1000,10 @@ To evaluate the satisfaction of this system, we approximate it with the toleranc
 First we scale the tolerance constants with respect to the values of the iterate $x$ and $\lambda$:
 
 \begin{align}
-  \begin{split}
-    \tau_x = \tau_P(1+\|x\|_\infty)\\
-    \tau_\lambda =\tau_D(1+\|\lambda\|_\infty)\\
-  \end{split}
+\begin{split}
+  \tau_x = \tau_P(1+\|x\|_\infty)\\
+  \tau_\lambda =\tau_D(1+\|\lambda\|_\infty)\\
+\end{split}
 \end{align}
 
 And we get the following convergence criterion:
@@ -1025,11 +1034,11 @@ Along the optimization process, the set of linearized constraints in the QP Prob
 For example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
 In that case the QP~\ref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
 To quope with that issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
-The basic idea is the following: At the beginning of an iteration, we estimate a list of infeasible constraints.
-The infeasible constraints are removed from the restoration problems constraints list and their violation is added to its cost function (that is the sum of all constraints violation).
+The basic idea is the following: At the beginning of an iteration, we estimate a list of infeasible linearized constraints.
+The infeasible constraints are removed from the restoration problems constraints list and their violation is added to its cost function (that becomes the sum of all constraints violation).
 Then the restoration problem only contains feasible constraints and has to minimize the sum of constraint violation.
-That is done by iterating just like in the SQPs main loop with the difference that at each iteration, we update the problem based on the new list of infeasible constraints.
-The restoration phase has its own filter and trust region.
+That is done by iterating just like in the SQPs main loop with the difference that at each iteration, we update the problem based on a new list of infeasible constraints.
+The restoration phase has its own filter called the restoration filter (RF) and trust region.
 For more details on the restoration phase, see Section~\ref{sub:restoration_phase}.
 
 Note that each iteration of the main SQP algorithm starts with the resolution of an FP (Feasibility Problem), that consists of the same linearized constraints as the QP problem~\ref{eq:QP_txm} without cost function.
@@ -1049,18 +1058,17 @@ Note that each iteration of the main SQP algorithm starts with the resolution of
 Its role is to determine whether the set of linearized constraints is feasible.
 If it is, the main SQP continues, otherwise, a list of infeasible constraint is provided and the restoration phase is entered.
 This feasibility problem is also solved at the beginning of each restoration iteration to determine whether or not to exit the restoration phase. As soon as a feasible point is found, the restoration is exited.
-
 Once a feasible point $x_F$ is found by the restoration phase, it is used as the new iterate in the main SQP phase.
-But since during the restoration, no care is taken about the value of the cost function, it is possible that $x_F$ is refused by the main filter, which cannot be accepted.
-So $x_F$ is forced inside the filter, and any pair dominating it is removed.
+Since during the restoration no care is taken about the value of the cost function, it is possible that $x_F$ is refused by the main filter, which is not an acceptable behavior.
+So $x_F$ is forced in the filter, and any pair dominating it is removed.
 Then the optimization can continue.
 
 \subsection{Second Order Correction}
 \label{sub:second_order_correction}
 
-In the event where a step proposed in the restoration process by the resolution of the restoration QP is refused by the restoration filter, instead of immediately reducing the size of the trust region, we can perform a Second Order Correction Step.
+In the event where a step proposed in the restoration process by the resolution of the restoration QP is refused by the restoration filter RF, instead of immediately reducing the size of the trust region, we can perform a Second Order Correction Step.
 
-The idea is to re-solve a QP after its solution $\mathbf{z}$ has not been accepted by the algorithm, but with a better approximation (second order) of the constraints:
+The idea is to re-solve a QP after its solution $\mathbf{z}$ has been refused by RF, but with a better approximation (second order) of the constraints:
 
 \begin{equation}
   c_i(x+{\bf z}) = c_i(x) + {\nabla c_i(x)}^T {\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z}
@@ -1093,9 +1101,7 @@ we get:
   \right.
 \end{align}
 
-This system is solved iteratively with updating $\bf z$ with the solution of
-the previous system and updating the values in $c_i(x+\mathbf{z})$ until a
-satisfactory solution is found
+This system is solved iteratively with updating $\bf z$ (but never changing $x$) with the solution of the previous system and updating the values in $c_i(x+\mathbf{z})$ until a satisfactory $\bf z$ is found.
 
 \subsection{Hessian update on manifolds}
 \label{sub:hessian_update_on_manifolds}
