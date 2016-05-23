@@ -15,7 +15,7 @@
 %{{{ LIST OF CONTRIBUTIONS
 %\section{List of contributions}
 %\begin{itemize}
-  %\item{Optimisation on Manifolds}
+  %\item{Optimization on Manifolds}
     %\begin{itemize}
       %\item Definition and examples of non-Euclidean manifolds
         %\begin{itemize}
@@ -86,11 +86,11 @@
 \label{sec:introduction_to_optimization_on_manifolds}
 
 Posture generation has been formulated as a problem over a Euclidean space.
-Robots variable may however be more naturally expressed over non-Euclidean manifolds.
+Robots variable may, however, be more naturally expressed over non-Euclidean manifolds.
 The archetypes for this are the rotation part of the root body of a humanoid robot, and ball joints, whose variables live in $SO(3)$.
 Some typical tasks are also naturally formulated on different manifolds.
 For example, for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$~\cite{escande:icra:2016}.
-Human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
+The human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
 
 Formulating the problem over $\mathbb{R}^n$ leads either to discontinuities that can prevent the convergence of the optimization solver, or to cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
 
@@ -728,8 +728,8 @@ For example, the retractation is computed as follows, and that scheme can be rep
 
 In order to use the manifold formulation described above in other softwares, and particularly in a numerical solver, we needed to write an independant C++ project that handles all the formulations without the user having to worry about it.
 This implementation is open-source and available at \href{https://github.com/stanislas-brossette/manifolds}{https://github.com/stanislas-brossette/manifolds}.
-The implementation consists in 3 types of classes: the Manifold class, the elementary manifold classes and the Point class.
-The Manifold class describes the abstract mathematical structure of a non-Euclidean manifolds and defines a common interface for all elementary manifolds to implement (retractation, pseudoLog,\ldots).
+The implementation consists in 3 types of classes: the Manifold class, the elementary manifold classes, and the Point class.
+The Manifold class describes the abstract mathematical structure of a non-Euclidean manifold and defines a common interface for all elementary manifolds to implement (retractation, pseudoLog,\ldots).
 Elementary Manifold classes ($\mathbb{R}^n$, $SO(3)$, $S2$, and the Cartesian Product) are the concrete manifolds.
 They inherit from the Manifold class and implement all their mathematical operations.
 The Cartesian Product class is used to build compound manifolds by being `multiplied' with other elementary manifolds.
@@ -801,7 +801,7 @@ As stated in Eq~\ref{eq:pb_on_SO3} we want to solve a non-linear constrained opt
   \end{array}
 \end{align}
 
-The list of constraints can be separated in 3 categories: Bounds, Linear and Nonlinear.
+The list of constraints can be separated in 3 categories: Bounds, Linear, and Nonlinear.
 For convenience, we formulate our optimization problem in a way that is compatible with LSSOL by changing all equality constraints into inequality constraints:
 
 \begin{equation}
@@ -822,7 +822,7 @@ Our problem can be written as:
 
 With $L_B$ and $U_B$ being respectively the lower and upper bounds for Bounds constraints, $L_L$ and $U_L$ the lower and upper bounds for Linear constraints, and $L_N$ and $U_N$ the lower and upper bounds for Nonlinear constraints.
 That formulation is convenient and used to define our problem, but since we are solving this problem on a non-Euclidean manifold, we need to re-formulate it around the current iterate $x_i$ at each iteration.
-This is done automatically behind the scene and the user only has to provide the informations to build problem~\ref{eq:optim_problem_on_manifold}.
+This is done automatically behind the scene and the user only has to provide the information to build problem~\ref{eq:optim_problem_on_manifold}.
 
 At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ that goes with each appearance of $x$):
 \begin{align}
@@ -840,12 +840,12 @@ At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ th
 With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively the lower and upper bounds of validity of the tangent map of $\mathcal{M}$ around $x$.
 After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\ref{eq:optim_problem_on_manifold} become nonlinear in problem~\ref{eq:optim_problem_on_txm}.
 It is then necessary to treat the problem and evaluate which constraint is linear and which is not, in order to go back to a formulation of the same type as in problem~\ref{eq:optim_problem_on_manifold}.
-Basically, for each constraint $c_j$ in problem~\ref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a realspace $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
+Basically, for each constraint $c_j$ in problem~\ref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a real space $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
 Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
 Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
-For example, a linear constraint on the elements of a unit-quaternion, although one can obviously be devised, does not seem to make much sense.
+For example, a linear constraint on the elements of a unit quaternion, although one can obviously be devised, does not seem to make much sense.
 
-In the particular case of linear constraints (and by extension bound constraints) on a submanifold that is a realspace, the constraints on $x$ are transformed into constraints on $z$ as follows:
+In the particular case of linear constraints (and by extension bound constraints) on a submanifold that is a real space, the constraints on $x$ are transformed into constraints on $z$ as follows:
 \begin{equation}
   L_L \leq Ax \leq U_L \ \Rightarrow \ L_L - Ax \leq A\mathbf{z} \leq U_L-Ax
 \end{equation}
@@ -893,7 +893,7 @@ The new iterate that will be considered is:
 \end{equation}
 
 Note that the only additional computation due to the formulation on manifold is the multiplication of the gradients of constraints and cost by the map's gradient at $0$.
-The computation time related to those products can be reduced by taking advantage of the fact that $\nabla \varphi_x(0)$ is block diagonal.
+The computation time related to those products can be reduced by taking advantage of the fact that $\nabla \varphi_x(0)$ is block-diagonal.
 
 \subsection{Trust-region and limit map}
 \label{sub:trust_region_and_limit_map}
@@ -901,14 +901,14 @@ The computation time related to those products can be reduced by taking advantag
 Maps $\varphi_{x}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by solving Problem~(\ref{eq:QP_txm}) should not be outside the validity region of the map.
 We can enforce this by adding the limits of the manifold map to the problem as bound constraints.
 In fact, this comes down to intersecting the original problem's bounds with the limits of the map and imposing the resulting bounds as constraints.
-This leads naturally to trust region methods that we therefore favor over line-search approaches.
+This leads naturally to trust region methods that we, therefore, favor over line-search approaches.
 We present the classical trust-region strategy in Section~\ref{ssec:the_trust_region_strategy}.
 
 In the case of a robotics problem, different variables often have different orders of magnitude, for example, contact forces can be of the order of $100N$ while joint angles are of the order of $1rad$.
 Let $x$ be the variable vector of such problem with $x={[\theta_0, \theta_1, f_0, f_1, f_2]}^T$ where $\theta$ represents an angular variables and $f$ a force.
 The shape of the trust-region should reflect those differences, but we want to keep the simplicity of the classical trust-region strategy.
 For that, we propose to separate the trust-region $\rho$ in two parts: its scale $\rho_\text{scale}$ which is a scalar, and its shape $\rho_\text{shape}$ which in a vector of dimension $n$ (that value is actually stored in the instance of manifold).
-$\rho_\text{shape}$ is set at the beginning of the optimization and remains constant, it represents the size of the trust-region in every directions.
+$\rho_\text{shape}$ is set at the beginning of the optimization and remains constant, it represents the size of the trust-region in every direction.
 In the previous example, we'd get ${\rho_\text{shape}} = {[1,1,100,100,100]}^T$
 And $\rho_\text{scale}$ is the scalar that gets updated in the trust-region strategy.
 
@@ -977,7 +977,7 @@ For each constraint, there are 3 possible situations:
   \bottomrule
 \end{tabular}
 
-Both $\lambda_l$ and $\lambda_u$ cannot be non null at the same time. So for each constraint, we can use a single Lagrange multiplier that is negative when the lower bound is violated or active, null when the constraint is satisfied, and positive when the upper bound is active or violated.
+Both $\lambda_l$ and $\lambda_u$ cannot be nonnull at the same time. So for each constraint, we can use a single Lagrange multiplier that is negative when the lower bound is violated or active, null when the constraint is satisfied, and positive when the upper bound is active or violated.
 This allows to reduce the KKT system to the following:
 
 \begin{equation}
@@ -1101,7 +1101,7 @@ we get:
   \right.
 \end{align}
 
-This system is solved iteratively with updating $\bf z$ (but never changing $x$) with the solution of the previous system and updating the values in $c_i(x+\mathbf{z})$ until a satisfactory $\bf z$ is found.
+This system is solved iteratively by updating $\bf z$ (but never changing $x$) with the solution of the previous system and updating the values in $c_i(x+\mathbf{z})$ until a satisfactory $\bf z$ is found.
 
 \subsection{Hessian update on manifolds}
 \label{sub:hessian_update_on_manifolds}
@@ -1132,6 +1132,42 @@ Defining $L'_k = L_k Q_k {(D'_k)}^{1/2}$, we get a regularized matrix $H'_k = P_
 In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~(\ref{eq:SQPStep}), which directly accepts the factorized form $(P_k, L'_k)$.
 This avoids an internal Cholesky factorization so that our regularization does not add too much time to the overall process of building and solving the QP.\@
 
+\subsection{An alternative Hessian Approximation Update}
+\label{sub:an_alternative_hessian_approximation_update}
+
+In~\cite{Fletcher:ifip:2006}, Fletcher presents a new Hessian update method that maintains and update the Hessian $H$ in the form $H=U U^T$, which is obviously always symmetric and it ensures that it is always positive semi-definite.
+Since a decomposition of $H$ is readily available with this method, we can get rid of the regularization of the Hessian in our algorithm.
+The matrix $U$ of size $(n,m)$ is smaller than $H$ and contains only informations from the last $m$ iteration, this means that this method has a built-in limited memory capability.
+In our robotics problems, using limited memory Hessian updates is useful because along the iteration process, the variables may change a lot, and the Hessian value near the solution may be very different from the one approximated around the first iterations.
+Thus, it can be helpful to `forget' about the old components of the approximation to leave room for the latest ones.
+At each iteration, the matrix $U$ is updated with either BFGS, or SR1, or a hybrid method, based on some tests on the value of the latest step.
+When possible, the SR1 update is preferred, because some results suggest that it allows faster convergence when the SR1 denominator is positive, otherwise, a BFGS or the hybrid method are used.
+For all those reasons, this update method is very attractive.
+We implemented it in our solver, but so far the results have not been very conclusive and some more work will be dedicated to that issue in the future.
+As of now, the best results where observed when using the self-scaling BFGS update method.
+
+\subsection{Hessian Update in Restoration phase}
+\label{sub:hessian_update_in_restoration_phase}
+
+The hessian $H$ computed through whichever method presented above is meant to approximate the value of $\nabla \mathcal{L}_{xx}(x,\lambda) = \nabla f(x) + \lambda^T \nabla c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
+But during the restoration phase, the definitions of $f$ and $c$ change at each iteration, depending on the sets of infeasible and feasible constraints ($\mathcal{I}$ and $\mathcal{F}$).
+In order to account for that change, we propose to compute an approximation of each constraint separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the hessians based on the current set of feasible constraints.
+
+\begin{align}
+  \begin{split}
+    H_f \approx \nabla^2 f\\
+    H_{c_i} \approx \nabla^2 c_i\\
+    H = \sum_{i\in \mathcal{I}}H_{c_i} + \sum_{i\in \mathcal{F}}\lambda_i H_{c_i}
+  \end{split}
+\end{align}
+
+With this definition of $H$, we can ensure the symmetry of $H$, but nothing guarantees its positive definiteness, although each of the underlying $H_i$ are positive semi-definite.
+It is then necessary to regularize $H$ after combining the $H_{c_i}$.
+This allows to have an approximation of the Hessian when exiting the restoration phase, by computing $H = H_f + \sum \lambda_i H_{c_i}$ and regularizing it.
+
+\subsection{Diagrams of the algorithms}
+\label{sub:diagrams_of_the_algorithms}
+
 \begin{figure}[htpb]
   \centering
   \input{Chapter3-Manifolds/Figs/tikzDiagrams/mainSQP}
@@ -1153,6 +1189,24 @@ This avoids an internal Cholesky factorization so that our regularization does n
 \label{fig:second_order_correction}
   \end{minipage}%
 \end{figure}
+
+\subsection{Solver Evaluation}
+\label{sub:solver_evaluation}
+
+We integrated our solver with the Roboptim interface (\href{http://roboptim.net/}{http://roboptim.net/}) to have a common interface as the one used with other solvers that are already interfaced with roboptim and used in our team, like IPOPT, CFSQP, and NAG.
+The roboptim framework provides a list of 71 canonical optimization problems that come from the Hock-Schittkowski-Collection~\cite{Hock1980} that allows to evaluate the rate of success and speed of each solvers.
+Although those problems are all on $\mathbb{R}^n$, thus, do not try the non-Euclidean capabilities of our solver, it is a good way compare its performances with those of other solvers.
+As of now, PGSolver finds a solution for 51 tests out of 72, using its default parameters.
+In the same conditions, IPOPT solves 65 problems, CFSQP 46 and NAG 58.
+This result serves only as indication of the correct behavior of a solver, because default parameters are usually not good and a solver reaches its full potential once its parameters have been tuned for a type of problem.
+Those tests can also be used in a non-regression criterion for our software.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this chapter, we presented the principle of nonlinear optimization on non-Euclidean manifolds, and detailed the choices we made to implement an efficient SQP algorithm that solves those problems efficiently.
+In addition to being used in our posture generation oriented problems, PGSolver has been used successfully in some inertia identification problems as presented in~\cite{traversaro:iros:2016}.
+In the next section we will focus on the formulation of optimization problems for posture generation.
 
 %}}}
 
