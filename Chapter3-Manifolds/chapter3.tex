@@ -30,11 +30,11 @@
       %\item Hessian update on manifolds, notion of vector transport and application to BFGS and SR1 updates
       %\item Computation of distances, notion of logarithm
     %\end{itemize}
-  %\item{Practical Implementation: PGSolver}
+  %\item{Practical Implementation: {\tt PGSolver}}
     %\begin{itemize}
       %\item General SQP algorithm adapted to local parametrization of manifolds.
-      %\item Local QP and resolution with LSSOL
-      %\item Feasibility problems and resolution with LSSOL
+      %\item Local QP and resolution with {\tt LSSOL}
+      %\item Feasibility problems and resolution with {\tt LSSOL}
       %\item Acceptance criterion:
         %\begin{itemize}
           %\item Merit function
@@ -71,7 +71,7 @@
           %\item Second-order correction phase
         %\end{itemize}
     %\end{itemize}
-  %\item{Applications and testings of PGSolver on non-robotic problems}
+  %\item{Applications and testings of {\tt PGSolver} on non-robotic problems}
     %\begin{itemize}
       %\item Point cloud fitting
       %\item Surface parametrisation
@@ -751,7 +751,7 @@ Figure~\ref{fig:uml_manifold} presents a simplified class diagram of this projec
 
 The SQP algorithm presented in Section~\ref{local_sqp_on_manifolds} works locally, \emph{i.e.} when starting close enough to the solution.
 In practice, various refinements are made to ensure convergence from any starting point.
-We detail hereafter our choices.
+We detail hereafter the choices we made for the implementation of our solver called {\tt PGSolver}.
 
 We summarize the entire SQP algorithm in Diagrams~\ref{fig:main_sqp_loop},~\ref{fig:restoration_loop} and~\ref{fig:second_order_correction}, which represent respectively the main SQP loop, the restoration phase and the second order correction algorithm.
 
@@ -759,9 +759,9 @@ We summarize the entire SQP algorithm in Diagrams~\ref{fig:main_sqp_loop},~\ref{
 \label{sub:linear_and_quadratic_problems_resolution}
 
 The central idea of an SQP algorithm is that it solves a series of QP iteratively until a solution is reached.
-There are many off-the-shelf QP solvers available and the state of the art is mature in that field, thus, we decided to use the LSSOL solver~\cite{gill:techrep:1986}.
-LSSOL provides resolution methods for several types of problems and we are interested in using the FP (Feasibility Problem) and QP ones.\@
-The LSSOL framework formulates problems as follows (Note that there are no equality constraints in this formulation):
+There are many off-the-shelf QP solvers available and the state of the art is mature in that field, thus, we decided to use the {\tt LSSOL} solver~\cite{gill:techrep:1986}.
+{\tt LSSOL} provides resolution methods for several types of problems and we are interested in using the FP (Feasibility Problem) and QP ones.\@
+The {\tt LSSOL} framework formulates problems as follows (Note that there are no equality constraints in this formulation):
 
 \begin{align}
   \minimize_{x\in \mathbb{R}^n}\ &{F(x)}\\
@@ -802,7 +802,7 @@ As stated in Eq~\ref{eq:pb_on_SO3} we want to solve a non-linear constrained opt
 \end{align}
 
 The list of constraints can be separated in 3 categories: Bounds, Linear, and Nonlinear.
-For convenience, we formulate our optimization problem in a way that is compatible with LSSOL by changing all equality constraints into inequality constraints:
+For convenience, we formulate our optimization problem in a way that is compatible with {\tt LSSOL} by changing all equality constraints into inequality constraints:
 
 \begin{equation}
   c(x) = 0 \Leftrightarrow 0 \leq c(x) \leq 0
@@ -821,7 +821,8 @@ Our problem can be written as:
 \end{align}
 
 With $L_B$ and $U_B$ being respectively the lower and upper bounds for Bounds constraints, $L_L$ and $U_L$ the lower and upper bounds for Linear constraints, and $L_N$ and $U_N$ the lower and upper bounds for Nonlinear constraints.
-That formulation is convenient and used to define our problem, but since we are solving this problem on a non-Euclidean manifold, we need to re-formulate it around the current iterate $x_i$ at each iteration.
+That formulation is conveniently used to define our problem.
+Since we are solving this problem on a non-Euclidean manifold, we need to re-formulate it around the current iterate $x_i$ at each iteration.
 This is done automatically behind the scene and the user only has to provide the information to build problem~\ref{eq:optim_problem_on_manifold}.
 
 At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ that goes with each appearance of $x$):
@@ -844,6 +845,7 @@ Basically, for each constraint $c_j$ in problem~\ref{eq:optim_problem_on_txm}, i
 Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
 Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
 For example, a linear constraint on the elements of a unit quaternion, although one can obviously be devised, does not seem to make much sense.
+So usually, when a non-Euclidean manifold is involved, the constraint is nonlinear.
 
 In the particular case of linear constraints (and by extension bound constraints) on a submanifold that is a real space, the constraints on $x$ are transformed into constraints on $z$ as follows:
 \begin{equation}
@@ -886,7 +888,7 @@ The QP to solve at each iteration is the following:
   \end{split}
 \end{align}
 
-The resolution of this QP~\ref{eq:QP_txm} (with LSSOL) gives the optimal solution $\mathbf{z}^*$ and Lagrange multipliers $\lambda^*$.
+The resolution of this QP~\ref{eq:QP_txm} (with {\tt LSSOL}) gives the optimal solution $\mathbf{z}^*$ and Lagrange multipliers $\lambda^*$.
 The new iterate that will be considered is:
 \begin{equation}
   x_{k+1}\leftarrow \varphi_{x_k}(\mathbf{z}^*)
@@ -929,8 +931,8 @@ Our algorithm is an adaptation of Fletcher's filter SQP~\cite{fletcher:mathprog:
 \subsection{Convergence criterion}
 \label{sub:convergence_criterion}
 
-An iterate $\{x,\lambda\}$ is considered to be a solution of the optimization problem is it satisfies the first-order optimality conditions (presented in Section~\ref{sub:optimality_conditions}) to within certain tolerances.
-We use the same criterion as the one presented in~\cite{gill:snopt:2002}.
+An iterate $\{x,\lambda\}$ is considered to be a solution of the optimization problem if it satisfies the first-order optimality conditions (presented in Section~\ref{sub:optimality_conditions}) to within certain tolerances.
+We use the same criterion as the one used in \href{http://www.sbsi-sol-optimize.com/asp/sol_product_snopt.htm}{{\tt SNOPT}} and presented in~\cite{gill:snopt:2002}.
 It has the advantage of using two different tolerance constants: $\tau_P$ monitores the primal optimality conditions, which means the satisfaction of the constraints, and $\tau_D$ monitores the dual conditions, which means the optimality of the cost function and of the Lagrange multipliers.
 That gives the user more control over the quality of the solution.
 
@@ -1038,7 +1040,7 @@ The basic idea is the following: At the beginning of an iteration, we estimate a
 The infeasible constraints are removed from the restoration problems constraints list and their violation is added to its cost function (that becomes the sum of all constraints violation).
 Then the restoration problem only contains feasible constraints and has to minimize the sum of constraint violation.
 That is done by iterating just like in the SQPs main loop with the difference that at each iteration, we update the problem based on a new list of infeasible constraints.
-The restoration phase has its own filter called the restoration filter (RF) and trust region.
+The restoration phase has its own filter called the restoration filter.
 For more details on the restoration phase, see Section~\ref{sub:restoration_phase}.
 
 Note that each iteration of the main SQP algorithm starts with the resolution of an FP (Feasibility Problem), that consists of the same linearized constraints as the QP problem~\ref{eq:QP_txm} without cost function.
@@ -1066,9 +1068,9 @@ Then the optimization can continue.
 \subsection{Second Order Correction}
 \label{sub:second_order_correction}
 
-In the event where a step proposed in the restoration process by the resolution of the restoration QP is refused by the restoration filter RF, instead of immediately reducing the size of the trust region, we can perform a Second Order Correction Step.
+In the event where a step proposed in the restoration process by the resolution of the restoration QP is refused by the restoration filter, instead of immediately reducing the size of the trust region, we can perform a Second Order Correction Step.
 
-The idea is to re-solve a QP after its solution $\mathbf{z}$ has been refused by RF, but with a better approximation (second order) of the constraints:
+The idea is to re-solve a QP after its solution $\mathbf{z}$ has been refused by the restoration filter, but with a better approximation (second order) of the constraints:
 
 \begin{equation}
   c_i(x+{\bf z}) = c_i(x) + {\nabla c_i(x)}^T {\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z}
@@ -1142,6 +1144,10 @@ In our robotics problems, using limited memory Hessian updates is useful because
 Thus, it can be helpful to `forget' about the old components of the approximation to leave room for the latest ones.
 At each iteration, the matrix $U$ is updated with either BFGS, or SR1, or a hybrid method, based on some tests on the value of the latest step.
 When possible, the SR1 update is preferred, because some results suggest that it allows faster convergence when the SR1 denominator is positive, otherwise, a BFGS or the hybrid method are used.
+
+Although this method provides a decomposition of $H$ as $U U^T$, $U$ is not trapezoidal, so we need to apply a QR on it so that we get $U=QR$, then $H=Q R R^T Q^T=Q Q^T$ with Q trapezoidal and R an orthogonal matrix.
+Then Q can be fed to {\tt LSSOL} directly.
+
 For all those reasons, this update method is very attractive.
 We implemented it in our solver, but so far the results have not been very conclusive and some more work will be dedicated to that issue in the future.
 As of now, the best results where observed when using the self-scaling BFGS update method.
@@ -1151,7 +1157,7 @@ As of now, the best results where observed when using the self-scaling BFGS upda
 
 The hessian $H$ computed through whichever method presented above is meant to approximate the value of $\nabla \mathcal{L}_{xx}(x,\lambda) = \nabla f(x) + \lambda^T \nabla c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
 But during the restoration phase, the definitions of $f$ and $c$ change at each iteration, depending on the sets of infeasible and feasible constraints ($\mathcal{I}$ and $\mathcal{F}$).
-In order to account for that change, we propose to compute an approximation of each constraint separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the hessians based on the current set of feasible constraints.
+In order to account for that change, we propose to compute an approximation of each constraints second derivative separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the hessians based on the current set of feasible constraints.
 
 \begin{align}
   \begin{split}
@@ -1163,10 +1169,29 @@ In order to account for that change, we propose to compute an approximation of e
 
 With this definition of $H$, we can ensure the symmetry of $H$, but nothing guarantees its positive definiteness, although each of the underlying $H_i$ are positive semi-definite.
 It is then necessary to regularize $H$ after combining the $H_{c_i}$.
-This allows to have an approximation of the Hessian when exiting the restoration phase, by computing $H = H_f + \sum \lambda_i H_{c_i}$ and regularizing it.
+This also allows to have an approximation of the Hessian when exiting the restoration phase, by computing $H = H_f + \sum \lambda_i H_{c_i}$ and regularizing it.
 
-\subsection{Diagrams of the algorithms}
-\label{sub:diagrams_of_the_algorithms}
+
+\subsection{Solver Evaluation}
+\label{sub:solver_evaluation}
+
+We integrated our solver with the Roboptim framework (\href{http://roboptim.net/}{http://roboptim.net/}) to have a common interface with other solvers that are already interfaced with roboptim and used in our team, like {\tt IPOPT}, {\tt CFSQP}, and {\tt NAG}.
+The roboptim framework provides a list of 72 canonical optimization problems that come from the Hock-Schittkowski-Collection~\cite{Hock1980} that allows to evaluate the rate of success and speed of each solvers.
+Although those problems are all on $\mathbb{R}^n$, thus, do not try the non-Euclidean capabilities of our solver, it is a good way compare its performances with those of other solvers.
+As of now, {\tt PGSolver} finds a solution for 51 tests out of 72, using its default parameters.
+In the same conditions, {\tt IPOPT} solves 65 problems, {\tt CFSQP} 46 and {\tt NAG} 58.
+This result serves only as indication of the correct behavior of a solver, because default parameters are usually not good and a solver reaches its full potential once its parameters have been tuned for a type of problem.
+Those tests can also be used in a non-regression criterion for our software.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this chapter, we presented the principle of nonlinear optimization on non-Euclidean manifolds, and detailed the choices we made to implement an SQP algorithm that solves those problems efficiently.
+In addition to being used in our posture generation problems, {\tt PGSolver} has been used successfully in some inertia identification problems as presented in~\cite{traversaro:iros:2016}.
+In the next section we will focus on the formulation of optimization problems for posture generation.
+
+\section{Diagrams of the algorithms}
+\label{sec:diagrams_of_the_algorithms}
 
 \begin{figure}[htpb]
   \centering
@@ -1189,24 +1214,6 @@ This allows to have an approximation of the Hessian when exiting the restoration
 \label{fig:second_order_correction}
   \end{minipage}%
 \end{figure}
-
-\subsection{Solver Evaluation}
-\label{sub:solver_evaluation}
-
-We integrated our solver with the Roboptim interface (\href{http://roboptim.net/}{http://roboptim.net/}) to have a common interface as the one used with other solvers that are already interfaced with roboptim and used in our team, like IPOPT, CFSQP, and NAG.
-The roboptim framework provides a list of 71 canonical optimization problems that come from the Hock-Schittkowski-Collection~\cite{Hock1980} that allows to evaluate the rate of success and speed of each solvers.
-Although those problems are all on $\mathbb{R}^n$, thus, do not try the non-Euclidean capabilities of our solver, it is a good way compare its performances with those of other solvers.
-As of now, PGSolver finds a solution for 51 tests out of 72, using its default parameters.
-In the same conditions, IPOPT solves 65 problems, CFSQP 46 and NAG 58.
-This result serves only as indication of the correct behavior of a solver, because default parameters are usually not good and a solver reaches its full potential once its parameters have been tuned for a type of problem.
-Those tests can also be used in a non-regression criterion for our software.
-
-\section{Conclusion}
-\label{sec:conclusion}
-
-In this chapter, we presented the principle of nonlinear optimization on non-Euclidean manifolds, and detailed the choices we made to implement an efficient SQP algorithm that solves those problems efficiently.
-In addition to being used in our posture generation oriented problems, PGSolver has been used successfully in some inertia identification problems as presented in~\cite{traversaro:iros:2016}.
-In the next section we will focus on the formulation of optimization problems for posture generation.
 
 %}}}
 
