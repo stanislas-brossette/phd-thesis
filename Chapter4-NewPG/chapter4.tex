@@ -58,7 +58,7 @@ Most constraints are geometric.
 In order to simplify the writing of functions, we use a dedicated system of expression graph encapsulated in a set of geometric objects.
 The main idea is to separate the purely mathematical logic from the geometric one.
 As an example if $P_r$ and $\overrightarrow{V_r}$ are a point and a vector attached to the camera of the robot, and $P_e$ is a fixed point in the environment, the constraint $(P_e - P_r)\cdot \overrightarrow{V_r} = 0$ can be used to have the robot look at $P_e$.
-With our system, the user creates only those objects and write the code {\tt (Pe-Pr).dot(Vr)} to get the value needed.
+With our system, the user creates only those objects and write the code {\tt (Pe-Pr).dot(Vr)} to create the needed function.
 The geometric layer takes care that all the quantities are expressed in the correct frame, the mathematical layer performs the corresponding operations.
 If $q$ is a variable object, {\tt (Pe-Pr).dot(Vr).diff(q)} returns automatically the differential of the expression w.r.t. $q$. This makes the writing of the constraints very easy.
 
@@ -80,18 +80,34 @@ We denote $\dim(x)$ the dimension of expression $x$.
 The value of expressions $A$ or $B$ are obtained by respectively calling the methods {\tt A.value()} and {\tt B.value()}.
 The derivative of $A$ with respect to itself is obtained by calling the method {\tt A.diff(A)} and returns an Identity matrix of size $\dim(A)$.
 Whereas the derivative of $A$ w.r.t $B$ returns a zero matrix with $\dim(A)$ rows and $\dim(B)$ columns.
-\begin{equation}
+\begin{equation}\nonumber
   \frac{\partial A}{\partial A} = \mathbf{1}_{\dim(A)}, \quad \frac{\partial A}{\partial B} = \mathbf{0}_{\dim(A),\dim(B)}
 \end{equation}
 
-Each operator on expressions is also defined as an expression, thus, it also defines {\tt value} and {\tt diff} methods.
-For example, let us consider that $A$ and $B$ are 3D coordinate expressions and a new expression $C = A\cdot B$ that is defined as the dot product of $A$ and $B$.
-The value and the derivative of $C$ w.r.t any $x$ expression are computed by:
+Each operator on expressions is defines its resulting expression, thus, it defines a {\tt value} and a {\tt diff} methods.
+For example, let us consider that $A$ and $B$ are 3D coordinate expressions and a new expression $C = A\cdot B$ that is defined as the dot product of $A$ and $B$, in code, one could write C's definition as simply:
+\begin{center}
+{\tt Scalar C = dot(A,B)}.
+\end{center}
+The value and the derivative of $C$ w.r.t any $x$ expression are then automatically computed as follows:
 \begin{equation}
+\label{eq:dot}
   C = A\cdot B,\quad \frac{\partial C}{\partial x} = A^T\frac{\partial B}{\partial x} + B^T\frac{\partial A}{\partial x}
 \end{equation}
+
+%\begin{table}
+%\begin{tabular}{cc}
+  %\toprule
+  %$C = A\cdot B$ & {\tt C.value() = dot(A.value() + B.value())} \\
+  %\midrule
+  %$\frac{\partial C}{\partial x} = A^T\frac{\partial B}{\partial x} + B^T\frac{\partial A}{\partial x}$ & {\tt C.diff(x) = A.value().transpose()*B.diff(x) \\ + B.value().transpose()*A.diff(x)} \\
+  %\bottomrule
+%\end{tabular}
+%\end{table}
+
+And the code of the dot function that translates eq:~\ref{eq:dot} that is pretty straightforward:
 \begin{center}
-{\tt C.value() = dot(A.value() + B.value())\\
+{\tt C.value() = A.value().dot(B.value())\\
 C.diff(x) = A.value().transpose()*B.diff(x) \\ + B.value().transpose()*A.diff(x)}
 \end{center}
 
@@ -114,7 +130,8 @@ Basic operations are defined between those features (when applicable).
 For example, the subtraction between two Points gives a Vector.
 The geometric logic resides in the change of frame and those operations.
 
-Based on that expression system, the robot can simply be represented as a function that keeps track and updates the transformations of the frames of all its bodies, with respect to an Array expression on entry, its articular parameters.
+Based on that expression system, the robot's geometry can simply be represented by a set of frames representing all its links, and functions that keeps track and updates the transformations of the frames of all its bodies, with respect to an Array expression on entry, its articular parameters.
+The forward kinematics algorithm~\ref{alg:FK} and the jacobian computation algorithm~\ref{alg:jacobian_computation} are used to define those functions.
 For a given articular parameter array, the user can query the frame of any body on the robot, and by composition, the user can query any feature defined on a frame of the robot, as well as its derivatives.
 This tools allows for a simplified writting of robotics constraints as a combination of operations on geometric features, without worrying about the vectors and matrix beneath and without having to write the derivatives.
 
@@ -131,6 +148,8 @@ And in the case of a scalar expression like $(P_e - P_r)\cdot \overrightarrow{V_
 \begin{center}
 {\tt(P\_h - P\_e).dot(V) = 0}.
 \end{center}
+
+This mathematical and geometric expression framework simplifies the task of the constraints developers and helps avoiding calculation mistakes.
 
 \section{Automatic mapping}
 \label{sec:automatic_mapping}
