@@ -697,7 +697,7 @@ We first write algorithm~\ref{alg:IS} in its matrix form.
 
 \begin{algorithm}
   \caption{Inverse Static algorithm on Matrix Form}
-\label{ISmatrix}
+\label{alg:ISmatrix}
 \begin{algorithmic}
   \For{$i = 0:n_B$}\\
   $f^G_i =
@@ -788,7 +788,7 @@ Note the following relations that make use of the robot's Jacobian to compute de
   + {}^i\mathbf{R}_W \widehat{\left(\widehat{{}^i\mathbf{t}_W}\mathbf{u}\right)} \omega_{i,j}
 \end{align}
 
-Let's differentiate the first equation of~\ref{ISmatrix} w.r.t $q_j$.
+Let's differentiate the first equation of~\ref{alg:ISmatrix} w.r.t $q_j$.
 
 \begin{align}
   A &=
@@ -943,11 +943,11 @@ In the following algorithm, we use the following notation $x$ to combine the var
 \end{equation}
 
 
-The entire algorithm for calculating the torque jacobian is presented in Algorithm~\ref{TJC}.
+The entire algorithm for calculating the torque jacobian is presented in Algorithm~\ref{alg:TJC}.
 
 \begin{algorithm}[htpb*]
 \caption{Torque Jacobian Calculation}
-\label{TJC}
+\label{alg:TJC}
 \begin{algorithmic}
   \State{Compute the Jacobian of generalized forces}
   \For{$i = 0:n_B$}

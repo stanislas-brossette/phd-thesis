@@ -71,7 +71,7 @@ At the mathematical level, we consider 5 types of expressions which can be eithe
   \item Array, a dynamic size array
 \end{itemize}
 The meaningful unary (inverse, opposite, norm\ldots) and binary (multiplication, addition, subtraction, dot product\ldots) operations (with their derivatives by chain rule) are implemented.
-We also have a Function class for more complicated expressions, for example expressing $q \mapsto T_i(q)$ where $T_i$ is the transformation between the reference frame of the robot and the frame of its $i$-th body~\footnote{The kinematics of rigid body systems is handled by the RBDyn library (\url{https://github.com/jorisv/RBDyn})}.
+We also have a Function class for more complicated expressions, for example expressing $q \mapsto T_i(q)$ where $T_i$ is the transformation between the reference frame of the robot and the frame of its $i$-th body~\footnote{The kinematics of rigid body systems is handled by the RBDyn library (\url{git@github.com:jrl-umi3218/RBDyn.git})}.
 The combinations of those elementary operations defines a computation graph, just like in many symbolic calculation frameworks.
 
 Each expression is able to compute its own value and the value of its derivative with respect to another expression.
@@ -140,7 +140,7 @@ We define a point $P_h$ on the body {\tt R\_HAND} of a robot and a point $P_e$ i
 We want to write a constraint that ensures that $P_h$ and $P_e$ are superimposed.
 We can write that constraint by requiring that all the vector defined by $V = P_h - P_e$ is null.
 Which means that the 3 elements of the expression of $V$ in a given frame $F$ are null.
-We can simply write that as
+We can simply write that as:
 \begin{center}
 {\tt(P\_h - P\_e).coord(F) = 0}.
 \end{center}
@@ -184,17 +184,6 @@ This idea is illustrated by the example in Fig.~\ref{fig:auto_map}
 \label{fig:auto_map}
 \end{figure}
 
-\section{Problem Generator}
-\label{problem_generator}
-
-The problem generator is the tool constructing the optimization problem.
-It registers all the variables and the functions related to a given problem.
-Each function is likely to bring additional variables with it.
-For each contact contributing to the balance, a variable on $\mathbb{R}^3$ representing the contact force is added to the problem.
-The associated wrench is added to the stability constraints.
-Once the registration is complete, the complete manifold of the problem is generated and uses the information of the Automatic mapping to `plug' each function with the correct sub-manifold.
-Subsequently, the optimization problem can be generated and passed to the solver.
-The communication between the solver and the generated problem is made through the RobOptim framework\footnote{\url{http://www.roboptim.net/}}~\cite{moulard:jsme:2013, moulard:jrsj:2014}.
 
 \section{Problem formulations}
 \label{sec:problem_formulations}
@@ -203,7 +192,7 @@ Let $q=[q_F^T; q_r^T]\in\mathbb{R}^3\times SO(3)\times \mathcal{M}_r$ be the com
 Let $\mathcal{W}_i(p)=\{f_i,m_i(p)\}$ be the wrench (force+moment) applied by the environment onto the robot at contact $i$ and expressed on point $p$.
 A frame $F$ is composed of a reference point and an orthonormal basis of 3 vectors $F = \{O, (x, y, z)\}$.
 
-Here is a list of constraints that we consider in our problem (implementation of other ones is on-going):
+Here is a list of constraints that we consider in our problem:
 \begin{itemize}
 \item Joint limits ${q^-} \leq q_r \leq {q^+}$:\\
 These cannot be directly translated on manifolds other than $\mathbb{R}^n$.
@@ -245,20 +234,108 @@ We write it as~\ref{eq:friction} (with $\mu$ the friction coefficient)
   \end{split}
   \label{eq:friction}
 \end{equation}
+
+\item The collision avoidance constraint can be defined between any two bodies.
+A convex mesh is attached to each body involved in the constraint.
+We denote them $C_1$ and $C_2$.
+We use the {\tt sch-core} library described in~\cite{benallegue:icra:2009} to compute the distance $d(C_1,C_2)$ between the 2 convex shapes and its derivative.
+A description of strictly convex hulls that can be used for this purpose is detailed in ~\cite{escande:itro:2014}.
+For each collision avoidance constraint, we require that the distance between the two convex remains superior to a minimal distance $d_{\min}$
+\begin{equation}
+  d(C_1, C_2)\geq d_{\min}
+\end{equation}
+
+\item The torque limit constraint makes use of the Inverse Statics algorithm~\ref{alg:ISmatrix} to compute the torques in all the joints of each robots and their derivatives are computed by algorithm~\ref{alg:TJC}.
+Denoting $\tau_i$ the torque in joint $i$ resulting from the robot's configuration and the external forces applied on it, its lower and upper limits as $\tau_i^-$ and $\tau_i^+$, the torque limit constraint writes as follows:
+\begin{equation}
+  \forall i,\ \tau_i^- \leq \tau_i \leq \tau_i^+
+\end{equation}
 \end{itemize}
 
 The frame in which the constraints are written matters critically.
 Most often, the frame's configuration depends on a part of the optimization variables, that must be accounted for in computing the constraints' Jacobian.
 Our framework computes such dependencies automatically.
 
-Our current PG (i.e.\ coding state) does not include yet collisions and auto-collisions, nor torque limits.
-Their implementation is on-going and is simply the matter of coding time.
-Another important part is its cost function.
-We only mention the cost function that have specificities when dealing with manifolds, the distance to a reference posture $q_0$.
-On a robot that has all its articulations parametrized on $\mathbb{R}$ the distance can be expressed simply with the Euclidean norm $d = \norm{q_j-q_0}^2$.
+Another important part is the problem's cost function.
+Any function of the problem's variables with a scalar return value can be used as a cost function.
+In our formulation, we take a sum of cost functions into account, several different functions $f_i$ over different variables can be defined separately.
+And then combined in a weighted sum in the problem's cost function(with $w_i$ the weight of function $f_i$):
+\begin{equation}
+  cost = \sum\limits_i w_i f_i
+\end{equation}
+Taking advantage of our framework, the set of variables over which the cost function is defined, its value and its derivatives are then computed automatically.
+
+A typical cost function is the distance to a reference posture $q_0$.
+On a robot that has all its articulations parametrized on $\mathbb{R}$ the distance can be expressed simply with the Euclidean norm $d = \norm{q_r-q_0}^2$.
 Since we work on non-Euclidean manifolds, the logarithm function on the manifold must be used.
 It gives the distance vector between two points in the tangent space, the norm of this vector can be used as a distance.
-So we get $d = \norm{\text{log}_{q_0}(q_r)}^2$.
+So we get $d = \norm{\text{log}_{q_0}(q_r)}^2$ (note that on $\mathbb{R}^n$, $\norm{\text{log}_{q_0}(q_r)}^2 = \norm{q_r - q_0}^2$ )
+
+We can also use the cost function to set a target value $v$ for the value of a contact force $\vec{F}$ in a given direction $d$. By simply implementing the following function:
+\begin{equation}
+  f = \norm{\vec{F}\cdot\vec{d}-v}
+\end{equation}
+
+The list of constraints and cost functions that can be used in robotics posture generation problems can be extended, and this process is made easier by our framework.
+
+\section{Implementation of a posture generation problem}
+\label{sec:implementation_of_a_posture_generation_problem}
+
+In this section, we provide an overview of the implementation of posture generation problems using our framework. We describe some of the key elements of the framework and then present the implementation of a problem.
+
+\paragraph{Problem's configuration:}
+The implementation of a posture generation problem is made through a combination of a c++ implementation of the core structure of the problem and a text file in yaml format that configures the problem and is parsed at runtime to avoid having to recompile the problem for every configuration's change.
+%We use two types of configuration files:
+%\begin{itemize}
+  %\item A default configuration file contains all the usual data, like the paths to robots description directories, as well as some data about each robot, like the lists of usual self-collisions used per robot, etc\ldots\\ {\tt problem-generator/configs/problemGeneratorConfig.yml.in}
+  %\item A problem specific configuration file that contains all the data necessary to describe the problem, like the list of robots, the location of some geometric features, some solver parameters, the choice for a robot to have a fixed basis, or torque limits and anything else that can help specify the problem.
+%\end{itemize}
+
+\paragraph{The Robot class:}
+%It is instanciated from a Robot::Init structure that contains all the necessary data for its construction.
+%Which includes its name, its urdf path, the path of its collision meshes, some booleans defining if the robot is fixed, has torque limits, etc\ldots
+%On instanciation of a robot, we use this urdf to instanciate the RBDyn objects that are used to compute the Forward Kinematics and Inverse Statics of the robot: a MultiBody, a MultiBodyGraph and a MultiBodyConfig, as well as its joint, torque limits, and the manifold in which the variables of the robot live.
+%The robot object is equipped with an external\_forces object that handles the external forces applied to it, and a torques object that handles its joint torques.
+%A Frame is created on each of the bodies of the robot.
+%A set of pre-defined surfaces on bodies can be loaded from an rsdf file.
+%A set of collision convex meshes attached to the bodies of the robot is created based on a provided list of mesh files.
+%The configuration of a robot depends on its articular parameters, to hanble that, the robot object contains an update method that runs the Forward Kinematics algorithm and updates the transformations of each body and its jacobian, which, by extension updates the its body frames. Every body frames get their transformation's values and derivatives from those quantities.
+The RBDyn library contains all the low level tools and algorithm to compute the physics of a robot.
+The robot class is built on top of RBDyn to provide high level functionalities while adapting it to our manifold formalism (which RBDyn does not handle natively).
+The basic structure of the robot is extracted from its urdf description file.
+The main functionality of the robot class is to create a Frame attached to each of its bodies and to update their transformations and derivatives based on the robots articular variables.
+It also maintains the transformations of all the collision meshes, and contains the joint and torque limits, as well as the manifold on which its variables live.
+Additionally, it contains some useful objects used to maintain and update the external forces applied on the robot, as well as the joint torques.
+
+\paragraph{The Function Class:}
+The functions that we use derivate from the Roboptim's functions.
+As such, they are able to compute their return value and derivative based on an input.
+
+\paragraph{The Constraint class:}
+A constraint is a function accompanied by its application manifold, bounds and scaling factors.
+It is convenient to use a function built by our expression framework here, to take advantage of their automatic derivation and variables.
+Every constraint has a geometric part and a stability part that are added separately to the problem.
+The stability part is mainly used to add contact forces.
+
+\paragraph{The Frame Constraint class:}
+It describes a very useful type of constraint between two frames $F_1$ and $F_2$.
+It terms of geometry, the canonical constraints one can enforce between two frames consist in blocking each of the 6 degrees of freedom of $F_2$ w.r.t $F_1$, e.g. blocking the translation and rotations along each axis.
+We can combine any set those canonical constraints to emulate any typical joint type between the two frames (fixed, planar, spherical, etc...).
+Any type of wrench can be composed the same way from the canonical wrenches (forces along each axis and moment along each axis).
+On top of those geometric and stability parts of that constraint, custom additional constraints can be added to it, for example requiring $O_2$ to be inside a polygon defined in $F_1$, or requiring that the forces generated by that constraint remain in their Coulomb friction cones.
+
+\paragraph{The PostureProblem class:}
+The PostureProblem class is in charge of building the complete optimization problem that represents our posture generation problem.
+It creates and owns the robots present in the problem.
+It registers all the variables and constraints of the problem as well as all the functions involved in the cost function.
+Each function is likely to bring additional variables with it.
+For each contact contributing to the balance, a variable representing the contact force is added to the problem.
+The associated wrench is added to the stability constraints.
+Once the registration is complete, the complete manifold of the problem is generated and uses the information of the Automatic mapping to `plug' each function with the correct sub-manifold.
+Subsequently, the optimization problem can be generated and passed to the solver.
+The communication between the solver and the generated problem is made through the RobOptim framework\footnote{\url{http://www.roboptim.net/}}~\cite{moulard:jsme:2013, moulard:jrsj:2014}.
+After creating the complete manifold, the PostureProblem class can be used to facilitate the individual initialization of all the separate variables of the problem without the user having to worry about the indexes.
+Finally, it can query the resolution of the problem by the solver and return the result.
 
 
 %FROM HERE IT IS OLD TEXT
