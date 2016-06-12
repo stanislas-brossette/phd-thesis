@@ -1,10 +1,11 @@
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Fourth Chapter                            %
 %                       New Posture Generation                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{New Posture Generation}
+
+\graphicspath{{Chapter4-NewPG/Figs/}}
 
 %\section{List of contributions}
 %\begin{itemize}
@@ -51,6 +52,10 @@ In our PG, we propose an architecture automating most of the problematic tasks, 
 \end{itemize}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                        GEOMETRIC EXPRESSIONS                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Geometric expressions}
 \label{sec:geometric_expressions}
 
@@ -58,9 +63,9 @@ Most constraints are geometric.
 In order to simplify the writing of functions, we use a dedicated system of expression graph encapsulated in a set of geometric objects.
 The main idea is to separate the purely mathematical logic from the geometric one.
 As an example if $P_r$ and $\overrightarrow{V_r}$ are a point and a vector attached to the camera of the robot, and $P_e$ is a fixed point in the environment, the constraint $(P_e - P_r)\cdot \overrightarrow{V_r} = 0$ can be used to have the robot look at $P_e$.
-With our system, the user creates only those objects and write the code {\tt (Pe-Pr).dot(Vr)} to create the needed function.
+With our system, the user creates only those objects and write the code \texttt{(Pe-Pr).dot(Vr)} to create the needed function.
 The geometric layer takes care that all the quantities are expressed in the correct frame, the mathematical layer performs the corresponding operations.
-If $q$ is a variable object, {\tt (Pe-Pr).dot(Vr).diff(q)} returns automatically the differential of the expression w.r.t. $q$. This makes the writing of the constraints very easy.
+If $q$ is a variable object, \texttt{(Pe-Pr).dot(Vr).diff(q)} returns automatically the differential of the expression w.r.t. $q$. This makes the writing of the constraints very easy.
 
 At the mathematical level, we consider 5 types of expressions which can be either variables or constants:
 \begin{itemize}
@@ -84,8 +89,8 @@ Whereas the derivative of $A$ w.r.t $B$ returns a zero matrix with $\dim(A)$ row
   \frac{\partial A}{\partial A} = \mathbf{1}_{\dim(A)}, \quad \frac{\partial A}{\partial B} = \mathbf{0}_{\dim(A),\dim(B)}
 \end{equation}
 
-Each operator on expressions is defines its resulting expression, thus, it defines a {\tt value} and a {\tt diff} methods.
-For example, let us consider that $A$ and $B$ are 3D coordinate expressions and a new expression $C = A\cdot B$ that is defined as the dot product of $A$ and $B$, in code, one could write C's definition as simply:
+Each operator on expressions defines its resulting expression, thus, it defines a {\tt value} and a {\tt diff} methods.
+For example, let us consider that $A$ and $B$ are 3D coordinate expressions and a new expression $C = A\cdot B$ that is defined as the dot product of $A$ and $B$, in code, one can write C's definition as simply:
 \begin{center}
 {\tt Scalar C = dot(A,B)}.
 \end{center}
@@ -105,14 +110,14 @@ The value and the derivative of $C$ w.r.t any $x$ expression are then automatica
 %\end{tabular}
 %\end{table}
 
-And the code of the dot function that translates eq:~\ref{eq:dot} that is pretty straightforward:
+The code of the dot function that translates eq:~\ref{eq:dot} that is pretty straightforward:
 \begin{center}
 {\tt C.value() = A.value().dot(B.value())\\
 C.diff(x) = A.value().transpose()*B.diff(x) \\ + B.value().transpose()*A.diff(x)}
 \end{center}
 
+It is easy to extend the capabilities of this framework by implementing additional operations.
 By following this approach, we can easily compute the values and derivatives of expressions that are the outcome of complex arithmetic trees.
-And it is easy to extend the capabilities of this framework by implementing additional operations.
 At the time when I am writing those lines, the following binary operators are available: cross product, dot product, classic product, addition, substraction, transformation.
 And the following unary operators are available: component extraction, inverse, norm, rotation, squareroot, transformation and vectorization.
 
@@ -135,10 +140,10 @@ The forward kinematics algorithm~\ref{alg:FK} and the jacobian computation algor
 For a given articular parameter array, the user can query the frame of any body on the robot, and by composition, the user can query any feature defined on a frame of the robot, as well as its derivatives.
 This tools allows for a simplified writting of robotics constraints as a combination of operations on geometric features, without worrying about the vectors and matrix beneath and without having to write the derivatives.
 
-Let us consider a simple constraint and how it can be written in this framework:
-We define a point $P_h$ on the body {\tt R\_HAND} of a robot and a point $P_e$ in the environment.
+Let us consider a simple constraint and its expression in this framework:
+We define a point $P_h$ on a body of a robot and a point $P_e$ in the environment.
 We want to write a constraint that ensures that $P_h$ and $P_e$ are superimposed.
-We can write that constraint by requiring that all the vector defined by $V = P_h - P_e$ is null.
+We can write that constraint by requiring that the vector defined by $V = P_h - P_e$ is null.
 Which means that the 3 elements of the expression of $V$ in a given frame $F$ are null.
 We can simply write that as:
 \begin{center}
@@ -149,7 +154,13 @@ And in the case of a scalar expression like $(P_e - P_r)\cdot \overrightarrow{V_
 {\tt(P\_h - P\_e).dot(V) = 0}.
 \end{center}
 
-This mathematical and geometric expression framework simplifies the task of the constraints developers and helps avoiding calculation mistakes.
+This mathematical and geometric expression framework simplifies the task of the constraints developers.
+And it helps avoiding calculation mistakes, because we only ever need to write the code for elementary functions and their combination is computed automatically by chain rule.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                          AUTOMATIC MAPPING                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Automatic mapping}
 \label{sec:automatic_mapping}
@@ -179,39 +190,59 @@ This idea is illustrated by the example in Fig.~\ref{fig:auto_map}
 \centering
   \centering
   \setlength\fboxsep{0pt}
-  \includegraphics[width=.5\linewidth]{Chapter4-NewPG/Figs/auto_mapping_text.pdf}
+  \includegraphics[width=.5\linewidth]{auto_mapping_text.pdf}
 \caption{automatic variable mapping}
 \label{fig:auto_map}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                        PROBLEM FORMULATION                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Problem formulations}
 \label{sec:problem_formulations}
 
 Let $q=[q_F^T; q_r^T]\in\mathbb{R}^3\times SO(3)\times \mathcal{M}_r$ be the combination of the free-flyer of the robot $q_F\in \mathbb{R}^3 \times SO(3)$ and the articular parameters $q_r\in\mathcal{M}_r$.
 Let $\mathcal{W}_i(p)=\{f_i,m_i(p)\}$ be the wrench (force+moment) applied by the environment onto the robot at contact $i$ and expressed on point $p$.
-A frame $F$ is composed of a reference point and an orthonormal basis of 3 vectors $F = \{O, (x, y, z)\}$.
+A frame $F$ is composed of a reference point and an orthonormal basis of 3 vectors $F = \{O, (\vec{x}, \vec{y}, \vec{z})\}$.
 
 Here is a list of constraints that we consider in our problem:
 \begin{itemize}
 \item Joint limits ${q^-} \leq q_r \leq {q^+}$:\\
-These cannot be directly translated on manifolds other than $\mathbb{R}^n$.
-For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, then the $S2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds.
+  These cannot be directly translated on manifolds other than $\mathbb{R}^n$.
+  For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, then the $S2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds.
 \item The contact constraint consists in identifying the features of two frames $F_1$ and $F_2$.
-For example, for a planar contact, we get the set of equation~\ref{eq:planar_contact}.
+  For example, for a planar contact, we get the set of equation~\ref{eq:planar_contact}.
 
-\begin{equation}
-  \begin{split}
+  \begin{equation}
+  \left\{
+  \begin{array}{ll}
     \overrightarrow{O_1O_2}\cdot\vec{z_1} = 0\\
     \vec{z_2}\cdot\vec{z_1} \leq 0 \\
     \vec{z_2}\cdot\vec{x_1} = 0 \\
     \vec{z_2}\cdot\vec{y_1} = 0
-  \end{split}
+  \end{array}
+  \right.
   \label{eq:planar_contact}
-\end{equation}
+  \end{equation}
 
-Note that on $F_2$ only the point $O_2$ and the vector $z_2$ are necessary.
-Other types of contacts can be created that way, by equalizing other features, as explained in~\cite{escande:ras:2013}.
+  Note that on $F_2$ only the point $O_2$ and the vector $\vec{z_2}$ are necessary.
+  Other types of contacts can be created that way, by equalizing other features, as explained in~\cite{escande:ras:2013}.
+  For example, we can fix the contact to a given position and orientation by adding to it the following set of equation~\ref{eq:fix_planar_contact} that locks the degrees of freedom of rotation around the normal and translation in the tangent plane of the contact:
+
+  \begin{align}
+  \left\{
+  \begin{array}{ll}
+    \overrightarrow{O_1O_2} \cdot \vec{x_1} = 0 \\
+    \overrightarrow{O_1O_2} \cdot \vec{y_1} = 0 \\
+    \vec{y_2} \cdot \vec{x_1} = 0 \\
+    \vec{x_2} \cdot \vec{y_1} = 0
+  \end{array}
+  \right.
+  \label{eq:fix_planar_contact}
+  \end{align}
+
+  Those two sets of equations \ref{eq:planar_contact} and \ref{eq:fix_planar_contact} can easily be recombined to generate other types of constraints(e.g. fixing only the translation, or only the rotations\ldots).
 
 \item The stability constraint ensures that the Euler-Newton equation~(\ref{eq:NewtonWrench}) is balanced for the set of external wrenches applied to the robot (gravity $\mathcal{W}_G$ and contact forces $\mathcal{W}_i$).
   \begin{equation}
@@ -220,36 +251,34 @@ Other types of contacts can be created that way, by equalizing other features, a
   \end{equation}
   For each contact that bears forces (`stability' contact), a wrench applied on the robot at the contact point is added to the problem.
   That wrench is parametrized on a subset of $\mathbb{R}^6$ depending on the type of contact.
-  For punctual contacts, the moment part is null on the application point.
-  Only a parametrization of the force part on $\mathbb{R}^3$ is needed.
-  We model planar contacts as a combination of punctual forces applied at each vertex of the contact polygon.
+  %For punctual contacts, the moment part is null on the application point.
+  %Only a parametrization of the force part on $\mathbb{R}^3$ is needed.
+  We model the resultant wrench of planar contacts as a combination of punctual forces applied at each vertex of the contact polygon.
   In the case of interaction forces between 2 robots, only one wrench is created and it is used as is in the stability equation of one robot and its opposite is used for the stability of the second robot.
-
+  That way, we are guaranteed that the forces inbetween the robots are balanced and we can evaluate the stability of each robot separately.
 \item The friction cone constraint limits the tangential part of every forces to avoid slippage.
-We write it as~\ref{eq:friction} (with $\mu$ the friction coefficient)
-\begin{equation}
-  \begin{split}
-    \mu^2f_z^2-f_x^2-f_y^2 \geq 0 \\
-    f_z \geq 0
-  \end{split}
-  \label{eq:friction}
-\end{equation}
-
+  We write it as~\ref{eq:friction} (with $\mu$ the friction coefficient)
+  \begin{equation}
+    \begin{split}
+      \mu^2f_z^2-f_x^2-f_y^2 \geq 0 \\
+      f_z \geq 0
+    \end{split}
+    \label{eq:friction}
+  \end{equation}
 \item The collision avoidance constraint can be defined between any two bodies.
-A convex mesh is attached to each body involved in the constraint.
-We denote them $C_1$ and $C_2$.
-We use the {\tt sch-core} library described in~\cite{benallegue:icra:2009} to compute the distance $d(C_1,C_2)$ between the 2 convex shapes and its derivative.
-A description of strictly convex hulls that can be used for this purpose is detailed in ~\cite{escande:itro:2014}.
-For each collision avoidance constraint, we require that the distance between the two convex remains superior to a minimal distance $d_{\min}$
-\begin{equation}
-  d(C_1, C_2)\geq d_{\min}
-\end{equation}
-
+  A convex mesh is attached to each body involved in the constraint.
+  We denote them $C_1$ and $C_2$.
+  We use the {\tt sch-core} library described in~\cite{benallegue:icra:2009} to compute the distance $d(C_1,C_2)$ between the 2 convex shapes and its derivative.
+  A description of strictly convex hulls that can be used for this purpose is detailed in~\cite{escande:itro:2014}.
+  For each collision avoidance constraint, we require that the distance between the two convex remains superior to a minimal distance $d_{\min}$
+  \begin{equation}
+    d(C_1, C_2)\geq d_{\min}
+  \end{equation}
 \item The torque limit constraint makes use of the Inverse Statics algorithm~\ref{alg:ISmatrix} to compute the torques in all the joints of each robots and their derivatives are computed by algorithm~\ref{alg:TJC}.
-Denoting $\tau_i$ the torque in joint $i$ resulting from the robot's configuration and the external forces applied on it, its lower and upper limits as $\tau_i^-$ and $\tau_i^+$, the torque limit constraint writes as follows:
-\begin{equation}
-  \forall i,\ \tau_i^- \leq \tau_i \leq \tau_i^+
-\end{equation}
+  Denoting $\tau_i$ the torque in joint $i$ resulting from the robot's configuration and the external forces applied on it, its lower and upper limits as $\tau_i^-$ and $\tau_i^+$, the torque limit constraint writes as follows:
+  \begin{equation}
+    \forall i,\ \tau_i^- \leq \tau_i \leq \tau_i^+
+  \end{equation}
 \end{itemize}
 
 The frame in which the constraints are written matters critically.
@@ -259,7 +288,7 @@ Our framework computes such dependencies automatically.
 Another important part is the problem's cost function.
 Any function of the problem's variables with a scalar return value can be used as a cost function.
 In our formulation, we take a sum of cost functions into account, several different functions $f_i$ over different variables can be defined separately.
-And then combined in a weighted sum in the problem's cost function(with $w_i$ the weight of function $f_i$):
+And then combined in a weighted sum as the problem's cost function (with $w_i$ the weight of function $f_i$):
 \begin{equation}
   cost = \sum\limits_i w_i f_i
 \end{equation}
@@ -269,7 +298,7 @@ A typical cost function is the distance to a reference posture $q_0$.
 On a robot that has all its articulations parametrized on $\mathbb{R}$ the distance can be expressed simply with the Euclidean norm $d = \norm{q_r-q_0}^2$.
 Since we work on non-Euclidean manifolds, the logarithm function on the manifold must be used.
 It gives the distance vector between two points in the tangent space, the norm of this vector can be used as a distance.
-So we get $d = \norm{\text{log}_{q_0}(q_r)}^2$ (note that on $\mathbb{R}^n$, $\norm{\text{log}_{q_0}(q_r)}^2 = \norm{q_r - q_0}^2$ )
+So we get $d = \norm{\text{log}_{q_0}(q_r)}^2$ (note that on $\mathbb{R}^n$, $\norm{\text{log}_{q_0}(q_r)}^2 = \norm{q_r - q_0}^2$)
 
 We can also use the cost function to set a target value $v$ for the value of a contact force $\vec{F}$ in a given direction $d$. By simply implementing the following function:
 \begin{equation}
@@ -278,10 +307,15 @@ We can also use the cost function to set a target value $v$ for the value of a c
 
 The list of constraints and cost functions that can be used in robotics posture generation problems can be extended, and this process is made easier by our framework.
 
-\section{Implementation of a posture generation problem}
-\label{sec:implementation_of_a_posture_generation_problem}
 
-In this section, we provide an overview of the implementation of posture generation problems using our framework. We describe some of the key elements of the framework and then present the implementation of a problem.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           IMPLEMENTATION                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Implementation}
+\label{sec:implementation}
+
+In this section, we provide an overview of some of the key elements of the framework:
 
 \paragraph{Problem's configuration:}
 The implementation of a posture generation problem is made through a combination of a c++ implementation of the core structure of the problem and a text file in yaml format that configures the problem and is parsed at runtime to avoid having to recompile the problem for every configuration's change.
@@ -315,12 +349,12 @@ As such, they are able to compute their return value and derivative based on an 
 A constraint is a function accompanied by its application manifold, bounds and scaling factors.
 It is convenient to use a function built by our expression framework here, to take advantage of their automatic derivation and variables.
 Every constraint has a geometric part and a stability part that are added separately to the problem.
-The stability part is mainly used to add contact forces.
+The stability part is mainly used to add contact forces to the stability constraint.
 
 \paragraph{The Frame Constraint class:}
 It describes a very useful type of constraint between two frames $F_1$ and $F_2$.
-It terms of geometry, the canonical constraints one can enforce between two frames consist in blocking each of the 6 degrees of freedom of $F_2$ w.r.t $F_1$, e.g. blocking the translation and rotations along each axis.
-We can combine any set those canonical constraints to emulate any typical joint type between the two frames (fixed, planar, spherical, etc...).
+It terms of geometry, the canonical constraints one can enforce between two frames consist in blocking each of the 6 degrees of freedom of $F_2$ w.r.t $F_1$, e.g.\ blocking the translation and rotations along each axis.
+We can combine any set those canonical constraints to emulate any typical joint type between the two frames (fixed, planar, spherical, etc\ldots).
 Any type of wrench can be composed the same way from the canonical wrenches (forces along each axis and moment along each axis).
 On top of those geometric and stability parts of that constraint, custom additional constraints can be added to it, for example requiring $O_2$ to be inside a polygon defined in $F_1$, or requiring that the forces generated by that constraint remain in their Coulomb friction cones.
 
@@ -338,103 +372,138 @@ After creating the complete manifold, the PostureProblem class can be used to fa
 Finally, it can query the resolution of the problem by the solver and return the result.
 
 
-%FROM HERE IT IS OLD TEXT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                     CONTACT ON NON-FLAT SURFACE                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%There can be several kinds of contact between a surface of the robot and its environment(which could contain other robots).
-%We denote $\mathcal{S}_R$ and $\mathcal{S}_E$ the two surfaces belonging to two bodies $\mathcal{B}_R$, $\mathcal{B}_E$ that are to be put in contact.
-%We equip those surfaces with a frame $\mathcal{F} = \{O, (x, y, z)\}$, with $O$ a point of contact on the surface, and $z$ a vector normal to the surface at $O$.
-%The transformation that leads from the reference frame of a body $\mathcal{B}$ to the reference frame of a surface $\mathcal{S}$ is denoted $^\mathcal{S}H_\mathcal{B}$.
-%Note that those two surfaces do not need to be plane, a curved continous surface would suit as well.
-%For a contact to be geometricaly satisfied, the planes defined by $\{O, (x, y)\}$ on both surfaces must be coplanar with normals of opposite directions.
-%This can be assured by satisfying the following set of equation:
+\section{Contact on non-flat surfaces}
+\label{sec:contact_on_non_flat_surfaces}
 
-%\begin{align}
-  %\begin{split}
-  %(O_R-O_E) . z_E = 0 \\
-  %z_R . x_E = 0 \\
-  %z_R . y_E = 0 \\
-  %z_R . z_E \leq 0
-  %\end{split}
-  %\label{eq:floating contact}
-%\end{align}
+Writing relations between geometric quantities defined in frames allows to describe a large spectrum of contacts.
+%It is especially convenient when the contact points are predefined or when the geometric relations are simple to express, like for the inclusion of 2 convex polygons in each other in the context of a planar contact.
+In particular, it allows to write most types on geometric constraints between canonical geometric shapes (point, line, plan).
+The most common type of contact constraint encountered is the contact between two surfaces.
+When those two surfaces are plan, a contact between them can be written simply with the set of equations~\ref{eq:planar_contact}.
+In that case, the quantities involved in the constraint are invariant with the location of the contact point, and the equations are valid for any point of the surface.
+
+%When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and pre-defined, the set of equation~\ref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
+
+When it comes to non-flat surfaces, the location of the frames used in eq:~\ref{eq:planar_contact} matters (in particular, the normal vector can vary for any point on the surface).
+
+%We propose to describe that type of contact by parametrizing the contact surface, and using an additional variable on which the location of the contact point and its normal vector are parametrized.
+%We remind that a contact constraint between $F_1$ and $F_2$ described by eq~\ref{eq:planar_contact} requires the full $F_1$ frame and on $F_2$, only the origin and its normal vector are necessary.
 
 %If any(either or both) of the two surfaces in contact is non-plane, finding the exact location of the contact point on the surface is necessary, because then, the normal to the contact is not known in advance.
-%In that situation, we propose to paramaterize the contact frame on the surface on a 1 or 2-dimentional manifold.
-%\begin{equation}
-  %\mathcal{F}(u_S\in \mathcal{M}_S) = \{O(u_S), (x(u_S), y(u_S), z(u_S)\}
-%\end{equation}
-%Which, depending on the shape, could be $\mathbb{R}^2$ or $S2$.
-%In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added to the optimization problem as well as the constraint set \ref{eq:floating contact} depending on it.
 
-%The floating contact constraint can be extended to fix the contact to a given position and orientation by adding to it the following set of equation that locks the degrees of freedom of rotation around the normal and translation in the tangent plane of the contact:
+We propose to handle that case by paramaterizing the contact frame on the surface with a variable $u_S$ on a 1 or 2-dimensional manifold $\mathcal{M}_S$ (which, depending on the shape, could be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$), and adding this variable to our optimization problem.
+\begin{equation}
+  \mathcal{F}(u_S\in \mathcal{M}_S) = \{O(u_S), (x(u_S), y(u_S), z(u_S)\}
+\end{equation}
 
-%\begin{align}
-  %\begin{split}
-  %(O_R-O_E) . x_E = 0 \\
-  %(O_R-O_E) . y_E = 0 \\
-  %y_R . x_E = 0 \\
-  %x_R . y_E = 0
-  %\end{split}
-  %\label{eq:fix planar contact}
-%\end{align}
+Then we can write the contact constraint on that parametrized frame with ease.
 
-%Those two sets of equations \ref{eq:floating contact} and \ref{eq:fix planar contact} can easily be recombined to generate other types of constraints(e.g. fixing only the translation, or only the rotations...).
+%In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added the optimization problem and we can desctibe  as well as the constraint set \ref{eq:planar_contact} depending on it.
 
-%For any scenario to be realistic, the robot must satisfy its stability constraint. Given a set of wrenches applied on the robot $\{\mathcal{W}_0, \mathcal{W}_1...,\mathcal{W}_{n_w}\}$.
-%The sum of all those wrenches applied on a singular point must be zero.
-%For each punctual contact that needs to bear forces, a new wrench is created, that wrench is parametrized by a set of two vectors describing its force $f = (f_x, f_y, f_z)^T \in \mathbb{R}^3$ and moment $m = (m_x, m_y, m_z)^T \in \mathbb{R}^3$ at the contact point.
-%We denode $\mathcal{W}_G$ the wrench generated by the weight of the robot: $\mathcal{W}_G(CoM) = \{(0, 0, -mg)^T, (0, 0, 0)^T\}$.
-%For any chosen reduction point $p$, the stability constraint writes as follows:
+\subsection{Application to plan-sphere contact}
+We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal to $S_S$.
+The most general way to express such a constraint is to ensure that $p_s$ is on $S_B$ and that $n_s$ and $n_B$ are opposite.
+To do that, we create a variable $v_{S2}$ on $S2$ and map $p_S$ and $n_S$ on it.
+In our framework, this constraint is expressed exactly as the contact between 2 planar surfaces, once the mappings of $p_s(v_{S2})$ and $n_s(v_{S2})$ are done.
+In a framework that does not handle manifolds, it would require to setup a specific constraint, ensuring that the distance between $c_s$ and $S_B$ is equal to $r_S$.
 
-%\begin{equation}
-  %\sum_{i=0}^{n_w}{\mathcal{W}_i(p)} + {\mathcal{W}_G(p)} = 0
-  %\label{eq:NewtonWrench}
-%\end{equation}
+In Fig.~\ref{fig:contact_plan_sphere} we show the results obtained by solving a problem where the HRP2-Kai robot has to keep its feet in contact with the ground at fixed positions, touch a sphere with a side of its right wrist and point as far as possible in a given direction $d$ with its left hand, under balance constraints.
+The top row of Fig.~\ref{fig:contact_plan_sphere} shows the results for this problem with several different $d$.
+%It shows that our optimization algorithm finds an optimal contact point on the sphere to reach its goal as best as possible while satisfying the given constraints.
+In every situation, the projection of the CoM is outside the polygon of support, meaning that such postures would not be reached without leaning on the sphere.
 
-%Equation \ref{eq:NewtonWrench} can be rewritten with only vectors as:
+\begin{figure}
+\centering
+  \centering
+  \setlength\fboxsep{0pt}
+  \setlength\fboxrule{1pt}
+  \fbox{\includegraphics[width=.95\textwidth]{4directionsStrokesWithCoM.png}}
+  %\fbox{\includegraphics[width=.95\linewidth]{papers/Humanoids2015/figure/contact_plan_sphere_4_directions.png}}}
+  \caption{HRP2-Kai leaning on sphere with right wrist to point the left gripper as far as possible in 4 cardinal directions.
+  Top row: semi-predefined contact; Bottom row: free contact with parametrized wrist.
+  Projection of the CoM on the ground (green dots)}
+\label{fig:contact_plan_sphere}
+\end{figure}
 
-%\begin{equation}
-  %\begin{split}
-  %\sum_{i=0}^{n_w}{f_i} - m g = 0 \\
-  %\sum_{i=0}^{n_w}{m_i(p)} + {m_G(p)} = 0
-  %\end{split}
-  %\label{eq:NewtonForceMoment}
-%\end{equation}
+\subsection{Contact with parametrized wrist}
 
-%A usual choice of reduction point for those equations is the center of mass of the robot.
-%In which case the moment part of the gravity wrench is null.
-%In the case of surfacic contact between two plane surfaces, the contact polygon is determined and a punctual force with zero moment is added on each vertex.
-%The forces generated on each point need to satisfy the Coulomb friction cone equations which writes as follows for a friction coefficient $c$:
+\begin{figure}[!htb]
+\centering
+  \centering
+  \setlength\fboxsep{0pt}
+  \setlength\fboxrule{1pt}
+  \fbox{\includegraphics[width=.65\linewidth]{param_wrist_detail.pdf}}
+  %\fbox{\includegraphics[width=.95\linewidth]{papers/Humanoids2015/figure/param_wrist_detail.png}}
+\caption{Parametrization of the wrist of HRP2-Kai}
+\label{fig:param_wrist_detail}
+\end{figure}
 
-%\begin{equation}
-  %\begin{split}
-    %c^2 f_z^2 - f_x^2 - f_y^2 \geq 0 \\
-    %f_z \geq 0
-  %\end{split}
-  %\label{eq:FrictionCone}
-%\end{equation}
+Being able to choose the location of the contact point on the sphere is interesting, but a limitation of this formulation is that the contact point on the wrist of the robot is restricted to one single user-defined face.
+Instead, we describe the shape of the wrist body as a parametric function and let the contact point on the wrist as well as its counterpart on the sphere, result from the optimization process.
+The section of HRP2-Kai's wrist is a square with rounded edges.
+We parametrize this shape as shown in Fig.~\ref{fig:param_wrist_detail}:
+we consider the angular coordinate $\theta$ of the point on the section.
+It is added as a variable on $\mathbb{R}$ to the problem.
+The shape of a quarter of section $[0;\pi/2]$ is a succession of a vertical line, a quarter of circle and a horizontal line.
+This pattern is repeated for the 3 other quarters.
+The equations are given in Fig.~\ref{fig:param_wrist_detail}.
+In our framework, we define the function describing the shape of the wrist, create a frame parametrized by that function and then define the contact between that frame and the point and normal on the sphere.
+This formulation not only is very easy to implement, but most importantly, allows for richer posture generations.
+The optimization algorithm chooses the contact point on the sphere as well as the contact point on the wrist, which leads to a wider accessibility range, and a better satisfaction of the cost function.
+The bottom row of Fig.~\ref{fig:contact_plan_sphere} displays the results of this simulation for the robot pointing in 4 directions.
+Notice that on the 2nd and the 4th (pointing forward and to the left) images, the results for the 2 types of models are nearly identical.
+Whereas in the 1st and 3rd images, different faces of the wrist have been chosen (On the 1st, the wrist is rotated by $180^{\circ}$, and $90^{\circ}$ on the 3rd).
+In these 4 cases, the contact with parametrized wrist gives a better cost of the objective function (the left hand points further).
+This observation scales:
+we solved this problem for 5000 random pointing directions, and in average, the contact with parametrized wrist allows to reach 5mm further.
+The success rate of the solver is $98.5\%$ in the parametrized wrist case against $99.9\%$ when the face is fixed.
+The numbers of iterations are similar.
 
-%It is not straightforward to devise a friction limit in terms of moment.
-%Which is why, in the current study, we considere that the punctual contacts are perfect and do not generate moment on their application point.
-%This translates in fixing the moment variables of the wrench to zero while the force variables still exist.
-%In the case of planar contacts, of course, the moment part cannot be ignored.
-%But, given a planar polygon in which the contact happens, the wrench generated by this contact can be modeled as a set of punctual forces, one on each vertex of the polygon.
-%Which respect the same friction cone equations \ref{eq:FrictionCone} and are taken into account in \ref{eq:NewtonWrench}.
+%Also, that kind of formulation makes it easier for the user to generate satisfactory postures, as he does not need to specify the plan contact surface anymore.
+This method is certainly scalable, and can be used for any kind of humanoid robot and environment.
+Yet, it requires to have a parametric equation of the surface.
 
-%\section{Posture Generation, variables and architecture}
-%\label{sec:posture_generation_variables_and_architecture}
+\subsection{Contact with an object parametrized on S2}
 
-%\section{Problem Formulation}
-%\label{sec:problem_formulation}
+In this simulation case, we want the HRP-4 robot (anther model) to carry a cube with its two hands.
+The most general way to do it is to select a face of the cube for each contact, and enforce the contact between that face and the hand's surface.
+We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S2$.
+The implicit equation of a superellipsoid is $S(x,y,z) = 0$, with
+\begin{equation}
+  S(x,y,z) = {\left( \left|\frac{x}{A}\right|^r + \left|\frac{y}{B}\right|^r\right)}^\frac{t}{r} + \left|\frac{z}{C}\right|^t - 1
+  \label{eq:super_ellipsoid}
+\end{equation}
 
-%\section{Simulation Results}
-%\label{sec:simulation_results}
+A point in $S2$ is represented by a vector $v=(x,y,z)$ in $\mathbb{E} = \mathbb{R}^3$.
+To a given unit vector $v$ we associate a point $\alpha v$ on the surface of the superellipsoid by solving $S(\alpha v) = 0$ for $\alpha$.
+At this point, the normal is given by $\dfrac{\nabla S(\alpha v)}{\left\|\nabla S(\alpha v)\right\|}$ which simplifies into $\dfrac{\nabla S(v)}{\left\|\nabla S(v)\right\|}$.
+%It returns the intersection between any unit vector and the surface of the super ellipsoid.
+%Also we generate a similar function that returns the normal of the intersection point.
+Given this parametrization, we write a contact constraint between the frame of the hand of the robot and the point and normal on the surface of the superellipsoid.
 
-%\section{Parametrization of complex solids on S2}
-%\label{sec:parametrization_of_complex_solids_on_s2}
+In Fig.~\ref{fig:hrp4_cube} we present some results for a posture generation problem with manipulation: On the left side, the feet are free to move on a sphere, and, on the right side, the left foot position is fixed and the right foot is free to move on the ground.
+The hands must be in contact with the cube.
+The cube is free to move (parametrized by $\mathbb{R}^3 \times SO(3)$) and has it own set of Euler-Newton equations, which must be fulfilled.
+%On the accompanying video, one can observe how the contact points on the cube evolve along with the optimization.
+%For each contact with the cube, a variable on $S2$ is added to the problem to parametrize the contact point.
+%Each hand is in contact with a point and normal on the cube.
 
-%\section{Potential contacts}
-%\label{sec:potential_contacts}
+\begin{figure}
+\centering
+  \centering
+  \setlength\fboxsep{0pt}
+  \setlength\fboxrule{1pt}
+  \fbox{\includegraphics[width=.8\linewidth]{hrp4CubeOnSphere.png}}
+\caption{HRP4 carrying 2kg a cube.
+Left: the objective function is to maintain the cube at a given position.
+Right: it is to put the cube as far as possible in a given direction}
+\label{fig:hrp4_cube}
+\end{figure}
 
-%\section{Optimization of the solvers parameter for a class of problems}
-%\label{sec:optimization_of_the_solvers_parameter_for_a_class_of_problems}
+
+
+
