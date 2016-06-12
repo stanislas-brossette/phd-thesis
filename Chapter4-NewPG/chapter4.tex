@@ -1,3 +1,4 @@
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           Fourth Chapter                            %
 %                       New Posture Generation                        %
@@ -384,11 +385,10 @@ Writing relations between geometric quantities defined in frames allows to descr
 In particular, it allows to write most types on geometric constraints between canonical geometric shapes (point, line, plan).
 The most common type of contact constraint encountered is the contact between two surfaces.
 When those two surfaces are plan, a contact between them can be written simply with the set of equations~\ref{eq:planar_contact}.
-In that case, the quantities involved in the constraint are invariant with the location of the contact point, and the equations are valid for any point of the surface.
-
+In that case, the quantities involved in the constraint are invariant with the location of the contact point, thus, the equations are valid for any point of the surface (in particular, the normal vector is the same for any point on the surface).
 %When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and pre-defined, the set of equation~\ref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
-
-When it comes to non-flat surfaces, the location of the frames used in eq:~\ref{eq:planar_contact} matters (in particular, the normal vector can vary for any point on the surface).
+When it comes to non-flat surfaces, the location of the frames used in eq:~\ref{eq:planar_contact} matters, as the quantitied in the constraint's equation depend on it.
+%(in particular, the normal vector can vary for any point on the surface).
 
 %We propose to describe that type of contact by parametrizing the contact surface, and using an additional variable on which the location of the contact point and its normal vector are parametrized.
 %We remind that a contact constraint between $F_1$ and $F_2$ described by eq~\ref{eq:planar_contact} requires the full $F_1$ frame and on $F_2$, only the origin and its normal vector are necessary.
@@ -396,16 +396,16 @@ When it comes to non-flat surfaces, the location of the frames used in eq:~\ref{
 %If any(either or both) of the two surfaces in contact is non-plane, finding the exact location of the contact point on the surface is necessary, because then, the normal to the contact is not known in advance.
 
 We propose to handle that case by paramaterizing the contact frame on the surface with a variable $u_S$ on a 1 or 2-dimensional manifold $\mathcal{M}_S$ (which, depending on the shape, could be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$), and adding this variable to our optimization problem.
+Then we can write the contact constraint on that parametrized frame with ease.
 \begin{equation}
+\label{eq:param_frame}
   \mathcal{F}(u_S\in \mathcal{M}_S) = \{O(u_S), (x(u_S), y(u_S), z(u_S)\}
 \end{equation}
-
-Then we can write the contact constraint on that parametrized frame with ease.
 
 %In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added the optimization problem and we can desctibe  as well as the constraint set \ref{eq:planar_contact} depending on it.
 
 \subsection{Application to plan-sphere contact}
-We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal to $S_S$.
+We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal on $S_S$.
 The most general way to express such a constraint is to ensure that $p_s$ is on $S_B$ and that $n_s$ and $n_B$ are opposite.
 To do that, we create a variable $v_{S2}$ on $S2$ and map $p_S$ and $n_S$ on it.
 In our framework, this constraint is expressed exactly as the contact between 2 planar surfaces, once the mappings of $p_s(v_{S2})$ and $n_s(v_{S2})$ are done.
@@ -454,6 +454,7 @@ The equations are given in Fig.~\ref{fig:param_wrist_detail}.
 In our framework, we define the function describing the shape of the wrist, create a frame parametrized by that function and then define the contact between that frame and the point and normal on the sphere.
 This formulation not only is very easy to implement, but most importantly, allows for richer posture generations.
 The optimization algorithm chooses the contact point on the sphere as well as the contact point on the wrist, which leads to a wider accessibility range, and a better satisfaction of the cost function.
+
 The bottom row of Fig.~\ref{fig:contact_plan_sphere} displays the results of this simulation for the robot pointing in 4 directions.
 Notice that on the 2nd and the 4th (pointing forward and to the left) images, the results for the 2 types of models are nearly identical.
 Whereas in the 1st and 3rd images, different faces of the wrist have been chosen (On the 1st, the wrist is rotated by $180^{\circ}$, and $90^{\circ}$ on the 3rd).
@@ -469,7 +470,7 @@ Yet, it requires to have a parametric equation of the surface.
 
 \subsection{Contact with an object parametrized on S2}
 
-In this simulation case, we want the HRP-4 robot (anther model) to carry a cube with its two hands.
+In this case, we want the HRP-4 robot (anther model) to carry a cube with its two hands.
 The most general way to do it is to select a face of the cube for each contact, and enforce the contact between that face and the hand's surface.
 We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S2$.
 The implicit equation of a superellipsoid is $S(x,y,z) = 0$, with
@@ -498,12 +499,18 @@ The cube is free to move (parametrized by $\mathbb{R}^3 \times SO(3)$) and has i
   \setlength\fboxsep{0pt}
   \setlength\fboxrule{1pt}
   \fbox{\includegraphics[width=.8\linewidth]{hrp4CubeOnSphere.png}}
-\caption{HRP4 carrying 2kg a cube.
+\caption{HRP4 carrying a 2kg cube.
 Left: the objective function is to maintain the cube at a given position.
 Right: it is to put the cube as far as possible in a given direction}
 \label{fig:hrp4_cube}
 \end{figure}
 
+\section{Contact with Complex Surfaces}
+\label{sec:contact_with_complex_surfaces}
+
+We showed that to generate contact between a body of a robot and simple geometric surfaces (sphere, superellipsoid, wrist of HRP2) we can devise some ad hoc parametrization of the surface and write constraints on the resulting approximated surface.
+Those are sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014}~\cite{vaillant:autonomousrobots:2016}.
+However, contacts with more complex objects is needed too, for unstructured environment or for manipulating objects.
 
 
 
