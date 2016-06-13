@@ -213,7 +213,19 @@ Here is a list of constraints that we consider in our problem:
   These cannot be directly translated on manifolds other than $\mathbb{R}^n$.
   For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, then the $S2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds.
 \item The contact constraint consists in identifying the features of two frames $F_1$ and $F_2$.
-  For example, for a planar contact, we get the set of equation~\ref{eq:planar_contact}.
+  For example, for a planar contact, we can write the constraints~\ref{eq:planar_contact_bad}.
+
+  \begin{equation}
+  \left\{
+  \begin{array}{ll}
+    \overrightarrow{O_1O_2}\cdot\vec{z_1} = 0\\
+    \vec{z_2} = -\vec{z_1} \\
+  \end{array}
+  \right.
+  \label{eq:planar_contact_bad}
+  \end{equation}
+
+  In practice, for a better numerical behavior of the optimization, we write that $\vec{z_2}$ is perpendicular to the plan $\{O_1, \vec{x_1}, \vec{y_1}\}$ and has opposite direction with $\vec{z_1}$,~\ref{eq:planar_contact}:
 
   \begin{equation}
   \left\{
@@ -237,7 +249,8 @@ Here is a list of constraints that we consider in our problem:
     \overrightarrow{O_1O_2} \cdot \vec{x_1} = 0 \\
     \overrightarrow{O_1O_2} \cdot \vec{y_1} = 0 \\
     \vec{y_2} \cdot \vec{x_1} = 0 \\
-    \vec{x_2} \cdot \vec{y_1} = 0
+    \vec{x_2} \cdot \vec{y_1} = 0 \\
+    \vec{x_2} \cdot \vec{x_1} \leq 0
   \end{array}
   \right.
   \label{eq:fix_planar_contact}
@@ -508,9 +521,95 @@ Right: it is to put the cube as far as possible in a given direction}
 \section{Contact with Complex Surfaces}
 \label{sec:contact_with_complex_surfaces}
 
-We showed that to generate contact between a body of a robot and simple geometric surfaces (sphere, superellipsoid, wrist of HRP2) we can devise some ad hoc parametrization of the surface and write constraints on the resulting approximated surface.
-Those are sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014}~\cite{vaillant:autonomousrobots:2016}.
-However, contacts with more complex objects is needed too, for unstructured environment or for manipulating objects.
+We showed that to generate contacts between a body of a robot and simple geometric surfaces (sphere, superellipsoid, wrist of HRP2) we can devise some ad hoc parametrization of the surface and write constraints on the resulting approximated surface.
+This is sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014}~\cite{vaillant:autonomousrobots:2016}.
+However, contacts with more complex objects are needed too, for unstructured environment or for manipulating objects.
 
+To work with derivative-based optimization algorithms, such as SQP or Interior Points, which are much faster than derivative-free algorithms, the functions involved in the optimization problem need to be at least $C^1$ and gradients must be full rank at the solution (for ensuring constraints qualification, see \cite{nocedal:book:2006}).
+Since the contact point can be anywhere on our parametrized surface, the gradients must be full rank everywhere.
 
+In the previously presented parametrizations of typical geometric shapes (sphere, superellipsoid\ldots) those continuity requirements are not a problem.
+But for a given object, a parametrization of its surface is rarely available, especially a parametrization conforming with the continuity requirements.
+On the contrary, we usually have an approximation of the object as a mesh.
+
+We can consider two types of surface parametrizations, the surfaces of closed topology, like a sphere, which are a large part of the objects of interest in our application, that we parametrize on $S2$ (because there is no diffeomorphism between the unit sphere and a subset of $\mathbb{R}^2$) and the surfaces of open topology, that generally can be parametrized on $\mathbb{R}^2$.
+The problem of finding a parametrization satisfying the continuity requirements exists for both of those when the surface's representation comes as a mesh.
+
+In~\cite{escande:icra:2016}, we provide a systematic way to obtain a parametric surface closely approximating a mesh and meeting the regularity requirements mentioned above, for a large class of objects, namely star-convex objects.
+To that end, we combine the use of Catmull-Clark subdivision surfaces with a tailored ray casting algorithm, and propose an efficient and robust numerical method to evaluate a point, a normal and their derivatives at a given set of parameters.
+
+As a result, we get a smooth parametrization of the input mesh that satisfies the continuity requirements.
+In fig:\ref{fig:CCS}, we show the catmull clark surface (in blue) corresponding to the mesh (in green) of an HRP-2 link, for two different levels of smoothness.
+On the right picture, we first apply twice a simple subdivision scheme, before using Catmull-Clark subdivisions, thus obtaining a surface closer to the original mesh but less smooth.
+The red line is the image of a circumference of the unit sphere through our parametrization.
+We can then freely use this surface parametrization in our posture generation problems.
+
+\begin{figure}
+  \centering
+    \includegraphics[width = 0.2\paperwidth]{leg3smooth.png}
+    \includegraphics[width = 0.2\paperwidth]{leg3smoothSharp.png}
+\caption{Catmull Clark Surfaces (in blue) approximating the mesh of a link on HRP-2 (in green)}
+\label{fig:CCS}
+\end{figure}
+
+\begin{figure}
+  \centering
+    \includegraphics[width = 0.4\linewidth]{hrp4hold.png}
+    \includegraphics[width = 0.4\linewidth]{manipulation.png}
+\caption{Left: HRP-4 holding an object, modeled with CCS, as far as possible in front of it. The red arrows depict the contact forces and the gravity forces applied on each object. Right: example of grasp generation.}
+\label{fig:examples_CCS}
+\end{figure}
+
+\begin{figure}
+  \centering
+    \includegraphics[width = 0.4\linewidth]{cubes.png}
+    \includegraphics[width = 0.4\linewidth]{cubes_collision.png}
+\caption{HRP-4 climbing a pile of cubes modeled as a single object with a single surface. (Right) Convex shapes used for collision avoidance}
+\label{fig:HRP4_cubes}
+\end{figure}
+%\begin{figure}
+  %\centering
+    %\includegraphics[width=0.8\columnwidth]{img/manipulation.png}
+  %\caption{Example of grasp generation.}
+  %\label{fig:hand}
+%\end{figure}
+
+We now show some examples of PG using the proposed approach to introduce complex objects to contact with.
+We make use of the capacity of our optimization solver to directly work with a variable $d$ on $S^2$ to parametrize our surface.
+When using more classical non-linear solvers, it is sufficient to take $d$ in $\mathbb{R}^3$ and to add a constraints of unit norm for $d$: the presented algorithm do not need a unit $d$ to work, and at the solution, the gradient will be full rank on the null-space of this constraint, which is enough for a good convergence.
+However, working directly on $S^2$ presents several advantages\cite{brossette:Humanoids:2015}.
+
+In the first example (Fig.~\ref{fig:examples_CCS}, left), a HRP-4 robot is asked to grasp an object (here a leg part of HRP-2) and to hold it as far as possible in front of him, with the following constraints: contacts must occur between predefined points on the hands of HRP-4 and points free to move on the surface of the object, modeled as a parametric surface with the approach of \cite{escande:icra:2016}; furthermore the robot has to keep its left foot at a given fixed position and has its right foot anywhere on the floor.
+The forces applied by the robot on the object must be sufficient to counter the gravity, and the system (robot,object) must be stable with all forces within their friction cones.
+Additionally, the robot must stay within its joint limits.
+We do not check here for collisions or torque limits.
+The solver finds a solution in about $70$ iterations.
+
+Contacts also occur in manipulation.
+Actually manipulation and locomotion are closely related.
+Locomotion can be seen as a manipulation of the environment, it is only a matter of reference frame(see~\cite{bouyarmane:ar:2012}).
+The second example (Fig.~\ref{fig:examples_CCS}, right) demonstrates our PG applied to grasping an object.
+The base of the hand is fixed, and the contact points on the fingers are given.
+The contact points on the objects are parametrized with our method and are free to move on the entire (approximated) surface of the object: the optimization finds automatically how to grasp the object so as to be able to maintain its stability, taking about $50$ iterations.
+Note that the object is non-convex.
+The example is a simple show-case, and we look forward to compare this approach with state-of-the-art methods for grasping.
+
+The third example (Fig.~\ref{fig:HRP4_cubes}) involves a stack of cubes on which the robot must stand, using its hands and feet to maintain its stability and respect its torque limits.
+The stack is modeled as a single object.
+Once again, contact points are fixed on the robot and free on the surface.
+Although the surface in modeled by a single object, that object is not convex, thus it cannot be used as is for collision avoidance.
+For collisions, we model the stack of cubes with a set of 21 cubes all slightly smaller than the actual cubes see:~\ref{fig:HRP4_cubes}(Right), and we require the robot to avoid collision with those cubes.
+The optimization takes around $115$ iteration to converge to a solution.
+Since their is a single surface to contact with, we do not need to specify with which faces, edges or corners the robot needs to be in contact with.
+The optimization decides it automatically.
+This is a very attractive feature of our approach as it allows to include discrete choices directly into our PG.
+This can be used to alleviate the work to be done by the user, be it a human or a planning algorithm: the user still has to specify the bodies in contact, but part of the combinatorics relative to the matching of a body with a particular surface or object is handled directly by the PG.
+
+\section{Conclusion}
+\label{sec:conclusion_ch4}
+
+In this section we presented our approach for formulating a posture generation problem and generating an optimization problem that represents it.
+We presented several tools that are meant to simplify this process for the developper, with the automatic variable management, the use of non-Euclidean manifolds and the geometric expressions framework.
+Leveraging those tools, we were able to devise a method to formulate a contact constraint with a solid for which the only representation available is a mesh.
+And to ensure the continuity properties of that formulation for a better use in optimization algorithms.
 
