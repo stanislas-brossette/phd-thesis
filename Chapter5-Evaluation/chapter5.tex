@@ -299,3 +299,51 @@ For example, even in a disaster situations as in Fukushima nuclear power plants,
 So having their model would then still permit our MCP to rely on 3D models to plan contacts for motion.
 PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
 Of course, our ultimate future plan is to handle uncertainties, control and planning recovery of discrepancies when they occur.
+
+
+\section{On the performance of formulation with Manifolds}
+\label{sec:On_the_performance_of_formulation_with_manifolds}
+
+In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our approach to develop a non-linear SQP solver on non-Euclidean Manifolds.
+We then propose to take advantage of it in our posture generator presented in Chapter~\ref{ch:PG}.
+The choice of using optimization was driven by the intuition that such approach would lead to generally faster and more robust convergence of resolution when the search space is a non-Euclidean manifold.
+To evaluate the influence of the formulation and resolution with manifold, we choose to study a problem different from a typical robotic posture generation.
+In a typical robotic posture generation problem, the search manifold is a composition of several instances of $\mathbb{R}^n$ and one $SO3$, and the equations involving the $SO3$ variables are quite complex.
+Thus it might be difficult to extract the actual influence of the non-Euclidean manifold formulation on the resolution.
+
+We choose to study a problem of cube stacking.
+Given a set of cubes, which pose is defined on $\mathbb{R}^3 \times SO3$, we want to find a configuration in which the cubes are all inside a box, and are not penetrating each other.
+For any cube $C_i$, we denote $V_i = \{v_0, v_1, \cdots, v_7\}$  the set of all its vertex, $\vec{t}\in\mathbb{R}^3$ and $R\in SO3$, respectively its translation and rotation w.r.t the world frame.
+To ensure that the cubes are inside the box, we can write a constraint that forces that all the corners of each cube are inside the box.
+For each plan composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plan to the origin along $\vec{n}$.
+The constraint for each cube $C_i$ being "above" a plan defined by $\{d, \vec{n}\}$ is of dimension 8 and can be written as:
+\begin{equation}
+  \forall v\in V,\ (\vec{t} + R v)\cdot \vec{n} \geq d
+\end{equation}
+
+To avoid interpenetration of the cubes, we could use the usual collision avoidance constraints as presented in Section~\ref{sec:problem_formulations}.
+In that case, the use of the exact mesh of the cubes would generate gradient discontinuities of the constraint.
+Approximating the mesh with STPBV, would allow to avoid those discontinuities, but then, if the STPBV is too close to the exact mesh, we would have a gradient close to discontinuous.
+Instead, we propose another approach that uses non-Euclidean manifolds: for each pair of cubes $C_i,\ C_j$, we require a plan $P_{ij}$ to fit inbetween them.
+The plan's location can be parametrized by its normal $\vec{n}\in S2$ and $d\in\mathbb{R}$, the signed distance from the plan to the origin along $\vec{n}$.
+Each plan's pose can be represented by a variable on $\mathbb{R} \times S2$.
+Thus we can write a constraint of dimension 16 such that $C_i$ is above $P_{ij}$ and $C_j$ is below $P_{ij}$ as:
+
+\begin{align}
+  \begin{split}
+    &\forall v\in V_i,\ (\vec{t} + R v)\cdot \vec{n} \geq d \\
+    &\forall v\in V_j,\ (\vec{t} + R v)\cdot \left(-\vec{n}\right) \geq -d
+  \end{split}
+\end{align}
+
+In order to simulate gravity, we minimize the sum of all the cubes' vertical coordinates:
+
+\begin{equation}
+  f = \sum\limits_i \vec{t_i}\cdot \vec{z}
+\end{equation}
+
+We consider the problem of stacking $n$ cubes in an open-top box composed of 5 plans (the ground and 4 walls).
+Each cube's pose is parametrized on $\mathbb{R}^3\times SO3$, while each plan in parametrized on $\mathbb{R}\times S2$.
+There is one plan for each pair of cubes, so, $n(n-1)/2$ plans.
+Thus the search manifold is: $\mathcal{M} = \left( \mathbb{R}^3\times SO3 \right)^n \times \left( \mathbb{R} \times S2 \right)^{\frac{n(n-1)}{2}} $ and the problem contains 5 constraints of dimension 8 per cube to fit them in the box and $n(n-1)/2$ constraints of dimension 16 to avoid the interpenetration of cubes.
+So the total constraint dimension is $32n+8n^2$.
