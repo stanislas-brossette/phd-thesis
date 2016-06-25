@@ -3,7 +3,8 @@
 %                            Introduction                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter*{Introduction}
+\setcounter{chapter}{-1}
+\chapter{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 \label{cha:introduction}
 
@@ -11,7 +12,7 @@
 
 The ultimate goal of robotics is to make robots realize some tasks.
 The tasks, as well as the robot used to fulfill them are various.
-For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human, a submarine robot exploring the wreckages of a ship, a humanoid robot exploring and fixing a destroyed nuclear plant.
+For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human, a submarine robot exploring the wreckages of a ship, a humanoid robot exploring and fixing a destroyed plant.
 
 \begin{figure}[ht]
   \centering
@@ -21,7 +22,7 @@ For example, it can be a robotic arm building a car in a factory, a surgeon robo
 \end{figure}
 
 The DARPA Robotics Challenge has brought some light on the humanoid robots.
-This competition brought together a large scope of robotics groups from universities, laboratories and private companies around a common goal: Make a robot succeed in several challenges without any human physical intervention.
+This competition brought together a large scope of robotics groups from universities, laboratories and private companies around a common goal: teleoperate a robot to make it succeed in several challenges without any human physical intervention.
 The robots were expected to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
 All those tasks can usually be broken down into sets of elementary tasks in human language.
 Some typical examples of tasks for a robot can be `Put hand in contact with target', `Put foot on next step', `Avoid collision with that object', `Maintain stability' or `Look in that direction'.
@@ -29,13 +30,13 @@ As is, those tasks do not mean anything for the robot.
 A robot is made of a collection of bodies that are linked together by joints actuated by motors.
 A robots configuration consists of the position and orientation of its base body, and the configuration of each of its joints.
 Satisfying a task requires that the joints of the robot reach a configuration for which the task is satisfied.
-The action of satisfying a task comes down to moving from an initial configuration to a goal configuration, figuring out the trajectory to follow and actually following it are the jobs of the trajectory generation and the control of the robot.
+The action of satisfying a task comes down to moving from an initial configuration to a goal configuration. Figuring out the trajectory to follow and actually following it are the jobs of the trajectory generation and the control of the robot.
 Those are by themselves some complete fields of robotics, and they have one thing in common, they both need to be given an initial configuration, a final configuration and sometime some intermediate configurations.
 Finding those configurations is the job of what we call the Posture Generation (PG), which is the main topic of this dissertation.
-There are two types of robots. The fixed-base robots and the mobile robots.
-The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated.
-Which means that the robot has as many degrees of freedom (DoF) as actuators, Thus, for any joint configuration, a unique robots position is achieved.
-On the contrary, mobile robots are under actuated, which means that the robot has more DoF than actuators.
+\newline There are two types of robots. The fixed-base robots and the mobile ones.
+The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated (But can sometimes have underactuated joints).
+This means that the robot has as many degrees of freedom (DoF) as actuators, Thus, for any joint configuration, a unique robots position can be achieved.
+On the contrary, mobile robots are always under actuated, which means that the robot has more DoF than actuators.
 Each link of the robot is actuated, but the position of the basis of the robot is the result of the configuration of the joints and of the contacts that the robot makes with the environment.
 A mobile robot's position depends on the location of its contacts with the environment.
 For biped robots evolving on a flat surface, a footstep planner can be used to decide of the sequence of steps to take so the robot can walk to its goal.
@@ -81,14 +82,13 @@ The gimbal lock is a singularity that happens when parameterizing $SO(3)$ on $\m
 Thus, one degree of freedom is lost.
 Note that this singularity can block the optimization algorithm and that it is only due to the choice of parameterization, it is not intrinsic to the manifold $SO(3)$.
 It is possible to parameterize $SO(3)$ without having to face singularities by parameterizing it over another non-Euclidean manifold.
-The most common ones being the unit quaternion space and the $3\times 3$ rotation matrix.
+The most common ones are the unit quaternion space and the $3\times 3$ rotation matrix.
 Most of the solvers available make the assumption that the search space is Euclidean, which makes is complicated to use quaternion or rotation matrix efficiently.
 To put it simply, for the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters, the coefficients of the quaternion and an equality constraint needs to be added to the optimization problem to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
 Similarly, if a variable is parameterized by a rotation matrix, then the variable $M$ has 9 parameters and several constraints need to be added to the problem so that M is symmetric, positive definite and its determinant is 1 $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
 Similar issues can be found with the parameterization of other non-Euclidean manifold, like $S2$ for example.
 
-There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters.
-Though to our knowledge, they are focused on non-constrained optimization.
+There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
 One of the particularity in our approach of posture generation is that we develop, extend and use one such optimization algorithm on non-Euclidean manifolds to solve robotics problems.
 
 Posture Generalization can be viewed as, and is sometimes called, Generalized Inverse Kinematics.
