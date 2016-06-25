@@ -111,7 +111,7 @@ For this reason, when addressing $SO(3)$ with classical optimization algorithms,
     \item rotation matrix, \emph{i.e.} an element $R$ of $\mathbb{R}^{3 \times 3}$ (or equivalently $\mathbb{R}^9$) with the additional constraints $R^T R = I$ and $\det{R} \geq 0$.
 \end{itemize}
 
-Then, if we use the unit quaternion parametrization, the problem~\ref{eq:pb_on_SO3} becomes:
+Then, if we use the unit quaternion parametrization, the problem~\Eqref{eq:pb_on_SO3} becomes:
 \begin{align}
 \label{eq:pb_on_SO3_quaternion}
   \minimize_{q \in \mathbb{R}^4} & \quad f(q)\\
@@ -124,14 +124,14 @@ Then, if we use the unit quaternion parametrization, the problem~\ref{eq:pb_on_S
 
 The problem to solve has 4 dimensions (to represent a 3-dimensional manifold), and has an additional constraint that is entirely due to our formulation choice.
 With this formulation, it is guaranteed that the solution $q^*$ is a unit quaternion, but not that all the iterates $q_k$ along the optimization process have a unit norm.
-During the optimization process, at each iteration, an increment $\delta$ is computed by solving a quadratic problem that approximates~\ref{eq:pb_on_SO3_quaternion} locally around $q_k$.
+During the optimization process, at each iteration, an increment $\delta$ is computed by solving a quadratic problem that approximates~\Eqref{eq:pb_on_SO3_quaternion} locally around $q_k$.
 In particular, this quadratic problem approximates the constraints linearly, thus, for any step $\delta$ not null, from a unit-norm quaternion iterate $q_k$, the next iterate $q_{k+1} = q_k + \delta$ does not respect the unit-norm constraint (it respects the \emph{linearization} of the unit-norm constraint).
 So the quaternion $q_{k+1}$ does not represent a rotation.
 Some additional treatment needs to be implemented.
 For example, normalizing the quaternion at each iteration, then it represents a rotation, but this normalization must be taken into account in the constraints, cost functions, and their differentiations, which is an additional programming burden.
 Similar issues can be found with the $\mathbb{R}^{3\times 3}$ matrix representation.
 
-The alternative is to use optimization software working natively with manifolds~\cite{brossette:Humanoids:2015},~\cite{absil:book:2008} and solve the optimization problem as it is written in~\ref{eq:pb_on_SO3}.
+The alternative is to use optimization software working natively with manifolds~\cite{brossette:Humanoids:2015},~\cite{absil:book:2008} and solve the optimization problem as it is written in~\Eqref{eq:pb_on_SO3}.
 It has an immediate advantage: we can write directly the problem without the need to add any parametrization-related constraints.
 Working directly with manifolds also has the advantage that at each iteration, the variables of the problem represent an element of the manifold.
 This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
@@ -174,7 +174,7 @@ where $\mathcal{M}$ is a $n$-dimensional smooth manifold and $c$ is a $m$-dimens
 
 %{{{ REPRESENTATION PROBLEM
 \subsection{Representation problem}
-When $\mathcal{M} = \mathbb{R}^n$, the problem~(\ref{eq:optim_problem}) is solved iteratively, starting from an initial guess $x_0$ and performing successive steps $x_{i+1} = x_i + {\bf p_i}$ where ${\bf p_i}$ is the increment found at the $i$-th iteration, until convergence is achieved.
+When $\mathcal{M} = \mathbb{R}^n$, the problem~\Eqref{eq:optim_problem} is solved iteratively, starting from an initial guess $x_0$ and performing successive steps $x_{i+1} = x_i + {\bf p_i}$ where ${\bf p_i}$ is the increment found at the $i$-th iteration, until convergence is achieved.
 The strategy to compute ${\bf p_i}$ depends on the solver.
 
 This classical scheme cannot be readily applied to optimization over non-Euclidean manifolds.
@@ -190,7 +190,7 @@ This boils down to choosing a representation space $\mathbb{E} = \mathbb{R}^r$ (
 \end{equation}
 In the following, we identify $\mathcal{M}$ with the set $\psi(\mathcal{M}) \subseteq \mathbb{E}$.
 
-With this representation, it is tempting to simply transform problem~(\ref{eq:optim_problem}) as an optimization over $\mathbb{R}^r$ with objective $f \circ \psi^{-1}$ and constraint $c \circ \psi^{-1}$, and solve it with a usual solver.
+With this representation, it is tempting to simply transform problem~\Eqref{eq:optim_problem} as an optimization over $\mathbb{R}^r$ with objective $f \circ \psi^{-1}$ and constraint $c \circ \psi^{-1}$, and solve it with a usual solver.
 But depending on the representation choice, one of the two following problems arises:\\
 (i) $r=n$, then it is not possible in the general non-Euclidean case to find $\psi$ without derivative discontinuities.
 This can lead to critical convergence problems, \\
@@ -236,7 +236,7 @@ For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 This gives us a local parametrization for $\mathcal{M}$.
 The driving idea of the optimization on manifolds is to change the parametrization at each iteration.
-Applying this idea, we can reformulate Problem~(\ref{eq:optim_problem}) around $x_i$ as
+Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as
 \begin{align}
 \label{eq:local_problem}
 \minimize_{{\bf z} \in T_{x_i}\mathcal{M}} & \quad f \circ \varphi_{x_i}({\bf z}) \\
@@ -247,7 +247,7 @@ Applying this idea, we can reformulate Problem~(\ref{eq:optim_problem}) around $
 \end{align}
 This is an optimization problem on $\mathbb{R}^n$.
 If we perform one iteration of a classical solver starting from ${\bf z_0} = 0$, we get an iterate ${\bf z_1}$, which corresponds to the iterate $x_{i+1} = \varphi_{x_i}({\bf z_1})$.
-We can then reformulate Problem~(\ref{eq:optim_problem}) around $x_{i+1}$, perform a new iteration and repeat the process until convergence.
+We can then reformulate Problem~\Eqref{eq:optim_problem} around $x_{i+1}$, perform a new iteration and repeat the process until convergence.
 
 \begin{figure}[!htb]
   \centering
@@ -277,7 +277,7 @@ We first define the Lagrangian function
   \mathcal{L}_x ({\bf z}, \lambda) = f\circ \varphi_x({\bf z}) - \lambda^T c \circ \varphi_x({\bf z})
 \end{equation}
 with $\lambda \in \mathbb{R}^m$ the vector of Lagrange multipliers, and note $H_k$ the Hessian matrix $\nabla_{zz}^2 \mathcal{L}_{x_k}$.
-Taking ${\bf z_0} = 0$, the $k$-th SQP step for Problem~(\ref{eq:local_problem}) is computed by solving the following quadratic program:
+Taking ${\bf z_0} = 0$, the $k$-th SQP step for Problem~\Eqref{eq:local_problem} is computed by solving the following quadratic program:
 
 \begin{align}
   \label{eq:SQPStep}
@@ -291,7 +291,7 @@ Taking ${\bf z_0} = 0$, the $k$-th SQP step for Problem~(\ref{eq:local_problem})
 The basic SQP approach adapted to manifolds can be summarized as follows
 \begin{enumerate}
   \item set $k=0$ and $x_k$ to the initial value
-  \item compute ${\bf z}$ from Problem~(\ref{eq:SQPStep}) for current $x_k$
+  \item compute ${\bf z}$ from Problem~\Eqref{eq:SQPStep} for current $x_k$
   \item set $x_k = \varphi_{x_k}({\bf z})$
   \item if convergence is not yet achieved go-to step 2
 \end{enumerate}
@@ -788,7 +788,7 @@ The QP4 type of problem is used when a decomposition of the matrix $A$ of QP2, $
 \subsection{Problem Definition}
 \label{sub:problem_definition}
 
-As stated in Eq~\ref{eq:pb_on_SO3} we want to solve a non-linear constrained optimizarion problem on manifold that takes the following form:
+As stated in Eq~\Eqref{eq:pb_on_SO3} we want to solve a non-linear constrained optimizarion problem on manifold that takes the following form:
 
 \begin{align}
   \minimize_{x \in \mathcal{M}} & \quad f(x)\\
@@ -820,7 +820,7 @@ Our problem can be written as:
 With $L_B$ and $U_B$ being respectively the lower and upper bounds for Bounds constraints, $L_L$ and $U_L$ the lower and upper bounds for Linear constraints, and $L_N$ and $U_N$ the lower and upper bounds for Nonlinear constraints.
 That formulation is conveniently used to define our problem.
 Since we are solving this problem on a non-Euclidean manifold, we need to re-formulate it around the current iterate $x_i$ at each iteration.
-This is done automatically behind the scene and the user only has to provide the information to build problem~\ref{eq:optim_problem_on_manifold}.
+This is done automatically behind the scene and the user only has to provide the information to build problem~\Eqref{eq:optim_problem_on_manifold}.
 
 At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ that goes with each appearance of $x$):
 \begin{align}
@@ -836,9 +836,9 @@ At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ th
 \end{align}
 
 With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively the lower and upper bounds of validity of the tangent map of $\mathcal{M}$ around $x$.
-After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\ref{eq:optim_problem_on_manifold} become nonlinear in problem~\ref{eq:optim_problem_on_txm}.
-It is then necessary to treat the problem and evaluate which constraint is linear and which is not, in order to go back to a formulation of the same type as in problem~\ref{eq:optim_problem_on_manifold}.
-Basically, for each constraint $c_j$ in problem~\ref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a real space $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
+After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\Eqref{eq:optim_problem_on_manifold} become nonlinear in problem~\Eqref{eq:optim_problem_on_txm}.
+It is then necessary to treat the problem and evaluate which constraint is linear and which is not, in order to go back to a formulation of the same type as in problem~\Eqref{eq:optim_problem_on_manifold}.
+Basically, for each constraint $c_j$ in problem~\Eqref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a real space $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
 Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
 Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
 For example, a linear constraint on the elements of a unit quaternion, although one can obviously be devised, does not seem to make much sense.
@@ -850,7 +850,7 @@ In the particular case of linear constraints (and by extension bound constraints
 \end{equation}
 For bounds constraints, the same goes with $A$ being the identity matrix on the submanifold.
 
-Once those substitutions are done, we obtain a problem of the following form (note that $L_B$, $L_L$, $L_N$, $U_B$, $U_L$, $U_N$, $A$ and $c$ are not the same as in problem~\ref{eq:optim_problem_on_manifold}):
+Once those substitutions are done, we obtain a problem of the following form (note that $L_B$, $L_L$, $L_N$, $U_B$, $U_L$, $U_N$, $A$ and $c$ are not the same as in problem~\Eqref{eq:optim_problem_on_manifold}):
 
 \begin{align}
 \label{eq:optim_txm_final}
@@ -863,8 +863,8 @@ Once those substitutions are done, we obtain a problem of the following form (no
   \end{array}\right.
 \end{align}
 
-This problem is an exact reformulation of problem~\ref{eq:optim_problem_on_manifold} on $T_x\mathcal{M}$.
-At each step of the optimization process, we solve the QP approximating this problem~\ref{eq:optim_txm_final} around $\mathbf{z}=0$.
+This problem is an exact reformulation of problem~\Eqref{eq:optim_problem_on_manifold} on $T_x\mathcal{M}$.
+At each step of the optimization process, we solve the QP approximating this problem~\Eqref{eq:optim_txm_final} around $\mathbf{z}=0$.
 The Taylor development of $c\circ\varphi_x(z)$ to the first order around $\mathbf{z} = 0$ gives:
 \begin{equation}
   c \circ \varphi_x(\mathbf{z}) \approx c\circ \varphi_{x_k}(0) + \frac{\partial c\circ \varphi_{x_k}}{\partial {\bf z}}(0) {\bf z } = c(x_k) + {\left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}
@@ -885,7 +885,7 @@ The QP to solve at each iteration is the following:
   \end{split}
 \end{align}
 
-The resolution of this QP~\ref{eq:QP_txm} (with {\tt LSSOL}) gives the optimal solution $\mathbf{z}^*$ and Lagrange multipliers $\lambda^*$.
+The resolution of this QP~\Eqref{eq:QP_txm} (with {\tt LSSOL}) gives the optimal solution $\mathbf{z}^*$ and Lagrange multipliers $\lambda^*$.
 The new iterate that will be considered is:
 \begin{equation}
   x_{k+1}\leftarrow \varphi_{x_k}(\mathbf{z}^*)
@@ -897,7 +897,7 @@ The computation time related to those products can be reduced by taking advantag
 \subsection{Trust-region and limit map}
 \label{sub:trust_region_and_limit_map}
 
-Maps $\varphi_{x}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by solving Problem~(\ref{eq:QP_txm}) should not be outside the validity region of the map.
+Maps $\varphi_{x}$ are only valid locally, and we need to account for this: a step ${\bf z}$ found by solving Problem~\Eqref{eq:QP_txm} should not be outside the validity region of the map.
 We can enforce this by adding the limits of the manifold map to the problem as bound constraints.
 In fact, this comes down to intersecting the original problem's bounds with the limits of the map and imposing the resulting bounds as constraints.
 This leads naturally to trust region methods that we, therefore, favor over line-search approaches.
@@ -1029,9 +1029,9 @@ And we get the following convergence criterion:
 \subsection{Feasibility restoration}
 \label{sub:feasibility_restoration}
 
-Along the optimization process, the set of linearized constraints in the QP Problem~\ref{eq:QP_txm} can become infeasible.
+Along the optimization process, the set of linearized constraints in the QP Problem~\Eqref{eq:QP_txm} can become infeasible.
 For example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
-In that case the QP~\ref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
+In that case the QP~\Eqref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
 To quope with that issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
 The basic idea is the following: At the beginning of an iteration, we estimate a list of infeasible linearized constraints.
 The infeasible constraints are removed from the restoration problems constraints list and their violation is added to its cost function (that becomes the sum of all constraints violation).
@@ -1040,7 +1040,7 @@ That is done by iterating just like in the SQPs main loop with the difference th
 The restoration phase has its own filter called the restoration filter.
 For more details on the restoration phase, see Section~\ref{sub:restoration_phase}.
 
-Note that each iteration of the main SQP algorithm starts with the resolution of an FP (Feasibility Problem), that consists of the same linearized constraints as the QP problem~\ref{eq:QP_txm} without cost function.
+Note that each iteration of the main SQP algorithm starts with the resolution of an FP (Feasibility Problem), that consists of the same linearized constraints as the QP problem~\Eqref{eq:QP_txm} without cost function.
 
 \begin{align}
   \label{eq:FP_txm}
@@ -1128,7 +1128,7 @@ We regularize it as follows: we first perform a Bunch-Kaufman factorization $P_k
 The eigenvalue decomposition $B_k = Q_k D_k Q_k^T$ is immediate and cheap to compute.
 From the diagonal matrix $D_k$ we form $D'_k$ such that $d'_{ii} = \max\left(d_{ii},\mu_{\min}\right)$ where $\mu_{\min}>0$ is user-defined (we typically set it to $0.1$).
 Defining $L'_k = L_k Q_k {(D'_k)}^{1/2}$, we get a regularized matrix $H'_k = P_k^T L_k L_k^T P_k$.
-In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~(\ref{eq:SQPStep}), which directly accepts the factorized form $(P_k, L'_k)$.
+In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~\Eqref{eq:SQPStep}, which directly accepts the factorized form $(P_k, L'_k)$.
 This avoids an internal Cholesky factorization so that our regularization does not add too much time to the overall process of building and solving the QP.\@
 
 \subsection{An alternative Hessian Approximation Update}

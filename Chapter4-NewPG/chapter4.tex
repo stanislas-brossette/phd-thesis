@@ -113,7 +113,7 @@ The value and the derivative of $C$ w.r.t any $x$ expression are then automatica
 %\end{tabular}
 %\end{table}
 
-The code of the dot function that translates eq:~\ref{eq:dot} is pretty straightforward:
+The code of the dot function that translates eq:~\Eqref{eq:dot} is pretty straightforward:
 \begin{center}
 {\tt C.value() = A.value().dot(B.value())\\
 C.diff(x) = A.value().transpose()*B.diff(x) \\ + B.value().transpose()*A.diff(x)}
@@ -217,7 +217,7 @@ These cannot be directly translated on manifolds other than $\mathbb{R}^n$.
 For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, then the $S2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds.
 
 \item The contact constraint consists in identifying the features of two frames $F_1$ and $F_2$.
-For example, for a planar contact, we can write the constraints~\ref{eq:planar_contact_bad}, with $\vec{z_1}$ and $\vec{z_2}$ the outbound normals to the surfaces in contact.
+For example, for a planar contact, we can write the constraints~\Eqref{eq:planar_contact_bad}, with $\vec{z_1}$ and $\vec{z_2}$ the outbound normals to the surfaces in contact.
 \begin{equation}
   \left\{
   \begin{array}{ll}
@@ -227,7 +227,7 @@ For example, for a planar contact, we can write the constraints~\ref{eq:planar_c
   \right.
 \label{eq:planar_contact_bad}
 \end{equation}
-In practice, for a better numerical behavior of the optimization, we write that $\vec{z_2}$ is perpendicular to the plan $\{O_1, \vec{x_1}, \vec{y_1}\}$ and has opposite direction with $\vec{z_1}$,~\ref{eq:planar_contact}:
+In practice, for a better numerical behavior of the optimization, we write that $\vec{z_2}$ is perpendicular to the plan $\{O_1, \vec{x_1}, \vec{y_1}\}$ and has opposite direction with $\vec{z_1}$,~\Eqref{eq:planar_contact}:
 \begin{equation}
   \left\{
   \begin{array}{ll}
@@ -241,7 +241,7 @@ In practice, for a better numerical behavior of the optimization, we write that 
 \end{equation}
 Note that on $F_2$ only the point $O_2$ and the vector $\vec{z_2}$ are necessary.
 Other types of contacts can be created that way, by equalizing other features, as explained in~\cite{escande:ras:2013}.
-For example, we can fix the contact to a given position and orientation by adding to it the following set of equation~\ref{eq:fix_planar_contact} that locks the degrees of freedom of rotation around the normal and translation in the tangent plane of the contact:
+For example, we can fix the contact to a given position and orientation by adding to it the following set of equation~\Eqref{eq:fix_planar_contact} that locks the degrees of freedom of rotation around the normal and translation in the tangent plane of the contact:
 \begin{align}
   \left\{
   \begin{array}{ll}
@@ -254,9 +254,9 @@ For example, we can fix the contact to a given position and orientation by addin
   \right.
 \label{eq:fix_planar_contact}
 \end{align}
-Those two sets of equations~\ref{eq:planar_contact} and~\ref{eq:fix_planar_contact} can easily be recombined to generate other types of constraints (e.g.\ fixing only the translation, or only the rotations\ldots).
+Those two sets of equations~\Eqref{eq:planar_contact} and~\Eqref{eq:fix_planar_contact} can easily be recombined to generate other types of constraints (e.g.\ fixing only the translation, or only the rotations\ldots).
 
-\item The stability constraint ensures that the Euler-Newton equation~(\ref{eq:NewtonWrench}) is balanced for the set of external wrenches applied to the robot (gravity $\mathcal{W}_G$ and contact forces $\mathcal{W}_i$).
+\item The stability constraint ensures that the Euler-Newton equation~\Eqref{eq:NewtonWrench} is balanced for the set of external wrenches applied to the robot (gravity $\mathcal{W}_G$ and contact forces $\mathcal{W}_i$).
 \begin{equation}
   \sum_{i}{\mathcal{W}_i(p)} + {\mathcal{W}_G(p)} = 0
   \label{eq:NewtonWrench}
@@ -270,7 +270,7 @@ In the case of interaction forces between 2 robots, only one wrench is created a
 That way, we are guaranteed that the forces inbetween the robots are balanced and we can evaluate the stability of each robot separately.
 
 \item The friction cone constraint limits the tangential part of every forces to avoid slippage.
-We write it as~\ref{eq:friction} (with $\mu$ the friction coefficient)
+We write it as~\Eqref{eq:friction} (with $\mu$ the friction coefficient)
 \begin{equation}
   \begin{split}
     \mu^2f_z^2-f_x^2-f_y^2 \geq 0 \\
@@ -399,14 +399,14 @@ Writing relations between geometric quantities defined in frames allows to descr
 %It is especially convenient when the contact points are predefined or when the geometric relations are simple to express, like for the inclusion of 2 convex polygons in each other in the context of a planar contact.
 In particular, it allows to write most types on geometric constraints between canonical geometric shapes (point, line, plan).
 The most common type of contact constraint encountered is the contact between two surfaces.
-When the two surfaces are plan, a contact between them can be written simply with the set of equations~\ref{eq:planar_contact}.
+When the two surfaces are plan, a contact between them can be written simply with the set of equations~\Eqref{eq:planar_contact}.
 In that case, the quantities involved in the constraint are invariant with the location of the contact point, thus, the equations are valid for any point of the surface (in particular, the normal vector is the same for any point on the surface).
-%When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and pre-defined, the set of equation~\ref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
-When it comes to non-flat surfaces, the location of the frames used in equations~\ref{eq:planar_contact} matters, as the quantities in the constraint's equations depend on it.
+%When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and pre-defined, the set of equation~\Eqref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
+When it comes to non-flat surfaces, the location of the frames used in equations~\Eqref{eq:planar_contact} matters, as the quantities in the constraint's equations depend on it.
 %(in particular, the normal vector can vary for any point on the surface).
 
 %We propose to describe that type of contact by parametrizing the contact surface, and using an additional variable on which the location of the contact point and its normal vector are parametrized.
-%We remind that a contact constraint between $F_1$ and $F_2$ described by eq~\ref{eq:planar_contact} requires the full $F_1$ frame and on $F_2$, only the origin and its normal vector are necessary.
+%We remind that a contact constraint between $F_1$ and $F_2$ described by eq~\Eqref{eq:planar_contact} requires the full $F_1$ frame and on $F_2$, only the origin and its normal vector are necessary.
 
 %If any(either or both) of the two surfaces in contact is non-plane, finding the exact location of the contact point on the surface is necessary, because then, the normal to the contact is not known in advance.
 
@@ -417,7 +417,7 @@ Then we can write the contact constraint on that parametrized frame with ease.
   \mathcal{F}(u_S\in \mathcal{M}_S) = \{O(u_S), (x(u_S), y(u_S), z(u_S))\}
 \end{equation}
 
-%In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added the optimization problem and we can desctibe  as well as the constraint set \ref{eq:planar_contact} depending on it.
+%In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added the optimization problem and we can desctibe  as well as the constraint set \Eqref{eq:planar_contact} depending on it.
 
 \subsection{Application to plan-sphere contact}
 We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal on $S_S$.

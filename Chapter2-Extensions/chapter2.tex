@@ -97,7 +97,7 @@ Third, we present our endeavor to apply an optimization method called `Lifted Ne
 %  SECTION INTEGRATION ON NON-INCLUSIVE CONTACTS IN POSTURE GENERATION  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In Section~\ref{sub:contact_constraints}, we defined a set of constraints (equations~\ref{eq:coplanarity}) that ensures the coplanarity of two planar surfaces in geometric planar contact.
+In Section~\ref{sub:contact_constraints}, we defined a set of constraints (equations~\Eqref{eq:coplanarity}) that ensures the coplanarity of two planar surfaces in geometric planar contact.
 Those equations guarantee the coplanarity of two infinite planar surfaces.
 Another set of constraints needs to be added to ensure the validity of a contact between two finite surfaces $S_1$ and $S_2$.
 That is, to ensure that the intersection of those two surfaces is not empty and that it is big enough to support the contact.
@@ -334,7 +334,7 @@ We thus defined the following pseudo-distance from an ellipse to a half-plane as
 \end{figure}
 
 Now let us consider a single segment $p_i p_j$ and an ellipse $\mathcal{E}$ defined in $F_0$.
-The expression of a vector ${{\bf v}_{F_0}}^T = {[v_x, v_y]}_{F_0}$ in $F_\mathcal{E}$ is obtained by applying the formula~(\ref{eq:F0-to-FE})
+The expression of a vector ${{\bf v}_{F_0}}^T = {[v_x, v_y]}_{F_0}$ in $F_\mathcal{E}$ is obtained by applying the formula~\Eqref{eq:F0-to-FE}.
 \begin{equation}
 {\bf v}_{F_\mathcal{E}} =
 \begin{bmatrix}
@@ -361,7 +361,7 @@ Then we get the following constraint:
 \label{eq:pseudo-distance}
 \end{equation}
 
-The combination of these equations~(\ref{eq:F0-to-FE}) and (\ref{eq:pseudo-distance}) applied for each edge of the polygons gives us all the necessary tools to develop a set of constraints that ensures that an ellipse is in the intersection of two polygons.
+The combination of these equations~\Eqref{eq:F0-to-FE} and \Eqref{eq:pseudo-distance} applied for each edge of the polygons gives us all the necessary tools to develop a set of constraints that ensures that an ellipse is in the intersection of two polygons.
 
 
 
@@ -371,7 +371,7 @@ The combination of these equations~(\ref{eq:F0-to-FE}) and (\ref{eq:pseudo-dista
 %       SUBSUBSECTION MODIFICATION OF THE OPTIMIZATION PROBLEM        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-To include the above idea in our posture generation, we need to modify the optimization problem~(\ref{eq:PG}) as follows.
+To include the above idea in our posture generation, we need to modify the optimization problem~\Eqref{eq:PG} as follows.
 Each non-inclusive geometrical contact adds five variables to the optimization vector, corresponding to the position, orientation, and radiuses of the ellipse ($x$, $y$, $\theta$, $r_x$ and $r_y$).
 One constraint of ellipse inclusion (as described above) is added to the problem for each edge of the polygons.
 The parameters $r_x$ and $r_y$ are given lower positive bounds to ensure that the ellipse is not empty.
@@ -400,7 +400,7 @@ But we know that the ellipse computed as above gives a lower bound of the contac
 \end{equation}
 with $\mathcal{A}(X)$ being the area of $X$.\newline
 Therefore, we can maximize the size of the ellipse in order to maximize the contact area.
-This is readily obtained by minimizing the value of $f_{\text{ellipse}}(r_x, r_y) = -\pi r_x r_y$ in the modified problem~(\ref{eq:PG}).
+This is readily obtained by minimizing the value of $f_{\text{ellipse}}(r_x, r_y) = -\pi r_x r_y$ in the modified problem~\Eqref{eq:PG}.
 In case there are other cost functions, the above cost can be added to them with a desired weight.
 This requires, however, to scale properly the cost so as to have a meaningful and easy-to-tune weight: the range of value of the ellipse's area goes from $0$ to $\mathcal{A}(P_1 \cap P_2) \leq \min (\mathcal{A}(P_1), \mathcal{A}(P_2))$.
 This latter quantity can be small (a typical area of contact of a humanoid robot is about $0.01m^2$, some environment surfaces can be smaller).
@@ -440,12 +440,12 @@ By defining such a surface, we impose partly the orientation of the contact.
 %A problem we encountered with that extension is that if the contact area is thin, then the ellipse  found inside this area will be thin too and thus have a small area.
 %This lead to some conditioning problems and at first the solver would stop without optimizing the size of the ellipse.
 %That was due to the fact that the area of the ellipse was negligible compared to the other costs involved in the cost function.
-%That is why we divided the area of the ellipse by $\min (\mathcal{A}(P_1), \mathcal{A}(P_2))$ to get the equation~\ref{eq:cost-ellipse} in the first place.
+%That is why we divided the area of the ellipse by $\min (\mathcal{A}(P_1), \mathcal{A}(P_2))$ to get the equation~\Eqref{eq:cost-ellipse} in the first place.
 Here again, one must be careful with numerical issues.
 Dealing with small numbers (here we would like to take the width of a fraction of a centimeter) may induce conditioning problems.
 Also, having two close parallel constraints of opposite direction (i.e. $g(x)\leq \alpha$ and  $-g(x)\leq \alpha$ with $\alpha$ small) is not a good practice in optimization as it will lead the solver to take small steps.
 Therefore, it is best to apply a scaling to the constraints by applying a geometrical scaling to $P_1$ and $P_2$ in the appropriate direction.\newline
-Likewise, constraints on the area of the ellipse should be based on the same formulation as in equation~(\ref{eq:cost-ellipse}).
+Likewise, constraints on the area of the ellipse should be based on the same formulation as in equation~\Eqref{eq:cost-ellipse}.
 
 
 
@@ -575,7 +575,7 @@ This example also illustrates one limitation of our method: it only considers pl
 
 
 %From a planning point of view, this particular result is obviously not achievable as the right leg of the robot goes through the ladder, this will be discussed in the next section.
-%Yet, the posture is perfectly valid as it respects of the constraints of problem~(\ref{eq:PG_chap2}).
+%Yet, the posture is perfectly valid as it respects of the constraints of problem~(\Eqref{eq:PG_chap2}).
 %This example illustrates our method in a multi-contact environment with almost linear contacts.
 %
 
@@ -1124,7 +1124,7 @@ The operators `addition', `subtraction', `multiplication', `sinus' and `cosinus'
 
 We developed a generic lifting algorithm that allows to automatically lift symbolic functions, and in particular, polynomials of trigonometric functions, based on a given criterion.
 To do so, we use symbolic variables, a symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn be explored and truncated at appropriate places where we insert additional variables.
-Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\ref{eq:direct_position}, where the green circles represent the variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the final expressions.
+Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the final expressions.
 \begin{figure}
   \centering
   \includegraphics[width=0.55\textwidth]{graphDirectEEPos.pdf}
@@ -1140,7 +1140,7 @@ We define the degree function as the degree of a polynomial with the specificity
 We also consider the option of eliminating or not the trigonometric functions.
 By eliminating the trigonometric functions, we mean that we reformulate the problem so that, given a variable $x$ that appears in our equations in the forms $\cos(x)$ and/or $\sin(x)$, we introduce 2 new variables $s_x$ and $c_x$, replace all the occurrences of $\cos(x)$ by $c_x$ and all the occurrences of $\sin(x)$ by $s_x$, and to ensure the equivalence of the two formulations, we add the equation ${c_x}^2 + {s_x}^2=1$ to our problem.
 
-For example, lifting the set of equation~\ref{eq:direct_position} with a maximum degree of 2 and without eliminating the trigonometric functions gives the following system, with all the $w_{i_j}$ being the additional lifted variables:
+For example, lifting the set of equation~\Eqref{eq:direct_position} with a maximum degree of 2 and without eliminating the trigonometric functions gives the following system, with all the $w_{i_j}$ being the additional lifted variables:
 \begin{equation}
   \begin{array}{c}
   \textbf{Lifted Equations}\\
@@ -1200,7 +1200,7 @@ Note that here, all the equations are polynomials of degree at most 2, no trigon
 \end{equation}
 
 This lifting methodology can be extended to most robotic systems.
-We also developed a lifting method that follows the principle described in~\ref{eq:robot_lift}, in which case, we get another set of equations similar to~\ref{eq:lifted_equations}.
+We also developed a lifting method that follows the principle described in~\Eqref{eq:robot_lift}, in which case, we get another set of equations similar to~\Eqref{eq:lifted_equations}.
 
 \subsection{Optimization on lifted variables}
 \label{subsec:optimization_on_lifted_variables}
