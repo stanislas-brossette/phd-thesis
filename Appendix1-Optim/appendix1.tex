@@ -72,7 +72,7 @@ An unconstrained optimization problem consists in minimizing an objective functi
 This problem that we denote $\mathcal{P}$ can be formulated as follows:
 
 \begin{equation}
-  \min_{x\in\mathbb{R}^n}\ {f(x)}
+  \minimize_{x\in\mathbb{R}^n}\ {f(x)}
 \label{eq:unconstrainedOptim}
 \end{equation}
 
@@ -120,7 +120,7 @@ In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from
 point is chosen and then a length of step is calculated to minimize the
 following 1-dimensional problem:
 \begin{align}
-  \min_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
+  \minimize_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
 \label{eq:lineSearchNLP}
 \end{align}
 
@@ -181,7 +181,7 @@ objective function is the quadratic model with approximated Hessian
 And the optimization problem to solve at each step of the optimization is
 
 \begin{align}
-  \min_{p} & \quad f_k + p^T \nabla f_k + p^T B_k p \nonumber\\
+  \minimize_{p} & \quad f_k + p^T \nabla f_k + p^T B_k p \nonumber\\
 \text{s.t.}&
 \quad \|p\| \leq \rho_k
 \label{eq:trustRegionNLP}
@@ -205,7 +205,7 @@ A general formulation for such problems (that we denote $\mathcal{P}$) is:
   \mathcal{P} \equiv
   \left\{
   \begin{array}{l}
-    \min\limits_{x\in\mathbb{R}^n}{f(x)}\\
+    \minimize\limits_{x\in\mathbb{R}^n}{f(x)}\\
     \text{ s.t. }
     \left\{
     \begin{array}{l}
@@ -230,7 +230,7 @@ We define the feasible set $\Omega$ that contains all the feasible points (point
 The formulation~\ref{formulation_NLCP} can then be rewritten as:
 \begin{equation}
   \label{formulation_NLCP_compact}
-  \mathcal{P} \equiv \min_{x\in\Omega}{f(x)}
+  \mathcal{P} \equiv \minimize_{x\in\Omega}{f(x)}
 \end{equation}
 
 In the general case, the problem~\ref{formulation_NLCP_compact} has multiple local solutions.
@@ -356,7 +356,7 @@ By increasing $\mu$ to $\infty$, we penalize the violation of the constraints wi
 The problem to solve only contains equality, boundary constraints and a cost function a cost function that prevents the slack variables from getting too close to 0:
 
 \begin{equation}
-  \min_{x,s}{f(x)- \mu\sum_{i\in I} \log(s_i)}
+  \minimize_{x,s}{f(x)- \mu\sum_{i\in I} \log(s_i)}
   \text{subject to }
   \left\{
     \begin{array}{l}
@@ -373,7 +373,7 @@ The QP is an approximation of the KKT conditions~\ref{KKT_conditions} of the act
 \begin{equation}
 \label{approx_QP}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T \nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla {f(x_k)}^T z \\
+    \minimize\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T \nabla_{xx}^2\mathcal{L}(x_k, \lambda_k)z + \nabla {f(x_k)}^T z \\
     \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in E \\
                        & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I
   \end{array}
@@ -390,7 +390,7 @@ To palliate to that issue, mainly two methods are used:
   \item The trust-region method adds a set of bound constraints to the QP~\ref{approx_QP}. So that the length of the step is limited by the trust-region. The size $\rho$ of the trust region is modified along the iterations based on the estimated quality of the QP approximation. In that case, the QP becomes:
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T \nabla_{xx}^2 \mathcal{L}(x_k, \lambda_k)z + {\nabla f(x_k)}^T z \\
+    \minimize\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T \nabla_{xx}^2 \mathcal{L}(x_k, \lambda_k)z + {\nabla f(x_k)}^T z \\
     \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in E \\
                        & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I\\
                        & |z|<\rho
@@ -401,8 +401,8 @@ To palliate to that issue, mainly two methods are used:
 \section{Sequential Quadratic Programming}
 \label{sec:sequential_quadratic_programming}
 
-The Sequential Quadratic Programming method is one of the most effective method to solve small and large scale non-linear constrained optimization problems.
-It has the upper hand on other methods mostly when solving problem with highly non-linear constraints.
+The Sequential Quadratic Programming method is one of the most effective method to solve small and large scale nonlinear constrained optimization problems.
+It has the upper hand on other methods mostly when solving problem with highly nonlinear constraints.
 
 \subsection{Principle}
 \label{sub:principle}
@@ -421,7 +421,7 @@ We denote $z_x$ and $z_\lambda$ the increments on $x$ and $\lambda$ respectively
 The problem is the following:
 \begin{equation}
   \begin{array}{l}
-    \min\limits_{x\in\mathbb{R}^n}{f(x)} \\
+    \minimize\limits_{x\in\mathbb{R}^n}{f(x)} \\
     \text{ subject to } C(x) = 0
   \end{array}
 \end{equation}
@@ -479,7 +479,7 @@ Solving this problem actually is equivalent to solving a QP problem of the follo
 
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
+    \minimize\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
     \text{s.t.} & \nabla_x C_k^T z_x + C_k = 0\\
   \end{array}
 \end{equation}
@@ -526,7 +526,7 @@ Denoting the solution of the QP problem $(z_x, l_k)$, the solution to~\ref{KKT_1
 This development can easily be extended to treat the case of problems constrained with inequality constraints:
 
 \begin{equation}
-  \min_{x\in\mathbb{R}^n}{f(x)}\ \text{subject to }
+  \minimize_{x\in\mathbb{R}^n}{f(x)}\ \text{subject to }
   \left\{
   \begin{array}{l}
     c_i(x) = 0,\ \forall i\in{E}\\
@@ -540,7 +540,7 @@ By solving the following Inequality-constrained Quadratic Problem (IQP) system a
 \begin{equation}
 \label{IQP}
   \begin{array}{ll}
-    \min\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
+    \minimize\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
     \text{s.t.} & \nabla_x {c_i}_k z_x + {c_i}_k = 0 ,\ \forall i\in E\\
                 & \nabla_x {c_i}_k z_x + {c_i}_k \geq 0 ,\ \forall i\in I\\
   \end{array}
@@ -557,7 +557,7 @@ At a step $k$ of the resolution of the IQP, all the constraints in the active se
 \begin{equation}
   \text{EQP} \equiv \left\{
   \begin{array}{ll}
-    \min\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
+    \minimize\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
     \text{s.t.} & \nabla_x {c_i}_k z_x + {c_i}_k = 0 ,\ \forall i\in \mathit{A}_k\\
   \end{array}
   \right.
@@ -720,7 +720,7 @@ At each step, the modified problem writes as:
 
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2Hz + \sum_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
+    \minimize\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2Hz + \sum_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
     \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in \mathcal{F} \\
                        & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I\\
                        & |z|<\rho_k
@@ -801,7 +801,7 @@ This results in a problem like~\ref{rest_SQP} to solve.
 
 \begin{equation}
   \begin{array}{ll}
-    \min\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2} z^T Hz - \sum\limits_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
+    \minimize\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2} z^T Hz - \sum\limits_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
     \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i \in \mathcal{F} \\
                        & |z|<\rho_k
   \end{array}
@@ -870,5 +870,5 @@ B_{k+1} = B_k + \frac{(y_k-B_k s_k){(y_k-B_k s_k)}^T}{{(y_k-B_k s_k)}^T s_k}
 Both those formulas proved to be efficient in some cases. It is not yet clear in which cases one is better than the other.
 
 \section{Conclusion}
-This section gives a general introduction to Non-linear constrained optimization without regards for robotics or optimization on manifolds
+This section gives a general introduction to nonlinear constrained optimization without regards for robotics or optimization on manifolds
 

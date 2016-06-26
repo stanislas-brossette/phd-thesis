@@ -159,7 +159,7 @@ We will now be able to specialize the solver for robotic problems, by leveraging
 \section{Optimization on Manifolds}
 \label{sec:optimization_on_manifolds}
 
-In this section, we describe a Sequential Quadratic Programming (SQP) approach~\cite{nocedal:book:2006} to solve the following non-linear constrained optimization program
+In this section, we describe a Sequential Quadratic Programming (SQP) approach~\cite{nocedal:book:2006} to solve the following nonlinear constrained optimization program
 
 \begin{align}
 \label{eq:optim_problem}
@@ -788,7 +788,7 @@ The QP4 type of problem is used when a decomposition of the matrix $A$ of QP2, $
 \subsection{Problem Definition}
 \label{sub:problem_definition}
 
-As stated in Eq~\Eqref{eq:pb_on_SO3} we want to solve a non-linear constrained optimizarion problem on manifold that takes the following form:
+As stated in Eq~\Eqref{eq:pb_on_SO3} we want to solve a nonlinear constrained optimizarion problem on manifold that takes the following form:
 
 \begin{align}
   \minimize_{x \in \mathcal{M}} & \quad f(x)\\
@@ -939,7 +939,7 @@ the problem can be rewritten as:
 \begin{align}
 \begin{split}
 \label{eq:problem}
-  \min_{\bf x \in \mathcal{M}} & \quad \mbox{\emph{f}}({\bf x}) \\
+  \minimize_{\bf x \in \mathcal{M}} & \quad \mbox{\emph{f}}({\bf x}) \\
   \text{subject to }&
   l \leq c({\bf x}) \leq u \\
 \end{split}

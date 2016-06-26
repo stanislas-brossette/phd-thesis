@@ -78,7 +78,7 @@ Third, we present our endeavor to apply an optimization method called `Lifted Ne
         %\end{itemize}
       %\item Solution
         %\begin{itemize}
-          %\item Develop a posture generator, along with a non-linear solver
+          %\item Develop a posture generator, along with a nonlinear solver
           %\item Better understanding of our own solver
           %\item Ability to use the solver in new ways:
           %\begin{itemize}
@@ -595,7 +595,7 @@ The size of the contact area is limited by the fact that the foot cannot penetra
 On~\Figref{fig:atlas_SmallStairs}, we present 3 postures generated in this environment.
 On each of those postures, we see that the ellipse's size is maximized until the foot enters in collision with the vertical wall behind each step.
 And when possible, like on the last step, the contact area is maximized without collision limitation and the foot is positioned as fully included in the support surface.
-We can see here that even when the size of the ellipse is maximized while competing with other non-linear constraints like collision avoidance, our method still works well and leads us to a satisfactory solution.
+We can see here that even when the size of the ellipse is maximized while competing with other nonlinear constraints like collision avoidance, our method still works well and leads us to a satisfactory solution.
 It has been used to actually make the robot climb a vertical ladder and presented in~\cite{vaillant:autonomousrobots:2016} and~\cite{vaillant:humanoids:2014}.
 
 %Under each simulation result, an image presents the disposition of the foot (in green) that is in geometrical non-inclusive contact with a step (in blue) and the optimal ellipse that has been found.
@@ -1039,7 +1039,7 @@ This algorithm efficiently computes the exact joint torques Jacobian for a robot
 In this section, we present our work on the use of lifted variables for robotics posture generation.
 The goal of this thesis is on one hand, to enable writing more complex and various problems in simpler ways by improving the formulation of posture generation problems, and on the other hand, to improve and adapt the resolution methods for those problems.
 This section focuses on the later.
-We formulate posture generation problems in an optimization friendly way in order to solve them using non-linear constrained optimization algorithms.
+We formulate posture generation problems in an optimization friendly way in order to solve them using nonlinear constrained optimization algorithms.
 In the following, we propose to apply the methods of lifted optimization presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to posture generation problems.
 
 The idea of lifting variables consists in taking a complicated equation $F(u) = 0$ and separating the complicated function $F$ into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on $u$ and on the output of functions of lower index:
@@ -1072,7 +1072,7 @@ With this formulation and the additional variables $x_i,\ i\in[1,\ldots, m]$, th
 \end{equation}
 
 This modified formulation can be used for any function of our optimization problem to reduce the complexity of individual equations at the cost of adding extra variables and constraints.
-One obvious drawback of this approach for solving a non-linear problem is the increased size of the linearized problem to solve at each iteration of the optimization.
+One obvious drawback of this approach for solving a nonlinear problem is the increased size of the linearized problem to solve at each iteration of the optimization.
 Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the jacobian of $G(u,x)$ to condense the lifted problem into a problem of the same size as the original one.
 Thus, the resolution of each iteration should take approximately the same time as with the original problem.
 
