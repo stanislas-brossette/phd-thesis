@@ -5,11 +5,11 @@
 %where you can also make suggestions and rate matlab2tikz.
 %
 \begin{tikzpicture}
-\newcommand{\figSize}{.28\linewidth}
+
 \begin{axis}[%
-width=\figSize,
-height=\figSize,
-at={(2.595in,0.512in)},
+width=4.208in,
+height=3.566in,
+at={(2.563in,0.481in)},
 scale only axis,
 every outer x axis line/.append style={black},
 every x tick label/.append style={font=\color{black}},
@@ -20,12 +20,12 @@ every outer y axis line/.append style={black},
 every y tick label/.append style={font=\color{black}},
 ymin=10,
 ymax=35,
-%ylabel={Number of iterations},
+ylabel={number of iterations},
 axis background/.style={fill=white},
-title={Number of iterations},
+title={Average number of iterations},
 axis x line*=bottom,
 axis y line*=left,
-legend style={at={(0.047,0.788)},anchor=south west,legend cell align=left,align=left,fill=white}
+legend style={legend cell align=left,align=left,draw=black}
 ]
 \addplot [color=red,solid]
   table[row sep=crcr]{%
@@ -52,9 +52,9 @@ legend style={at={(0.047,0.788)},anchor=south west,legend cell align=left,align=
 \end{axis}
 
 \begin{axis}[%
-width=\figSize,
-height=\figSize,
-at={(\figSize + 2.9in ,0.512in)},
+width=4.208in,
+height=3.566in,
+at={(8.1in,0.481in)},
 scale only axis,
 every outer x axis line/.append style={black},
 every x tick label/.append style={font=\color{black}},
@@ -65,9 +65,9 @@ every outer y axis line/.append style={black},
 every y tick label/.append style={font=\color{black}},
 ymin=0,
 ymax=0.018,
-%ylabel={Time per iteration (s)},
+ylabel={Time per iteration (s)},
 axis background/.style={fill=white},
-title={Time per iteration (s)},
+title={Average time spent per iteration},
 axis x line*=bottom,
 axis y line*=left
 ]
@@ -92,9 +92,9 @@ axis y line*=left
 \end{axis}
 
 \begin{axis}[%
-width=\figSize,
-height=\figSize,
-at={(2*\figSize + 3.2in,0.512in)},
+width=4.208in,
+height=3.566in,
+at={(13.637in,0.481in)},
 scale only axis,
 every outer x axis line/.append style={black},
 every x tick label/.append style={font=\color{black}},
@@ -105,9 +105,9 @@ every outer y axis line/.append style={black},
 every y tick label/.append style={font=\color{black}},
 ymin=0,
 ymax=0.7,
-%ylabel={Total time (s)},
+ylabel={Total time (s)},
 axis background/.style={fill=white},
-title={Total time (s)},
+title={Total time},
 axis x line*=bottom,
 axis y line*=left
 ]
