@@ -1,0 +1,43 @@
+
+\chapter{State of the art}
+\label{cha:state_of_the_art}
+
+Posture Generalization can be viewed as, and is sometimes called, Generalized Inverse Kinematics.
+The Inverse Kinematics problem consists in finding the joint configuration for an articulated multibody to complete a given task.
+It is, by definition purely kinematics, it has no regards for stability, or other physics related constraints.
+The IK problem has been widely studied and used in the fields of robotics, computer graphics, computer games and animation.
+For the simplest cases, with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found.
+But for more complicated cases, optimization methods are usually used.
+
+Most approaches to solve IK problems use pseudo-inverse based methods that are the Jacobian inverse and its variations, Jacobian transpose, Damped least squares with and without Singular Values decomposition or Selectively Damped Least Squares~\cite{balestrino1984robust, tolani2000real, baillieul1985kinematic, wampler1986manipulator, nakamura1986inverse, buss2005selectively}.
+Those approaches are all computationally expensive and suffer from singularities.
+In~\cite{pechev2008inverse} an alternative method based on a control approach is proposed.
+Some statistical approaches have been proposed in~\cite{courty2008inverse, hecker2008real}, with respectively a sequential Monte Carlo method and a particle filtering approach.
+In~\cite{AristidouFABRIK, Aristidou:2016_ExtFABRIK} the forward and backward reaching inverse kinematics resolution method that is based on a geometric iterative heuristic approach is proposed.
+Finding a solution to an IK problem without regards for the stability of the solution is a popular approach in the field of randomized path planning~\cite{cortes2002random, lavalle1999probabilistic}.
+All these approaches are used to find a solution to the geometric IK problem.
+To extend those to find statically stable solutions to the posture generation problems, one can use the methods presented in~\cite{bretl:itro:2008} or~\cite{rimon2008general} to test the stability of the IK solution and use them as rejection criterion for the proposed solution.
+Then if the proposed solution is deemed feasible, the optimal contact forces can be computed using methods proposed in~\cite{boyd2007fast}.
+
+Those approach lead to a sequential resolution of the posture generation problem.
+
+In~\cite{Zhao1994}, Zhao proposes to use a nonlinear optimization algorithm over a Cartesian space to solve the IK problem.
+\cite{bouyarmane2010static} extends that approach to solve the posture generation problem with a single nonlinear optimization query, computing the contact forces and joint configuration at the same time.
+
+
+%\cite{aristidou2009} presents a review of existing techniques to solve inverse kinematics and one can see that the optimization approaches to that problem are various: Inverse Jacobian, Newton method, Sequential Monte Carlo and Heuristic approaches. It also presents a novel geometric iterative heuristic approach.
+
+The Generalized Inverse Kinematics refers to a problem similar to the Inverse Kinematics in the sense that it searches a joint configuration for an articulated figure to complete a task under several other constraints like ensuring the stability of the structure, respecting its joint limits, avoiding collision with the environment or with itself.
+
+Generating viable robotic postures is a common problem encountered in sampling-based planning techniques and simulation of virtual characters.
+Generating desired initial, intermediary or finale posture configurations requires defining static task goals (e.g.\ reach a target point in 6D) to be done under intrinsic constraints such as joint limits, torque limits, avoiding non-desired self-collisions\ldots and perceptual or extrinsic ones such as keeping an object in the embedded camera field-of-view, avoiding non-desired collisions with surrounding objects, etc.
+
+In the past few years, our team has dedicated considerable efforts in proposing a general multi-contact motion planner to solve such cases of non-gaited acyclic planning.
+Given a humanoid robot, an environment, a start and a final desired postures, the planner generates a sequence of contact stances allowing any part of the humanoid to make contact with any part of the environment to achieve motion towards the goal.
+The planner's role is to grow a tree of contact stances iteratively, from a given posture, it tries to removes one of its contacts or to add a new one.
+The tree grows, following some heuristics until the solution is reached.
+A typical experiment with a HRP-2 robot achieving such an acyclic motion is presented in~\cite{escande:iser:2008}, and the planner is thoroughly described in~\cite{escande:ras:2013}.
+Extensions of this multi-contact planner to multi-agent robots and objects gathering locomotion and manipulation are presented in~\cite{bouyarmane:ar:2012}, and preliminary validations with some DARPA challenge scenarios, such as climbing a ladder, ingress/egress a utility car or crossing through a relatively constrained pathway are presented in~\cite{bouyarmane:humanoids:2012}.
+\cite{hauser:issr:2007} presents a different approach to multi-contact planning based on probabilistic roadmap and random sampling of the configuration space.
+Another way of planning a multi-contact scenario, which is actually the most popular, is to do it by hand, the user chooses iteratively which contacts to add and remove until the goal is reached.
+
