@@ -30,11 +30,12 @@ As is, those tasks do not mean anything for the robot.
 A robot is made of a collection of bodies that are linked together by joints actuated by motors.
 A robots configuration consists of the position and orientation of its base body, and the configuration of each of its joints.
 Satisfying a task requires that the joints of the robot reach a configuration for which the task is satisfied.
-The action of satisfying a task comes down to moving from an initial configuration to a goal configuration. Figuring out the trajectory to follow and actually following it are the jobs of the trajectory generation and the control of the robot.
+The action of satisfying a task comes down to moving from an initial configuration to a goal.
+Computing the trajectory to follow and actually following it are the jobs of the trajectory generation and the control of the robot.
 Those are by themselves some complete fields of robotics, and they have one thing in common, they both need to be given an initial configuration, a final configuration and sometime some intermediate configurations.
 Finding those configurations is the job of what we call the Posture Generation (PG), which is the main topic of this dissertation.
 \newline There are two types of robots. The fixed-base robots and the mobile ones.
-The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated (But can sometimes have underactuated joints).
+The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated (But not always, as they sometimes have underactuated joints).
 This means that the robot has as many degrees of freedom (DoF) as actuators, Thus, for any joint configuration, a unique robots position can be achieved.
 On the contrary, mobile robots are always under actuated, which means that the robot has more DoF than actuators.
 Each link of the robot is actuated, but the position of the basis of the robot is the result of the configuration of the joints and of the contacts that the robot makes with the environment.
@@ -67,9 +68,18 @@ All the aforementioned planning method rely on the fact that we have a tool to d
 The tool used for finding a robot configuration that satisfies a set of constraints like the geometric constraints of contact is called a `Posture Generator' (PG) and the development of that tool is the main topic of this dissertation.
 
 The mission of a posture generator is, for a poly articulated system, to find a configuration so that the system satisfies a set of constraints.
-For simple systems, with simple constraints, like a 6 DoF robotic arm having to reach a point with its end effector, some closed-form expressions can usually be devised.
+For simple systems, with simple constraints, like a 6 DoF robotic arm having to reach a point with its end effector, some closed-form expressions can sometimes be devised.
 But computing robot configuration to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
 When the robotic problem studied becomes too complex for closed-form formulas, it is formulated as a nonlinear optimization program and solved using state of the art optimization algorithms.
+
+Optimization algorithms can be derivative-free or not.
+The computation of the derivatives of the functions involved in the optimization problem is a common source of error.
+The strength of the derivative-free approaches is that the user does not need to implement the derivatives.
+But those approaches have proven to be much slower than their counterparts using derivatives.
+One way to avoid implementation errors in the derivatives computation is to use finite differences to compute them.
+This method is very slow, especially when the dimension of the problem is large.
+In order to design an efficient optimization algorithm, we will focus on methods using derivative informations and will implement those derivatives computations.
+The finite difference approach can be used to verify the correctness of the computation.
 
 Because it is a key tool for many robotics application, the posture generator is an important element of any robotics framework.
 It needs to be efficient at finding a solution when one exists and at figuring when a problem is not feasible.
@@ -89,7 +99,7 @@ Similarly, if a variable is parameterized by a rotation matrix, then the variabl
 Similar issues can be found with the parameterization of other non-Euclidean manifold, like $S2$ for example.
 
 There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
-One of the particularity in our approach of posture generation is that we develop, extend and use one such optimization algorithm on non-Euclidean manifolds to solve robotics problems.
+One of the particularity in our approach of posture generation is that we develop, extend and use one such optimization algorithm on non-Euclidean manifolds to solve robotics problems with constraints.
 
 Posture Generalization can be viewed as, and is sometimes called, Generalized Inverse Kinematics.
 The Inverse Kinematics problem consists in finding the joint configuration for an articulated multibody to complete a given task.

@@ -631,7 +631,7 @@ It has been used to actually make the robot climb a vertical ladder and presente
 
 In the last simulation, the HRP-2 robot has to cross a gap by making contacts
 with small surfaces.
-As well as for the previous simulation, the two objects
+As for the previous simulation, the two objects
 with which the feet of the robot will be in contact are too small for making a
 complete contact, instead, non-inclusive geometric contacts are found by
 maximizing the area of an ellipse that fits in the intersection of the polygons
@@ -662,7 +662,7 @@ Generating arbitrarily shaped contact areas proved to be doable very simply in a
 We focused on writing constraints that have continuous gradients since the posture generation problem is dominantly smooth.
 Hence, our geometric contact model can be useful for other optimization based purposes, for example, control or trajectory optimization, and any gradient-based descent scheme which handles inequalities (e.g.~\cite{escande:icra:2010}).
 While we were expecting an increase of computation time due to the addition of new variables in the problem (5 more for a total of 80--100 variables)
-we noticed that the timings obtained with this method are sensibly the same that our previous version of the posture generator with full contact surface inclusion.
+we noticed that the timings obtained with this method are sensibly the same that with our previous version of the posture generator with full contact surface inclusion.
 Consequently, this method offering a richer contact search (exploration) during planning comes without degrading computation time.
 In fact, it truly allows us to substantially reduce the time spent by the user in ad-hoc tuning the shapes of the contact patches, or fixing the contact positions that were previously done by hand.
 Also, it is fairly easy to implement and extends multi-contact planning algorithms like the one described in~\cite{escande:ras:2013}{} to give it richer planning possibilities.
@@ -687,9 +687,9 @@ This method extends straightforwardly to point cloud data as far as polygonal pa
 %                     SECTION TORQUE DERIVATION                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section, we present an efficient algorithm to compute the Jacobian of the joint torques in a robot with respect to all the articular variables of the robot and the variables involved in the expression of the external forces applied on the robot.
-The evaluation of the joint torques Jacobian is necessary to conduct an optimization algorithm in which the torques are involved in constraints or cost functions.
-The computation of the joint torques jacobian is done by differentiating algorithm~\ref{alg:IS}.
+In this section, we present an efficient algorithm to compute the Jacobian matrix of the joint torques in a robot with respect to all the articular variables of the robot and the variables involved in the expression of the external forces applied on the robot.
+The evaluation of the joint torques Jacobian matrix is useful to conduct an optimization algorithm in which the torques are involved in constraints or cost functions.
+The computation of the joint torques jacobian matrix is done by differentiating algorithm~\ref{alg:IS}.
 In most cases, the acceleration of gravity could be replaced by its value on earth $\mathbf{a_c} = \vec{0}$ and $\mathbf{a_f} = g \vec{z}$.
 For the sake of genericity, we keep it as $\mathbf{a_c}$ and $\mathbf{a_f}$ in the algorithm description, which could be useful if the robot is in an accelerating vehicle, for example.
 We first write algorithm~\ref{alg:IS} in its matrix form.
