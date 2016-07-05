@@ -48,6 +48,7 @@ Otherwise, another IK solution is generated and tested.
 And the process is repeated until a satisfactory solution is found.
 This type of sequencial approach of posture generation problem resolution features a rejection criterion that can in some cases be difficult to overcome, making this approach costly.
 For example, if there is a small number of contacts and very few configurations are stable.
+
 %Those approach lead to a sequential resolution of the posture generation problem where a solution to the IK problem is searched, then tested for stability, if it is stable, the optimal forces are computed, otherwise, another solution is searched for.
 
 Another way to solve the posture generation problem is to consider the complete problem as one, with the IK targets and all the other constraints (stability, collisions, toque limits, etc\ldots) in a single nonlinear constrained optimization problem.
@@ -57,7 +58,8 @@ In~\cite{escande:iros:2006}, that approach is employed to generate postures that
 Interestingly enough, in that study, the C-code that computes the robot's kinematics is generated through Maple and the HuMAnS toolbox provided by INRIA.
 The constraints of contact, stability and collision are then computed on top of it.
 And the problem is solved by the CFSQP solver~\cite{cfsqp:manual}.
-In~\cite{hauser:ijrr:2008}, a similar posture generation approach is used to fing viable postures for different legged robots on varied terrains in the context of a Probabilistic RoadMap planning.
+In~\cite{hauser:ijrr:2008}, a similar posture generation approach is used to fing viable postures for different legged robots on varied terrains in the context of a Probabilistic RoadMap planning, which is a planning approach based on random sampling of the configuration space.
+%\cite{hauser:issr:2007} presents a different approach to multi-contact planning based on probabilistic roadmap and random sampling of the configuration space.
 In~\cite{bouyarmane2010static}, Bouyarmane propose a generalization of the formulation of posture generation problems for systems of multiple robots and manipulated objects.
 Also, he generalizes the notion of contacts by allowing contacts to bear contact forces or not and to not necessarily be coplanar or horizontal.
 This generalistic formulation enables the generation of postures with inter-robot contacts.
@@ -74,8 +76,6 @@ Another way of planning a multi-contact scenario, which is actually oftem used w
 This type of approach is used when the plan to execute is very complex and when a lot of fine tunning of the postures is required.
 As in~\cite{vaillant:autonomousrobots:2016}, where a sequence of postures allowing the HRP-2 robot to climb a vertical ladder is generated and tuned manually.
 Those postures are provided as input to a finite state machine that builds additional intermediary tasks accounting for geometric uncertainties and specific grasps procedures to be realized on the real robot by a multi-objective model-based QP controller.
-
-\cite{hauser:issr:2007} presents a different approach to multi-contact planning based on probabilistic roadmap and random sampling of the configuration space.
 
 In many planning approaches~\cite{kuffner2005motion, chestnutt2007navigation, hauser:ijrr:2008, kolter2008control, bouyarmane:icra:2011} the planning problem is decomposed in two stages, first the sets of contacts and associated postures are planned and then the motions to go from one set to another are computed.
 Those two stages are loosely coupled, which can result in suboptimal use of the contacts available.
