@@ -97,9 +97,9 @@ Third, we present our endeavor to apply an optimization method called `Lifted Ne
 %  SECTION INTEGRATION ON NON-INCLUSIVE CONTACTS IN POSTURE GENERATION  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In Section~\ref{sub:contact_constraints}, we defined a set of constraints (equations~\Eqref{eq:coplanarity}) that ensures the coplanarity of two planar surfaces in geometric planar contact.
+In Section~\ref{sec:contact_constraints}, we defined a set of constraints (equations~\Eqref{eq:coplanarity}) that ensures the coplanarity of two planar surfaces in geometric planar contact.
 Those equations guarantee the coplanarity of two infinite planar surfaces.
-Another set of constraints needs to be added to ensure the validity of a contact between two finite surfaces $S_1$ and $S_2$, that is, to ensure that the intersection of those two surfaces is not empty and that it is big enough to support the contact.
+Another set of constraints needs to be added to ensure the validity of a contact between two finite surfaces $S_1$ and $S_2$, to ensure that the intersection of those two surfaces is not empty and that it is big enough to support the contact.
 
 In this section, we propose a simple way to formulate geometric contact formation to have an arbitrary intersection shape in a robotic (humanoid) posture generation problem.
 We start by defining convex areas of contact on the robot's body and the environment, that we call contact patches.
@@ -353,7 +353,7 @@ In $F_\mathcal{E}$, the distance between the circumference of $\mathcal{E}$ and 
 \end{equation}
 where $\wedge$ denotes the cross product and $O_{\mathcal{E}}$ is the center of the ellipse.
 
-To avoid numerical problems when the segment $p_i p_j$ is small, (see sec.~\ref{subsubsec:singular_cases}), it is preferable to multiply this distance by $\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E}}$ before using it as a constraint.
+To avoid numerical problems when the segment $p_i p_j$ is small, it is preferable to multiply this distance by $\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E}}$ before using it as a constraint.
 Then we get the following constraint:
 \begin{equation}
   -{\left.\overrightarrow{p_i p_j}\right|}_{F_\mathcal{E}} \wedge {\left.\overrightarrow{p_i O_\mathcal{E}}\right|}_{F_\mathcal{E}}+\| \overrightarrow{p_i p_j}\|_{F_\mathcal{E}} \leq 0
@@ -454,14 +454,9 @@ Likewise, constraints on the area of the ellipse should be based on the same for
 %                   SUBSECTION SIMULATION RESULTS                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We dedicated considerable efforts in proposing a general multi-contact motion planner to solve cases of non-gaited acyclic planning.
-Given a humanoid robot, an environment, a start and a final desired postures, our planner generates a sequence of contact stances allowing any part of the humanoid to make contact with any part of the environment to achieve motion towards the goal.
-Our planner is thoroughly described in~\cite{escande:ras:2013}.
-Extensions of this multi-contact planner to multi-agent robots and objects gathering locomotion and manipulation are presented in~\cite{bouyarmane:ar:2012}, and preliminary validations with some DARPA challenge scenarios, such as climbing a ladder, ingress/egress a utility car or crossing through a relatively constrained pathway are presented in~\cite{bouyarmane:humanoids:2012}.
-In~\cite{escande:ras:2013} and~\cite{bouyarmane:ar:2012}, we describe works in multi-contact that are achieved by other colleagues in robotics.
 In order to illustrate our method, we present some examples starring the HRP-2 and ATLAS humanoid robots, that are typical posture generations encountered in multi-contact planning.
 %All the computations of the following experiments are performed on a single thread of an Intel(R) Core(TM) i7-3840QM CPU at 2.80GHz, with 16Go of RAM.
-For the implementation of our posture generator, we use the RobOptim optimization framework~\cite{moulard:jsme:2013}{} relying on the IPOPT solver~\cite{wachter:mp:2006}{}.
+For the implementation of our posture generator, we use the RobOptim optimization framework~\cite{moulard:jsme:2013} relying on the IPOPT solver~\cite{wachter:mathprog:2006}.
 
 
 
@@ -557,11 +552,11 @@ In this particular step, the robot is using its right foot and both hands to mai
 We search a posture that keeps those previous contacts and adds a geometrical contact between the left foot and the second rung of the ladder.
 The result of that optimization can be observed on figure~\ref{fig:hrp2_jrl_complete}, with the robot posture on the left and a close-up look at the contact areas on the right.
 The difficulty of this situation is that a contact has to be made with a very thin surface of the environment (the ladder rung).
-Usual contact generation method would reduce a lot the span of possible contact positions (by patching the robot's foot with a very small surface or by imposing a set of authorized contact positions).
-Whereas with our method, the contact configuration is found during the optimization process without requiring any extra human work.
+%Usual contact generation method would reduce a lot the span of possible contact positions (by patching the robot's foot with a very small surface or by imposing a set of authorized contact positions).
+%Whereas with our method, the contact configuration is found during the optimization process without requiring any extra human work.
 The contact chosen by our software includes an ellipse which first axis is the width of the robot's foot and second axis is as thin as the ladder rung.
-One problem to expect is that numerical instability might happen if the surface of the rung is given too thin.
-But that would also happen with full inclusion constraints.
+%One problem to expect is that numerical instability might happen if the surface of the rung is given too thin.
+%But that would also happen with full inclusion constraints.
 This example also illustrates one limitation of our method: it only considers planar contacts and if one wants to model a purely linear contact another contact model must be used, since our modeling of those singular cases is approximative.
 %is the first step of the HRP-2 robot climbing a ladder.
 %The two hands are in bilateral contact with the two side bars of the ladder, the left foot is fixed on the ground and is the only part of the robot involved in the stability.
@@ -665,8 +660,9 @@ While we were expecting an increase of computation time due to the addition of n
 we noticed that the timings obtained with this method are sensibly the same that with our previous version of the posture generator with full contact surface inclusion.
 Consequently, this method offering a richer contact search (exploration) during planning comes without degrading computation time.
 In fact, it truly allows us to substantially reduce the time spent by the user in ad-hoc tuning the shapes of the contact patches, or fixing the contact positions that were previously done by hand.
-Also, it is fairly easy to implement and extends multi-contact planning algorithms like the one described in~\cite{escande:ras:2013}{} to give it richer planning possibilities.
-This method extends straightforwardly to point cloud data as far as polygonal patches can be extracted.
+Also, it is fairly easy to implement and extends multi-contact planning algorithms like the one described in~\cite{escande:ras:2013} to give it richer planning possibilities.
+This method extends straightforwardly to point cloud data as far as polygonal convex patches can be extracted.
+But one of its limitation is that in its current form, it cannot handle contacts with non-convex surfaces.
 
 %There are several opportunities for future work.
 %For example, we could improve the generality of our contact constraint formulation even further to manage linear and punctual contacts without the approximations we currently use.
@@ -692,7 +688,7 @@ The evaluation of the joint torques Jacobian matrix is useful to conduct an opti
 The computation of the joint torques jacobian matrix is done by differentiating algorithm~\ref{alg:IS}.
 In most cases, the acceleration of gravity could be replaced by its value on earth $\mathbf{a_c} = \vec{0}$ and $\mathbf{a_f} = g \vec{z}$.
 For the sake of genericity, we keep it as $\mathbf{a_c}$ and $\mathbf{a_f}$ in the algorithm description, which could be useful if the robot is in an accelerating vehicle, for example.
-We first write algorithm~\ref{alg:IS} in its matrix form.
+We first write algorithm~\ref{alg:IS} in its matrix form(which is more convenient for the purpose of derivating it).
 
 \begin{algorithm}
   \caption{Inverse Static algorithm on Matrix Form}
@@ -725,11 +721,11 @@ We first write algorithm~\ref{alg:IS} in its matrix form.
   \For{$i = n_J-1:0$}
   \State$\tau_i = {f^G_i}^T S_i$
   \If{$pred(i) \neq -1$}
-  \State$f^G_{pred(i)} =
+  \State$f^G_{pred(i)} \leftarrow
   \begin{bmatrix}
     \mathbf{m}^{G}_{pred(i)} \\ \mathbf{f}^{G}_{pred(i)}
   \end{bmatrix}
-  +=
+  +
   \begin{bmatrix}
     {\mathbf{R}^{PtS}_i}^T & \widehat{\mathbf{t}^{PtS}_i}{\mathbf{R}^{PtS}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{PtS}_i}^T \\
@@ -743,10 +739,9 @@ We first write algorithm~\ref{alg:IS} in its matrix form.
 \end{algorithmic}
 \end{algorithm}
 
-The variables of this algorithm w.r.t which we need to differentiate it are the geometric parameters of the robot $q$ and the variables of the external wrenches which can contain $q$ and some other variables $y$.
+The variables of this algorithm w.r.t. which we need to differentiate it are the configuration of the robot $q$ and the variables of the external wrenches which can themselves depend on $q$ and some other variables $y$, for example, in the case of a contact with another robot, the application point and value of those forces depend on $q$ and on the configuration of the other robot.
 We denote $\dim(q)$ and $\dim(y)$ the dimensions of $q$ and $y$ respectively.
 We assume that the derivatives of $m_i^{ext}$ and $f_i^{ext}$: $\frac{\partial m_i^{ext}}{\partial q}$, $\frac{\partial m_i^{ext}}{\partial y}$, $\frac{\partial f_i^{ext}}{\partial q}$, and $\frac{\partial f_i^{ext}}{\partial y}$ are known.
-The external forces can depend on a number of variables other than $q$, for example, in the case of a contact with another robot, the application point and value of those forces depend on $q$ and also on the articular values of the other robot.
 
 Besides $m_i^{ext}$ and $f_i^{ext}$, all the quantities of the algorithm depend only on $q$.
 Therefore, the derivation w.r.t $y$ is trivial and is automatically computed by our final algorithm.
@@ -879,10 +874,10 @@ Note the following relations:
   - \left( {({\mathbf{R}_i^J}^T \mathbf{u})}^T \cdot \mathbf{t}^J_i\right) \mathbf{I}_3\right)S_{i,j}^R\\
 \end{align}
 
-The last equation's derivation goes like follows:
+The last equation's derivation goes as follows:
 
 \begin{align}
-  f^G_{pred(i)} & +=
+  f^G_{pred(i)} & \leftarrow f^G_{pred(i)} +
   \begin{bmatrix}
     {\mathbf{R}^{PtS}_i}^T & \widehat{\mathbf{t}^{PtS}_i}{\mathbf{R}^{PtS}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{PtS}_i}^T \\
@@ -891,7 +886,7 @@ The last equation's derivation goes like follows:
     \mathbf{m}^{G}_i \\ \mathbf{f}^{G}_i
   \end{bmatrix}
   \\
-  & += \begin{bmatrix}
+  & =f^G_{pred(i)} + \begin{bmatrix}
     {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
   \end{bmatrix}
@@ -906,7 +901,7 @@ The last equation's derivation goes like follows:
 \end{align}
 
 \begin{equation}
-  K_i =
+  K_i :=
   \begin{bmatrix}
     \widehat{({\mathbf{R}_i^J}^T \mathbf{m}^{G}_i)}
     + \left({\mathbf{R}_i^J}^T \mathbf{f}^{G}_i\right) \cdot {\mathbf{t}^J_i}^T
@@ -917,7 +912,7 @@ The last equation's derivation goes like follows:
 \end{equation}
 
 \begin{equation}
-  \frac{\partial f^G_{pred(i)}}{\partial q} -=
+    \frac{\partial f^G_{pred(i)}}{\partial q} \leftarrow \frac{\partial f^G_{pred(i)}}{\partial q} -
   \begin{bmatrix}
     {\mathbf{R}^{x}_i}^T & \widehat{\mathbf{t}^{x}_i}{\mathbf{R}^{x}_i}^T \\
     \mathbf{0} & {\mathbf{R}^{x}_i}^T \\
@@ -1076,7 +1071,7 @@ Thus, the resolution of each iteration should take approximately the same time a
 
 The lifted variable approach is known to be superior to the non-lifted one in the problem of shooting methods for boundary value problems~\cite{osborne:1969:shooting}.
 With good intuition, the authors of~\cite{Albersmeyer:2010:LNM:1958447.1958472} state that the lifting idea could be directly transferred in the context of kinematic chain arising in robotics.
-Indeed, as we state in Section~\ref{sub:forward_kinematics}, the equation that governs the transformation of a robot's end effector on body $i$, ${}^i X_W(q)$ is constructed iteratively and seems to be a good candidate for lifting.
+Indeed, as we state in Section~\ref{sec:forward_kinematics}, the equation that governs the transformation of a robot's end effector on body $i$, ${}^i X_W(q)$ is constructed iteratively and seems to be a good candidate for lifting.
 If we consider a single chain robot with $m$ bodies, such that $\kappa (m) = \{0, 1, 2, \ldots m\}$ the ${}^m X_W(q) = X_\text{goal}$ can naturally be lifted as follows:
 
 \begin{equation}
@@ -1117,11 +1112,11 @@ Its articular variables are denoted $q = (q_1, q_2)$ and the expression of the e
 
 Those equations are polynomials in the variables $\cos(q_1)$, $\sin(q_1)$, $\cos(q_2)$, $\sin(q_2)$.
 Furthermore, they are polynomials of degree $1$ in each of those variables separately.
-This observation extends to the case of any robot composed of the joints presented in Section~\ref{sub:joints_formulations} and that does not contain kinematic loops (kinematic loops are not considered in this thesis).
+This observation extends to the case of any robot composed of the joints presented in Section~\ref{sec:joints_formulations} and that does not contain kinematic loops (kinematic loops are not considered in this thesis).
 The operators `addition', `subtraction', `multiplication', `sinus' and `cosinus' are enough to describe the kinematics of a robot.
 
 We developed a generic lifting algorithm that allows to automatically lift symbolic functions, and in particular, polynomials of trigonometric functions, based on a given criterion.
-To do so, we use symbolic variables, a symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn be explored and truncated at appropriate places where we insert additional variables.
+To do so, we use symbolic variables. A symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn be explored and truncated at appropriate places where we insert additional variables.
 Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the final expressions.
 \begin{figure}
   \centering
@@ -1131,7 +1126,7 @@ Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equati
 \end{figure}
 
 To lift a set of equations, we explore the graph from left to right. At each node of the graph, we consider the sub-graph that lies on its left.
-If this sub-graph violates our criterion, it is lifted, a lifting variable is added and replaces the sub-graph.
+If this sub-graph violates our criterion, a lifting variable is added and replaces the sub-graph.
 Then we iterate this process on the remaining graph until it does not violate the criterion.
 Given that the equations to solve are polynomials of trigonometric functions, we decided to lift them based on a criterion of maximum degree of the lifted polynomials.
 We define the degree function as the degree of a polynomial with the specificity that trigonometric functions are considered to be polynomials of infinite degree (And thus are always lifted, no matter the maximum degree criterion).
@@ -1227,11 +1222,11 @@ And for regularization, we approximate the full-space hessian matrix through BFG
 Those methods are presented in~\cite{bonnans:springer:2002}.
 %All those methods are applied on the full-space iteration, during the update process of the optimization, the lifted and final equations are treated the same way.
 
-\subsection{Condensed BFGS update}
-\label{subsec:condensed_bfgs_update}
-In appendix, we propose a formulation of the condensed version of the BFGS algorithm.
+%\subsection{Condensed BFGS update}
+%\label{subsec:condensed_bfgs_update}
+%In appendix, we propose a formulation of the condensed version of the BFGS algorithm.
 
-TODO Because it has not been used much and we didn't get any good results out of it, I'm not sure if I should present it or not\ldots
+%TODO Because it has not been used much and we didn't get any good results out of it, I'm not sure if I should present it or not\ldots
 
 \subsection{Results, experimentation}
 \label{subsec:Results}
@@ -1284,7 +1279,7 @@ Indeed, we need to choose one item amongst each or the categories cited below:
 \end{itemize}
 The number of possible combination of choices is large and grows with any new possibility added.
 
-We devised a set of simple robots that will be the basis of our experimentation.
+We devised a set of simple robots to be the basis of our experimentation.
 For simplicity, we focused on fixed base robots with only revolute joints.
 To study the influence of the number of degrees of freedom of a robot on the optimization performance, we studied planar robots composed of $n$ successive links of length 1 attached to one another by revolute joints.
 We also studied a 7 axis 3D arm robot and a torso robot with 2 arms.
@@ -1391,12 +1386,12 @@ We studied many of the possible configurations of resolution methods (22 in tota
 Still, it seems possible to draw some conclusions out of it, because in most cases, the direct approach outperforms the lifted one.
 The only case where we observe a neat advantage in favor of the lifted methods compared to the direct one is when using the interior point method that is built-in in fmincon in Matlab with a randomized initialization and the norm 2 of the articular parameters vector as a cost function.
 
-The overall results we extracted from those experiments is that the most performing method is: Solving the direct formulation with our custom solver, using BFGS regularization and either Armijo or filter line search and no cost function.
+The overall results we extracted from those experiments is that the best performing method is: solving the direct formulation with our custom solver, using BFGS regularization and either Armijo or filter line search and no cost function.
 
 We observed that when the lifted variables are initialized randomly the direct problem is usually solved faster than the lifted one.
 Whereas when the lifted variables are initialized so that the lifted equations are initially satisfied, the results are sensibly the same for lifted and direct approaches.
 
-After comparison of all the results that we obtained, for all the planar robots with 2 to 12 degrees of freedom and across all the resolution methods that we tried, the best performing formulation is the direct one. Except for the 7 DOF robot, where the resolution of the lifted problem with maximum degree 2 outperforms slightly all the other methods.
+After comparison of all the results that we obtained, for all the planar robots with 2 to 12 degrees of freedom and across all the resolution methods that we tried, the best performing formulation is the direct one, except for the 7 DOF robot, where the resolution of the lifted problem with maximum degree 2 outperforms slightly all the other methods.
 
 Overall, it seems that the idea of lifting does not provide better performances than the direct formulation for solving inverse kinematics problem.
 In the view of that observation, we decided to not go further in this research direction.

@@ -58,102 +58,30 @@
   %\item Utilization of posture generation in planning
 %\end{itemize}
 %}}}
-\section{Problem Definition}
-\label{sec:problem_definition}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                     SECTION PROBLEM DEFINITION                      %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-We consider the problem where we have a robotic system and we want to have it do some tasks, like for example to make a contact between a point on a body of the robot and a point of the environment.
-This contact task can be modelized as a simple equality.
-We denote $q$ the joint configuration (joint + base) of the robot, $g(q)$ is the 3D position of the point of interest on the robot and $P$ is the point of the environment.
-Then our problem comes down to finding a configuration $q^*$ such that $f(q^*) = P$.
-For robots like humanoids, the equations describing their kinematics are quite complicated, and, in the presence of angular joints, they are nonlinear.
-In the general case, even for simple tasks, a closed form solution of the problem does not exist.
-
-We denote $\mathcal{C}$ the configuration space of our robotic system.
-It is the manifold in which $q$ lives. The dimension of $\mathcal{C}$ is equal to the number of degrees of freedom of the robot.
-Note that if all the joints of the robot are actuated, this is the number of motors of the robot.
-And if the robot has a free-floating basis (is not fixed) then the position in $\mathbb{R}^3$ and rotation in $SO(3)$ of its basis are part of $q$.
-
-We can formulate that problem as follows:
-
-\begin{equation}
-  \text{find}\ q\in\mathcal{C}\ \text{such that}\ g(q)=P
-\end{equation}
-
-The space of solution of this problem is a submanifold of $\mathcal{C}$ that we call ${\mathcal{C}}_F$ the feasible configuration space (which can be empty).
-
-In addition to the equality constraint abovementioned, the problem can feature some inequality constraints.
-For example, each joint variable can be limited to a certain range of value: $\forall i,\ q_i\in [q_i^-,\ q_i^+]$. Then the problem becomes a combination of equality and inequality constraints.%, and can be written as:
-%\begin{equation}
-  %\text{find}\ q\in\mathcal{C}\ \text{such that}\left\{
-  %\begin{array}{l}
-    %g(q)=P \\
-    %\forall i,\ q_i^- \leq q_i \leq q_i^+
-  %\end{array}
-  %\right.
-%\end{equation}
-Finally, we can also require finding the point of $\mathcal{C}_F$ that minimizes a criterion, such as the distance to a goal posture $q_0$.
-Our problem becomes:
-
-\begin{equation}
-  \left\{
-  \begin{array}{l}
-    \minimize\limits_{q\in\mathcal{C}}{\|q-q_0\|_2}\\
-    \text{ s.t. }
-    \left\{
-    \begin{array}{l}
-      g(q)=P\\
-      \forall i,\ q_i^- \leq q_i \leq q_i^+
-    \end{array}
-    \right.
-  \end{array}
-  \right.
-\end{equation}
-
-This type of problem is called a nonlinear constrained optimization problem and can be formulated in a more generic fashion as:
-
-\begin{equation}
-\label{eq:optim_form_PG}
-  \left\{
-  \begin{array}{l}
-    \minimize\limits_{x\in\mathcal{C}}{f(x)}\\
-    \text{ s.t. }
-    \left\{
-    \begin{array}{l}
-      c_i(x) = 0,\ \forall i\in{E}\\
-      c_i(x) \geq 0,\ \forall i\in{I}\\
-    \end{array}
-    \right.
-  \end{array}
-  \right.
-\end{equation}
-
-Where $x$ is the optimization variable (in space $\mathcal{C}$) we want to find that minimizes the cost function $f(x)$ while satisfying the equality constraints $c_i(x) = 0,\ \forall i\in{E}$ and inequality constraints $c_i(x) \geq 0,\ \forall i\in{I}$
-
-Such problems can be solved by a nonlinear optimization solver.
-In Appendix~\ref{chapter:optimization}, we present some principles of nonlinear optimization in unconstrained and constrained cases.
-Several off-the-shelf solvers are available and have been widely used in for solving robotics problems.
-The CFSQP solver~\cite{cfsqp:manual} was used in~\cite{escande:iros:2009} and~\cite{escande:ras:2013} where thousands of HRP-2 posture generation queries were made to explore the feasible space.
-The IPOPT solver has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator had been extended to handle multi-robot problems and more complex and various contact models.
-In this thesis, we use those off-the-shelf solvers a little in the beginning and later we tackle the development of our own nonlinear optimization solver.
-
-From this point forward, we formulate and solve posture generation problems as nonlinear constrained optimization problem.
-And in the next sections, we focus on the formulating several robotics constraints and cost function in the formalism of nonlinear optimization.
 
 
+In this Chapter, we present in detail the formulation of a posture generation problem.
+We present the algorithms used to compute the kinematics of a robot and its derivatives as well as the joint torques.
+Then we formulate some classical functions that are often used in posture generation: joint limits, contact constraints, collision avoidance, stability, torque limits and friction cones.
+In Figure~\ref{fig:PG}, we illustrate those constraints with the result of a posture generation problem where the HRP4 robot must climb on a stack of cubes while being statically stable, respecting its joint and torque limits, the contact forces must remain in the friction cones and the robot must avoid auto-collisions and collisions with the environment.
 
-\section{Problem Formulation}
-\label{sec:pg_formulation}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.7\textwidth]{PG.pdf}
+  \caption{HRP4 on a stack of cubes. The color of each box corresponds to the color of the item it depicts.}
+\label{fig:PG}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                    SECTION PROBLEM FORMULATION                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Kinematics Formulation}
+\label{sec:kinematics_formulation}
 
-\subsection{Forward Kinematics}
-\label{sub:forward_kinematics}
+
+\section{Forward Kinematics}
+\label{sec:forward_kinematics}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   SUBSECTION FORWARD KINEMATICS                     %
@@ -174,13 +102,6 @@ For joint $J_i$ they are respectively denoted $pred(i)$ and $succ(i)$, and $B_{p
 We denote $\lambda(j)$ the index of the parent body of $B_j$.
 The number of degrees of freedom of $J_i$ is denoted $dof^J_i$ and the number of degrees of freedom of the whole robot is denoted $dof$.
 Figure~\ref{fig:mbg} illustrates this numbering system for a simple robot with 4 joints and 5 bodies (including the basis)
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.7\textwidth]{mbg.pdf}
-  \caption{MultiBody graph}
-\label{fig:mbg}
-\end{figure}
 
 The geometric relations between bodies and joints are described through transformations between their reference frames.
 We use transformations as described in the Spacial Vector Algebra chapter of `Rigid Body Dynamics Algorithm' by Roy Featherstone~\cite{featherstone:book:2007}.
@@ -225,10 +146,17 @@ Its inverse is:
   \end{bmatrix}
 \end{equation}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{mbg.pdf}
+  \caption{MultiBody graph}
+\label{fig:mbg}
+\end{figure}
+
 %Each joint $J_i$ is defined in the reference frame of its predecessor body by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ from the base of the body to the base of the joint.
 Each joint $J_i$ is defined by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ between the reference frame of its predecessor body and its own reference frame.
 Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $\mathbf{S}_i$.
-Each column of $\mathbf{S}_i$ described a degree of freedom of $J_i$ its upper part for the rotations and lower for translations (see Section~\ref{sub:joints_formulations}).
+Each column of $\mathbf{S}_i$ described a degree of freedom of $J_i$ its upper part for the rotations and lower for translations (see Section~\ref{sec:joints_formulations}).
 \begin{equation}
   \mathbf{S}_i =
   \begin{bmatrix}
@@ -293,8 +221,8 @@ Given a transformation ${}^p X_i$ defined in the frame of $B_i$, its value in th
 
 
 
-\subsection{Joints formulations}
-\label{sub:joints_formulations}
+\section{Joints formulations}
+\label{sec:joints_formulations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   SUBSECTION JOINTS FORMULATIONS                    %
@@ -419,14 +347,21 @@ The rotation matrix for such a rotation is given by:
 
 Euler Angle formulations have the advantage to be simple and intuitive.
 There are many other possible choices of axes to define a Euler Angle 3D rotation.
-But they all suffer from singularities (the Gimbal lock), which happens when two of the three rotation axis become aligned.
+But they all suffer from singularities (the gimbal lock), which happens when two of the three rotation axis become aligned.
 In such a configuration, the only rotations possible are one rotation around the two aligned axis and one rotation around the third axis.
 Thus, one degree of freedom is lost.
-Those singularities are prohibitive for the use of that type of formulation in a posture generation (the optimization algorithm could get stuck in them).
+Those singularities are prohibitive for the use of that type of formulation in a posture generation.
+In~\cite{grassia1998}, Grassia states that any attempt to parameterize the entire set of 3D rotations by an open subset of Euclidean space(as do Euler angles) will suffer from gimbal lock.
+Note that this singularity is only due to the user's choice of parameterization, it is not intrinsic to the manifold $SO(3)$.
+%One can prove that there is no smooth mapping between $SO(3)$ and $\mathbb{R}^3$ that is free of singularities.
+It is possible to parameterize $SO(3)$ without having to face singularities by parameterizing it over another non-Euclidean manifold.
+The most common ones are the set of unit quaternion embedded in $\mathbb{R}^4$ and the set of rotation matrices embedded in $\mathbb{R}^{3\times 3}$.
+%To avoid singularities, one must use a higher dimension parametrization, such as the most common $SO(3)$ representation in robotics that are the unit quaternions and the rotation matrices.
+%The unit quaternions space is the subset of $\mathbb{R}^4$ where all elements have unit norm.
+With the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters $q = [q_w, q_x, q_y, q_z]$, and it is necessary to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
+Similarly, if a variable is parameterized by a rotation matrix, then the matrix $M$ representing it has 9 parameters and M must be orthogonal and have determinant 1: $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
+Similar issues can be found with the parameterization of other non-Euclidean manifold, like $S2$ for example.
 
-One can prove that there is no smooth mapping between $SO(3)$ and $\mathbb{R}^3$ that is free of singularities.
-The most common $SO(3)$ representation in robotics are unit quaternions and rotation matrices.
-The unit quaternions space is the subset of $\mathbb{R}^4$ where all elements have unit norm.
 A quaternion $q = [q_w, q_x, q_y, q_z]$ is a unit quaternion iff $q_w^2+q_x^2+q_y^2+q_z^2 = 1$.
 It represents a rotation of angle $\theta$ around an axis ${\bf u}$ such that:
 \begin{align}
@@ -501,8 +436,8 @@ Given a parameter set $q = \{ q_w, q_x, q_y, q_z, t_x, t_y, t_z\}$, we get the f
 
 
 
-\subsection{Jacobian computation}
-\label{sub:jacobian_computation}
+\section{Jacobian computation}
+\label{sec:jacobian_computation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                  SUBSECTION JACOBIAN COMPUTATION                    %
@@ -565,15 +500,15 @@ We write the jacobian of each body at its origin as follows:
 
 
 
-\section{Geometric constraints}
-\label{sec:geometric_constraints}
+%\section{Geometric constraints}
+%\label{sec:geometric_constraints}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %          SECTION GEOMETRIC CONSTRAINTS                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Joint Limits}
-\label{sub:joint_limits}
+\section{Joint Limits}
+\label{sec:joint_limits}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                      SUBSECTION JOINT LIMITS                        %
@@ -603,8 +538,8 @@ This type of formulation is presented in~\cite{baerlocher}.
 
 
 
-\subsection{Contact constraints}
-\label{sub:contact_constraints}
+\section{Contact constraints}
+\label{sec:contact_constraints}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   SUBSECTION CONTACT CONSTRAINTS                    %
@@ -666,8 +601,8 @@ We illustrate those two types of contacts in~\Figref{fig:contactConstraint}
 
 
 
-\subsection{Collision avoidance}
-\label{sub:collision_avoidance}
+\section{Collision avoidance}
+\label{sec:collision_avoidance}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   SUBSECTION COLLISION AVOIDANCE                    %
@@ -703,16 +638,15 @@ In many cases, it is possible to avoid the collision between two bodies of a rob
 That approach is conservative and ad-hoc but can save some precious computation time.
 
 
-
-\section{Static constraints}
-\label{sec:static_constraints}
+%\section{Static constraints}
+%\label{sec:static_constraints}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                SECTION STATIC CONSTRAINTS                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{External Forces}
-\label{sub:external_forces}
+\section{External Forces}
+\label{sec:external_forces}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     SUBSECTION EXTERNAL FORCES                      %
@@ -750,8 +684,8 @@ We drop the frame subscript when the choice of the frame does not matter and all
 
 
 
-\subsection{Static stability}
-\label{sub:static_stability}
+\section{Static stability}
+\label{sec:static_stability}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                    SUBSECTION STATIC STABILITY                      %
@@ -801,7 +735,7 @@ If the robots actuators are powerful enough to maintain its posture under any ex
 %In some cases, an articulated robot is considered as a rigid body and this equation alone can be used to ensure its stability.
 %It is only valid if the robot can generate infinite torques in its articulations, or at least if we have some guarantee that the robot is able to generate large enough torques.
 Otherwise, it is necessary to verify that the robot's actuators can generate large enough torques to maintain that posture.
-The details of torque computation are discussed in Section~\ref{sub:torque_limits}
+The details of torque computation are discussed in Section~\ref{sec:torque_limits}
 
 Equation~\Eqref{eq:stability} can be used in an optimization problem.
 We consider that each wrench $w_i$ applied on the system is defined by the position of its application point $P_i$ and the values $m_i$ and $f_i$ that represent the moment and resultant of $w_i$ at $P_i$.
@@ -858,8 +792,8 @@ We will explicit a method to automatically compute those derivatives in a furthe
 
 
 
-\subsection{Center of mass projection}
-\label{sub:center_of_mass_projection}
+\section{Center of mass projection}
+\label{sec:center_of_mass_projection}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                SUBSECTION CENTER OF MASS PROJECTION                 %
@@ -911,8 +845,8 @@ Thus, we have the property: a rigid body that has all its contacts with the envi
 
 
 
-\subsection{Torque limits}
-\label{sub:torque_limits}
+\section{Torque limits}
+\label{sec:torque_limits}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                      SUBSECTION TORQUE LIMITS                       %
@@ -970,20 +904,20 @@ The torque limit constraint writes as:
 We will detail the derivation of this constraint in Section~\ref{sec:torque_derivation}.
 
 
-\subsection{Contact Forces and Friction Cones}
-\label{subsec:contact_forces_and_friction_cones}
+\section{Contact Forces and Friction Cones}
+\label{sec:contact_forces_and_friction_cones}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %            SUBSECTION CONTACT FORCES AND FRICTION CONES             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Here we use the same frames and notations as introduced in Section~\ref{sub:contact_constraints}.
+%Here we use the same frames and notations as introduced in Section~\ref{sec:contact_constraints}.
 
 The contacts involved in a posture generation problem can be separated into two types: Geometric Contacts and Stability Contacts.
 
 The Geometric Contact is a contact where the position of contact is reached, but that contact does not support any contact forces (this is a necessary step to generate a sequence of quasi-static transitions).
 Physically, that correspond to the transition state between a configuration without contact and a configuration with contact on which forces are applied.
-We defined the Geometric Contacts in Section~\ref{sub:contact_constraints}.
+We defined the Geometric Contacts in Section~\ref{sec:contact_constraints}.
 The Stability Contact is a Geometric Contact that bears interaction forces.
 
 %In planning, contacts are added or removed one by one between successive postures.
@@ -1141,3 +1075,4 @@ h_i(q,f) \geq 0\ \ \forall\mathcal{T}_i.
 \label{eq:PG}
 \end{align}
 
+In the next chapter, we present an extension to the contact constraint formulation that allows to generate non-inclusive contacts, an algorithm to compute the exact derivatives of the torques in robot's joints, and our endeavor to apply a different optimization approach to solving posture generation problems.

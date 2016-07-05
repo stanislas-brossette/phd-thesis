@@ -82,14 +82,15 @@
 \section{Introduction to optimization on Manifolds}
 \label{sec:introduction_to_optimization_on_manifolds}
 
-Posture generation has been formulated as a problem over a Euclidean space.
+Posture generation has been traditionnaly formulated as a problem over a Euclidean space.
 Robots variable may, however, be more naturally expressed over non-Euclidean manifolds.
-The archetypes for this are the rotation part of the root body of a humanoid robot, and ball joints, whose variables live in $SO(3)$.
+The archetypes for this are the rotation part of the root body of a robot, and ball joints, whose variables live in $SO(3)$.
 Some typical tasks are also naturally formulated on different manifolds.
 For example, for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$~\cite{escande:icra:2016}.
 The human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
 
-Formulating the problem over $\mathbb{R}^n$ leads either to discontinuities that can prevent the convergence of the optimization solver, or to cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
+Formulating the problem over $\mathbb{R}^n$ leads either to singularities that can prevent the convergence of the optimization solver, or to cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
+In addition, since constraints can be violated during the optimization process, the iterates may not be elements of the search manifold.
 
 For example, let us consider an optimization problem over the $SO(3)$ manifold:
 
@@ -103,7 +104,7 @@ For example, let us consider an optimization problem over the $SO(3)$ manifold:
 \end{align}
 
 $SO(3)$ is a 3-dimensional manifold.
-As such, it can be parametrized \emph{locally} by $3$ variables, for example, a choice of Euler angles, but any such parametrization necessarily exhibits singularities when taken as a global map (e.g.\ gimbal lock for Euler angles), which can be detrimental to our optimization process.
+As such, it can be parametrized \emph{locally} by $3$ variables, for example a choice of Euler angles. But any such parametrization necessarily exhibits singularities when taken as a global map (e.g.\ gimbal lock for Euler angles), which can be detrimental to our optimization process.
 
 For this reason, when addressing $SO(3)$ with classical optimization algorithms, it is often preferred to use one of the two following parametrizations:
 \begin{itemize}
@@ -118,35 +119,37 @@ Then, if we use the unit quaternion parametrization, the problem~\Eqref{eq:pb_on
   \text{subject to}&
   \left\{\begin{array}{lr}
     {l} \leq c(q) \leq {u} \nonumber\\
-    \|q\| - 1 = 0
+    {\|q\|}^2 - 1 = 0
   \end{array}\right.
 \end{align}
 
 The problem to solve has 4 dimensions (to represent a 3-dimensional manifold), and has an additional constraint that is entirely due to our formulation choice.
 With this formulation, it is guaranteed that the solution $q^*$ is a unit quaternion, but not that all the iterates $q_k$ along the optimization process have a unit norm.
-During the optimization process, at each iteration, an increment $\delta$ is computed by solving a quadratic problem that approximates~\Eqref{eq:pb_on_SO3_quaternion} locally around $q_k$.
-In particular, this quadratic problem approximates the constraints linearly, thus, for any step $\delta$ not null, from a unit-norm quaternion iterate $q_k$, the next iterate $q_{k+1} = q_k + \delta$ does not respect the unit-norm constraint (it respects the \emph{linearization} of the unit-norm constraint).
-So the quaternion $q_{k+1}$ does not represent a rotation.
-Some additional treatment needs to be implemented.
-For example, normalizing the quaternion at each iteration, then it represents a rotation, but this normalization must be taken into account in the constraints, cost functions, and their differentiations, which is an additional programming burden.
-Similar issues can be found with the $\mathbb{R}^{3\times 3}$ matrix representation.
-
-The alternative is to use optimization software working natively with manifolds~\cite{brossette:Humanoids:2015},~\cite{absil:book:2008} and solve the optimization problem as it is written in~\Eqref{eq:pb_on_SO3}.
-It has an immediate advantage: we can write directly the problem without the need to add any parametrization-related constraints.
-Working directly with manifolds also has the advantage that at each iteration, the variables of the problem represent an element of the manifold.
-This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
-Having intermediate values naturally staying on the manifold can be useful to evaluate additional functions that pre-suppose it (additional constraints, external monitoring $\ldots$).
-It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the optimization, so that when the optimization process is stopped after a few iterations, the output is valid in the sense that it is always a point of the manifold.
-
-With non-manifold formulations, at any given iteration, the parametrization-related constraints can be violated, thus, the variables might not lie in the manifold.
+During the optimization process, at each iteration, an increment $\mathbf{p}$ is computed by solving a quadratic problem that approximates~\Eqref{eq:pb_on_SO3_quaternion} locally around $q_k$.
+In particular, this quadratic problem approximates the constraints linearly, thus, for any step $\mathbf{p}$ not null, even if iterate $q_k$ if of unit norm, the next iterate $q_{k+1} = q_k + \mathbf{p}$ does not respect the unit-norm constraint (it respects the \emph{linearization} of the unit-norm constraint).
+So the quaternion $q_{k+1}$ does not represent a rotation, while the objective and constraints functions might expect it to do so.
+%With non-manifold formulations, at any given iteration, the parametrization-related constraints can be violated, thus, the variables might not lie in the manifold.
+In general, with non-manifold formulations, at any given iteration, the parametrization-related constraints can be violated, thus, the iterate might not lie in the manifold.
+%Some additional treatment needs to be implemented.
 It is then needed to project them on it.
+%For example, all the functions involved in the problem can be composed with a normalization of the quaternion.
+%Which in turn must be taken into account in the constraints and cost functions differentiations, which is an additional programming burden.
 Denoting $\pi$ the projection (for example $\pi = \frac{q}{\left\|q\right\|}$ in the unit quaternion formulation), to evaluate a function $f$ on a manifold, we need to compute $f \circ \pi$.
 If further the gradient is needed, that projection must also be accounted for (authors in~\cite{bouyarmane:humanoids:2012} explain that issue in great details for robotics problems with free-floating bases).
 
-In this chapter, we present a new nonlinear constrained optimization solver able to work on generic smooth manifolds.
+Similar issues can be found with the $\mathbb{R}^{3\times 3}$ matrix representation.
+
+The alternative is to use optimization software working natively with manifolds \cite{brossette:Humanoids:2015}, \cite{absil:book:2008} and solve the optimization problem as it is written in~\Eqref{eq:pb_on_SO3}.
+It has an immediate advantage: we can write directly the problem without the need to add any parametrization-related constraints.
+Working directly with manifolds also has the advantage that at each iteration, the variables of the problem represent an element of the manifold.
+%This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
+Having intermediate values naturally staying on the manifold can be useful to evaluate additional functions that pre-suppose it (additional constraints, external monitoring $\ldots$).
+It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the optimization, so that when the optimization process is stopped after a few iterations, the output is valid in the sense that it is always a point of the manifold.
+
+In this chapter, we present a new nonlinear optimization solver able to work on generic smooth manifolds.
 We take inspiration from the approach used for unconstrained optimization on manifold~\cite{absil:book:2008} and adapt it to constrained optimization.
 To the best of our knowledge, constrained optimization on manifold has drawn few research for now.
-This is likely due to the fact that in most problems the only constraint is to be on the manifold, in that case, unconstrained optimization on manifold is enough.
+This is likely due to the fact that in most problems the only constraint is to be on the manifold.%, in that case, unconstrained optimization on manifold is enough.
 We are only aware of the work of Schulman \emph{et al.}~\cite{Schulman2014}, where the authors explain the adaptation of their solver to work on $SE(3)$.
 This adaptation is however not valid for general manifolds without more care about hessian computation.
 
@@ -171,6 +174,7 @@ In this section, we describe a Sequential Quadratic Programming (SQP) approach~\
 \end{align}
 
 where $\mathcal{M}$ is a $n$-dimensional smooth manifold and $c$ is a $m$-dimensional real-valued function.
+The inequality constraints can be replaced with an equality one when the upper and lower bounds are equal.
 
 %{{{ REPRESENTATION PROBLEM
 \subsection{Representation problem}
@@ -190,17 +194,19 @@ This boils down to choosing a representation space $\mathbb{E} = \mathbb{R}^r$ (
 \end{equation}
 In the following, we identify $\mathcal{M}$ with the set $\psi(\mathcal{M}) \subseteq \mathbb{E}$.
 
-With this representation, it is tempting to simply transform problem~\Eqref{eq:optim_problem} as an optimization over $\mathbb{R}^r$ with objective $f \circ \psi^{-1}$ and constraint $c \circ \psi^{-1}$, and solve it with a usual solver.
-But depending on the representation choice, one of the two following problems arises:\\
-(i) $r=n$, then it is not possible in the general non-Euclidean case to find $\psi$ without derivative discontinuities.
-This can lead to critical convergence problems, \\
-(ii) $r>n$, then most elements of $\mathbb{E}$ do not represent an element of $\mathcal{M}$ %($\psi(\mathcal{M})$ is a measure-zero subset of $\mathbb{E}$)
-and $\psi$ cannot be surjective.
-Constraints need to be added to force the solution on $\mathcal{M}$.
-As a result, the problem has more variables and constraints w.r.t (i).
-Moreover, the additional constraints are unlikely to be met along the iteration process (even if $x_i$ is an element of $\mathcal{M}$, $x_i+{\bf p_i}$ is likely not, as nothing enforces it).
-This means that in order to evaluate $f \circ \psi^{-1}$ and $c \circ \psi^{-1}$ at a given $x_i$, one has to project it on $\psi(\mathcal{M})$ first, effectively computing $f \circ \psi^{-1} \circ \pi$ and $c \circ \psi^{-1} \circ \pi$, where $\pi$ is the projection.
-The composition by $\pi$ is an additional burden in programming (see e.g.\ in~\cite{bouyarmane:humanoids:2012a}).
+With this representation, it is tempting to simply transform problem~\Eqref{eq:optim_problem} as an optimization over $\mathbb{R}^r$ with objective $f \circ \psi^{-1}$ and constraint $c \circ \psi^{-1}$, and solve it with a classical solver.
+But, as we stated in~\ref{sec:introduction_to_optimization_on_manifolds}, if $r=n$ we will get singulatities, and if $r>n$ we will add parametrization-related variables and constraints to our problem and the iterates may not lie on the manifold and need to be projected on it.
+So another approach needs to be taken.
+%But depending on the representation choice, one of the two following problems arises:\\
+%(i) $r=n$, then it is not possible in the general non-Euclidean case to find $\psi$ without derivative discontinuities.
+%This can lead to critical convergence problems, \\
+%(ii) $r>n$, then most elements of $\mathbb{E}$ do not represent an element of $\mathcal{M}$ %($\psi(\mathcal{M})$ is a measure-zero subset of $\mathbb{E}$)
+%and $\psi$ cannot be surjective.
+%Constraints need to be added to force the solution on $\mathcal{M}$.
+%As a result, the problem has more variables and constraints w.r.t (i).
+%Moreover, the additional constraints are unlikely to be met along the iteration process (even if $x_i$ is an element of $\mathcal{M}$, $x_i+{\bf p_i}$ is likely not, as nothing enforces it).
+%This means that in order to evaluate $f \circ \psi^{-1}$ and $c \circ \psi^{-1}$ at a given $x_i$, one has to project it on $\psi(\mathcal{M})$ first, effectively computing $f \circ \psi^{-1} \circ \pi$ and $c \circ \psi^{-1} \circ \pi$, where $\pi$ is the projection.
+%The composition by $\pi$ is an additional burden in programming (see e.g.\ in~\cite{bouyarmane:humanoids:2012a}).
 Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi$ in optimization on manifolds and a step followed by a projection as is done in classical optimization.
 
 \begin{figure}[htpb]
@@ -210,18 +216,18 @@ Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through 
 \label{fig:stepOnSphere}
 \end{figure}
 
-As a simple example, the set of 3D-rotations $SO(3)$ is a manifold of dimension $3$.
-The following (classical) choices can be made
-\begin{itemize}
-  \item Rotation matrix ${\bf R} \in \mathbb{R}^{3\times 3} \approx \mathbb{R}^9$, additional constraints: $\{{\bf R}^t{\bf R} = I\ ,\ \det({\bf R})=1\}$, projection by orthogonalization,
-  \item Quaternion ${\bf q} \in \mathbb{R}^4$, additional constraints: $\{ \left\|{\bf q}\right\|=1\}$, projection $\pi({\bf x}) = {\bf x}/\left\|{\bf x}\right\|$,
-  \item Euler angles ($\mathbb{E} = \mathbb{R}^3$), singularities when reaching gimbal lock.
-\end{itemize}
+%As a simple example, the set of 3D-rotations $SO(3)$ is a manifold of dimension $3$.
+%The following (classical) choices can be made
+%\begin{itemize}
+  %\item Rotation matrix ${\bf R} \in \mathbb{R}^{3\times 3} \approx \mathbb{R}^9$, additional constraints: $\{{\bf R}^t{\bf R} = I\ ,\ \det({\bf R})=1\}$, projection by orthogonalization,
+  %\item Quaternion ${\bf q} \in \mathbb{R}^4$, additional constraints: $\{ \left\|{\bf q}\right\|=1\}$, projection $\pi({\bf x}) = {\bf x}/\left\|{\bf x}\right\|$,
+  %\item Euler angles ($\mathbb{E} = \mathbb{R}^3$), singularities when reaching gimbal lock.
+%\end{itemize}
 
 %}}}
 %{{{ LOCAL PARAMETRIZATION
 \subsection{Local parametrization}
-By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}\approx \mathbb{R}^n$, the tangent space to $\mathcal{M}$ at $x$, and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
+By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}$, the tangent space to $\mathcal{M}$ at $x$(which is isomorphic to $\mathbb{R}^n$), and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
 
 \begin{equation}
   \varphi_x\ :\
