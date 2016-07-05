@@ -144,7 +144,7 @@ It has an immediate advantage: we can write directly the problem without the nee
 Working directly with manifolds also has the advantage that at each iteration, the variables of the problem represent an element of the manifold.
 %This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
 Having intermediate values naturally staying on the manifold can be useful to evaluate additional functions that pre-suppose it (additional constraints, external monitoring $\ldots$).
-It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the optimization, so that when the optimization process is stopped after a few iterations, the output is valid in the sense that it is always a point of the manifold.
+It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the optimization, so that when the optimization process is stopped after a few iterations, the output is still meaningful in the sense that it is always a point of the manifold.
 
 In this chapter, we present a new nonlinear optimization solver able to work on generic smooth manifolds.
 We take inspiration from the approach used for unconstrained optimization on manifold~\cite{absil:book:2008} and adapt it to constrained optimization.
