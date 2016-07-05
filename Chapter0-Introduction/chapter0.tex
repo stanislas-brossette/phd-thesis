@@ -33,7 +33,7 @@ Satisfying a task requires that the joints of the robot reach a configuration fo
 The action of satisfying a task comes down to moving from an initial configuration to a goal.
 Computing the trajectory to follow and actually following it are the jobs of the trajectory generation and the control of the robot.
 Those are by themselves some complete fields of robotics, and they have one thing in common, they both need to be given an initial and a final configuration, and sometimes some intermediate ones.
-Finding those configurations is the job of what we call the Posture Generator (PG), which is the main topic of this dissertation.
+Finding those configurations is the job of what we call the Posture Generator (PG).
 
 There are two types of robots. The fixed-base robots and the mobile ones.
 The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated (But not always, as they sometimes have underactuated joints).
@@ -66,15 +66,6 @@ When the robotic problem studied becomes too complex for closed-form formulas, i
 The Posture Generator is a key tool of many robotics applications and as such, it is an important component of any robotics framework.
 It needs to be efficient at finding a solution when one exists and at figuring when a problem is not feasible.
 The speed of generating a multi-contact sequence is directly related to the quality of the posture generator, which is directly related to the quality of the optimization algorithm that it uses.
-
-Optimization algorithms can be derivative-free or not.
-The computation of the derivatives of the functions involved in the problem is a common source of error.
-The strength of the derivative-free approaches is that the user does not need to implement the derivatives.
-But those approaches are much slower than their counterparts using derivatives.
-One way to avoid implementation errors in the derivatives computation is to use finite differences to compute them.
-This method is very slow, especially when the dimension of the problem is large.
-In order to design an efficient optimization algorithm, we will focus on methods using derivative informations and will implement those derivatives computations.
-The finite difference approach can be used to verify the correctness of the computation.
 
 The variables of a robotics problem sometimes naturally belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
 A manifold is a topological space that locally resembles Euclidean space near each point.
@@ -114,7 +105,8 @@ The organization of this thesis is as follows:
 \begin{itemize}
   \item In Chapter~\ref{cha:state_of_the_art_and_problem_definition} we give the state of the art of posture generation and optimization on manifolds.
   \item In Chapter~\ref{cha:posture_generation_problem_formulation}, we present the detailed formulation of a posture generation problem.
-  \item In Chapter~\ref{cha:extensions_of_posture_generation} we present three different and unrelated extensions: two formulation extensions, the first one allowing to generate non-inclusive contacts between convex surfaces, the second one is the exact derivation of the torques in the actuators of a robot. Then we present our endeavor to use `Lifted Newton Method' to solve posture generation problems.
+  \item In Chapter~\ref{cha:extensions_of_posture_generation} we present three different and unrelated contributions: two formulation extensions, one allowing to generate non-inclusive contacts between convex surfaces, the other is the exact derivation of the torques in the actuators of a robot.
+  Then we present our endeavor to use the `Lifted Newton Method' to solve posture generation problems.
   \item Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} describes the principles of nonlinear optimization over non-Euclidean manifolds and our implementation of a solver based on those principles.
   \item In Chapter~\ref{ch:PG}, we present a framework that simplifies and extends the formulation of posture generation problems by formulating and solving the optimization problem over native non-Euclidean manifolds, managing automatically the variables of the problems and proposing a framework that formalizes and simplifies the writing of functions on geometric entities often used in robotics.
   \item In Chapter~\ref{cha:evaluation_and_experimentation}, we evaluate the performances of our solver on manifolds and of our posture generator. And then present a preliminary work on how to generate postures on a sensory acquired environment.
