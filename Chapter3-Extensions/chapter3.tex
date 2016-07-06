@@ -101,7 +101,7 @@ In Section~\ref{sec:contact_constraints}, we defined a set of constraints (equat
 Those equations guarantee the coplanarity of two infinite planar surfaces.
 Another set of constraints needs to be added to ensure the validity of a contact between two finite surfaces $S_1$ and $S_2$, to ensure that the intersection of those two surfaces is not empty and that it is big enough to support the contact.
 
-In this section, we propose a simple way to formulate geometric contact formation to have an arbitrary intersection shape in a robotic (humanoid) posture generation problem.
+In this section, we propose a simple way to formulate geometric contact formation to have an arbitrary intersection shape in a robotic (humanoid) posture generation problem, when searching for a mobile contact between two surfaces.
 We start by defining convex areas of contact on the robot's body and the environment, that we call contact patches.
 We can generate contacts with an arbitrary intersection of a pair of any of these predefined contact patches.
 Virtually any planar surface can be a contact patch.
@@ -145,7 +145,7 @@ On each figure, the blue rectangle describes a surface $S_2$ with which we want 
     &
     %\begin{minipage}[t]{5cm}
     The center point of $S_1$ is included
-    in $S_2$
+    in $S_2$~\cite{hauser:humanoid:2005}
     \begin{itemize}
       \item Easy and cheap to compute
       \item Eliminates valid solutions
@@ -157,7 +157,7 @@ On each figure, the blue rectangle describes a surface $S_2$ with which we want 
     \end{minipage}
     &
     %\begin{minipage}[t]{5cm}
-    $S_1$ is fully included in $S_2$
+    $S_1$ is fully included in $S_2$~\cite{bouyarmane:ar:2012}
     \begin{itemize}
       \item Eliminates many valid solutions
     \end{itemize}
@@ -168,7 +168,7 @@ On each figure, the blue rectangle describes a surface $S_2$ with which we want 
     \end{minipage}
     &
     %\begin{minipage}[t]{5cm}
-    $S_1$ contains a set of sampled points, the center of $S_2$ has to match one of them
+    $S_1$ contains a set of sampled points, the center of $S_2$ has to match one of them~\cite{chestnutt:humanoids:2003}
     \begin{itemize}
       \item Discrete set of possible solutions
       \item Eliminates many valid solutions
@@ -181,7 +181,7 @@ On each figure, the blue rectangle describes a surface $S_2$ with which we want 
     &
     %\begin{minipage}[t]{5cm}
     The contact is valid if an ellipse of sufficient size is found in
-    the intersection $S_1 \cap S_2$
+    the intersection $S_1 \cap S_2$~\cite{brossette:iros:2014}
     \begin{itemize}
       \item Smooth
       \item Does not eliminate valid solutions
@@ -1035,9 +1035,10 @@ This section focuses on the later.
 We formulate posture generation problems in an optimization friendly way in order to solve them using nonlinear constrained optimization algorithms.
 In the following, we propose to apply the methods of lifted optimization presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to posture generation problems.
 
-The idea of lifting variables consists in taking a complicated equation $F(u) = 0$ and separating the complicated function $F$ into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on $u$ and on the output of functions of lower index:
+The idea of lifting variables consists in taking a complicated equation $F(u) = 0$ and decomposing it into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on $u$ and on the output of functions of lower index~\ref{eq:simplerFunctions}.
 
 \begin{equation}
+\label{eq:simplerFunctions}
   x_i = f_i(u, x_1, x_2, \ldots,x_{i-1}),\ \forall i\in[1,\ldots, m]
 \end{equation}
 
@@ -1049,9 +1050,10 @@ Such that they can be used in a chain to recompose $F$:
        &= f_F\left(u, f_1(u), f_2(u,f_1(u)), f_3(u,f_1(u),f_2(u,f_1(u))), \ldots, f_m(u, \ldots, f_{m-1}(u,\cdots))\right)
 \end{align}
 
-With this formulation and the additional variables $x_i,\ i\in[1,\ldots, m]$, the problem $F(u) = 0$ can be rewritten as a lifted problem:
+With this formulation and the additional `lifted' variables $x_i,\ i\in[1,\ldots, m]$, the problem $F(u) = 0$ can be rewritten as a lifted problem:
 
 \begin{equation}
+\label{eq:lifted_variables}
   G(u,x) =
   \begin{pmatrix}
   f_1(u) - x_1 \\
@@ -1065,6 +1067,11 @@ With this formulation and the additional variables $x_i,\ i\in[1,\ldots, m]$, th
 \end{equation}
 
 This modified formulation can be used for any function of our optimization problem to reduce the complexity of individual equations at the cost of adding extra variables and constraints.
+By reducing the complexity of the functions, we ought to improve the quality of their quadratic approximations, which should lead to better convergence properties of the Newton scheme.
+
+%The reason for expecting this approach to yield good results is that during the optimization process, at each step, a quadratic approximation of the function $F$ is used to compute the next iterate.
+%If $F$ is a complicated function, the quadratic approximation may be quite far from $F$ and simpler functions may have better quadratic approximations, which should lead to better convergence properties of the Newton scheme.
+
 One obvious drawback of this approach for solving a nonlinear problem is the increased size of the linearized problem to solve at each iteration of the optimization.
 Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the jacobian of $G(u,x)$ to condense the lifted problem into a problem of the same size as the original one.
 Thus, the resolution of each iteration should take approximately the same time as with the original problem.
@@ -1094,8 +1101,12 @@ This formulation can be generalized to more complex robots by considering/liftin
 \subsection{Lifting Algorithm}
 \label{subsec:LiftingAlgorithm}
 
-In order to explore the capabilities of optimization on lifted problems, we developed and studied several lifting approaches.
-Let us consider a simple planar 2 axis robot, with 2 successive links of length 1 attached by revolute joints.
+In order to explore the capabilities of optimization on lifted problems, we developed and studied several lifting approaches based on different lifting criterion.
+A lifting criterion is a criterion that should be satisfied as best as possible by all the functions present at the end of the lifting process.
+For example, the degree of a polynomial can be a used, one could require that all the functions are polynomials of at most degree $m$.
+In~\ref{eq:robot_lift}, we lifted based one the criterion that each function should only contain a single joint transformation.
+
+Let us consider an example with a simple planar 2 axis robot, with 2 successive links of length 1 attached by revolute joints.
 Its articular variables are denoted $q = (q_1, q_2)$ and the expression of the end-effector's (EE) position is the following:
 \begin{equation}
   \left(\begin{array}{c}
@@ -1117,11 +1128,11 @@ The operators `addition', `subtraction', `multiplication', `sinus' and `cosinus'
 
 We developed a generic lifting algorithm that allows to automatically lift symbolic functions, and in particular, polynomials of trigonometric functions, based on a given criterion.
 To do so, we use symbolic variables. A symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn be explored and truncated at appropriate places where we insert additional variables.
-Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the final expressions.
+Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the original variables, the yellow ones represent the lifted variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the end effector equations.
 \begin{figure}
   \centering
-  \includegraphics[width=0.55\textwidth]{graphDirectEEPos.pdf}
-  \caption{Computation graph for end effector position of a 2 axis planar robotic arm}
+  \includegraphics[width=0.65\textwidth]{graphDirectLiftedEEPos.pdf}
+  \caption{Computation graph for end effector position of a 2 axis planar robotic arm. Top: Direct equations. Bottom: Lifted equations. Green circles represent the original variables, yellow the lifted ones, pink represent intermediary operations and red represent the final operation for the end effector equations}
 \label{fig:graph_direct}
 \end{figure}
 
@@ -1217,8 +1228,10 @@ Our problems require the use of nonlinear cost and constraints, thus, a Newton m
 
 We implemented the lifted and direct SQP approaches as described in paragraph 3.2.3 of~\cite{Albersmeyer:2010:LNM:1958447.1958472}.
 The hessian matrices in our problems are usually not symmetric positive definite, so we need to use a globalization method as well as a regularization of the Hessian to enforce convergence.
-For globalization, we implemented some line search methods with Armijo and Wolfe conditions, as well as a filter with backtracking line search.
+For globalization, we implemented some line search methods with Armijo and Wolfe conditions, as well as a filter with line search (see~\ref{ssub:the_filter_method}).
 And for regularization, we approximate the full-space hessian matrix through BFGS updates (with Powell's correction) or SR1 updates.
+We implemented different ways to initialize the lifted variables.
+They can either be all initialized with zero value, or all random, or their initial value can be computed such that all the lifter equations are satisfied($m$ first lines of~\ref{eq:lifted_variables}).
 Those methods are presented in~\cite{bonnans:springer:2002}.
 %All those methods are applied on the full-space iteration, during the update process of the optimization, the lifted and final equations are treated the same way.
 
@@ -1240,7 +1253,7 @@ Indeed, we need to choose one item amongst each or the categories cited below:
   \begin{itemize}
     \item None, direct problem
     \item Lifted with maximum degree of 2
-    \item Lifted based on Joints
+    \item Lifted based on Joints(one joint transformation per equation)
   \end{itemize}
   \item Treatment of trigonometric equations
   \begin{itemize}
@@ -1251,7 +1264,6 @@ Indeed, we need to choose one item amongst each or the categories cited below:
   \begin{itemize}
     \item Our custom SQP
     \item fmincon (active-set, interior point, SQP)
-    \item Gauss-Newton
   \end{itemize}
   \item Type of initialization of the lifted variables
   \begin{itemize}
@@ -1259,7 +1271,7 @@ Indeed, we need to choose one item amongst each or the categories cited below:
     \item Random
     \item Satisfying the lifted equations
   \end{itemize}
-  \item Type of Regularization of the Hessian
+  \item Type of Hessian update
   \begin{itemize}
     \item None
     \item BFGS
@@ -1282,14 +1294,14 @@ The number of possible combination of choices is large and grows with any new po
 We devised a set of simple robots to be the basis of our experimentation.
 For simplicity, we focused on fixed base robots with only revolute joints.
 To study the influence of the number of degrees of freedom of a robot on the optimization performance, we studied planar robots composed of $n$ successive links of length 1 attached to one another by revolute joints.
-We also studied a 7 axis 3D arm robot and a torso robot with 2 arms.
+We also studied a 7 axis 3D manipulator arm robot and a planar upper body robot with 2 arms.
 Illustration of those different types of robots are given in figure~\ref{fig:robots}, where blue lines represent the links, red circles represent the revolute joints, green squares represent the origin of links, the biggest green square being the origin of the base link of the robot, and the red cross is the end effector.
-\begin{figure*}[ht]
+\begin{figure}
   \centering
-  \includegraphics[width=0.95\textwidth]{robots.png}
+  \includegraphics[width=0.98\textwidth]{robots.png}
   \caption{Examples of robots used}
 \label{fig:robots}
-\end{figure*}
+\end{figure}
 
 We propose to use the following test to compare the performances of different lifting methods for all our experiments:
 \begin{enumerate}
@@ -1307,8 +1319,8 @@ We propose to use the following test to compare the performances of different li
 \end{enumerate}
 
 This approach allows to fairly compare the performances of all lifting approaches on a given problem.
-And to observe the influence of the number of degrees of freedom of the robot on those performances.
-We plot the average number of iterations needed to reach convergence on the y-axis for each planar robot with their number of degrees of freedom on the x-axis.
+And to observe the influence of the number of degrees of freedom of the robot on those performances, we use the n-axis planar robot model.
+We plot the average number of iterations needed to reach convergence against the number of degrees of freedom of the planar robot.
 In figure~\ref{fig:lift_results} we present the results obtained for the resolution with our custom SQP, using BFGS updates and a filter line-search, without cost function, initializing all the variables randomly.
 In figure~\ref{fig:lift_results2} we present the results obtained for the resolution with our custom SQP, using SR1 updates and a filter line-search, without cost function, initializing all the variables such that the lifted equations are satisfied.
 
@@ -1342,7 +1354,7 @@ In figure~\ref{fig:lift_results2} we present the results obtained for the resolu
 \legend{Direct, Direct trigo , Lifted, Lifted trigo, Lifted joint, Lifted joint trigo }
 \end{axis}
 \end{tikzpicture}
-\caption{Custom SQP, BFGS, filter line-search, random initialization}%, no cost function
+\caption{Number of iterations to reach convergence against number of DOF of the n-axis planar robot for the different lifting methods solved with our Custom SQP, BFGS, filter line-search, random initialization}%, no cost function
 \label{fig:lift_results}
 \end{figure}
 
@@ -1377,7 +1389,7 @@ In figure~\ref{fig:lift_results2} we present the results obtained for the resolu
 \legend{Direct, Direct trigo , Lifted, Lifted trigo, Lifted joint, Lifted joint trigo }
 \end{axis}
 \end{tikzpicture}
-\caption{Custom SQP, SR1, filter Line-Search, initialization satisfying lifted equations}%, no Cost
+\caption{Number of iterations to reach convergence against number of DOF of the n-axis planar robot for the different lifting methods solved with our Custom SQP, SR1, filter Line-Search, initialization satisfying lifted equations}%, no Cost
 \label{fig:lift_results2}
 \end{figure}
 

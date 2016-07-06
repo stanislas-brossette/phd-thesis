@@ -590,6 +590,7 @@ Either by multiplying the step found by the QP with a coefficient $\alpha$ in th
 Or by bounding the norm of the step found in the QP by adding a boundary constraint on $z$ directly inside of the QP problem.
 
 \subsubsection{The Line-Search Strategy}
+\label{ssub:line_search}
 In the Line-Search strategy, starting from a current iterate $x_k$ with a QP generated step $z$ solution of the linearized problem~\ref{IQP}.
 We search a coefficient $\alpha$ such that $x_{k+1}=x_k+\alpha z$ is satisfactory.
 A usual way to decide if a point is satisfactory is to use a Merit function.
