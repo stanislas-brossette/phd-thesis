@@ -121,16 +121,17 @@ C.diff(x) = A.value().transpose()*B.diff(x) \\ + B.value().transpose()*A.diff(x)
 
 It is easy to extend the capabilities of this framework by implementing additional operations.
 By following this approach, we can easily compute the values and derivatives of expressions that are the outcome of complex arithmetic trees.
-At the time when I am writing those lines, the following binary operators are available: cross product, dot product, classic product, addition, substraction, transformation.
+Currently, the following binary operators are available: cross product, dot product, classic product, addition, substraction, transformation.
 And the following unary operators are available: component extraction, inverse, norm, rotation, squareroot, transformation and vectorization.
 
 The geometric layer consists of physical or geometric objects, named features, which exist independently of their mathematical expression in a given reference frame.
-We have so far 4 objects:
-\begin{itemize}
+We have so far four objects:
+\begin{enumerate}
   \item A Frame, defined by a Transformation expression and a reference frame.
-  \item A Point and a Vector, defined by a Coordinates expression and a reference frame.
+  \item A Point, defined by a Coordinates expression and a reference frame.
+  \item A Vector, defined by a Coordinates expression and a reference frame.
   \item A Wrench, defined by a pair of Coordinates expressions and a reference frame.
-\end{itemize}
+\end{enumerate}
 We have a special World Frame object to serve as starting reference frame.
 
 For each feature, one can get its expression in a given frame.
@@ -140,19 +141,18 @@ The geometric logic resides in the change of frame and those operations.
 
 Based on that expression system, the robot's geometry can simply be represented by a set of frames representing all its links, and functions that keep track and update the transformations of the frames of all its bodies, with respect to an Array expression on entry, its articular parameters.
 The forward kinematics algorithm~\ref{alg:FK} and the jacobian computation algorithm~\ref{alg:jacobian_computation} are used to define those functions.
-For a given articular parameter array, the user can query the frame of any body on the robot, and by composition, the user can query any feature defined on a frame of the robot, as well as its derivatives.
+For a given articular parameter array, the user can query the frame of any body on the robot, and by composition, any feature defined on a frame of the robot, as well as its derivatives.
 This tool allows for a simplified writting of robotics constraints as a combination of operations on geometric features, without worrying about the vectors and matrices and without having to write the derivatives.
 
 Let us consider a simple constraint and its expression in this framework:
-We define a point $P_h$ on a body of a robot and a point $P_e$ in the environment.
+we define a point $P_h$ on a body of a robot and a point $P_e$ in the environment.
 We want to write a constraint that ensures that $P_h$ and $P_e$ are superimposed.
-We can write that constraint by requiring that the vector defined by $V = P_h - P_e$ is null.
-Which means that the 3 elements of the expression of $V$ in a given frame $F$ are null.
+We can write that constraint by requiring that the vector defined by $V = P_h - P_e$ is zero, which means that the 3 elements of the expression of $V$ in a given frame $F$ are zero.
 We can simply write that as:
 \begin{center}
 {\tt(P\_h - P\_e).coord(F) = 0}.
 \end{center}
-And in the case of a scalar expression like $(P_e - P_r)\cdot \overrightarrow{V_r} = 0$ it can be written without any consideration about frames as
+In the case of a scalar expression like $(P_e - P_r)\cdot \overrightarrow{V_r} = 0$, it can be written without any consideration about frames as
 \begin{center}
 {\tt(P\_h - P\_e).dot(V) = 0}.
 \end{center}
@@ -169,12 +169,12 @@ And it helps avoiding calculation mistakes, because we only ever need to write t
 \label{sec:automatic_mapping}
 
 The manifold $\mathcal{M}$, on which the optimization takes place, is a Cartesian product of several sub-manifolds. Same goes for their representation spaces:
-\begin{equation}
+\begin{align}
   \begin{split}
-    \mathcal{M} = \mathcal{M}_1\times\mathcal{M}_2\times\mathcal{M}_3\times\hdots\\
-    \mathbb{E} = \mathbb{E}_1\times\mathbb{E}_2\times\mathbb{E}_3\times\hdots
+    \mathcal{M}& = \mathcal{M}_1\times\mathcal{M}_2\times\mathcal{M}_3\times\hdots\\
+    \mathbb{E}& = \mathbb{E}_1\times\mathbb{E}_2\times\mathbb{E}_3\times\hdots
   \end{split}
-\end{equation}
+\end{align}
 From the solver's viewpoint, the entry space of each function is the complete manifold.
 But for the developer, writing a function on the complete $\mathbb{E}$ is cumbersome because (i) of the need to manage indexes, and (ii) when the function is implemented, the complete $\mathbb{E}$ may not be known.
 A user-written function $f$ is usually defined on a subset of $\mathbb{E}$, say $\mathbb{E}_I=\mathbb{E}_i\times\mathbb{E}_j\times\mathbb{E}_k\hdots$, that is minimalist for that function, and should not account for unrelated manifolds.
@@ -205,7 +205,7 @@ This idea is illustrated by the example in Fig.~\ref{fig:auto_map}
 \section{Problem formulations}
 \label{sec:problem_formulations}
 
-Let $q=[q_F^T; q_r^T]\in\mathbb{R}^3\times SO(3)\times \mathcal{M}_r$ be the combination of the free-flyer of the robot $q_F\in \mathbb{R}^3 \times SO(3)$ and the articular parameters $q_r\in\mathcal{M}_r$.
+Let $q=[q_F^T; q_r^T]\in SE(3)\times \mathcal{M}_r$ be the combination of the free-flyer of the robot $q_F\in SE(3) = \mathbb{R}^3 \times SO(3)$ and the articular parameters $q_r\in\mathcal{M}_r$.
 Let $\mathcal{W}_i(p)=\{f_i,m_i(p)\}$ be the wrench (force+moment) applied by the environment onto the robot at contact $i$ and expressed on point $p$.
 A frame $F$ is composed of a reference point and an orthonormal basis of 3 vectors $F = \{O, (\vec{x}, \vec{y}, \vec{z})\}$.
 
@@ -334,7 +334,7 @@ The list of constraints and cost functions that can be used in robotics posture 
 In this section, we provide an overview of some of the key elements of the framework:
 
 \paragraph{Problem's configuration:}
-The implementation of a posture generation problem is made through a combination of a c++ implementation of the core structure of the problem and a text file in yaml format that configures the problem and is parsed at runtime to avoid having to recompile the problem for every configuration's change.
+The implementation of a posture generation problem is made through a combination of a \texttt{C++} implementation of the core structure of the problem and a text file in yaml format that configures the problem and is parsed at runtime to avoid having to recompile the problem for every configuration's change.
 %We use two types of configuration files:
 %\begin{itemize}
   %\item A default configuration file contains all the usual data, like the paths to robots description directories, as well as some data about each robot, like the lists of usual self-collisions used per robot, etc\ldots\\ {\tt problem-generator/configs/problemGeneratorConfig.yml.in}
@@ -350,7 +350,7 @@ The implementation of a posture generation problem is made through a combination
 %A set of pre-defined surfaces on bodies can be loaded from an rsdf file.
 %A set of collision convex meshes attached to the bodies of the robot is created based on a provided list of mesh files.
 %The configuration of a robot depends on its articular parameters, to hanble that, the robot object contains an update method that runs the Forward Kinematics algorithm and updates the transformations of each body and its jacobian, which, by extension updates the its body frames. Every body frames get their transformation's values and derivatives from those quantities.
-The RBDyn library contains all the low level tools and algorithm to compute the physics of a robot.
+The RBDyn library contains all the low level tools and algorithm to compute the kinematics and statics of a robot.
 The robot class is built on top of RBDyn to provide high level functionalities while adapting it to our manifold formalism (which RBDyn does not handle natively).
 The basic structure of the robot is extracted from its urdf description file.
 The main functionality of the robot class is to create a Frame attached to each of its bodies and to update their transformations and derivatives based on the robots articular variables.
@@ -369,10 +369,10 @@ The stability part is mainly used to add contact forces to the stability constra
 
 \paragraph{The Frame Constraint class:}
 It describes a very useful type of constraint between two frames $F_1$ and $F_2$.
-It terms of geometry, the canonical constraints one can enforce between two frames consist in blocking each of the 6 degrees of freedom of $F_2$ w.r.t $F_1$, e.g.\ blocking the translation and rotations along each axis.
+In terms of geometry, the canonical constraints one can enforce between two frames consist in blocking each of the 6 degrees of freedom of $F_2$ w.r.t $F_1$, e.g.\ blocking the translation and rotations along each axis.
 We can combine any set of those canonical constraints to emulate any typical joint type between the two frames (fixed, planar, spherical, etc\ldots) and more.
 Any type of wrench can be composed the same way from the canonical wrenches (forces and moments along each axis).
-On top of those geometric and stability parts of that constraint, custom additional constraints can be added to it, for example requiring $O_2$ to be inside a polygon defined in $F_1$, or requiring that the forces generated by that constraint remain in their Coulomb friction cones.
+On top of those geometric and stability parts of that constraint, custom additional constraints can be added to it, for example requiring the origin of $F_2$, $O_2$, to be inside a polygon defined in $F_1$, or requiring that the forces generated by that constraint remain in their Coulomb friction cones.
 
 \paragraph{The PostureProblem class:}
 The PostureProblem class is in charge of building the complete optimization problem that represents our posture generation problem.
@@ -381,7 +381,7 @@ It registers all the variables and constraints of the problem as well as all the
 Each function is likely to bring additional variables with it.
 For each contact contributing to the balance, a variable representing the contact force is added to the problem.
 The associated wrench is added to the stability constraints.
-Once the registration is complete, the complete manifold of the problem is generated and uses the information of the Automatic mapping to `plug' each function with the correct sub-manifold.
+Once the registration is complete, the complete manifold of the problem is generated and uses the information of the automatic mapping to `plug' each function with the correct sub-manifold.
 Subsequently, the optimization problem can be generated and passed to the solver.
 The communication between the solver and the generated problem is made through the RobOptim framework\footnote{\url{http://www.roboptim.net/}}~\cite{moulard:jsme:2013, moulard:jrsj:2014}.
 After creating the complete manifold, the PostureProblem class can be used to facilitate the individual initialization of all the separate variables of the problem without the user having to worry about the indexes.
@@ -420,7 +420,7 @@ Then we can write the contact constraint on that parametrized frame with ease.
 %In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added the optimization problem and we can desctibe  as well as the constraint set \Eqref{eq:planar_contact} depending on it.
 
 \subsection{Application to plan-sphere contact}
-We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal on $S_S$.
+We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal on $S_s$.
 The most general way to express such a constraint is to ensure that $p_s$ is on $S_B$ and that $n_s$ and $n_B$ are opposite.
 To do that, we create a variable $v_{S2}$ on $S2$ and map $p_S$ and $n_S$ on it.
 In our framework, this constraint is expressed exactly as the contact between 2 planar surfaces, once the mappings of $p_s(v_{S2})$ and $n_s(v_{S2})$ are done.
@@ -471,8 +471,7 @@ This formulation not only is very easy to implement, but most importantly, allow
 The optimization algorithm chooses the contact point on the sphere as well as the contact point on the wrist, which leads to a wider accessibility range, and a better satisfaction of the cost function.
 
 The bottom row of Fig.~\ref{fig:contact_plan_sphere} displays the results of this simulation for the robot pointing in 4 directions.
-Notice that on the 2nd and the 4th (pointing forward and to the left) images, the results for the 2 types of models are nearly identical.
-Whereas in the 1st and 3rd images, different faces of the wrist have been chosen (On the 1st, the wrist is rotated by $180^{\circ}$, and $90^{\circ}$ on the 3rd).
+Notice that on the 2nd and the 4th (pointing forward and to the left) images, the results for the 2 types of models are nearly identical, whereas in the 1st and 3rd images, different faces of the wrist have been chosen (On the 1st, the wrist is rotated by $180^{\circ}$, and $90^{\circ}$ on the 3rd).
 In these 4 cases, the contact with parametrized wrist gives a better value of the objective function (the left hand points further).
 This observation scales:
 we solved this problem for 5000 random pointing directions, and in average, the contact with parametrized wrist allows to reach 5mm further.
@@ -485,7 +484,7 @@ Yet, it requires to have a parametric equation of the surface.
 
 \subsection{Contact with an object parametrized on S2}
 
-In this case, we want the HRP-4 robot (anther model) to carry a cube with its two hands.
+In this case, we want the HRP-4 robot to carry a cube with its two hands.
 The most general way to do it is to select a face of the cube for each contact, and enforce the contact between that face and the hand's surface.
 We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S2$.
 The implicit equation of a superellipsoid is $S(x,y,z) = 0$, with
@@ -527,7 +526,7 @@ We showed that to generate contacts between a body of a robot and simple geometr
 This is sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014}~\cite{vaillant:autonomousrobots:2016}.
 However, contacts with more complex objects are needed too, for unstructured environment or for manipulating objects.
 
-To work with derivative-based optimization algorithms, such as SQP or Interior Points, which are much faster than derivative-free algorithms, the functions involved in the optimization problem need to be at least $C^1$ and gradients must be full rank at the solution (for ensuring constraints qualification, see~\cite{nocedal:book:2006}).
+To work with derivative-based optimization algorithms, such as SQP or Interior Points, the functions involved in the optimization problem need to be at least $C^1$ and gradients must be full rank at the solution (for ensuring constraints qualification, see~\cite{nocedal:book:2006}).
 Since the contact point can be anywhere on our parametrized surface, the gradients must be full rank everywhere.
 
 In the previously presented parametrizations of typical geometric shapes (sphere, superellipsoid\ldots) those continuity requirements are not a problem.
@@ -541,9 +540,9 @@ In~\cite{escande:icra:2016}, we provide a systematic way to obtain a parametric 
 To that end, we combine the use of Catmull-Clark subdivision surfaces with a tailored ray casting algorithm, and propose an efficient and robust numerical method to evaluate a point, a normal and their derivatives at a given set of parameters.
 
 As a result, we get a smooth parametrization of the input mesh that satisfies the continuity requirements.
-In Fig:\ref{fig:CCS}, we show the catmull clark surface (in blue) corresponding to the mesh (in green) of an HRP-2 link, for two different levels of smoothness.
+In Fig:\ref{fig:CCS}, we show the Catmull-Clark surface (in blue) corresponding to the mesh (in green) of an HRP-2 link, for two different levels of smoothness.
 On the right picture, we first apply twice a simple subdivision scheme, before using Catmull-Clark subdivisions, thus obtaining a surface closer to the original mesh but less smooth.
-The red line is the image of a circumference of the unit sphere through our parametrization.
+The red line is the image of a great circle of the unit sphere through our parametrization.
 
 \begin{figure}
   \centering
@@ -557,8 +556,8 @@ Because this parametrization respects the continuity requirements for being used
 
 We now show some examples of PG using the proposed approach to introduce complex objects to contact with.
 We make use of the capacity of our optimization solver to directly work with a variable $d$ on $S^2$ to parametrize our surfaces.
-When using more classical nonlinear solvers, it is sufficient to take $d$ in $\mathbb{R}^3$ and to add a constraints of unit norm for $d$: the parametrization algorithm do not need a unit $d$ to work, and at the solution, the gradient will be full rank on the null-space of this constraint, which is enough for a good convergence.
-However, working directly on $S^2$ presents several advantages\cite{brossette:Humanoids:2015}.
+%When using more classical nonlinear solvers, it is sufficient to take $d$ in $\mathbb{R}^3$ and to add a constraints of unit norm for $d$: the parametrization algorithm do not need a unit $d$ to work, and at the solution, the gradient will be full rank on the null-space of this constraint, which is enough for a good convergence.
+%However, working directly on $S^2$ presents several advantages\cite{brossette:Humanoids:2015}.
 
 \begin{figure}
   \centering
@@ -600,7 +599,7 @@ Note that the object is non-convex.
 The third example (Fig.~\ref{fig:HRP4_cubes}) involves a stack of cubes on which the robot must stand, using its hands and feet to maintain its stability and respect its torque limits.
 The stack is modeled as a single object.
 Once again, contact points are fixed on the robot and free on the surface.
-Although the surface in modeled by a single object, that object is not convex, thus it cannot be used as is for collision avoidance.
+The surface is modeled by a single object. That object is not convex, thus it cannot be used as is for collision avoidance.
 For collisions, we model the stack of cubes with a set of 21 cubes all slightly smaller than the actual cubes see:~\ref{fig:HRP4_cubes} (Right), and we require the robot to avoid collision with those cubes.
 The optimization takes around $115$ iteration to converge to a solution.
 Since their is a single surface to contact with, we do not need to specify with which faces, edges or corners the robot needs to be in contact with.
