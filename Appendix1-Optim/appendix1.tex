@@ -49,7 +49,7 @@ In modern science, optimization has an important place.
 Mechanical engineers optimize the shape of structural parts.
 Investors optimize the profit of a portfolio while minimizing the risks of loss.
 Chemists optimize the efficiency and speed of reactions.
-When it comes to robotics, optimization is everywhere.
+When it comes to robotics, optimization is widely used.
 From the design of a robot to its actuation.
 Any positioning of a robot requires the computation of the articular parameters of each joint of the robot, finding such parameters might be possible by using analytical methods for simple robots, but for robots as complex as humanoid robots, it is not possible.
 Most often, an optimization process is used.
@@ -60,27 +60,26 @@ And solution of a problem in the sense that is satisfies a set of $m$ constraint
 Both the constraints and the objective function are defined on the variable space $\mathit{S}$, which is the space in which the variable $x$ lives and in which we search a solution $x^*$ to our problem.
 
 In order to present the principles of optimization, in this chapter we will always consider that the variable space is $\mathit{S}=\mathbb{R}^n$.
-We first consider unconstrained problems, that do not have any constraint and that only goal is to minimize a cost function.
+We first consider unconstrained problems.
 That type of problem will not be used in the rest of our dissertation, therefore, we will just present them shortly.
 We will then focus on constrained optimization problems and the numerous methods used in their resolution.
 We will particularly detail one specific constrained problem resolution algorithm that is the Sequential Quadratic Program (SQP).
-The extension of those methods to solving problems on more complex variable spaces that are the non Euclidean manifolds will be the topic of a further chapter of this dissertation.
+The extension of those methods to solving problems on more complex variable spaces that are the non Euclidean manifolds is the topic of Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
 
 \section{Unconstrained Optimization}
 
 An unconstrained optimization problem consists in minimizing an objective function without any constraint.
-This problem that we denote $\mathcal{P}$ can be formulated as follows:
+This problem, denoted $\mathcal{P}$, can be formulated as follows:
 
 \begin{equation}
   \minimize_{x\in\mathbb{R}^n}\ {f(x)}
 \label{eq:unconstrainedOptim}
 \end{equation}
 
-In order to solve this problem, we want to design an iterative algorithm that, starting from an initial guess $x_0$, will converge toward the solution $x^*$.
-The objective function is not necessarily completely known.
-In the sense that we cannot always have an explicit formula, often, the function $f$ is computed by another program that is able to compute $f(x)$, $\nabla_x f(x)$ and sometimes $\nabla_{xx} f(x)$ for a given value of $x$.
-In order to have an efficient algorithm, we want to avoid any unnecessary computation of $f(x)$ and its derivatives.
-We will denote the values taken by $x$ along the iterations as $x_0$, $x_1$, $x_2$,\ldots $x_i$.
+The classical approach to solve $\mathcal{P}$ is to use an iterative algorithm, starting from an initial guess $x_0$, and converging toward the solution $x^*$.
+The objective function is not necessarily completely known, in the sense that we cannot always have an explicit formula. Often, the function $f$ is computed by another program that is able to compute $f(x)$, $\nabla_x f(x)$ and sometimes $\nabla_{xx} f(x)$ for a given value of $x$.
+In order to have an efficient algorithm, we need to avoid any unnecessary computation of $f(x)$ and its derivatives.
+We denote the values taken by $x$ along the iterations as $x_0$, $x_1$, $x_2$,\ldots $x_i$.
 And $f(x_i)$ is denoted $f_i$.
 
 Since our knowledge of the objective function is only partial, it would not be possible to guarantee that a point $x^*$ is a global solution:
@@ -97,7 +96,7 @@ Though, we can find a local solution $x^*$ of $\mathcal{P}$ (a local minimizer o
 
 That is the kind of solution that we are looking for and that our algorithms should find.
 
-Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}_2$), then we have the following sufficient conditions for the optimality of $x^*$ as presented in~\cite{nocedal:book:2006}:
+Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}^2$), then we have the following sufficient conditions for the optimality of $x^*$ as presented in~\cite{nocedal:book:2006}:
 
 \begin{theorem}
   If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$ and that $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite.
@@ -218,10 +217,10 @@ A general formulation for such problems (that we denote $\mathcal{P}$) is:
 \end{equation}
 
 Where $f$ and $c_i$ are real valued functions on a subset of $\mathbb{R}^n$.
-$f$ is the objective function. And $c_i$ are the constraint functions.
+$f$ is the objective function, and the $c_i$ are the constraint functions.
 ${I}$ and ${E}$ are sets of index such that $c_i,\ i\in{E}$ are the equality constraints, and $c_i,\ i\in{I}$ are the inequality constraints.
 
-We define the feasible set $\Omega$ that contains all the feasible points (points satisfying the constraints) of $\mathcal{P}$~\ref{formulation_NLCP}.
+We define the feasible set $\Omega$ that contains all the feasible points (points satisfying the constraints) of $\mathcal{P}$.
 
 \begin{equation}
   \Omega = \left\{ x\in \mathbb{R}^n:\ \forall i\in {E},\ c_i=0,\ \forall i\in{I},\ c_i \geq0\right\}
@@ -302,7 +301,7 @@ In many cases, the main goal of an optimization algorithm is to find a point tha
   \end{equation}
 \end{definition}
 
-And at a KKT solution $(x^*,\lambda^*)$ the critical cone $C(x^*, \lambda^*)$ is:
+And at a KKT solution $(x^*,\lambda^*)$, the critical cone $C(x^*, \lambda^*)$ is:
 
 \begin{equation}
   C(x^*,\lambda^*) = \{w\in F(x^*)|{\nabla c_i(x^*)}^T w=0, \forall i\in\mathit{A}(x^*)\cap I\ \text{with } \lambda_i^*>0\}
@@ -310,8 +309,7 @@ And at a KKT solution $(x^*,\lambda^*)$ the critical cone $C(x^*, \lambda^*)$ is
 
 The critical cone contains the linearly feasible directions for which it is not clear from first derivative information alone if $f$ will increase or decrease.
 
-Once the KKT condition is reached for a point $(x^*, \lambda^*)$.
-For a direction $w$ of $F(x^*)$ for which $w^T\nabla f(x^*)=0$, it is impossible to tell from first derivative information only, if an increment in this direction will have a positive effect on the problem resolution.
+Once the KKT condition is reached for a point $(x^*, \lambda^*)$, for a direction $w$ of $F(x^*)$ for which $w^T\nabla f(x^*)=0$, it is impossible to tell from first derivative information only, if an increment in this direction will have a positive effect on the problem resolution.
 Thus it is possible that the KKT constraint is not enough to determine if a point is a solution or just a stationary point.
 
 The Second-Order Sufficient Conditions allow to discriminate local solutions from stationary points:
@@ -329,11 +327,10 @@ In particular, this condition is always verified if $\nabla_{xx}^2\mathcal{L}(x^
 \section{Resolution of a Non Linear Constrained Optimization Problem}
 \label{sec:resolution_of_a_non_linear_constrained_optimization_problem}
 
-In the previous section, we presented some theoretical tools to describe the solution of an NLCP that only use the derivative terms of order one and two of the problem's functions.
+In the previous section, we presented some theoretical tools to describe the solution of a nonlinear constrained optimization problem that only use the derivative terms of order one and two of the problem's functions.
 Here we present some methods for actually solving such problems.
-There exists many different algorithms to solve an NLCP\@.
-But all have in common to be iterative processes.
-In which we start from an initial guess $x_k$ for $x^*$.
+There exists many different algorithms to solve an nonlinear constrained optimization problem.
+But all have in common to be iterative processes, in which we start from an initial guess $x_0$ for $x^*$.
 From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem~\ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
 And we iterate that operation until a point $x_k$ sufficiently close to a solution is found.
 By sufficiently close to a solution we mean that this point satisfies the optimality conditions with a good enough precision.
@@ -353,7 +350,7 @@ The minimum of $p(\mu,x)$ varies with the penalty parameter $\mu$.
 By increasing $\mu$ to $\infty$, we penalize the violation of the constraints with increasing severity until reaching a solution $x^*$.
 
 \paragraph{The interior point method} generates steps by solving a relaxed constrained problem where slack variables are introduced to relax inequality constraints.
-The problem to solve only contains equality, boundary constraints and a cost function a cost function that prevents the slack variables from getting too close to 0:
+The problem to solve only contains equality, boundary constraints and a cost function that prevents the slack variables from getting too close to 0:
 
 \begin{equation}
   \minimize_{x,s}{f(x)- \mu\sum_{i\in I} \log(s_i)}
@@ -547,8 +544,7 @@ By solving the following Inequality-constrained Quadratic Problem (IQP) system a
 \end{equation}
 
 The main difficulty in solving that QP~\ref{IQP} comes from finding the optimal active set $\mathit{A}_k$.
-It is a necessary but costly operation.
-Especially when starting from a random active set $\mathit{A}_0$.
+It is a necessary but costly operation, especially when starting from a random active set $\mathit{A}_0$.
 The process is mostly based on a try and guess approach guided by heuristics (that may vary with different resolution algorithms).
 
 To find the optimal active set, the QP starts from a random active set $\mathit{A}_0$ ignore the non-active constraints and try to solve the QP with the remaining active constraints.
@@ -578,16 +574,14 @@ The SQP approach to solving the problem~\ref{formulation_NLCP} as presented abov
 which requires that the Hessian $\nabla_{xx}^2\mathcal{L}$ is positive definite on the tangent space of the active constraints.
 That property is guarantied to hold near the solution, but not when starting from a remote point on a non-convex problem.
 To cope with that issue, several methods exist.
-In the next few section, we will present the globalisation methods that are the Line Search and Trust Region approaches, they ensure that the QP subproblem is always feasible.
-Then we'll present some methods used to choose whether to accept of reject an iterate with the merit function and filter methods.
-And finally we will discuss some Hessian approximation methods.
+In the next few sections, we present the globalisation methods that are the Line Search and Trust Region approaches, they ensure that the QP subproblem is always feasible.
+Then we present some methods used to choose whether to accept of reject an iterate with the merit function and filter methods.
+And finally we discuss some Hessian approximation methods.
 
 \subsection{Globalization methods}
 \label{sub:globalization_methods}
 
-As we stated above, the globalisation phase of an SQP optimization is meant to modify the step generated by the QP resolution in order to improve the global convergence of the algorithm.
-Either by multiplying the step found by the QP with a coefficient $\alpha$ in the Line-Search approach.
-Or by bounding the norm of the step found in the QP by adding a boundary constraint on $z$ directly inside of the QP problem.
+As we stated above, the globalisation phase of an SQP optimization is meant to modify the step generated by the QP resolution in order to improve the global convergence of the algorithm, either by multiplying the step found by the QP with a coefficient $\alpha$ in the Line-Search approach, or by bounding the norm of the step found in the QP by adding a boundary constraint on $z$ directly inside of the QP problem.
 
 \subsubsection{The Line-Search Strategy}
 \label{ssub:line_search}
@@ -600,7 +594,7 @@ A typical merit function for a problem with only equality constraints can be wri
   M(x,\mu) = f(x)+\mu \|c(x)\|_1
 \end{equation}
 
-The goal of the line-search will then be to find a value $\alpha^*$ of $\alpha$ that minimizes the Merit function: $M(\alpha^*) < M(0)$ and $M'(\alpha^*)=0$.
+The goal of the line-search is to find a value $\alpha^*$ of $\alpha$ that minimizes the merit function: $M(\alpha^*) < M(0)$ and $M'(\alpha^*)=0$.
 Many simple and efficient methods exist to minimize a 1-dimensional function but most work better if the function to minimize is smooth.
 If inequality constraints are present, a simple penalty function like~\ref{penalty_function} would not be satisfactory because of the non-smoothness of the operator ${[.]}^-$.
 To avoid that problem, slack variables can come in handy to replace the inequality constraints in the problem as follows:
@@ -679,9 +673,9 @@ The filter maintains a list of pairs $p_i=\{f_i, h_i\}$ such that no pair domina
 When a new point $x$ is submitted to the filter for acceptance, the values $f(x)$ and $h(x)$ are computed and the pair $p = \{f(x), h(x)\}$ is compared to every pairs $p_i$.
 If there is at least one pair $p_i$ in the filter that dominates $p$, the point is refused.
 Otherwise, no pair of the filter dominates $p$, then $p$ is accepted and added to the filter.
-Once $p$ is added to the filter, any pair in the filter that is dominated by $p$ is removed from it to ensure to keep a list of pairs non dominated by each other in the filter (That would slow down the algorithm with useless calculations).
+Once $p$ is added to the filter, any pair in the filter that is dominated by $p$ is removed from it to ensure to keep a list of pairs non dominated by each other in the filter.
 In order to ensure global convergence, this method requires several refinements as explained in~\cite{fletcher:mathprog:2000}.
-First, it needs to avoid accepting pairs that are excessively close to each other for that, the domination criterion is modified with a sloping envelope, as proposed in Chin~\cite{chin:mathprog:2003}.
+First, it needs to avoid accepting pairs that are excessively close to each other. For that, the domination criterion is modified with a sloping envelope, as proposed in Chin~\cite{chin:mathprog:2003}.
 The sloping envelope definition takes user defined parameters $\beta$ and $\gamma$ in $[0,\ 1]$.
 
 \begin{definition}
@@ -731,7 +725,7 @@ At each step, the modified problem writes as:
 
 Once a solution $z$ of~\ref{approx_QP_TR} is found, the potential next iterate $x_{k+1} = x_k + z$ is checked against the acceptance criterion (should it be a merit function or a filter or other).
 If it is accepted, that means that our current model is good, we move to the next step with $x_{k+1} \leftarrow x_k + z$, and the size of the trust region can be augmented based on some heuristics.
-Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some heuristics (e.g. $\rho\leftarrow\rho/2$) and the problem~\ref{approx_QP_TR} is solved again with the new value of $\rho$.
+Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some heuristics (e.g. $\rho_{k+1}\leftarrow\rho_k /2$) and the problem~\ref{approx_QP_TR} is solved again with the new value of $\rho_{k+1}$.
 This is repeated until a satisfying point is found, or until an infeasible problem is found.
 
 \begin{figure}
@@ -741,7 +735,7 @@ This is repeated until a satisfying point is found, or until an infeasible probl
 \label{fig:TR_incompatible}
 \end{figure}
 
-With this approach, a problem that is inherent to trust region methods arises: The generation of infeasible problem.
+With this approach, a problem that is inherent to trust region methods arises: the generation of infeasible problem.
 The reduction of the size of the trust region can lead to an incompatible set of constraints.
 For example, with a single constraint, as illustrated in figure~\ref{fig:TR_incompatible}.
 The linearisation of the constraint is represented by the plain strait line, and the trust region by the circle (although in practice we use a rectangular box).
