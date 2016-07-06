@@ -207,14 +207,14 @@ So another approach needs to be taken.
 %Moreover, the additional constraints are unlikely to be met along the iteration process (even if $x_i$ is an element of $\mathcal{M}$, $x_i+{\bf p_i}$ is likely not, as nothing enforces it).
 %This means that in order to evaluate $f \circ \psi^{-1}$ and $c \circ \psi^{-1}$ at a given $x_i$, one has to project it on $\psi(\mathcal{M})$ first, effectively computing $f \circ \psi^{-1} \circ \pi$ and $c \circ \psi^{-1} \circ \pi$, where $\pi$ is the projection.
 %The composition by $\pi$ is an additional burden in programming (see e.g.\ in~\cite{bouyarmane:humanoids:2012a}).
-Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi$ in optimization on manifolds and a step followed by a projection as is done in classical optimization.
+%Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi$ in optimization on manifolds and a step followed by a projection as is done in classical optimization.
 
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.5\linewidth]{Humanoids2015/stepOnSphere.pdf}
-  \caption{StepOnSphere}
-\label{fig:stepOnSphere}
-\end{figure}
+%\begin{figure}[htpb]
+  %\centering
+  %\includegraphics[width=0.5\linewidth]{Humanoids2015/stepOnSphere.pdf}
+  %\caption{StepOnSphere}
+%\label{fig:stepOnSphere}
+%\end{figure}
 
 %As a simple example, the set of 3D-rotations $SO(3)$ is a manifold of dimension $3$.
 %The following (classical) choices can be made
@@ -223,6 +223,14 @@ Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through 
   %\item Quaternion ${\bf q} \in \mathbb{R}^4$, additional constraints: $\{ \left\|{\bf q}\right\|=1\}$, projection $\pi({\bf x}) = {\bf x}/\left\|{\bf x}\right\|$,
   %\item Euler angles ($\mathbb{E} = \mathbb{R}^3$), singularities when reaching gimbal lock.
 %\end{itemize}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.5\linewidth]{Humanoids2015/stepOnSphere.pdf}
+  \caption{StepOnSphere}
+\label{fig:stepOnSphere}
+\end{figure}
+
 
 %}}}
 %{{{ LOCAL PARAMETRIZATION
@@ -237,11 +245,13 @@ By definition, there is always, at a point $x$ of a smooth $n$-dimensional manif
   \end{array} \nonumber%
 \end{equation}
 
+$\varphi_x$ gives us a local parametrization for $\mathcal{M}$.
+Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi_x$ in optimization on manifolds and a step followed by a projection as it can be done in classical optimization.
+
 $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplan of a higher dimensionality space.
 For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplan embedded in $\mathbb{R}^3$.
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
-This gives us a local parametrization for $\mathcal{M}$.
-The driving idea of the optimization on manifolds is to change the parametrization at each iteration.
+The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local map from the tangent space to the current iterate to $\mathcal{M}$ at each iteration.
 Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as
 \begin{align}
 \label{eq:local_problem}
@@ -298,7 +308,7 @@ The basic SQP approach adapted to manifolds can be summarized as follows
 \begin{enumerate}
   \item set $k=0$ and $x_k$ to the initial value
   \item compute ${\bf z}$ from Problem~\Eqref{eq:SQPStep} for current $x_k$
-  \item set $x_k = \varphi_{x_k}({\bf z})$
+  \item set $x_{k+1} = \varphi_{x_k}({\bf z})$ and $k=k+1$
   \item if convergence is not yet achieved go-to step 2
 \end{enumerate}
 
@@ -310,7 +320,7 @@ Computations of function values and derivatives are based on the fact that $f \c
   \end{array} \nonumber\\
   \psi\circ\varphi:
   \begin{array}{ccc}
-    \mathbb{R}^n & \reduce{\rightarrow}{6} & \mathbb{E}
+    T_x{\mathcal{M}} & \reduce{\rightarrow}{6} & \mathbb{E}
   \end{array} \nonumber%
 \end{align}
 are representable functions (whereas $f$, $\psi$ and $\varphi_x$ are not, due to the fact that they feature $\mathcal{M}$ as input or output).
@@ -329,25 +339,24 @@ $\frac{\partial f'}{\partial y}$ denotes the gradient of $f'$ with respect to an
 \label{sub:examples_on_non_euclidean_manifolds}
 
 For each elementary manifold $\mathcal{M}$, we need to define a set of elements and operations.
-Those need only to be implemented once for each elementary manifold (it is then trivial to get those functions for Cartesian products of manifolds).
+Those need only to be implemented once (it is then trivial to get those functions for Cartesian products of manifolds).
 The composition with $f'$ and $c'$ is done automatically.
 The expression of those functions is adapted from~\cite{boumal:jmlr:2014}.
 
 \paragraph{Retractation:}
 We need a retractation operation $\psi\circ\varphi_x$ (that we denote simply $\varphi_x$) and its derivative.
-During the optimization process, we need the expression of the derivatives of $\varphi_x$ in order to compute the gradients of the cost function and constraints at the beginning of each iteration to later compute the approximated quadratic problem to be solved in that iteration.
+During the optimization process, we need the expression of the derivatives of $\varphi_x$ in order to compute the gradients of the cost function and constraints at the beginning of each iteration.
 Because we change the parametrization of our problem to be centered on $x_k$ at each iteration, we only ever need to evaluate the gradient of $\varphi_x$ for $\mathbf{z}=0$, $\frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$.
-In many cases, this quantity is invariant w.r.t $x$ and can be computed once and for all for each manifold.
+In some cases, this quantity is invariant w.r.t $x$ and can be computed once and for all.
 
-\paragraph{Pseudo-Logarithm and distances:}
-It is necessary to be able to compute distances on manifolds.
+\paragraph{Pseudo-logarithm and distances:}
+It is interesting to compute distances on manifolds.
 For that, we define the pseudo-logarithm (aka pseudolog), which is the inverse of the retractation operator.
-Note that the logarithm map is the inverse of the exponential map.
 \begin{equation*}
   \zeta_x:\mathcal{M}\rightarrow T_x\mathcal{M}
 \end{equation*}
 \begin{equation*}
-  \forall (x,y)\in \mathcal{M}\times\mathcal{M},\ \mathbf{z}:=\zeta_x(y)\ \text{is such that}\ \varphi_x(\mathbf{z}) = y
+  \forall (x,y)\in \mathcal{M}\times\mathcal{M},\ \mathbf{z}=\zeta_x(y)\ \text{is such that}\ \varphi_x(\mathbf{z}) = y
 \end{equation*}
 The pseudolog operator gives the vector of $T_x\mathcal{M}$ to go from $x$ to $y$.
 It is used to compute the (pseudo-) distance between two points of $\mathcal{M}$
@@ -355,7 +364,7 @@ It is used to compute the (pseudo-) distance between two points of $\mathcal{M}$
   \dist(x,y) = \|\zeta_x(y)\|
 \end{equation*}
 
-\paragraph{Vector Transport:}
+\paragraph{Vector transport:}
 To compare two vectors $\mathbf{v}_1$ and $\mathbf{v}_2$ defined in tangent spaces of different points, respectively, $T_{x_1}\mathcal{M}$ and $T_{x_2}\mathcal{M}$, it is necessary to transport $\mathbf{v}_1$ into $T_{x_2}\mathcal{M}$.
 Figure~\ref{fig:transport} illustrates the transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
 $\mathbf{v}_2$ can then be compared to the transported $\mathbf{v}_1$: $\mathcal{T}_{x_1,\mathbf{z}}(\mathbf{v}_1)$.
@@ -370,16 +379,17 @@ This operation will come in handy for the computation of Hessian approximations 
 
 %\paragraph{Projections:} A projection operator on $\mathcal{M}$, as well as one on $T_x\mathcal{M}$ can come in handy, especially to help eliminate some numerical errors when necessary.
 
-\paragraph{Limits on tangent map:} The tangent map can present some singularities, thus it is necessary to limit the length of steps made through retractation to the validity region of each manifold.
+%\paragraph{Limits on tangent map:} The tangent map can present some singularities, thus it is necessary to limit the length of steps made through retractation to the validity region of each manifold.
+\paragraph{Limits of validity of the retractation:} The retractation is only valid locally, and we need to give a (conservative) approximation of its validity region.
 
 To summarize, for each elementary manifold $\mathcal{M}$, we need to implement the following elements:
 \begin{itemize}
   \item Tangent Space at point $x$, $T_x\mathcal{M}$
   \item Embedding spaces $\mathbb{E}$ and $T_x\mathcal{M}$
   \item Retractation operator $\varphi:\ (x,\mathbf{z}) \rightarrow \varphi_x(\mathbf{z})$
-  \item Gradient of the retractation operator $\partial \varphi(x):\rightarrow \frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$
+  \item Gradient of the retractation operator at zero $\partial \varphi(x):\rightarrow \frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$
   \item Pseudo-logarithm operator $\zeta:\ (x,y) \rightarrow \zeta_x(y)$
-  \item Gradient of pseudo-logarithm operator $\frac{\partial \zeta_x}{\partial y}(y)$
+  \item Gradient of pseudo-logarithm operator at the iterate $\frac{\partial \zeta_x}{\partial y}(x)$
   \item Transport operator $\mathcal{T}:\ (x,\mathbf{z}, \mathbf{v})\rightarrow \mathcal{T}_{x,\mathbf{z}}(v)$
   \item Projection from $\mathbb{E}$ on $\mathcal{M}$, $\pi_\mathcal{M}$
   \item Projection from $T_x\mathbb{E}$ on $T_x\mathcal{M}$, $\pi_{T_x\mathcal{M}}$
@@ -729,7 +739,7 @@ For example, the retractation is computed as follows, and that scheme can be rep
 \subsection{Implementation of Manifolds}
 \label{sub:implementation_of_manifolds}
 
-In order to use the manifold formulation described above in other softwares, and particularly in a numerical solver, we needed to write an independant C++ project that handles all the formulations without the user having to worry about it.
+In order to use the manifold formulation described above in other softwares, and particularly in a numerical solver, we wrote an independant C++ project.
 This implementation is open-source and available at \href{https://github.com/stanislas-brossette/manifolds}{https://github.com/stanislas-brossette/manifolds}.
 The implementation consists in 3 types of classes: the Manifold class, the elementary manifold classes, and the Point class.
 The Manifold class describes the abstract mathematical structure of a non-Euclidean manifold and defines a common interface for all elementary manifolds to implement (retractation, pseudoLog,\ldots).
@@ -762,7 +772,7 @@ We summarize the entire SQP algorithm in Diagrams~\ref{fig:main_sqp_loop},~\ref{
 \label{sub:linear_and_quadratic_problems_resolution}
 
 The central idea of an SQP algorithm is that it solves a series of QP iteratively until a solution is reached.
-There are many off-the-shelf QP solvers available and the state of the art is mature in that field, thus, we decided to use the {\tt LSSOL} solver~\cite{gill:techrep:1986}.
+There are many off-the-shelf QP solvers available and the state of the art is mature in that field, thus we decided to use the {\tt LSSOL} solver~\cite{gill:techrep:1986}.
 {\tt LSSOL} provides resolution methods for several types of problems and we are interested in using the FP (Feasibility Problem) and QP ones.\@
 The {\tt LSSOL} framework formulates problems as follows (Note that there are no equality constraints in this formulation):
 
@@ -789,7 +799,7 @@ With the $F$ function taking different forms depending on the problem to solve:
 \end{tabular}
 \end{table}
 
-The QP4 type of problem is used when a decomposition of the matrix $A$ of QP2, $A=B^T B$ is available.
+The QP4 type of problem is used when a decomposition of the matrix $A$ of QP2, $A=B^T B$ is already available.
 
 \subsection{Problem Definition}
 \label{sub:problem_definition}
@@ -808,7 +818,7 @@ The list of constraints can be separated in 3 categories: Bounds, Linear, and No
 For convenience, we formulate our optimization problem in a way that is compatible with {\tt LSSOL} by changing all equality constraints into inequality constraints:
 
 \begin{equation}
-  c(x) = 0 \Leftrightarrow 0 \leq c(x) \leq 0
+  c(x) = a \Leftrightarrow a \leq c(x) \leq a
 \end{equation}
 
 Our problem can be written as:
@@ -844,11 +854,12 @@ At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ th
 With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively the lower and upper bounds of validity of the tangent map of $\mathcal{M}$ around $x$.
 After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\Eqref{eq:optim_problem_on_manifold} become nonlinear in problem~\Eqref{eq:optim_problem_on_txm}.
 It is then necessary to treat the problem and evaluate which constraint is linear and which is not, in order to go back to a formulation of the same type as in problem~\Eqref{eq:optim_problem_on_manifold}.
-Basically, for each constraint $c_j$ in problem~\Eqref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a real space $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time I am writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
-Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
-Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
-For example, a linear constraint on the elements of a unit quaternion, although one can obviously be devised, does not seem to make much sense.
-So usually, when a non-Euclidean manifold is involved, the constraint is nonlinear.
+Basically, for each constraint $c_j$ in problem~\Eqref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a real space $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time of writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
+It is however unusual to write linear constraints on non-Euclidean manifolds.
+%Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
+%Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
+%For example, a linear constraint on the elements of a unit quaternion, although one can obviously be devised, does not seem to make much sense.
+%So usually, when a non-Euclidean manifold is involved, the constraint is nonlinear.
 
 In the particular case of linear constraints (and by extension bound constraints) on a submanifold that is a real space, the constraints on $x$ are transformed into constraints on $z$ as follows:
 \begin{equation}
@@ -876,7 +887,7 @@ The Taylor development of $c\circ\varphi_x(z)$ to the first order around $\mathb
   c \circ \varphi_x(\mathbf{z}) \approx c\circ \varphi_{x_k}(0) + \frac{\partial c\circ \varphi_{x_k}}{\partial {\bf z}}(0) {\bf z } = c(x_k) + {\left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}
 \end{equation}
 
-The QP to solve at each iteration is the following:
+The QP to be solved at each iteration is the following:
 
 \begin{align}
   \label{eq:QP_txm}
@@ -982,7 +993,7 @@ For each constraint, there are 3 possible situations:
   \bottomrule
 \end{tabular}
 
-Both $\lambda_l$ and $\lambda_u$ cannot be nonnull at the same time. So for each constraint, we can use a single Lagrange multiplier that is negative when the lower bound is violated or active, null when the constraint is satisfied, and positive when the upper bound is active or violated.
+Both $\lambda_l$ and $\lambda_u$ cannot be nonzero at the same time. So for each constraint, we can use a single Lagrange multiplier that is negative when the lower bound is violated or active, null when the constraint is satisfied, and positive when the upper bound is active or violated.
 This allows to reduce the KKT system to the following:
 
 \begin{equation}
@@ -1035,11 +1046,10 @@ And we get the following convergence criterion:
 \subsection{Feasibility restoration}
 \label{sub:feasibility_restoration}
 
-Along the optimization process, the set of linearized constraints in the QP Problem~\Eqref{eq:QP_txm} can become infeasible.
-For example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
+Along the optimization process, the set of linearized constraints in the QP Problem~\Eqref{eq:QP_txm} can become infeasible, for example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
 In that case the QP~\Eqref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
-To quope with that issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
-The basic idea is the following: At the beginning of an iteration, we estimate a list of infeasible linearized constraints.
+To quope with this issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
+The basic idea is the following: at the beginning of an iteration, we estimate a list of infeasible linearized constraints.
 The infeasible constraints are removed from the restoration problems constraints list and their violation is added to its cost function (that becomes the sum of all constraints violation).
 Then the restoration problem only contains feasible constraints and has to minimize the sum of constraint violation.
 That is done by iterating just like in the SQPs main loop with the difference that at each iteration, we update the problem based on a new list of infeasible constraints.
@@ -1115,11 +1125,11 @@ Aside from the manifold adaptation, our main departure from Fletcher is in the H
 After testing several possibilities, we settled for a self-scaling damped BFGS update~\cite{nocedal:mp:1993,nocedal:book:2006}, adapted to the manifold framework.
 More precisely, given the Hessian approximation $H_k$ at iteration $k$, we compute the approximation $H_{k+1}$ as follows
 \begin{align}
-  &s_k = \mathcal{T}_z(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_z(\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
+  &s_k = \mathcal{T}_{\bf z}(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_{\bf z}(\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
   &\theta_k = \left\{\begin{array}{ll}
     1 & \mbox{if} \; s_k^T y_k \geq 0.2 s_k^T \tilde{H}_k s_k \\
     \frac{0.8 s_k^T \tilde{H}_k s_k}{s_k^T \tilde{H}_k s_k - s_k^T y_k} & \mbox{otherwise}
-  \end{array}\right. \nonumber\\
+  \end{array}\right. \quad \mbox{(Powell update)}\nonumber\\
   &r_k = \theta_k y_k + \left(1-\theta_k\right) \tilde{H}_k s_k \quad \mbox{(damped update)} \nonumber\\
   &\tau_k = \min\left(1, \frac{s_k^T r_k}{s_k^T \tilde{H}_k s_k} \right) \quad \mbox{(self-scaling)} \nonumber\\
   &H_{k+1} = \tau_k \left(\tilde{H}_k-\frac{\tilde{H}_k s_k s_k^T \tilde{H}_k}{s_k^T \tilde{H}_k s_k} \right) + \frac{r_k r_k^T}{s_k^T r_k} \nonumber%
@@ -1179,19 +1189,13 @@ This also allows to have an approximation of the Hessian when exiting the restor
 \label{sub:solver_evaluation}
 
 We integrated our solver with the Roboptim framework (\href{http://roboptim.net/}{http://roboptim.net/}) to have a common interface with other solvers that are already interfaced with roboptim and used in our team, like {\tt IPOPT}, {\tt CFSQP}, and {\tt NAG}.
-The roboptim framework provides a list of 72 canonical optimization problems that come from the Hock-Schittkowski-Collection~\cite{Hock1980} that allows to evaluate the rate of success and speed of each solvers.
+The roboptim framework provides a list of 72 canonical optimization problems coming from the Hock-Schittkowski-Collection~\cite{Hock1980} that allows to evaluate the rate of success and speed of each solvers.
 Although those problems are all on $\mathbb{R}^n$, thus, do not try the non-Euclidean capabilities of our solver, it is a good way compare its performances with those of other solvers.
 As of now, {\tt PGSolver} finds a solution for 51 tests out of 72, using its default parameters.
 In the same conditions, {\tt IPOPT} solves 65 problems, {\tt CFSQP} 46 and {\tt NAG} 58.
 This result serves only as indication of the correct behavior of a solver, because default parameters are usually not good and a solver reaches its full potential once its parameters have been tuned for a type of problem.
 Those tests can also be used in a non-regression criterion for our software.
 
-\section{Conclusion}
-\label{sec:conclusion}
-
-In this chapter, we presented the principle of nonlinear optimization on non-Euclidean manifolds, and detailed the choices we made to implement an SQP algorithm that solves those problems efficiently.
-In addition to being used in our posture generation problems, {\tt PGSolver} has been used successfully in some inertia identification problems as presented in~\cite{traversaro:iros:2016}.
-In the next section we will focus on the formulation of optimization problems for posture generation.
 
 \section{Diagrams of the algorithms}
 \label{sec:diagrams_of_the_algorithms}
@@ -1217,6 +1221,13 @@ In the next section we will focus on the formulation of optimization problems fo
 \label{fig:second_order_correction}
   \end{minipage}%
 \end{figure}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this chapter, we presented the principle of nonlinear optimization on non-Euclidean manifolds, and detailed the choices we made to implement an SQP algorithm that solves those problems efficiently.
+In addition to being used in our posture generation problems, {\tt PGSolver} has been used successfully in some inertia identification problems as presented in~\cite{traversaro:iros:2016}.
+In the next section we will focus on the formulation of optimization problems for posture generation.
 
 %}}}
 
