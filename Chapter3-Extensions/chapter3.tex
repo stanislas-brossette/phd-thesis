@@ -1409,3 +1409,12 @@ Overall, it seems that the idea of lifting does not provide better performances 
 In the view of that observation, we decided to not go further in this research direction.
 Even though intuitively, the idea of lifting seems to apply naturally to robotics equations, the results obtained were not satisfying enough to justify investing more efforts in this approach so we decided to move on.
 
+\section{Conclusion}
+\label{sec:chap3_conclusion}
+
+In this chapter we presented three different and unrelated contributions to the field.
+First we proposed a convenient formulation of contact constraints that allows to generate non-inclusive contacts between two surfaces while ensuring that the size of the intersection is satisfactory.
+Second we presented a generic differentiation of the torque computation algorithm, allowing to compute the joint torque jacobian of a robotic system.
+And finally we described our endeavor to use the idea of variable lifting in optimization to solve posture generation problems, which unfortunately proved inefficient to accelerate the convergence of our solvers on those problems.
+
+In the next chapter, we will dive deeper in the field of nonlinear optimization on manifolds, study how an SQP algorithm can be modified to be able to deal with manifolds and finally present our own implementation of such an algorithm.
