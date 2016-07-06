@@ -69,15 +69,15 @@ The speed of generating a multi-contact sequence is directly related to the qual
 
 The variables of a robotics problem sometimes naturally belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
 A manifold is a topological space that locally resembles Euclidean space near each point.
-More precisely, each point of an n-dimensional manifold has a neighbourhood that is homeomorphic to the Euclidean space of dimension n.
+Each point of an n-dimensional manifold has a neighbourhood that is homeomorphic to the Euclidean space of dimension n.
 An n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
-Most of the solvers available make the assumption that the search space is Euclidean and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
+Most of the optimization solvers available make the assumption that the search space is Euclidean and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
 But it is often possible to parametrize $\mathcal{M}$ over a higher dimensionality Euclidean space with added constraint (e.g. unit quaternions, rotation matrices).
 It is then possible to solve those problems with classical solvers at the cost of additional variables, constraints and special treatments in the optimization problem.
 There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
-In this thesis, we develop our own nonlinear solver on manifolds, that we use to solve optimization problems on their native search manifolds, should they be of posture generation or others.
+During this thesis, we develop our own nonlinear solver on manifolds, that we use to solve optimization problems on their native search manifolds, should they be posture generation problems or others.
 This has the added advantage that unlike off-the-shelf solver, which are often a black box on which the user has a very limited level of control, we have full control over that solver and can specialize/modify it to fit our needs.
 
 %\paragraph{Specificities of our approach}
