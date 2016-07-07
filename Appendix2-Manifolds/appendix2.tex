@@ -9,11 +9,117 @@
 
 \graphicspath{{Appendix2-Manifolds/Figs/}}
 
-This appendix chapter comes as a complement for Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
+This appendix chapter comes as a complement for Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} in which we explicite the elements necessary for the description of several elementary manifolds.
 
-%{{{SO(3) MATRIX REPRESENTATION
-\subsubsection{$SO(3)$ Matrix representation}
-\label{ssub:so(3)_matrix_representation}
+%{{{ THE REAL SPACE MANIFOLD $\MATHBB{R^N$}
+\section{The Real Space manifold}
+\label{sec:the_real_space}
+The Realspace manifold of dimension $n$ is denoted $\mathbb{R}^n$.
+Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it are straightforward.
+
+\begin{table} [H]
+\caption{Description of the $\mathbb{R}^n$ manifold}
+\centering
+\begin{tabular}{cc}
+  \toprule
+  $\mathcal{M}$ & $\mathbb{R}^n$ \\
+  \midrule
+  $\mathbb{E}$ & $\mathbb{R}^n$ \\
+  \midrule
+  $T_x\mathcal{M}$ & $\mathbb{R}^n$ \\
+  \midrule
+  $T_x\mathbb{E}$ & $\mathbb{R}^n$ \\
+  \midrule
+  $\phi_x(\mathbf{z})$ & $\mathbf{x} + \mathbf{z}$ \\
+  \midrule
+  $\partial \phi_x(0)$ & $\mathbb{I}_n$ \\
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
+  $\zeta(x,y)$ & $\mathbf{y} - \mathbf{x}$ \\
+  \midrule
+  $\frac{\partial \zeta_x}{\partial y}(x)$ & $\mathbb{I}_n$ \\
+  \midrule
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
+  \midrule
+  $\pi_\mathcal{M}(\mathbf{x})$ & $\mathbf{x}$ \\
+  \midrule
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
+  \midrule
+  $\lim$ & $\|\mathbf{v}\| \leq \infty$ \\
+  \bottomrule
+\end{tabular}
+\end{table}
+%}}}
+%{{{ THE 3D ROTATION MANIFOLD SO(3): MATRIX REPRESENTATION
+\section{The 3D Rotation manifold: Matrix representation}
+\label{sec:the_3d_rotation_manifold_matrix_representation}
+
+The 3D rotation manifold is denoted $SO(3)$.
+
+An element $x$ of $SO(3)$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3\times 3}$ by:
+\begin{equation}
+  x\in SO(3),\ \mathbf{x} =\begin{bmatrix}
+    x_{00} & x_{01} & x_{02} \\
+    x_{10} & x_{11} & x_{12} \\
+    x_{20} & x_{21} & x_{22} \\
+  \end{bmatrix}
+\end{equation}
+
+We recall the operators
+\begin{equation}
+\widehat{.}: \begin{bmatrix}
+  \omega_0\\\omega_1\\\omega_2\\
+\end{bmatrix}
+\rightarrow
+\begin{bmatrix}
+  0 & -\omega_2 & \omega_1 \\
+  \omega_2 & 0 & -\omega_0 \\
+  -\omega_1 & \omega_0 & 0\\
+\end{bmatrix}
+\end{equation}
+And its inverse:
+\begin{equation}
+\widecheck{.}: \begin{bmatrix}
+    x_{00} & x_{01} & x_{02} \\
+    x_{10} & x_{11} & x_{12} \\
+    x_{20} & x_{21} & x_{22} \\
+\end{bmatrix}
+\rightarrow
+\begin{bmatrix}
+  x_{21}\\x_{02}\\x_{10}\\
+\end{bmatrix}
+\end{equation}
+
+
+The exponential map is known as the Rodrigues formula:
+\begin{equation}
+  \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 +
+  \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}} +
+  \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}}^2
+\end{equation}
+
+Note that when $\|\mathbf{v}\|$ is small, we make the following replacements to avoid numerical instability.
+It is important to ensure the precision of the retractation near zero because in an optimization process, many small steps are taken, especially when close to the solution.
+
+\begin{align}
+ \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} & = 1-\frac{\|\mathbf{v}\|}{6}\\
+ \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} & = 0.5 - \frac{\|\mathbf{v}\|}{24}
+\end{align}
+
+And the logarithm is computed as follows (see~\cite{merlhiot:thesis:2009}):
+\begin{align}
+\begin{split}
+  \forall R\in\psi(SO(3)),\ f(R) &=
+  \left\{ \begin{matrix}
+  0 & \text{if }Tr(R) = 3 \\
+  \frac{\arccos\left(\frac{Tr(R)-1}{2}\right)}{2\sin\left(\arccos\left(\frac{Tr(R)-1}{2}\right)\right)}\left(R-R^T\right) & \text{otherwise} \\
+  \end{matrix} \right.\\
+  \log(R) &= \widecheck{f\left(R\right)}
+\end{split}
+\end{align}
 
 We considere a point $x\in\mathcal{M}$ and its representation matrix with the following storing order:
 \begin{equation}
@@ -66,10 +172,101 @@ And the derivation of the logarithm operation writes as:
   \end{bmatrix}
 \end{align}
 
+\begin{table} [H]
+\caption{Description of the $SO(3)$ manifold with matrix representation}
+\centering
+\begin{tabular}{cc}
+  \toprule
+  $\mathcal{M}$ & $SO(3)$ \\
+  \midrule
+  $\mathbb{E}$ & $\mathbb{R}^{3\times 3}$ \\
+  \midrule
+  $T_x\mathcal{M}$ & $\mathbb{R}^3$ \\
+  \midrule
+  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
+  \midrule
+  $\psi(x) = \mathbf{x}$ & $ \begin{bmatrix}
+    x_{00} & x_{01} & x_{02} \\
+    x_{10} & x_{11} & x_{12} \\
+    x_{20} & x_{21} & x_{22} \\
+  \end{bmatrix} $ \\
+  \midrule
+  $\phi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
+  $\partial \phi_x(0)$ & see Equation~\ref{eq:diffRetrSO3Matrix} \\
+  \midrule
+  $\zeta(x,y)$ & $\log(\mathbf{x}^T\mathbf{y})$ \\
+  \midrule
+  $\frac{\partial \zeta_x}{\partial y}(x)$ & see Equation~\ref{eq:diffLogSO3Matrix} \\
+  \midrule
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
+  \midrule
+  $\pi_\mathcal{M}(\mathbf{x})$ & Q from QR decomposition of $\mathbf{x}$ \\
+  \midrule
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
+  \midrule
+  $\lim$ & $\|\mathbf{v}\| \leq \pi$ \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
 %}}}
-%{{{SO(3): QUATERNION REPRESENTATION
-\subsubsection{$SO(3)$: Quaternion representation}
-\label{ssub:so3_quaternion_representation}
+
+%{{{ THE 3D ROTATION MANIFOLD SO3 QUATERNION REPRESENTATION
+\section{The 3D Rotation manifold with quaternion representation}
+\label{sec:the_3d_rotation_manifold_quaternion_representation}
+
+The 3D rotation manifold is denoted $SO(3)$.
+
+An element $x$ of $SO(3)$ is represented by $\mathbf{q}=\psi(x)$ in $\mathbb{R}^{4}$ by:
+\begin{equation}
+  x\in SO(3),\ \mathbf{q} =\begin{bmatrix}
+    q_{w}\\
+    q_{x}\\
+    q_{y}\\
+    q_{z}\\
+  \end{bmatrix}
+  =\begin{bmatrix}
+    q_{w}\\
+    \mathbf{q_{vec}}\\
+  \end{bmatrix}
+\end{equation}
+
+The exponential map is:
+\begin{equation}
+  \exp\ :\left|
+  \begin{array}{ccc}
+    \mathbb{R}^3 & \rightarrow & \mathbb{R}^4 \\
+    \mathbf{z} & \mapsto & \begin{bmatrix}
+      \cos \left( \frac{\|\mathbf{z}\|}{2} \right)\\
+      \sin \left( \frac{\|\mathbf{z}\|}{2} \right) \frac{\mathbf{z}}{\|\mathbf{z}\|}\\
+    \end{bmatrix} \\
+  \end{array} \nonumber%
+  \right.
+\end{equation}
+
+Note that when $\|\mathbf{v}\|$ is small, we make the following replacements to avoid numerical instability.
+
+\begin{equation}
+  \exp(\mathbf{z}) = \begin{bmatrix}
+    1 -\frac{\|\mathbf{z}\|}{8} + \frac{{\|\mathbf{z}\|}^2}{384}\\
+    \left(0.5 - \frac{\|\mathbf{z}\|}{48} + \frac{{\|\mathbf{z}\|}^2}{3840}\right)\mathbf{z}
+  \end{bmatrix}
+\end{equation}
+
+And the logarithm is:
+\begin{equation}
+  \log\ :\left|
+  \begin{array}{ccc}
+    \mathbb{R}^4 & \rightarrow & \mathbb{R}^3 \\
+    q & \mapsto & \arctan \left( \frac{2 \|\mathbf{q_{vec}}\| q_w}{q_w^2 - {\|\mathbf{q_{vec}\|}^2}} \right) \frac{\mathbf{q_{vec} } }{\|\mathbf{q_{vec}}\|} \\
+  \end{array}
+  \right.
+\end{equation}
 
 We considere a point $q\in\mathcal{M}$ and its representation quaternion with the following storing order:
 \begin{equation}
@@ -115,6 +312,124 @@ And the derivation of the logarithm operation writes as:
   \end{bmatrix}
 \end{align}
 
+
+\begin{table} [H]
+\caption{Description of the $\mathbf{SO(3)}$ manifold with quaternion representation}
+\centering
+\begin{tabular}{cc}
+  \toprule
+  $\mathcal{M}$ & $SO(3)$ \\
+  \midrule
+  $\mathbb{E}$ & $\mathbb{R}^{4}$ \\
+  \midrule
+  $T_x\mathcal{M}$ & $\mathbb{R}^3$ \\
+  \midrule
+  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
+  \midrule
+  $\phi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
+  \midrule
+  $\partial \phi_x(0)$ & see Appendix~\ref{eq:diffRetrSO3Quat} \\
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
+  $\zeta(x,y)$ & $\log(\mathbf{x}^{-1}\mathbf{y})$ \\
+  \midrule
+  $\frac{\partial \zeta_x}{\partial y}(x)$ & see Appendix~\ref{eq:diffLogSO3Quat} \\
+  \midrule
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
+  \midrule
+  $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
+  \midrule
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
+  \midrule
+  $\lim$ & $\|\mathbf{v}\| \leq \pi$ \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
 %}}}
 
 
+%{{{ THE UNIT SPHERE MANIFOLD $S2$
+\section{The Unit Sphere manifold}
+\label{sec:the_unit_sphere_manifold_s2}
+
+An element $x$ of $S2$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3}$ by:
+\begin{equation}
+  x\in S2,\ \mathbf{x} =\begin{bmatrix}
+    x_0\\
+    x_1\\
+    x_2\\
+  \end{bmatrix}
+\end{equation}
+
+With this manifold, the tangent space at $x$ is the tangent plane to the unit-sphere at $x$.
+Thus, $T_x\mathcal{M}$ it is a 2-dimensional space, and its representation space is $\mathbb{R}^3$.
+%A tangent vector to $x$, $\mathbf{z}$, is such that $\mathbf{x}\cdot \mathbf{z} = \mathbf{x}^T\mathbf{z}=0$.
+
+For the retractation we simply use a normalized sum:
+\begin{equation}
+  \phi_x(\mathbf{z}) = \frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}
+\end{equation}
+
+We define a distance operation on $S2$ as:
+\begin{equation}
+  \dist(x, y) = 1-\mathbf{x}\cdot \mathbf{y}
+\end{equation}
+
+And the projection on the tangent space:
+\begin{equation}
+  \pi_{T_x\mathcal{M}}(\mathbf{z}) = \mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}
+\end{equation}
+
+The pseudo-logarithm operation is the following:
+\begin{equation}
+  \zeta_x(y) = \dist(x,y)\frac{\pi_{T_x\mathcal{M}}(\mathbf{z})}{\|\pi_{T_x\mathcal{M}}(\mathbf{z})\|}
+\end{equation}
+
+The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $T_y\mathcal{M}$ with $y = \phi_x(\mathbf{v})$, corresponds to rotating $\mathbf{v}$ by the rotation that transforms $x$ into $y$:
+\begin{align}
+  &\mathbf{y} = \phi_x(\mathbf{z}) \\
+  &R = \mathbb{I}_3 + \widehat{\mathbf{x} \wedge \mathbf{y}} + \frac{{\widehat{\mathbf{x} \wedge \mathbf{y} } }^2}{1+\mathbf{x}\cdot\mathbf{y}} \\
+  &\mathcal{T}(x,\mathbf{z}, \mathbf{v}) = R\mathbf{v}
+\end{align}
+
+\begin{table} [H]
+\caption{Description of the S2 manifold}
+\centering
+\begin{tabular}{cc}
+  \toprule
+  $\mathcal{M}$ & $S2$ \\
+  \midrule
+  $\mathbb{E}$ & $\mathbb{R}^{3}$ \\
+  \midrule
+  $T_x\mathcal{M}$ & $\mathbb{R}^2$ \\
+  \midrule
+  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
+  \midrule
+  $\phi_x(\mathbf{z})$ & $\frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}$ \\
+  \midrule
+  $\partial \phi_x(0)$ & $\mathbb{I}_3 - \mathbf{x}\cdot\mathbf{x}^T$ \\
+  \bottomrule
+\end{tabular}
+\quad
+\begin{tabular}{cc}
+  \toprule
+  $\zeta(x,y)$ & $\mathbf{y} - (\mathbf{x} \cdot \mathbf{y}) \mathbf{x}$ \\
+  \midrule
+  $\frac{\partial \zeta_x(x)}{\partial y}$ & $\mathbb{I}_3 -\mathbf{x}\cdot\mathbf{x}^T$ \\
+  \midrule
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbb{I}_3 + \widehat{\mathbf{x} \wedge \phi_x(\mathbf{z})} + \frac{{\widehat{\mathbf{x} \wedge \phi_x(\mathbf{z})}}^2}{1+\mathbf{x}\cdot\phi_x(\mathbf{z})}$ \\
+  \midrule
+  $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
+  \midrule
+  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}$ \\
+  \midrule
+  $\lim$ & $\|\mathbf{v}\| \leq \infty$ \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+%}}}

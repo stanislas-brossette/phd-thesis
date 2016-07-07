@@ -134,7 +134,7 @@ In general, with non-manifold formulations, at any given iteration, the parametr
 It is then needed to project them on it.
 %For example, all the functions involved in the problem can be composed with a normalization of the quaternion.
 %Which in turn must be taken into account in the constraints and cost functions differentiations, which is an additional programming burden.
-Denoting $\pi$ the projection (for example $\pi = \frac{q}{\left\|q\right\|}$ in the unit quaternion formulation), to evaluate a function $f$ on a manifold, we need to compute $f \circ \pi$.
+Denoting $\pi_\mathcal{M}$ the projection (for example $\pi_\mathcal{M} = \frac{q}{\left\|q\right\|}$ in the unit quaternion formulation), to evaluate a function $f$ on a manifold, we need to compute $f \circ \pi_\mathcal{M}$.
 If further the gradient is needed, that projection must also be accounted for (authors in~\cite{bouyarmane:humanoids:2012} explain that issue in great details for robotics problems with free-floating bases).
 
 Similar issues can be found with the $\mathbb{R}^{3\times 3}$ matrix representation.
@@ -189,13 +189,15 @@ This boils down to choosing a representation space $\mathbb{E} = \mathbb{R}^r$ (
   \psi\ :\
   \begin{array}{ccc}
     x & \reduce{\mapsto}{6} & \mathbf{x} \\
-    \mathcal{M} & \reduce{\rightarrow}{6} & \mathbb{E}
+    \mathcal{M} & \reduce{\rightarrow}{6} & \psi(\mathcal{M}) \subseteq \mathbb{E}
   \end{array}\nonumber%
 \end{equation}
-In the following, we identify $\mathcal{M}$ with the set $\psi(\mathcal{M}) \subseteq \mathbb{E}$.
+%In the following, we identify $\mathcal{M}$ with the set $\psi(\mathcal{M}) \subseteq \mathbb{E}$.
+$\psi(\mathcal{M})$ is the subset of $\mathbb{E}$ containing the representation of all the elements of $\mathcal{M}$.
+The projection operator $\pi_\mathcal{M}$ that we mentionned in Section~\ref{sec:introduction_to_optimization_on_manifolds} is actually a projection from $\mathbb{E}$ to $\psi(\mathcal{M})$.
 
 With this representation, it is tempting to simply transform problem~\Eqref{eq:optim_problem} as an optimization over $\mathbb{R}^r$ with objective $f \circ \psi^{-1}$ and constraint $c \circ \psi^{-1}$, and solve it with a classical solver.
-But, as we stated in~\ref{sec:introduction_to_optimization_on_manifolds}, if $r=n$ we will get singulatities, and if $r>n$ we will add parametrization-related variables and constraints to our problem and the iterates may not lie on the manifold and need to be projected on it.
+But, as we stated in Section~\ref{sec:introduction_to_optimization_on_manifolds}, if $r=n$ we will get singulatities, and if $r>n$ we will add parametrization-related variables and constraints to our problem and the iterates may not lie on the manifold and need to be projected on it.
 So another approach needs to be taken.
 %But depending on the representation choice, one of the two following problems arises:\\
 %(i) $r=n$, then it is not possible in the general non-Euclidean case to find $\psi$ without derivative discontinuities.
@@ -246,23 +248,23 @@ By definition, there is always, at a point $x$ of a smooth $n$-dimensional manif
 \end{equation}
 
 $\varphi_x$ gives us a local parametrization for $\mathcal{M}$.
-Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi_x$ in optimization on manifolds and a step followed by a projection as it can be done in classical optimization.
+Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi_x$ in optimization on manifolds and a step followed by a projection $\pi_\mathcal{M}$ as it can be done in classical optimization.
 
 $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplan of a higher dimensionality space.
 For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplan embedded in $\mathbb{R}^3$.
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
-The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local map from the tangent space to the current iterate to $\mathcal{M}$ at each iteration.
-Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as
+The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local map $\varphi_{x_i}$ at the current iterate $x_i$ at each iteration.
+Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as:
 \begin{align}
 \label{eq:local_problem}
 \minimize_{{\bf z} \in T_{x_i}\mathcal{M}} & \quad f \circ \varphi_{x_i}({\bf z}) \\
   \text{subject to}&
   \begin{array}{rcl}
-    {l} \leq & \reduce{c \circ \varphi_{x_i}({\bf z})}{8}& \leq {b} \nonumber
+    {l} \leq & c \circ \varphi_{x_i}({\bf z}) & \leq {b} \nonumber
   \end{array}
 \end{align}
 This is an optimization problem on $\mathbb{R}^n$.
-If we perform one iteration of a classical solver starting from ${\bf z_0} = 0$, we get an iterate ${\bf z_1}$, which corresponds to the iterate $x_{i+1} = \varphi_{x_i}({\bf z_1})$.
+If we perform one iteration of a classical solver starting from $x_i$, we compute an increment ${\bf z_i}$, which leads to the next iterate $x_{i+1} = \varphi_{x_i}({\bf z_i})$.
 We can then reformulate Problem~\Eqref{eq:optim_problem} around $x_{i+1}$, perform a new iteration and repeat the process until convergence.
 
 \begin{figure}[!htb]
@@ -272,27 +274,60 @@ We can then reformulate Problem~\Eqref{eq:optim_problem} around $x_{i+1}$, perfo
 \label{fig:phimap}
 \end{figure}
 
-However, convergence cannot be achieved without care on the choice of $\varphi_{x_i}$: it must be such that for any ${\bf z}$, the curve $t \mapsto \varphi_{x_i}(tz)$ is tangent to ${\bf z}$, see Fig.~\ref{fig:phimap}, so that the update $x_{i+1} = \varphi_{x_i}({\bf z_1})$ is made in the direction given by ${\bf z_1}$.
+However, convergence cannot be achieved without care on the choice of $\varphi_{x_i}$.
+Once the optimization algorithm chooses an increment ${\bf z}_i$, we want to move from $x_i$ in the direction of ${\bf z}_i$ on the manifold.
+In Euclidean spaces($\mathbb{R}^n$), moving in the direction of a vector is straightforward.
+On a manifold, the notion of moving in the direction of a tangent vector, while staying on the manifold, is generalized by the notion of retractation mapping.
+
+A retractation $R$ at $x$, denoted $R_x$ is a mapping from $T_x{\mathcal{M}}$ to $\mathcal{M}$ with a local rigidity condition that preserves gradients at $x$.
+Absil~\cite{absil:book:2008} defines a retractation as follows:
+\begin{definition}
+A retractation on a manifold $\mathcal{M}$ is a smooth mapping $R$ from the tangent bundle $T\mathcal{M}$ onto $\mathcal{M}$ with the following properties.
+Let $R_x$ denote the restriction of $R$ to $T_x\mathcal{M}$.
+\begin{enumerate}
+  \item $R_x(0_x) = x$, where $0_x$ denotes the zero element of $T_x\mathcal{M}$.
+  \item With the canonical identification $T_{0_x}T_x\mathcal{M}\approx T_x\mathcal{M}$, $R_x$ satisfies
+  \begin{equation}
+    DR_x(0_x) = \mathbb{I}_{T_x\mathcal{M}}
+  \end{equation}
+  Where $DR_x(0_x)$ denotes the gradient of $R_x$ at $0_x$ and $\mathbb{I}_{T_x\mathcal{M}}$ denotes the identity mapping on $T_x\mathcal{M}$.
+\end{enumerate}
+\end{definition}
+
+This signifies that for any ${\bf z}$, the curve $t \mapsto \varphi_{x_i}(t{\bf z})$ is tangent to ${\bf z}$, see Fig.~\ref{fig:phimap}, so that the update $x_{i+1} = \varphi_{x_i}({\bf z_i})$ is made in the direction given by ${\bf z_i}$.
 
 The exponential map is a good theoretical candidate, but it is often impractical or expensive to compute.
 Depending on the manifold, cheaper maps can be chosen.
 
 With the iterative formulation approach described above, we do not have any parametrization issue, do not need additional constraints, and have the minimum number of optimization parameters.
-But we still need a map $\psi$ and real space $\mathbb{E}$ to represent the $x_i$ and keep track of them in a global way.
-The ${\bf x_i}$ are guaranteed to be on $\mathcal{M}$ so we can choose a representation with $r>n$ where $\psi$ is singularity-free without any drawback.
+We can use the map $\psi:\mathcal{M} \rightarrow \psi(\mathcal{M})$, which is surjective, to represent the $x_i$ and keep track of them in a global way.
+%But we still need a map $\psi$ and real space $\mathbb{E}$ to represent the $x_i$ and keep track of them in a global way.
+%The ${\bf x_i}$ are guaranteed to be on $\mathcal{M}$ so we can choose a representation with $r>n$ where $\psi$ is singularity-free without any drawback.
 Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it was a function from $\mathbb{E}$ to $\mathbb{R}$ without the need to project on $\psi(\mathcal{M})$ first (same goes for $c' = c \circ \psi^{-1}$).
-For example if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}$ is automatically a rotation matrix and can be used directly as such when writing the function.
+For example if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}=\psi(x_i)$ is always a rotation matrix and can be used directly as such when writing the function.
 
 %}}}
 %{{{ LOCAL SQP ON MANIFOLDS
 \subsection{Local SQP on manifolds}
 \label{local_sqp_on_manifolds}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.5\linewidth]{diagramFunction.pdf}
+  \caption{Diagram summarizing the different functions(in blue) and spaces(in black) used to represent a function on a manifold}
+\label{fig:diagram_function}
+\end{figure}
+
 We choose to adopt an SQP approach to solve our problem.
 We first define the Lagrangian function
 \begin{equation}
-  \mathcal{L}_x ({\bf z}, \lambda) = f\circ \varphi_x({\bf z}) - \lambda^T c \circ \varphi_x({\bf z})
+  %\mathcal{L}_x ({\bf z}, \lambda) = f\circ \varphi_x({\bf z}) - \lambda^T c \circ \varphi_x({\bf z})
+  \mathcal{L}_x ({\bf z}, \lambda) = f\circ \varphi_x({\bf z}) - {\lambda_u}^T (c \circ \varphi_x({\bf z}) - u) - {\lambda_l}^T (c \circ \varphi_x({\bf z}) - l)
 \end{equation}
-with $\lambda \in \mathbb{R}^m$ the vector of Lagrange multipliers, and note $H_k$ the Hessian matrix $\nabla_{zz}^2 \mathcal{L}_{x_k}$.
+with $\lambda_l \in \mathbb{R}^m$ and $\lambda_u \in \mathbb{R}^m$ the vector of Lagrange multipliers respectively associated with the lower and upper bound constraints.
+The values of a Lagrange multiplier translate the activity status of the constraint it is associated with(see~\ref{sub:convergence_criterion}).
+
+We denote $H_k$ the Hessian matrix $\nabla_{zz}^2 \mathcal{L}_{x_k}$.
 Taking ${\bf z_0} = 0$, the $k$-th SQP step for Problem~\Eqref{eq:local_problem} is computed by solving the following quadratic program:
 
 \begin{align}
@@ -333,20 +368,67 @@ The gradient of $f \circ \varphi_x$ is
 
 $\frac{\partial f'}{\partial y}$ denotes the gradient of $f'$ with respect to an element of $\mathbb{E}$, which is the derivative that is usually calculated for use in classical optimization schemes.
 
+In figure~\ref{fig:diagram_function}, we present a summary of the different functions used in our approach to represent functions on manifolds.
+
+\subsection{Vector transport}
+\label{sub:vector_transport}
+
+Nonlinear optimization algorithm such as the SQP rely on the second order information on the problem that is contained in the Hessian.
+The exact value the Hessian is not always available, or might be too expensive to compute.
+In those cases, we approximate the second order derivative by comparing first order information (tangent vectors) taken a distinct points of the manifold.
+Much like in the case of the retractation operation, comparing tangent vectors is straightforward on an Euclidean space is straightforward, but not on a manifold.
+
+Given $x_1\in\mathcal{M}$ and $\mathbf{z}\in T_{x_1}\mathcal{M}$, we denote $x_2=\varphi_{x_1}(\mathbf{z})$.
+We consider two vectors $\mathbf{v}_1 \in T_{x_1}\mathcal{M}$ and $\mathbf{v}_2 \in T_{x_2}\mathcal{M}$ that we want to compare, it is necessary to transport $\mathbf{v}_1$ into $T_{x_2}\mathcal{M}$.
+
+Absil~\cite{absil:book:2008} gives a formal definition of the vector transport in chapter 8.
+
+One can describe the vector transport function from a point $x\in \mathcal{M}$ along an increment $\mathbf{z}$ as:
+\begin{equation}
+  \mathcal{T}_{x,z} :\
+  \begin{array}{ccc}
+    \mathbf{v} & \reduce{\mapsto}{6} & \mathcal{T}_{x,\mathbf{z}}(\mathbf{v}) \\
+    T_x\mathcal{M} & \reduce{\rightarrow}{6} & T_{\varphi_x(\mathbf{z})}\mathcal{M}
+  \end{array} \nonumber%
+\end{equation}
+
+%The vector transport can be defined as follows~\cite{absil:book:2008}.
+
+%Let $T\mathcal{M}\oplusT\mathcal{M}=\{(\mathbf{z},\mathbf{v}):\mathbf{z}, \mathbf{v}\in T_x\mathcal{M}, x\in \mathcal{M}$
+%\begin{definition}
+  %A vector transport on a manifold $\mathcal{M}$ is a smooth mapping
+  %\begin{equation}
+    %T\mathcal{M}\oplus T\mathcal{M} \rightarrow T\mathcal{M}:(\mathbf{z},\mathbf{v})\mapsto \mathcal{T}_
+  %\end{equation}
+%\end{definition}
+
+Figure~\ref{fig:transport} illustrates that transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
+%$\mathbf{v}_2$ can then be compared to the transported $\mathbf{v}_1$: $\mathcal{T}_{x_1,\mathbf{z}}(\mathbf{v}_1)$.
+%This operation will come in handy for the computation of Hessian approximations explained in Section~\ref{sub:hessian_update_on_manifolds}.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{transport.pdf}
+  \caption{Vector transport on a non-Euclidean manifold}
+\label{fig:transport}
+\end{figure}
+
+
 %}}}
 %{{{ DESCRIPTION OF NON-EUCLIDEAN MANIFOLDS
 \subsection{Description of non-Euclidean manifolds}
 \label{sub:examples_on_non_euclidean_manifolds}
 
-For each elementary manifold $\mathcal{M}$, we need to define a set of elements and operations.
+In order to develop some optimization algorithm on manifolds, we need to define a set of elements and operations for each elementary manifold $\mathcal{M}$ that will enable us to handle its elements with ease.
+%For each elementary manifold $\mathcal{M}$, we need to define a set of elements and operations.
 Those need only to be implemented once (it is then trivial to get those functions for Cartesian products of manifolds).
 The composition with $f'$ and $c'$ is done automatically.
 The expression of those functions is adapted from~\cite{boumal:jmlr:2014}.
 
 \paragraph{Retractation:}
-We need a retractation operation $\psi\circ\varphi_x$ (that we denote simply $\varphi_x$) and its derivative.
-During the optimization process, we need the expression of the derivatives of $\varphi_x$ in order to compute the gradients of the cost function and constraints at the beginning of each iteration.
-Because we change the parametrization of our problem to be centered on $x_k$ at each iteration, we only ever need to evaluate the gradient of $\varphi_x$ for $\mathbf{z}=0$, $\frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$.
+We need a retractation operation $\phi_x = \psi\circ\varphi_x$ and its derivative.
+During the optimization process, we need the expression of the derivatives of $\phi_x$ in order to compute the gradients of the cost function and constraints at the beginning of each iteration.
+Because we change the parametrization of our problem to be centered on $x_k$ at each iteration, we only ever need to evaluate the gradient of $\phi_x$ for $\mathbf{z}=0$, $\frac{\partial \phi_x}{\partial \mathbf{z}}(0)$.
 In some cases, this quantity is invariant w.r.t $x$ and can be computed once and for all.
 
 \paragraph{Pseudo-logarithm and distances:}
@@ -356,7 +438,7 @@ For that, we define the pseudo-logarithm (aka pseudolog), which is the inverse o
   \zeta_x:\mathcal{M}\rightarrow T_x\mathcal{M}
 \end{equation*}
 \begin{equation*}
-  \forall (x,y)\in \mathcal{M}\times\mathcal{M},\ \mathbf{z}=\zeta_x(y)\ \text{is such that}\ \varphi_x(\mathbf{z}) = y
+  \forall (x,y)\in \mathcal{M}\times\mathcal{M},\ \mathbf{z}=\zeta_x(y)\ \text{is such that}\ \phi_x(\mathbf{z}) = y
 \end{equation*}
 The pseudolog operator gives the vector of $T_x\mathcal{M}$ to go from $x$ to $y$.
 It is used to compute the (pseudo-) distance between two points of $\mathcal{M}$
@@ -365,29 +447,25 @@ It is used to compute the (pseudo-) distance between two points of $\mathcal{M}$
 \end{equation*}
 
 \paragraph{Vector transport:}
-To compare two vectors $\mathbf{v}_1$ and $\mathbf{v}_2$ defined in tangent spaces of different points, respectively, $T_{x_1}\mathcal{M}$ and $T_{x_2}\mathcal{M}$, it is necessary to transport $\mathbf{v}_1$ into $T_{x_2}\mathcal{M}$.
-Figure~\ref{fig:transport} illustrates the transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
-$\mathbf{v}_2$ can then be compared to the transported $\mathbf{v}_1$: $\mathcal{T}_{x_1,\mathbf{z}}(\mathbf{v}_1)$.
+To compare two vectors living in the tangent spaces of different points of $\mathcal{M}$, it is necessary to use the vector transport operation to transport one of them in the space of the other one before comparing them.
+%To compare two vectors $\mathbf{v}_1$ and $\mathbf{v}_2$ defined in tangent spaces of different points, respectively, $T_{x_1}\mathcal{M}$ and $T_{x_2}\mathcal{M}$, it is necessary to transport $\mathbf{v}_1$ into $T_{x_2}\mathcal{M}$.
+%Figure~\ref{fig:transport} illustrates the transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
+%$\mathbf{v}_2$ can then be compared to the transported $\mathbf{v}_1$: $\mathcal{T}_{x_1,\mathbf{z}}(\mathbf{v}_1)$.
 This operation will come in handy for the computation of Hessian approximations explained later in this chapter.
 
-\begin{figure}[htpb]
-  \centering
-  \includegraphics[width=0.8\linewidth]{transport.pdf}
-  \caption{Vector transport on a non-Euclidean manifold}
-\label{fig:transport}
-\end{figure}
 
-%\paragraph{Projections:} A projection operator on $\mathcal{M}$, as well as one on $T_x\mathcal{M}$ can come in handy, especially to help eliminate some numerical errors when necessary.
+\paragraph{Projections:} It is useful to define a projection operator on $\mathcal{M}$, as well as one on $T_x\mathcal{M}$, especially to help eliminate some numerical errors when necessary.
+The projection operator on $\mathcal{M}$ projects an element of $\mathbb{E}$ onto $\psi(M)\subseteq \mathbb{E}$ while the one on $T_x{M}$ projects an element of $\mathbb{E}$ onto $T_x\mathcal{M}$.
 
 %\paragraph{Limits on tangent map:} The tangent map can present some singularities, thus it is necessary to limit the length of steps made through retractation to the validity region of each manifold.
 \paragraph{Limits of validity of the retractation:} The retractation is only valid locally, and we need to give a (conservative) approximation of its validity region.
 
 To summarize, for each elementary manifold $\mathcal{M}$, we need to implement the following elements:
 \begin{itemize}
-  \item Tangent Space at point $x$, $T_x\mathcal{M}$
+  \item Tangent space at point $x$, $T_x\mathcal{M}$
   \item Embedding spaces $\mathbb{E}$ and $T_x\mathcal{M}$
-  \item Retractation operator $\varphi:\ (x,\mathbf{z}) \rightarrow \varphi_x(\mathbf{z})$
-  \item Gradient of the retractation operator at zero $\partial \varphi(x):\rightarrow \frac{\partial \varphi_x}{\partial \mathbf{z}}(0)$
+  \item Retractation operator $\phi:\ (x,\mathbf{z}) \rightarrow \phi_x(\mathbf{z})$
+  \item Gradient of the retractation operator at zero $\partial \phi(x):\rightarrow \frac{\partial \phi_x}{\partial \mathbf{z}}(0)$
   \item Pseudo-logarithm operator $\zeta:\ (x,y) \rightarrow \zeta_x(y)$
   \item Gradient of pseudo-logarithm operator at the iterate $\frac{\partial \zeta_x}{\partial y}(x)$
   \item Transport operator $\mathcal{T}:\ (x,\mathbf{z}, \mathbf{v})\rightarrow \mathcal{T}_{x,\mathbf{z}}(v)$
@@ -396,324 +474,14 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
   \item Limits of the tangent map, $\lim$
 \end{itemize}
 
-%{{{ THE REAL SPACE MANIFOLD $\MATHBB{R^N$}
-\subsubsection{The Real Space manifold $\mathbb{R}^n$}
-\label{ssub:the_real_space}
-Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it are straightforward.
+We provide the detailed formulas for those operations in Appendix~\ref{appendix:manifolds} for different elementary manifolds:
+\begin{itemize}
+  \item The Realspace of dimension $n$ in~\ref{sec:the_real_space}
+  \item The 3D rotations manifold SO(3) with matrix formulation in~\ref{sec:the_3d_rotation_manifold_matrix_representation}
+  \item The 3D rotations manifold SO(3) with quaternion formulation in~\ref{sec:the_3d_rotation_manifold_quaternion_representation}
+  \item The unit sphere manifold S2 in~\ref{sec:the_unit_sphere_manifold_s2}
+\end{itemize}
 
-\begin{table} [H]
-\caption{Description of the $\mathbb{R}^n$ manifold}
-\centering
-\begin{tabular}{cc}
-  \toprule
-  $\mathcal{M}$ & $\mathbb{R}^n$ \\
-  \midrule
-  $\mathbb{E}$ & $\mathbb{R}^n$ \\
-  \midrule
-  $T_x\mathcal{M}$ & $\mathbb{R}^n$ \\
-  \midrule
-  $T_x\mathbb{E}$ & $\mathbb{R}^n$ \\
-  \midrule
-  $\varphi_x(\mathbf{z})$ & $\mathbf{x} + \mathbf{z}$ \\
-  \midrule
-  $\partial \varphi_x(0)$ & $\mathbb{I}_n$ \\
-  \bottomrule
-\end{tabular}
-\quad
-\begin{tabular}{cc}
-  \toprule
-  $\zeta(x,y)$ & $\mathbf{y} - \mathbf{x}$ \\
-  \midrule
-  $\frac{\partial \zeta_x}{\partial y}(x)$ & $\mathbb{I}_n$ \\
-  \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & $\mathbf{x}$ \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
-  \midrule
-  $\lim$ & $\|\mathbf{v}\| \leq \infty$ \\
-  \bottomrule
-\end{tabular}
-\end{table}
-%}}}
-%{{{ THE 3D ROTATION MANIFOLD SO(3): MATRIX REPRESENTATION
-\subsubsection{The 3D Rotation manifold $\mathbf{SO(3)}$: Matrix representation}
-\label{ssub:the_3d_rotation_manifold_matrix_representation}
-
-An element $x$ of $SO(3)$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3\times 3}$ by:
-\begin{equation}
-  x\in SO(3),\ \mathbf{x} =\begin{bmatrix}
-    x_{00} & x_{01} & x_{02} \\
-    x_{10} & x_{11} & x_{12} \\
-    x_{20} & x_{21} & x_{22} \\
-  \end{bmatrix}
-\end{equation}
-
-We recall the operators
-\begin{equation}
-\widehat{.}: \begin{bmatrix}
-  \omega_0\\\omega_1\\\omega_2\\
-\end{bmatrix}
-\rightarrow
-\begin{bmatrix}
-  0 & -\omega_2 & \omega_1 \\
-  \omega_2 & 0 & -\omega_0 \\
-  -\omega_1 & \omega_0 & 0\\
-\end{bmatrix}
-\end{equation}
-And its inverse:
-\begin{equation}
-\widecheck{.}: \begin{bmatrix}
-    x_{00} & x_{01} & x_{02} \\
-    x_{10} & x_{11} & x_{12} \\
-    x_{20} & x_{21} & x_{22} \\
-\end{bmatrix}
-\rightarrow
-\begin{bmatrix}
-  x_{21}\\x_{02}\\x_{10}\\
-\end{bmatrix}
-\end{equation}
-
-
-The exponential map is known as the Rodrigues formula:
-\begin{equation}
-  \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 +
-  \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}} +
-  \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}}^2
-\end{equation}
-
-Note that when $\|\mathbf{v}\|$ is small, we make the following replacements to avoid numerical instability.
-It is important to ensure the precision of the retractation near zero because in an optimization process, many small steps are taken, especially when close to the solution.
-
-\begin{align}
- \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} & = 1-\frac{\|\mathbf{v}\|}{6}\\
- \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} & = 0.5 - \frac{\|\mathbf{v}\|}{24}
-\end{align}
-
-And the logarithm is computed as follows (see~\cite{merlhiot:thesis:2009}):
-\begin{align}
-\begin{split}
-  \forall R\in\psi(SO(3)),\ f(R) &=
-  \left\{ \begin{matrix}
-  0 & \text{if }Tr(R) = 3 \\
-  \frac{\arccos\left(\frac{Tr(R)-1}{2}\right)}{2\sin\left(\arccos\left(\frac{Tr(R)-1}{2}\right)\right)}\left(R-R^T\right) & \text{otherwise} \\
-  \end{matrix} \right.\\
-  \log(R) &= \widecheck{f\left(R\right)}
-\end{split}
-\end{align}
-
-\begin{table} [H]
-\caption{Description of the $SO(3)$ manifold with matrix representation}
-\centering
-\begin{tabular}{cc}
-  \toprule
-  $\mathcal{M}$ & $SO(3)$ \\
-  \midrule
-  $\mathbb{E}$ & $\mathbb{R}^{3\times 3}$ \\
-  \midrule
-  $T_x\mathcal{M}$ & $\mathbb{R}^3$ \\
-  \midrule
-  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
-  \midrule
-  $\psi(x) = \mathbf{x}$ & $ \begin{bmatrix}
-    x_{00} & x_{01} & x_{02} \\
-    x_{10} & x_{11} & x_{12} \\
-    x_{20} & x_{21} & x_{22} \\
-  \end{bmatrix} $ \\
-  \midrule
-  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
-  \bottomrule
-\end{tabular}
-\quad
-\begin{tabular}{cc}
-  \toprule
-  $\partial \varphi_x(0)$ & see Appendix~\ref{eq:diffRetrSO3Matrix} \\
-  \midrule
-  $\zeta(x,y)$ & $\log(\mathbf{x}^T\mathbf{y})$ \\
-  \midrule
-  $\frac{\partial \zeta_x}{\partial y}(x)$ & see Appendix~\ref{eq:diffLogSO3Matrix} \\
-  \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & Q from QR decomposition of $\mathbf{x}$ \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
-  \midrule
-  $\lim$ & $\|\mathbf{v}\| \leq \pi$ \\
-  \bottomrule
-\end{tabular}
-\end{table}
-
-%}}}
-%{{{ THE 3D ROTATION MANIFOLD SO3 QUATERNION REPRESENTATION
-\subsubsection{The 3D Rotation manifold $\mathbf{SO(3)}$: Quaternion representation}
-\label{ssub:the_3d_rotation_manifold_quaternion_representation}
-An element $x$ of $SO(3)$ is represented by $\mathbf{q}=\psi(x)$ in $\mathbb{R}^{4}$ by:
-\begin{equation}
-  x\in SO(3),\ \mathbf{q} =\begin{bmatrix}
-    q_{w}\\
-    q_{x}\\
-    q_{y}\\
-    q_{z}\\
-  \end{bmatrix}
-  =\begin{bmatrix}
-    q_{w}\\
-    \mathbf{q_{vec}}\\
-  \end{bmatrix}
-\end{equation}
-
-The exponential map is:
-\begin{equation}
-  \exp\ :\left|
-  \begin{array}{ccc}
-    \mathbb{R}^3 & \rightarrow & \mathbb{R}^4 \\
-    \mathbf{z} & \mapsto & \begin{bmatrix}
-      \cos \left( \frac{\|\mathbf{z}\|}{2} \right)\\
-      \sin \left( \frac{\|\mathbf{z}\|}{2} \right) \frac{\mathbf{z}}{\|\mathbf{z}\|}\\
-    \end{bmatrix} \\
-  \end{array} \nonumber%
-  \right.
-\end{equation}
-
-Note that when $\|\mathbf{v}\|$ is small, we make the following replacements to avoid numerical instability.
-
-\begin{equation}
-  \exp(\mathbf{z}) = \begin{bmatrix}
-    1 -\frac{\|\mathbf{z}\|}{8} + \frac{{\|\mathbf{z}\|}^2}{384}\\
-    \left(0.5 - \frac{\|\mathbf{z}\|}{48} + \frac{{\|\mathbf{z}\|}^2}{3840}\right)\mathbf{z}
-  \end{bmatrix}
-\end{equation}
-
-And the logarithm is:
-\begin{equation}
-  \log\ :\left|
-  \begin{array}{ccc}
-    \mathbb{R}^4 & \rightarrow & \mathbb{R}^3 \\
-    q & \mapsto & \arctan \left( \frac{2 \|\mathbf{q_{vec}}\| q_w}{q_w^2 - {\|\mathbf{q_{vec}\|}^2}} \right) \frac{\mathbf{q_{vec} } }{\|\mathbf{q_{vec}}\|} \\
-  \end{array}
-  \right.
-\end{equation}
-
-
-\begin{table} [H]
-\caption{Description of the $\mathbf{SO(3)}$ manifold with quaternion representation}
-\centering
-\begin{tabular}{cc}
-  \toprule
-  $\mathcal{M}$ & $SO(3)$ \\
-  \midrule
-  $\mathbb{E}$ & $\mathbb{R}^{4}$ \\
-  \midrule
-  $T_x\mathcal{M}$ & $\mathbb{R}^3$ \\
-  \midrule
-  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
-  \midrule
-  $\varphi_x(\mathbf{z})$ & $\mathbf{x}\exp(\mathbf{z})$ \\
-  \midrule
-  $\partial \varphi_x(0)$ & see Appendix~\ref{eq:diffRetrSO3Quat} \\
-  \bottomrule
-\end{tabular}
-\quad
-\begin{tabular}{cc}
-  \toprule
-  $\zeta(x,y)$ & $\log(\mathbf{x}^{-1}\mathbf{y})$ \\
-  \midrule
-  $\frac{\partial \zeta_x}{\partial y}(x)$ & see Appendix~\ref{eq:diffLogSO3Quat} \\
-  \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z}$ \\
-  \midrule
-  $\lim$ & $\|\mathbf{v}\| \leq \pi$ \\
-  \bottomrule
-\end{tabular}
-\end{table}
-
-%}}}
-%{{{ THE UNIT SPHERE MANIFOLD $S2$
-\subsubsection{The Unit Sphere manifold $\mathbf{S2}$}
-\label{ssub:the_unit_sphere_manifold_s2}
-
-An element $x$ of $S2$ is represented by $\mathbf{x}=\psi(x)$ in $\mathbb{R}^{3}$ by:
-\begin{equation}
-  x\in S2,\ \mathbf{x} =\begin{bmatrix}
-    x_0\\
-    x_1\\
-    x_2\\
-  \end{bmatrix}
-\end{equation}
-
-With this manifold, the tangent space at $x$ is the tangent plane to the unit-sphere at $x$.
-Thus, $T_x\mathcal{M}$ it is a 2-dimensional space, and its representation space is $\mathbb{R}^3$.
-%A tangent vector to $x$, $\mathbf{z}$, is such that $\mathbf{x}\cdot \mathbf{z} = \mathbf{x}^T\mathbf{z}=0$.
-
-For the retractation we simply use a normalized sum:
-\begin{equation}
-  \varphi_x(\mathbf{z}) = \frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}
-\end{equation}
-
-We define a distance operation on $S2$ as:
-\begin{equation}
-  \dist(x, y) = 1-\mathbf{x}\cdot \mathbf{y}
-\end{equation}
-
-And the projection on the tangent space:
-\begin{equation}
-  \pi_{T_x\mathcal{M}}(\mathbf{z}) = \mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}
-\end{equation}
-
-The pseudo-logarithm operation is the following:
-\begin{equation}
-  \zeta_x(y) = \dist(x,y)\frac{\pi_{T_x\mathcal{M}}(\mathbf{z})}{\|\pi_{T_x\mathcal{M}}(\mathbf{z})\|}
-\end{equation}
-
-The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $T_y\mathcal{M}$ with $y = \varphi_x(\mathbf{v})$, corresponds to rotating $\mathbf{v}$ by the rotation that transforms $x$ into $y$:
-\begin{align}
-  &\mathbf{y} = \varphi_x(\mathbf{z}) \\
-  &R = \mathbb{I}_3 + \widehat{\mathbf{x} \wedge \mathbf{y}} + \frac{{\widehat{\mathbf{x} \wedge \mathbf{y} } }^2}{1+\mathbf{x}\cdot\mathbf{y}} \\
-  &\mathcal{T}(x,\mathbf{z}, \mathbf{v}) = R\mathbf{v}
-\end{align}
-
-\begin{table} [H]
-\caption{Description of the S2 manifold}
-\centering
-\begin{tabular}{cc}
-  \toprule
-  $\mathcal{M}$ & $S2$ \\
-  \midrule
-  $\mathbb{E}$ & $\mathbb{R}^{3}$ \\
-  \midrule
-  $T_x\mathcal{M}$ & $\mathbb{R}^2$ \\
-  \midrule
-  $T_x\mathbb{E}$ & $\mathbb{R}^3$ \\
-  \midrule
-  $\varphi_x(\mathbf{z})$ & $\frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}$ \\
-  \midrule
-  $\partial \varphi_x(0)$ & $\mathbb{I}_3 - \mathbf{x}\cdot\mathbf{x}^T$ \\
-  \bottomrule
-\end{tabular}
-\quad
-\begin{tabular}{cc}
-  \toprule
-  $\zeta(x,y)$ & $\mathbf{y} - (\mathbf{x} \cdot \mathbf{y}) \mathbf{x}$ \\
-  \midrule
-  $\frac{\partial \zeta_x(x)}{\partial y}$ & $\mathbb{I}_3 -\mathbf{x}\cdot\mathbf{x}^T$ \\
-  \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbb{I}_3 + \widehat{\mathbf{x} \wedge \varphi_x(\mathbf{z})} + \frac{{\widehat{\mathbf{x} \wedge \varphi_x(\mathbf{z})}}^2}{1+\mathbf{x}\cdot\varphi_x(\mathbf{z})}$ \\
-  \midrule
-  $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
-  \midrule
-  $\pi_{T_x\mathcal{M}}(\mathbf{z})$ & $\mathbf{z} - (\mathbf{x} \cdot \mathbf{z}) \mathbf{x}$ \\
-  \midrule
-  $\lim$ & $\|\mathbf{v}\| \leq \infty$ \\
-  \bottomrule
-\end{tabular}
-\end{table}
-
-%}}}
 %{{{ CARTESIAN PRODUCT OF MANIFOLDS
 \subsubsection{Cartesian Product of Manifolds}
 \label{ssub:cartesian_product_of_manifolds}
@@ -728,9 +496,9 @@ For example, the retractation is computed as follows, and that scheme can be rep
   \end{bmatrix}\in \mathcal{M},\ \mathbf{z}=\begin{bmatrix}
     \mathbf{z_1}\\ \mathbf{z_2}\\
   \end{bmatrix}\in T_x\mathcal{M}\\
-  &\varphi_x(z) = \begin{bmatrix}
-    \varphi_{x_1}(\mathbf{z_1})\\
-    \varphi_{x_2}(\mathbf{z_2})\\
+  &\phi_x(z) = \begin{bmatrix}
+    \phi_{x_1}(\mathbf{z_1})\\
+    \phi_{x_2}(\mathbf{z_2})\\
   \end{bmatrix}
 \end{align}
 
@@ -762,8 +530,8 @@ Figure~\ref{fig:uml_manifold} presents a simplified class diagram of this projec
 \section{Practical implementation}
 \label{sec:practical_implementation}
 
-The SQP algorithm presented in Section~\ref{local_sqp_on_manifolds} works locally, \emph{i.e.} when starting close enough to the solution.
-In practice, various refinements are made to ensure convergence from any starting point.
+The SQP algorithm presented in Section~\ref{local_sqp_on_manifolds} works locally, \emph{i.e.} it is guaranteed to converge when starting close enough to the solution.
+In practice, various refinements are made to ensure convergence from any starting point, it is called the globalization.
 We detail hereafter the choices we made for the implementation of our solver called {\tt PGSolver}.
 
 We summarize the entire SQP algorithm in Diagrams~\ref{fig:main_sqp_loop},~\ref{fig:restoration_loop} and~\ref{fig:second_order_correction}, which represent respectively the main SQP loop, the restoration phase and the second order correction algorithm.
@@ -804,7 +572,7 @@ The QP4 type of problem is used when a decomposition of the matrix $A$ of QP2, $
 \subsection{Problem Definition}
 \label{sub:problem_definition}
 
-As stated in Eq~\Eqref{eq:pb_on_SO3} we want to solve a nonlinear constrained optimizarion problem on manifold that takes the following form:
+As stated in Eq~\Eqref{eq:pb_on_SO3} we want to solve a nonlinear constrained optimization problem on manifold that takes the following form:
 
 \begin{align}
   \minimize_{x \in \mathcal{M}} & \quad f(x)\\
@@ -841,18 +609,18 @@ This is done automatically behind the scene and the user only has to provide the
 At iteration $i$, the problem becomes (for clarity, we drop the subscript $i$ that goes with each appearance of $x$):
 \begin{align}
 \label{eq:optim_problem_on_txm}
-  \minimize_{\mathbf{z} \in T_x\mathcal{M}} & \quad f(\varphi_x(\mathbf{z}))\\ \nonumber
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}} & \quad f(\phi_x(\mathbf{z}))\\ \nonumber
   \text{subject to}&\left\{
   \begin{array}{lr}
     {\bf z}_{\text{map}}^- \leq \mathbf{z} \leq {\bf z}_{\text{map}}^+ \\
-    L_B \leq \varphi_x(\mathbf{z}) \leq U_B \\
-    L_L \leq A\varphi_x(\mathbf{z}) \leq U_L \\
-    L_N \leq c(\varphi_x(\mathbf{z})) \leq U_N
+    L_B \leq \phi_x(\mathbf{z}) \leq U_B \\
+    L_L \leq A\phi_x(\mathbf{z}) \leq U_L \\
+    L_N \leq c(\phi_x(\mathbf{z})) \leq U_N \\
   \end{array}\right.
 \end{align}
 
 With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively the lower and upper bounds of validity of the tangent map of $\mathcal{M}$ around $x$.
-After this reformulation, we note that if $\varphi_x$ is nonlinear, then the bounds and linear constraints of problem~\Eqref{eq:optim_problem_on_manifold} become nonlinear in problem~\Eqref{eq:optim_problem_on_txm}.
+After this reformulation, we note that if $\phi_x$ is nonlinear, then the bounds and linear constraints of problem~\Eqref{eq:optim_problem_on_manifold} become nonlinear in problem~\Eqref{eq:optim_problem_on_txm}.
 It is then necessary to treat the problem and evaluate which constraint is linear and which is not, in order to go back to a formulation of the same type as in problem~\Eqref{eq:optim_problem_on_manifold}.
 Basically, for each constraint $c_j$ in problem~\Eqref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a real space $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time of writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
 It is however unusual to write linear constraints on non-Euclidean manifolds.
@@ -867,49 +635,53 @@ In the particular case of linear constraints (and by extension bound constraints
 \end{equation}
 For bounds constraints, the same goes with $A$ being the identity matrix on the submanifold.
 
-Once those substitutions are done, we obtain a problem of the following form (note that $L_B$, $L_L$, $L_N$, $U_B$, $U_L$, $U_N$, $A$ and $c$ are not the same as in problem~\Eqref{eq:optim_problem_on_manifold}):
+Once those substitutions are done, we obtain a new problem of the following form (where $L_B'$, $L_L'$, $L_N'$, $U_B'$, $U_L'$, $U_N'$ are the lower and upper bounds for the bounds, linear and nonlinear constraint, $A'$ is the matrix of linear constraints and $c'$ is the list of nonlinear functions):
 
 \begin{align}
 \label{eq:optim_txm_final}
-  \minimize_{\mathbf{z} \in T_x\mathcal{M}} & \quad f \circ \varphi_x(\mathbf{z})\\ \nonumber
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}} & \quad f \circ \phi_x(\mathbf{z})\\ \nonumber
   \text{subject to}&\left\{
   \begin{array}{lr}
-    L_B \leq \mathbf{z} \leq U_B \\
-    L_L \leq A \mathbf{z} \leq U_L \\
-    L_N \leq c \circ \varphi_x(\mathbf{z}) \leq U_N
+    L_B' \leq \mathbf{z} \leq U_B' \\
+    L_L' \leq A' \mathbf{z} \leq U_L' \\
+    L_N' \leq c' \circ \phi_x(\mathbf{z}) \leq U_N'\\
   \end{array}\right.
 \end{align}
 
 This problem is an exact reformulation of problem~\Eqref{eq:optim_problem_on_manifold} on $T_x\mathcal{M}$.
 At each step of the optimization process, we solve the QP approximating this problem~\Eqref{eq:optim_txm_final} around $\mathbf{z}=0$.
-The Taylor development of $c\circ\varphi_x(z)$ to the first order around $\mathbf{z} = 0$ gives:
+The Taylor development of $c\circ\phi_x(z)$ to the first order around $\mathbf{z} = 0$ gives:
 \begin{equation}
-  c \circ \varphi_x(\mathbf{z}) \approx c\circ \varphi_{x_k}(0) + \frac{\partial c\circ \varphi_{x_k}}{\partial {\bf z}}(0) {\bf z } = c(x_k) + {\left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}
+  c' \circ \phi_x(\mathbf{z}) \approx c'\circ \phi_{x_k}(0) + \frac{\partial c'\circ \phi_{x_k}}{\partial {\bf z}}(0) {\bf z } = c'(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c' (x_k)\right)}^T\mathbf{z}
 \end{equation}
 
+The trust-region constraint (see Section~\ref{sub:trust_region_and_limit_map}) is added to the problem to limit the length of a step, $\rho$ denotes the size of the trust-region.
+$H_k$ is an estimation of the Hessian computed as shown in Section~\ref{sub:hessian_update_on_manifolds}.
 The QP to be solved at each iteration is the following:
 
 \begin{align}
   \label{eq:QP_txm}
   \begin{split}
-  \minimize_{\mathbf{z} \in T_x\mathcal{M}=\mathbb{R}^n } & \quad {\left(\nabla\varphi_{x_k}(0) \nabla f (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H_k{\bf z }\\
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}=\mathbb{R}^n } & \quad {\left(\nabla\phi_{x_k}(0) \nabla f (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H_k{\bf z }\\
   \text{subject to}&\left\{
   \begin{array}{lr}
-    L_B \leq \mathbf{z} \leq U_B \\
-    L_L \leq A \mathbf{z} \leq U_L \\
-    L_N \leq c(x_k) + {\left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}\leq U_N\\
+    L_B' \leq \mathbf{z} \leq U_B' \\
+    L_L' \leq A' \mathbf{z} \leq U_L' \\
+    L_N' \leq c'(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c' (x_k)\right)}^T\mathbf{z}\leq U_N'\\
+    -\rho \leq \mathbf{z} \leq \rho \quad (\text{trust-region constraint}) \\
   \end{array}\right.
   \end{split}
 \end{align}
 
 The resolution of this QP~\Eqref{eq:QP_txm} (with {\tt LSSOL}) gives the optimal solution $\mathbf{z}^*$ and Lagrange multipliers $\lambda^*$.
 The new iterate that will be considered is:
-\begin{equation}
-  x_{k+1}\leftarrow \varphi_{x_k}(\mathbf{z}^*)
-\end{equation}
+\begin{align}
+  x_{k+1} & \leftarrow \phi_{x_k}(\mathbf{z}^*)\\
+  \lambda_{k+1} & \leftarrow \lambda^*
+\end{align}
 
 Note that the only additional computation due to the formulation on manifold is the multiplication of the gradients of constraints and cost by the map's gradient at $0$.
-The computation time related to those products can be reduced by taking advantage of the fact that $\nabla \varphi_x(0)$ is block-diagonal.
+The computation time related to those products can be reduced by taking advantage of the fact that $\nabla \phi_x(0)$ is block-diagonal.
 
 \subsection{Trust-region and limit map}
 \label{sub:trust_region_and_limit_map}
@@ -924,7 +696,7 @@ In the case of a robotics problem, different variables often have different orde
 Let $x$ be the variable vector of such problem with $x={[\theta_0, \theta_1, f_0, f_1, f_2]}^T$ where $\theta$ represents an angular variables and $f$ a force.
 The shape of the trust-region should reflect those differences, but we want to keep the simplicity of the classical trust-region strategy.
 For that, we propose to separate the trust-region $\rho$ in two parts: its scale $\rho_\text{scale}$ which is a scalar, and its shape $\rho_\text{shape}$ which in a vector of dimension $n$ (that value is actually stored in the instance of manifold).
-$\rho_\text{shape}$ is set at the beginning of the optimization and remains constant, it represents the size of the trust-region in every direction.
+$\rho_\text{shape}$ is constant and set at the beginning of the optimization, the i-th element of $\rho_\text{shape}$ is the order of magnitude of the i-th dimension of the optimization variable.
 In the previous example, we'd get ${\rho_\text{shape}} = {[1,1,100,100,100]}^T$
 And $\rho_\text{scale}$ is the scalar that gets updated in the trust-region strategy.
 
@@ -940,7 +712,7 @@ To know if a step ${\bf z}$ is acceptable or not, one usually uses a penalty-bas
 In our early tests, the update of the penalty parameters proved to be difficult with our types of problems.
 We now use a filter approach instead, as presented in Section~\ref{ssub:the_filter_method}.
 
-Our algorithm is an adaptation of Fletcher's filter SQP~\cite{fletcher:mathprog:2000} to the case of manifolds: we use an adaptive trust-region that is intersected with the validity region of $\varphi_{x_i}$, and a new iterate $x_{i+1} = \varphi_{x_i}({\bf z})$ is accepted if either the cost function or the sum of constraint violations is made better than for any previous iterates.
+Our algorithm is an adaptation of Fletcher's filter SQP~\cite{fletcher:mathprog:2000} to the case of manifolds: we use an adaptive trust-region that is intersected with the validity region of $\phi_{x_i}$, and a new iterate $x_{i+1} = \phi_{x_i}({\bf z})$ is accepted if either the cost function or the sum of constraint violations is made better than for any previous iterates.
 
 \subsection{Convergence criterion}
 \label{sub:convergence_criterion}
@@ -963,7 +735,7 @@ the problem can be rewritten as:
 \end{align}
 
 Each constraint is considered as a double inequality, thus, is associated with two Lagrange multipliers: $\lambda_l$ for the lower bound and $\lambda_u$ for the upper bound.
-The basic KKT conditions for that problem writes as:
+The basic KKT condition for that problem writes as:
 
 \begin{equation}
 \label{KKT}
@@ -971,12 +743,15 @@ The basic KKT conditions for that problem writes as:
 \begin{array}{lr}
   \nabla \mathcal{L} = \nabla f({\bf x}) + \lambda_l.\nabla c({\bf x}) + \lambda_u.\nabla
 c({\bf x}) = 0 \\
-  c({\bf x}) - l \geq 0 \\
-  c({\bf x}) - u \leq 0 \\
-  \lambda_l \leq 0 \\
-  \lambda_u \geq 0 \\
-  \lambda_l.(c({\bf x})-l) = 0 \\
-  \lambda_u.(c({\bf x})-u) = 0
+  \forall i
+  \begin{cases}
+  c_i({\bf x}) - l_i \geq 0 \\
+  c_i({\bf x}) - u_i \leq 0 \\
+  {\lambda_l}_i \leq 0 \\
+  {\lambda_u}_i \geq 0 \\
+  {\lambda_l}_i.(c_i({\bf x})-l_i) = 0 \\
+  {\lambda_u}_i.(c_i({\bf x})-u_i) = 0
+  \end{cases}
 \end{array}
 \right.
 \end{equation}
@@ -985,11 +760,11 @@ For each constraint, there are 3 possible situations:
 
 \begin{tabular}{cccc}
   \toprule
-  Lower bound violated or active & $c(x)-l\leq0$ & $\lambda_l\leq0$ & $\lambda_u=0$ \\
+  Lower bound violated or active & $c_i(x)-l_i\leq0$ & ${\lambda_l}_i\leq0$ & ${\lambda_u}_i=0$ \\
   \midrule
-  Constraint satisfied & $l\leq c(x) \leq u$ & $\lambda_l=0$ & $\lambda_u=0$ \\
+  Constraint satisfied & $l_i\leq c_i(x) \leq u_i$ & ${\lambda_l}_i=0$ & ${\lambda_u}_i=0$ \\
   \midrule
-  Upper bound violated or active & $c(x)-u\geq0$ & $\lambda_l=0$ & $\lambda_u\geq0$ \\
+  Upper bound violated or active & $c_i(x)-u_i\geq0$ & ${\lambda_l}_i=0$ & ${\lambda_u}_i\geq0$ \\
   \bottomrule
 \end{tabular}
 
@@ -1001,12 +776,13 @@ This allows to reduce the KKT system to the following:
 \left\{
 \begin{array}{lr}
   \nabla \mathcal{L} = \nabla f({\bf x}) + \lambda.\nabla c({\bf x}) = 0 \\
+  \forall i
   \begin{cases}
-  c({\bf x}) = l & \text{and } \lambda \leq 0 \\
+  c_i({\bf x}) = l_i & \text{and } \lambda_i \leq 0 \\
   \text{OR}\\
-  l \leq c({\bf x}) \leq u & \text{and } \lambda = 0 \\
+  l_i \leq c_i({\bf x}) \leq u_i & \text{and } \lambda_i = 0 \\
   \text{OR}\\
-  c({\bf x}) = u & \text{and } \lambda \geq 0
+  c_i({\bf x}) = u_i & \text{and } \lambda_i \geq 0
   \end{cases}
 \end{array}
 \right.
@@ -1046,13 +822,62 @@ And we get the following convergence criterion:
 \subsection{Feasibility restoration}
 \label{sub:feasibility_restoration}
 
-Along the optimization process, the set of linearized constraints in the QP Problem~\Eqref{eq:QP_txm} can become infeasible, for example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
+Along the optimization process, the set of linearized constraints in the QP Problem~\Eqref{eq:QP_txm} can become unfeasible, for example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
 In that case the QP~\Eqref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
 To quope with this issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
-The basic idea is the following: at the beginning of an iteration, we estimate a list of infeasible linearized constraints.
-The infeasible constraints are removed from the restoration problems constraints list and their violation is added to its cost function (that becomes the sum of all constraints violation).
+The basic idea is the following: at the beginning of an iteration, the list of unfeasible constraints is computed and stored in $\mathcal{U}_l$ if the lower bound in unfeasible and in $\mathcal{U}_u$ if the upper bound is unfeasible and the list of feasible constraints is stored in $\mathcal{F}$.
+The unfeasible constraints are removed from the restoration problems' constraints list and their violation is added to its cost function (that becomes the sum of all constraints violation).
+We get the following restoration cost function:
+\begin{equation}
+  f^\text{rest} = \sum_{i\in\mathcal{U}_l} (l_i - c_i(x)) +\sum_{i\in\mathcal{U}_u} (c_i(x) - u_i)
+\end{equation}
 Then the restoration problem only contains feasible constraints and has to minimize the sum of constraint violation.
-That is done by iterating just like in the SQPs main loop with the difference that at each iteration, we update the problem based on a new list of infeasible constraints.
+The problem to solve becomes:
+\begin{align}
+\label{eq:restoration_problem}
+  \minimize_{x \in \mathcal{M}} & \quad \sum_{i\in\mathcal{U}_l} (l_i - c_i(x)) +\sum_{i\in\mathcal{U}_u} (c_i(x) - u_i)\\ \nonumber
+  \text{s.t.}&\left\{
+  \begin{array}{lr}
+    \forall i \in \mathcal{F}   \quad l_i \leq c_i(x) \leq u_i \\
+    \forall i \in \mathcal{U}_l \quad -\infty \leq c_i(x) \leq u_i \\
+    \forall i \in \mathcal{U}_u \quad l_i \leq c_i(x) \leq +\infty \\
+  \end{array}\right.
+\end{align}
+To simplify the writing of that QP, we denote $l^\text{rest}$ and $u^\text{rest}$ two vectors that represent respectively the lower and upper bounds of the constraints of the restoration problem:
+\begin{align}
+  \forall i \in \mathcal{F}   ,\ & l^\text{rest}_i = l_i    ,\ u^\text{rest}_i = u_i \\
+  \forall i \in \mathcal{U}_l ,\ & l^\text{rest}_i = -\infty,\ u^\text{rest}_i = u_i \\
+  \forall i \in \mathcal{U}_u ,\ & l^\text{rest}_i = l_i    ,\ u^\text{rest}_i = +\infty \\
+\end{align}
+
+The problem becomes:
+\begin{align}
+\label{eq:restoration_problem_simple}
+  \minimize_{x \in \mathcal{M}} & \quad \sum_{i\in\mathcal{U}_l} (l_i - c_i(x)) +\sum_{i\in\mathcal{U}_u} (c_i(x) - u_i)\\ \nonumber
+  \text{s.t.}&\left\{
+  \begin{array}{lr}
+    \forall i \quad l^\text{rest}_i \leq c_i(x) \leq u^\text{rest}_i \\
+  \end{array}\right.
+\end{align}
+
+
+That is solved by iterating just like in the SQPs main loop with the difference that at each iteration, we update the problem based on new lists of unfeasible constraints.
+An approximation $H^\text{rest}_k$ of the Hessian is computed especially for the restoration phase.
+The restoration phase has and updates its own trust-region $\rho_\text{rest}$.
+Dropping the differences between bounds, linear and nonlinear constraints, the QP to solve at each iteration of the restoration phase is the following:
+\begin{align}
+  \label{eq:QP_restoration}
+  \begin{split}
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}=\mathbb{R}^n } & \quad {\left(\nabla\phi_{x_k}(0) \nabla f^\text{rest} (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
+  \text{s.t.}&\left\{
+  \begin{array}{lr}
+    \forall i \quad l^\text{rest}_i \leq c_i(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z} \leq u^\text{rest}_i \\
+    -\rho^\text{rest} \leq \mathbf{z} \leq \rho^\text{rest} \\
+  \end{array}\right.
+  \end{split}
+\end{align}
+
+
 The restoration phase has its own filter called the restoration filter.
 For more details on the restoration phase, see Section~\ref{sub:restoration_phase}.
 
@@ -1065,18 +890,19 @@ Note that each iteration of the main SQP algorithm starts with the resolution of
   \begin{array}{lr}
     L_B \leq \mathbf{z} \leq U_B \\
     L_L \leq A \mathbf{z} \leq U_L \\
-    L_N \leq c(x_k) + {\left(\nabla\varphi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}\leq U_N\\
+    L_N \leq c(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}\leq U_N\\
   \end{array}\right.
   \end{split}
 \end{align}
 
 Its role is to determine whether the set of linearized constraints is feasible.
-If it is, the main SQP continues, otherwise, a list of infeasible constraint is provided and the restoration phase is entered.
-This feasibility problem is also solved at the beginning of each restoration iteration to determine whether or not to exit the restoration phase. As soon as a feasible point is found, the restoration is exited.
+If it is, the main SQP continues, otherwise, the restoration phase is entered.
+This feasibility problem is also solved at the beginning of each restoration iteration to determine whether or not to exit the restoration phase.
+As soon as a feasible point is found, the restoration is exited.
 Once a feasible point $x_F$ is found by the restoration phase, it is used as the new iterate in the main SQP phase.
 Since during the restoration no care is taken about the value of the cost function, it is possible that $x_F$ is refused by the main filter, which is not an acceptable behavior.
 So $x_F$ is forced in the filter, and any pair dominating it is removed.
-Then the optimization can continue.
+Then the main phase of the optimization can continue.
 
 \subsection{Second Order Correction}
 \label{sub:second_order_correction}
@@ -1090,6 +916,18 @@ The idea is to re-solve a QP after its solution $\mathbf{z}$ has been refused by
 \end{equation}
 
 The restoration QP problem becomes:
+
+\begin{align}
+  \label{eq:QP_soc}
+  \begin{split}
+  \minimize_{\mathbf{z} \in T_x\mathcal{M}=\mathbb{R}^n } & \quad {\left(\nabla\phi_{x_k}(0) \nabla f^\text{rest} (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
+  \text{s.t.}&\left\{
+  \begin{array}{lr}
+    \forall i \quad l^\text{rest}_i \leq c_i(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z} \leq u^\text{rest}_i \\
+    -\rho^\text{rest} \leq \mathbf{z} \leq \rho^\text{rest} \\
+  \end{array}\right.
+  \end{split}
+\end{align}
 
 \begin{align}
   \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^T H{\bf z}} \nonumber
@@ -1169,7 +1007,7 @@ As of now, the best results where observed when using the self-scaling BFGS upda
 \label{sub:hessian_update_in_restoration_phase}
 
 The hessian $H$ computed through whichever method presented above is meant to approximate the value of $\nabla \mathcal{L}_{xx}(x,\lambda) = \nabla f(x) + \lambda^T \nabla c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
-But during the restoration phase, the definitions of $f$ and $c$ change at each iteration, depending on the sets of infeasible and feasible constraints ($\mathcal{I}$ and $\mathcal{F}$).
+But during the restoration phase, the definitions of $f$ and $c$ change at each iteration, depending on the sets of unfeasible and feasible constraints ($\mathcal{I}$ and $\mathcal{F}$).
 In order to account for that change, we propose to compute an approximation of each constraints second derivative separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the hessians based on the current set of feasible constraints.
 
 \begin{align}
