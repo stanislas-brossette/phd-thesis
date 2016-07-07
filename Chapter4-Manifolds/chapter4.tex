@@ -868,10 +868,10 @@ Dropping the differences between bounds, linear and nonlinear constraints, the Q
 \begin{align}
   \label{eq:QP_restoration}
   \begin{split}
-  \minimize_{\mathbf{z} \in T_x\mathcal{M}=\mathbb{R}^n } & \quad {\left(\nabla\phi_{x_k}(0) \nabla f^\text{rest} (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
+  \minimize_{\mathbf{z} \in T_x\mathcal{M} } & \quad {\left(\nabla\phi_{x_k}(0) \nabla f^\text{rest} (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
   \text{s.t.}&\left\{
   \begin{array}{lr}
-    \forall i \quad l^\text{rest}_i \leq c_i(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z} \leq u^\text{rest}_i \\
+    \forall i \quad l^\text{rest}_i \leq c_i(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c_i (x_k)\right)}^T\mathbf{z} \leq u^\text{rest}_i \\
     -\rho^\text{rest} \leq \mathbf{z} \leq \rho^\text{rest} \\
   \end{array}\right.
   \end{split}
@@ -890,7 +890,7 @@ Note that each iteration of the main SQP algorithm starts with the resolution of
   \begin{array}{lr}
     L_B \leq \mathbf{z} \leq U_B \\
     L_L \leq A \mathbf{z} \leq U_L \\
-    L_N \leq c(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z}\leq U_N\\
+    L_N \leq c(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c_i (x_k)\right)}^T\mathbf{z}\leq U_N\\
   \end{array}\right.
   \end{split}
 \end{align}
@@ -909,59 +909,65 @@ Then the main phase of the optimization can continue.
 
 In the event where a step proposed in the restoration process by the resolution of the restoration QP is refused by the restoration filter, instead of immediately reducing the size of the trust region, we can perform a Second Order Correction Step.
 
-The idea is to re-solve a QP after its solution $\mathbf{z}$ has been refused by the restoration filter, but with a better approximation (second order) of the constraints:
+The idea is to re-solve a QP after its solution $\mathbf{z}_k$ has been refused by the restoration filter, but with a better approximation (second order) of the constraints:
 
 \begin{equation}
-  c_i(x+{\bf z}) = c_i(x) + {\nabla c_i(x)}^T {\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z}
+  c_i(x_k+{\bf z}) = c_i(x_k) + {\nabla c_i(x_k)}^T {\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x_k){\bf z}
 \end{equation}
 
 The restoration QP problem becomes:
 
 \begin{align}
-  \label{eq:QP_soc}
+  \label{eq:QP_soc_dirty}
   \begin{split}
-  \minimize_{\mathbf{z} \in T_x\mathcal{M}=\mathbb{R}^n } & \quad {\left(\nabla\phi_{x_k}(0) \nabla f^\text{rest} (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
+  \minimize_{\mathbf{z} \in T_x\mathcal{M} } & \quad {\left(\nabla\phi_{x_k}(0) \nabla f^\text{rest} (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
   \text{s.t.}&\left\{
   \begin{array}{lr}
-    \forall i \quad l^\text{rest}_i \leq c_i(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c (x_k)\right)}^T\mathbf{z} \leq u^\text{rest}_i \\
+    \forall i \quad l^\text{rest}_i \leq c_i(x_k) + {\left(\nabla\phi_{x_k}(0) \nabla c_i (x_k)\right)}^T\mathbf{z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x_k){\bf z}
+ \leq u^\text{rest}_i \\
     -\rho^\text{rest} \leq \mathbf{z} \leq \rho^\text{rest} \\
   \end{array}\right.
   \end{split}
 \end{align}
 
-\begin{align}
-  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^T H{\bf z}} \nonumber
-  \\ \text{s.t.}&
-  \left\{
-  \begin{array}{lr}
-    { L_B \leq {\bf z} \leq U_B}\\
-    \forall i \in \mathcal{F} &\ {LB_i - c_i(x)\leq {\nabla c_i(x)}^T.{\bf z} + \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z} \leq UB_i - c_i(x)}\\
-  \end{array}
-  \right.
-\end{align}
-
-Using $ \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x){\bf z} \approx c_i(x+{\bf z}) - c_i(x) - {\nabla c_i(x)}^T {\bf z} $
+Using $ \frac{1}{2}{\bf z}^T{\nabla}^2c_i(x_k){\bf z} \approx c_i(x_k+{\bf z}_k) - c_i(x_k) - {\nabla c_i(x_k)}^T {\bf z}_k $
 we get:
 
 \begin{align}
-  \minimize_{{\bf z} \in \mathbb{R}^n} &\ \sum_{i\in \mathcal{U}} {\nabla c_i}^T{\bf z} + \frac{1}{2}{{\bf z}^T H{\bf z}} \nonumber\\
-  \text{s.t.}&
-  \left\{
+  \label{eq:QP_soc}
+  \begin{split}
+  \minimize_{\mathbf{z} \in T_x\mathcal{M} } &\quad {\left(\nabla\phi_{x_k}(0) \nabla f^\text{rest} (x_k)\right)}^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
+  \text{s.t.}&\left\{
   \begin{array}{lr}
-    L_B \leq {\bf z} \leq U_B \\
-    \forall i \in \mathcal{F},\quad {LB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z} \leq {\nabla c_i(x)}^T{\bf z} \leq UB_i - c_i(x +{\bf z}) + {\nabla c_i(x)}^T{\bf z}}\\
-  \end{array}
-  \right.
+    \forall i \quad l^\text{rest}_i \leq {\left(\nabla\phi_{x_k}(0) \nabla c_i (x_k)\right)}^T(\mathbf{z} - \mathbf{z}_k) + c_i(\phi_{x_k}({\bf z}_k)) \leq u^\text{rest}_i \\
+    -\rho^\text{rest} \leq \mathbf{z} \leq \rho^\text{rest} \\
+  \end{array}\right.
+  \end{split}
 \end{align}
 
-This system is solved iteratively by updating $\bf z$ (but never changing $x$) with the solution of the previous system and updating the values in $c_i(x+\mathbf{z})$ until a satisfactory $\bf z$ is found.
+Denoting $g_k = {\left(\nabla\phi_{x_k}(0) \nabla f (x_k)\right)}$ and $A_k = {\left(\nabla\phi_{x_k}(0) \nabla c_i (x_k)\right)}$, we can rewrite~\ref{eq:QP_soc} as follows:
+
+\begin{align}
+  \label{eq:QP_soc_simple}
+  \begin{split}
+  \minimize_{\mathbf{z} \in T_x\mathcal{M} }& \quad g_k^T\mathbf{z} + \frac{1}{2} {\bf z }^T H^\text{rest}_k{\bf z }\\
+  \text{s.t.}&\left\{
+  \begin{array}{lr}
+    \forall i \quad l^\text{rest}_i + A_k\mathbf{z}_k - c_i(\phi_{x_k}({\bf z}_k)) \leq A_k^T\mathbf{z}\leq u^\text{rest}_i+ A_k\mathbf{z}_k - c_i(\phi_{x_k}({\bf z}_k))  \\
+    -\rho^\text{rest} \leq \mathbf{z} \leq \rho^\text{rest} \\
+  \end{array}\right.
+  \end{split}
+\end{align}
+
+This system is solved iteratively by updating $\mathbf{z}_k$ (but never changing $x$) with the solution of the previous system and updating the values of $c_i(\phi_{x_k}(\mathbf{z}_k))$ until a satisfactory $\bf z$ is found.
 
 \subsection{Hessian update on manifolds}
 \label{sub:hessian_update_on_manifolds}
 
 Aside from the manifold adaptation, our main departure from Fletcher is in the Hessian computation where we used an approximation, since the exact one is too expensive to compute in our problems.
 After testing several possibilities, we settled for a self-scaling damped BFGS update~\cite{nocedal:mp:1993,nocedal:book:2006}, adapted to the manifold framework.
-More precisely, given the Hessian approximation $H_k$ at iteration $k$, we compute the approximation $H_{k+1}$ as follows
+More precisely, given the Hessian approximation $H_k$ at iteration $k$, we compute the approximation $H_{k+1}$ as follows:
+Note that as explained in Section~\ref{sub:vector_transport}, the gradients are transformed through vector transport before being compared.
 \begin{align}
   &s_k = \mathcal{T}_{\bf z}(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_{\bf z}(\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
   &\theta_k = \left\{\begin{array}{ll}
@@ -981,8 +987,9 @@ Despite Powell's update, $H_{k}$ might not be positive definite (but still symme
 We regularize it as follows: we first perform a Bunch-Kaufman factorization $P_k H_k P_k^T= L_k B_k L_k^T$ where $P_k$ is a permutation matrix, $L_k$ is unit lower triangular and $B_k$ is block diagonal with blocks of size $1 \times 1$ or $2\times 2$ (obtaining $B_k$ as a diagonal matrix is not numerically stable for Cholesky-like decomposition of indefinite matrices), see~\cite{golub:book:1996}.
 The eigenvalue decomposition $B_k = Q_k D_k Q_k^T$ is immediate and cheap to compute.
 From the diagonal matrix $D_k$ we form $D'_k$ such that $d'_{ii} = \max\left(d_{ii},\mu_{\min}\right)$ where $\mu_{\min}>0$ is user-defined (we typically set it to $0.1$).
-Defining $L'_k = L_k Q_k {(D'_k)}^{1/2}$, we get a regularized matrix $H'_k = P_k^T L_k L_k^T P_k$.
-In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~\Eqref{eq:SQPStep}, which directly accepts the factorized form $(P_k, L'_k)$.
+Defining $L'_k = L_k Q_k {(D'_k)}^{1/2}$, we get a regularized matrix $H'_k = P_k^T L_k L_k^T P_k = (L_k^T P_k)^T L_k^T P_k$.
+%In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~\Eqref{eq:SQPStep}, which directly accepts the factorized form $(P_k, L'_k)$.
+We take advantage of {\tt LSSOL}'s capability to receive $H$ in the factorized form $H=A^TA$ with $A=L_k^T P_k$ upper-trapezoidal as an input.
 This avoids an internal Cholesky factorization so that our regularization does not add too much time to the overall process of building and solving the QP.\@
 
 \subsection{An alternative Hessian Approximation Update}
@@ -996,8 +1003,8 @@ Thus, it can be helpful to `forget' about the old components of the approximatio
 At each iteration, the matrix $U$ is updated with either BFGS, or SR1, or a hybrid method, based on some tests on the value of the latest step.
 When possible, the SR1 update is preferred, because some results suggest that it allows faster convergence when the SR1 denominator is positive, otherwise, a BFGS or the hybrid method are used.
 
-Although this method provides a decomposition of $H$ as $U U^T$, $U$ is not trapezoidal, so we need to apply a QR on it so that we get $U=QR$, then $H=Q R R^T Q^T=Q Q^T$ with Q trapezoidal and R an orthogonal matrix.
-Then Q can be fed to {\tt LSSOL} directly.
+Although this method provides a decomposition of $H$ as $U U^T$, $U$ is not trapezoidal, so we need to apply a QR on $U^T$ it so that we get $U^T=QR$, then $H=R^T Q^T Q R=Q^T Q$ with Q trapezoidal and R an orthogonal matrix.
+Then $Q$ can be fed to {\tt LSSOL} directly.
 
 For all those reasons, this update method is very attractive.
 We implemented it in our solver, but so far the results have not been very conclusive and some more work will be dedicated to that issue in the future.
@@ -1012,16 +1019,14 @@ In order to account for that change, we propose to compute an approximation of e
 
 \begin{align}
   \begin{split}
-    H_f \approx \nabla^2 f\\
     H_{c_i} \approx \nabla^2 c_i\\
     H = \sum_{i\in \mathcal{I}}H_{c_i} + \sum_{i\in \mathcal{F}}\lambda_i H_{c_i}
   \end{split}
 \end{align}
 
-With this definition of $H$, we can ensure the symmetry of $H$, but nothing guarantees its positive definiteness, although each of the underlying $H_i$ are positive semi-definite.
+With this definition of $H$, we can ensure the symmetry of $H$, but nothing guarantees its positive definiteness.
 It is then necessary to regularize $H$ after combining the $H_{c_i}$.
-This also allows to have an approximation of the Hessian when exiting the restoration phase, by computing $H = H_f + \sum \lambda_i H_{c_i}$ and regularizing it.
-
+This also allows to have an approximation of the Hessian when exiting the restoration phase, by computing $H = H_f + \sum \lambda_i H_{c_i}$ with $H_f \approx \nabla^2 f$ and regularizing it.
 
 \subsection{Solver Evaluation}
 \label{sub:solver_evaluation}
