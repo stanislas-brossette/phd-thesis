@@ -464,7 +464,7 @@ This specific constraint is composed of four distinct parts:
   \item The geometric constraint generates the constraints associated with the user's choice of combination of degrees of freedom to block amongst TX, TY, TZ, RX, RY, RZ.
   \item The static constraint part (optional) instanciates the wrench to be added to the stability constraint of the problem based on the user's choice of components FX, FY, FZ, MX, MY, MZ.
   \item A custom geometric additional function field (optional) allows the user to add extra geometry constraints to the problem (through a \texttt{C++11} lambda that is executed after the geometric constraints are added to the problem).
-  \item A custom static additional function field (optional) allows the user to add extra static constraints to the problem (through a \texttt{C++11} lambda that is executed after the constraints wrench has been created and added to the problem).
+  \item A custom static additional function field (optional) allows the user to add extra static constraints to the problem (through a \texttt{C++11} lambda that is executed after the constraint's wrench has been created and added to the problem).
 \end{itemize}
 The custom geometric additional function can typically be used to in the context of a planar contact to limit the position of $O_2$ to the inside of a polygon defined in the plan $(O_1,\vec{x_1},\vec{x_2})$.
 As for the static additional function, it can be used to add constraints on the values of the constraint's wrench, for example, enforcing the friction cone constraints.
@@ -496,11 +496,11 @@ Finally, it can query the resolution of the problem by the solver and return the
 \section{Contact on non-flat surfaces}
 \label{sec:contact_on_non_flat_surfaces}
 
-Writing relations between geometric quantities defined in frames allows to describe a large spectrum of contacts.
+Writing relations between geometric quantities defined in frames allows to describe a large variety of contacts.
 %It is especially convenient when the contact points are predefined or when the geometric relations are simple to express, like for the inclusion of 2 convex polygons in each other in the context of a planar contact.
 In particular, it allows to write most types on geometric constraints between canonical geometric shapes (point, line, plan).
 The most common type of contact constraint encountered is the contact between two surfaces $S_1$ and $S_2$.
-The set of equations used to defined that type of constraint can be obtained through a frame constraint blocking TZ, RX and RY, and gives(provided that the correct frames are defined, $F_1$ on $S_1$ with $\vec{z_1}$ normal outbound and $F_2$ on $S_2$ with $\vec{z_2}$ normal inbound):
+The set of equations used to define that type of constraint can be obtained through a frame constraint blocking TZ, RX and RY. Provided that the correct frames are defined, $F_1$ on $S_1$ with $\vec{z_1}$ normal outbound and $F_2$ on $S_2$ with $\vec{z_2}$ normal inbound, the constraint writes as:
 
 \begin{equation}
   \left\{
@@ -525,19 +525,29 @@ When it comes to non-flat surfaces, the location of the frames used in equations
 
 %If any(either or both) of the two surfaces in contact is non-plane, finding the exact location of the contact point on the surface is necessary, because then, the normal to the contact is not known in advance.
 
-We propose to handle that case by paramaterizing the contact frame on the surface with a variable $u_S$ on a 1 or 2-dimensional manifold $\mathcal{M}_S$ (which, depending on the shape, could be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$), and adding this variable to our optimization problem.
+We propose to add an additional variable $u_S$ to our optimization problem to represent the location of the contact frame on non-flat surface.
+This gives the ability to our solver to choose the optimal contact position on a non-flat surface.
+Depending on its shape, the manifold $\mathcal{M}_S$ on which the surface is parameterized can be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$.
 Then we can write the contact constraint on that parametrized frame with ease.
 \begin{equation}
 \label{eq:param_frame}
   \mathcal{F}(u_S\in \mathcal{M}_S) = \{O(u_S), (x(u_S), y(u_S), z(u_S))\}
 \end{equation}
+In this section, we will successively present several ways to parameterize various non-flat surfaces to generate contacts with them.
+
+%We propose to handle that case by paramaterizing the contact frame on the surface with a variable $u_S$ on a 1 or 2-dimensional manifold $\mathcal{M}_S$ (which, depending on the shape, could be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$), and adding this variable to our optimization problem.
+%Then we can write the contact constraint on that parametrized frame with ease.
+%\begin{equation}
+%\label{eq:param_frame}
+  %\mathcal{F}(u_S\in \mathcal{M}_S) = \{O(u_S), (x(u_S), y(u_S), z(u_S))\}
+%\end{equation}
 
 %In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added the optimization problem and we can desctibe  as well as the constraint set \Eqref{eq:planar_contact} depending on it.
 
 \subsection{Application to plan-sphere contact}
 We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal on $S_s$.
 The most general way to express such a constraint is to ensure that $p_s$ is on $S_B$ and that $n_s$ and $n_B$ are opposite.
-To do that, we create a variable $v_{S2}$ on $S2$ and map $p_S$ and $n_S$ on it.
+To do that, we create a variable $v_{S2}$ on $S2$, add it to our optimization problem and map $p_S$ and $n_S$ on it.
 In our framework, this constraint is expressed exactly as the contact between 2 planar surfaces, once the mappings of $p_s(v_{S2})$ and $n_s(v_{S2})$ are done.
 In a framework that does not handle manifolds, it would require to setup a specific constraint, ensuring that the distance between $c_s$ and $S_B$ is equal to $r_S$.
 
@@ -601,7 +611,7 @@ Yet, it requires to have a parametric equation of the surface.
 
 In this case, we want the HRP-4 robot to carry a cube with its two hands.
 The most general way to do it is to select a face of the cube for each contact, and enforce the contact between that face and the hand's surface.
-We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S2$.
+We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S2$, thus adding a variable on $S2$ to our problem.
 The implicit equation of a superellipsoid is $S(x,y,z) = 0$, with
 \begin{equation}
   S(x,y,z) = {\left( \left|\frac{x}{A}\right|^r + \left|\frac{y}{B}\right|^r\right)}^\frac{t}{r} + \left|\frac{z}{C}\right|^t - 1
@@ -637,7 +647,9 @@ Right: it is to put the cube as far as possible in a given direction}
 \section{Contact with Complex Surfaces}
 \label{sec:contact_with_complex_surfaces}
 
-We showed that to generate contacts between a body of a robot and simple geometric surfaces (sphere, superellipsoid, wrist of HRP2) we can devise some ad hoc parametrization of the surface and write constraints on the resulting approximated surface.
+We have presented some methods to formulate contact constraint with parameterized surfaces.
+The surfaces that we used so far could all be approximately represented by closed-form equations (sphere, superellipsoid, wrist of HRP-2).
+%We showed that to generate contacts between a body of a robot and simple geometric surfaces (sphere, superellipsoid, wrist of HRP2) we can devise some ad hoc parametrization of the surface and write constraints on the resulting approximated surface.
 This is sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014}~\cite{vaillant:autonomousrobots:2016}.
 However, contacts with more complex objects are needed too, for unstructured environment or for manipulating objects.
 
