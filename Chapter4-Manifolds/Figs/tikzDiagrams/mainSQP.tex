@@ -41,10 +41,10 @@ Failure\end{tabular}};
 \draw [arrow] (addToFilter) -- (limitedStep);
 \draw [arrow] (smallStepTest) -- node[anchor=west] {yes} (fail);
 \draw [arrow] (limitedStep.330) -- node[anchor=west] {yes} (increaseTR);
-\draw [arrow] (forceAdd) |-([shift={(15mm,-3mm)}]forceAdd.south east)-- ([shift={(22mm,3mm)}]update.north east)-|(update);
-\draw [arrow] (increaseTR) |-([shift={(-64mm,-7mm)}]increaseTR.south west)-- ([shift={(-29mm,3mm)}]update.north west)-| (update);
-\draw [arrow] (limitedStep)node[anchor=east, yshift=-10mm] {no} |-([shift={(-64mm,-7mm)}]increaseTR.south west)-- ([shift={(-29mm,3mm)}]update.north west)-| (update);
-\draw [arrow] (smallStepTest.210) node[anchor=east, yshift=-2mm] {no}|-([shift={(-64mm,-7mm)}]increaseTR.south west)-- ([shift={(-29mm,3mm)}]update.north west)-| (update);
+\draw [arrow] (forceAdd) |-([shift={(15mm,-3mm)}]forceAdd.south east)-- ([shift={(22mm,3mm)}]update.north east)-|(update.20);
+\draw [arrow] (increaseTR) |-([shift={(-64mm,-7mm)}]increaseTR.south west)-- ([shift={(-29mm,3mm)}]update.north west)-| (update.160);
+\draw [arrow] (limitedStep)node[anchor=east, yshift=-10mm] {no} |-([shift={(-64mm,-7mm)}]increaseTR.south west)-- ([shift={(-29mm,3mm)}]update.north west)-| (update.160);
+\draw [arrow] (smallStepTest.210) node[anchor=east, yshift=-2mm] {no}|-([shift={(-64mm,-7mm)}]increaseTR.south west)-- ([shift={(-29mm,3mm)}]update.north west)-| (update.160);
 
 \end{tikzpicture}
 }

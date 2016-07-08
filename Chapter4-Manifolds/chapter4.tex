@@ -1013,7 +1013,7 @@ As of now, the best results where observed when using the self-scaling BFGS upda
 \subsection{Hessian Update in Restoration phase}
 \label{sub:hessian_update_in_restoration_phase}
 
-The hessian $H$ computed through whichever method presented above is meant to approximate the value of $\nabla \mathcal{L}_{xx}(x,\lambda) = \nabla f(x) + \lambda^T \nabla c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
+The hessian $H$ computed through whichever method presented above is meant to approximate the value of $\nabla^2 \mathcal{L}_{xx}(x,\lambda) = \nabla^2 f(x) + \lambda^T \nabla^2 c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
 But during the restoration phase, the definitions of $f$ and $c$ change at each iteration, depending on the sets of unfeasible and feasible constraints ($\mathcal{I}$ and $\mathcal{F}$).
 In order to account for that change, we propose to compute an approximation of each constraints second derivative separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the hessians based on the current set of feasible constraints.
 
