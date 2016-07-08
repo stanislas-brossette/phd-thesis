@@ -147,11 +147,13 @@ This tool allows for a simplified writting of robotics constraints as a combinat
 Let us consider a simple constraint and its expression in this framework:
 we define a point $P_h$ on a body of a robot and a point $P_e$ in the environment.
 We want to write a constraint that ensures that $P_h$ and $P_e$ are superimposed.
-We can write that constraint by requiring that the vector defined by $V = P_h - P_e$ is zero, which means that the 3 elements of the expression of $V$ in a given frame $F$ are zero.
-We can simply write that as:
+%We can write that constraint by requiring that the vector defined by $V = P_h - P_e$ is zero, which means that the 3 elements of the expression of $V$ in a given frame $F$ are zero.
+Given a frame $F$, we can simply write that as:
 \begin{center}
-{\tt(P\_h - P\_e).coord(F) = 0}.
+\tt{ P\_h.coord(F) - P\_e.coord(F)=0}
 \end{center}
+(the "$=0$" part of the equation is here for readability only; In the code, the value of the resulting expression is constrained by boundaries)
+
 In the case of a scalar expression like $(P_e - P_r)\cdot \overrightarrow{V_r} = 0$, it can be written without any consideration about frames as
 \begin{center}
 {\tt(P\_h - P\_e).dot(V) = 0}.
@@ -177,10 +179,17 @@ The manifold $\mathcal{M}$, on which the optimization takes place, is a Cartesia
 \end{align}
 From the solver's viewpoint, the entry space of each function is the complete manifold.
 But for the developer, writing a function on the complete $\mathbb{E}$ is cumbersome because (i) of the need to manage indexes, and (ii) when the function is implemented, the complete $\mathbb{E}$ may not be known.
-A user-written function $f$ is usually defined on a subset of $\mathbb{E}$, say $\mathbb{E}_I=\mathbb{E}_i\times\mathbb{E}_j\times\mathbb{E}_k\hdots$, that is minimalist for that function, and should not account for unrelated manifolds.
+A user-written function $f$ is usually defined on a subset of $\mathbb{E}$, say $\mathbb{E}_I=\mathbb{E}_i\times\mathbb{E}_j\times\mathbb{E}_k\hdots$, that is minimalistic for that function, and should not account for unrelated manifolds.
 One does not want to think about the values of the forces when writing a geometric constraint for example.
-Our automatic mapping tool keeps track of all the necessary mappings for each function added and upon the instantiation of the problem, generates the correct projection functions $\pi_I$ such that the developer can write a function $f$ on $\mathbb{E}_I$ while the solver receives it as a function $f \circ \pi_I$ on $\mathbb{E}$.
-This idea is illustrated by the example in Fig.~\ref{fig:auto_map}
+
+We developped an automatic mapping tool that keeps track of all the necessary mappings for each function added and upon the instantiation of the problem, generates the correct projection functions $\pi_I$ such that the developer can write a function $f$ on $\mathbb{E}_I$ while the solver receives it as a function $f \circ \pi_I$ on $\mathbb{E}$.
+
+This tool was built as an add-on to the RobOptim~\cite{moulard:jsme:2013} framework called {\bf roboptim-core-manifold} and its goal is to extend the notion of function to take into account its application manifold and map the correspondance between the values in the input of the problem and the input of the function.
+We define a class called DescriptiveWrapper that contains a RobOptim function and a description of its application manifold.
+Once a function is wrapped in a DescriptiveWrapper and the optimization problem is set, we need to establish the mapping between the variable of the problem, which is defined on the global manifold of the problem, and the input of the function that must match the description of its application manifold.
+That is the role fulfilled by the WrapperOnManifold layer, that compares the two manifolds, matches them and computes an input mapping from the problem's input vector to the function's, which we denote $\pi_I$.
+This mapping is computed once during the instanciation of the problem and then used at each call of the function.
+The use of the input mapping is illustrated by the example in Fig.~\ref{fig:auto_map}
 %\begin{equation}
   %\begin{split}
   %\pi_I:\mathbb{E}\to\mathbb{E}_I\\
@@ -208,53 +217,102 @@ This idea is illustrated by the example in Fig.~\ref{fig:auto_map}
 Let $q=[q_F^T; q_r^T]\in SE(3)\times \mathcal{M}_r$ be the combination of the free-flyer of the robot $q_F\in SE(3) = \mathbb{R}^3 \times SO(3)$ and the articular parameters $q_r\in\mathcal{M}_r$.
 Let $\mathcal{W}_i(p)=\{f_i,m_i(p)\}$ be the wrench (force+moment) applied by the environment onto the robot at contact $i$ and expressed on point $p$.
 A frame $F$ is composed of a reference point and an orthonormal basis of 3 vectors $F = \{O, (\vec{x}, \vec{y}, \vec{z})\}$.
+For frames define on a surface, with one vector of $(\vec{x}, \vec{y}, \vec{z})$ being the outbound normal to the surface, and the two others tangent, we rename $\vec{n}$ the normal one and $\vec{t}, \vec{b}$(tangent and bitangent) the two other ones, ensuring that $(\vec{n}, \vec{t}, \vec{b})$ is an orthonormal direct basis.
+When a frame is denoted with the subscript i, $F_i$, all its components are added the same subscript.
 
 Here is a list of constraints that we consider in our problems:
 
 \begin{itemize}
 \item Joint limits ${q^-} \leq q_r \leq {q^+}$:\\
 These cannot be directly translated on manifolds other than $\mathbb{R}^n$.
-For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, then the $S2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds.
+For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, then the $S2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds(in that case the limit constraint is not a simple bound constraint, but writes as $f(q_r)\leq 0$).
 
-\item The contact constraint consists in identifying the features of two frames $F_1$ and $F_2$.
-For example, for a planar contact, we can write the constraints~\Eqref{eq:planar_contact_bad}, with $\vec{z_1}$ and $\vec{z_2}$ the outbound normals to the surfaces in contact.
-\begin{equation}
-  \left\{
-  \begin{array}{ll}
-    \overrightarrow{O_1O_2}\cdot\vec{z_1} = 0\\
-    \vec{z_2} = -\vec{z_1} \\
-  \end{array}
-  \right.
-\label{eq:planar_contact_bad}
-\end{equation}
-In practice, for a better numerical behavior of the optimization, we write that $\vec{z_2}$ is perpendicular to the plan $\{O_1, \vec{x_1}, \vec{y_1}\}$ and has opposite direction with $\vec{z_1}$,~\Eqref{eq:planar_contact}:
-\begin{equation}
-  \left\{
-  \begin{array}{ll}
-    \overrightarrow{O_1O_2}\cdot\vec{z_1} = 0\\
-    \vec{z_2}\cdot\vec{z_1} \leq 0 \\
-    \vec{z_2}\cdot\vec{x_1} = 0 \\
-    \vec{z_2}\cdot\vec{y_1} = 0
-  \end{array}
-  \right.
-\label{eq:planar_contact}
-\end{equation}
-Note that on $F_2$ only the point $O_2$ and the vector $\vec{z_2}$ are necessary.
-Other types of contacts can be created that way, by equalizing other features, as explained in~\cite{escande:ras:2013}.
-For example, we can fix the contact to a given position and orientation by adding to it the following set of equation~\Eqref{eq:fix_planar_contact} that locks the degrees of freedom of rotation around the normal and translation in the tangent plane of the contact:
+%\item The contact constraint consists in identifying the features of two frames $F_1$ and $F_2$.
+%For example, for a planar contact, we can write the constraints~\Eqref{eq:planar_contact_bad}.
+%\begin{equation}
+  %\left\{
+  %\begin{array}{ll}
+    %\overrightarrow{O_1O_2}\cdot\vec{n_1} = 0\\
+    %\vec{n_2} = -\vec{n_1} \\
+  %\end{array}
+  %\right.
+%\label{eq:planar_contact_bad}
+%\end{equation}
+%In practice, for a better numerical behavior of the optimization, we write that $\vec{n_2}$ is perpendicular to the plan $\{O_1, \vec{t_1}, \vec{b_1}\}$ and has opposite direction with $\vec{n_1}$,~\Eqref{eq:planar_contact}:
+%\begin{equation}
+  %\left\{
+  %\begin{array}{ll}
+    %\overrightarrow{O_1O_2}\cdot\vec{n_1} = 0\\
+    %\vec{n_2}\cdot\vec{n_1} \leq 0 \\
+    %\vec{n_2}\cdot\vec{t_1} = 0 \\
+    %\vec{n_2}\cdot\vec{b_1} = 0
+  %\end{array}
+  %\right.
+%\label{eq:planar_contact}
+%\end{equation}
+%Note that on $F_2$ only the point $O_2$ and the vector $\vec{n_2}$ are necessary.
+%Other types of contacts can be created that way, by equalizing other features, as explained in~\cite{escande:ras:2013}.
+%For example, we can fix the contact to a given position and orientation by adding to it the following set of equation~\Eqref{eq:fix_planar_contact} that locks the degrees of freedom of rotation around the normal and translation in the tangent plane of the contact:
+%\begin{align}
+  %\left\{
+  %\begin{array}{ll}
+    %\overrightarrow{O_1O_2} \cdot \vec{t_1} = 0 \\
+    %\overrightarrow{O_1O_2} \cdot \vec{b_1} = 0 \\
+    %\vec{b_2} \cdot \vec{t_1} = 0 \\
+    %\vec{t_2} \cdot \vec{b_1} = 0 \\
+    %\vec{t_2} \cdot \vec{t_1} \leq 0
+  %\end{array}
+  %\right.
+%\label{eq:fix_planar_contact}
+%\end{align}
+%Those two sets of equations~\Eqref{eq:planar_contact} and~\Eqref{eq:fix_planar_contact} can easily be recombined to generate other types of constraints (e.g.\ fixing only the translation, or only the rotations\ldots).
+
+\item The Frame constraint is a generic type of constraint that consists in blocking a pre-defined set of degrees of freedom of one frame $F_2$ w.r.t. another frame $F_1$.
+By default, the frame $F_2$ has 6 degrees of freedom w.r.t. $F_1$, three translational degrees of freedom TX, TY, and TZ, respectively along $\vec{x_1}$, $\vec{y_1}$ and $\vec{z_1}$ and three rotational ones RX, RY, and RZ, respectively around $(O_1,\vec{x_1})$, $(O_1,\vec{y_1})$ and $(O_1,\vec{z_1})$.
+We can write constraints such that any combination of the translational degrees of freedom is blocked:
+
 \begin{align}
-  \left\{
-  \begin{array}{ll}
-    \overrightarrow{O_1O_2} \cdot \vec{x_1} = 0 \\
-    \overrightarrow{O_1O_2} \cdot \vec{y_1} = 0 \\
-    \vec{y_2} \cdot \vec{x_1} = 0 \\
-    \vec{x_2} \cdot \vec{y_1} = 0 \\
-    \vec{x_2} \cdot \vec{x_1} \leq 0
-  \end{array}
-  \right.
-\label{eq:fix_planar_contact}
+  \text{If TX is blocked: } \overrightarrow{O_1 O_2} \cdot \vec{x_1} = 0 \\
+  \text{If TY is blocked: } \overrightarrow{O_1 O_2} \cdot \vec{y_1} = 0 \\
+  \text{If TZ is blocked: } \overrightarrow{O_1 O_2} \cdot \vec{z_1} = 0
 \end{align}
-Those two sets of equations~\Eqref{eq:planar_contact} and~\Eqref{eq:fix_planar_contact} can easily be recombined to generate other types of constraints (e.g.\ fixing only the translation, or only the rotations\ldots).
+
+Similarly, any pair of rotational degrees, or the three of them can be blocked (blocking only one rotation is not possible with that formalism).
+If the three rotations RX, RY, RZ are blocked, we get the set of constraints~\ref{eq:3_rotations_blocked}:
+\begin{equation}
+\label{eq:3_rotations_blocked}
+\begin{cases}
+  \vec{z1}\cdot\vec{y2} = 0 \\
+  \vec{z1}\cdot\vec{x2} = 0 \\
+  \vec{x1}\cdot\vec{y2} = 0 \\
+  \vec{z1}\cdot\vec{z2} \geq 0 \\
+  \vec{y1}\cdot\vec{y2} \geq 0
+\end{cases}
+\end{equation}
+
+When two rotational degrees of freedom are blocked, we get the set of constraints~\ref{eq:2_rotations_blocked}
+To generalize the following formulas, we rename the axis X, Y, and Z with respect to their respective roles in this constraint.
+The one rotational degree that remains free is denoted N with vector $\vec{n}$, and the two others are denoted T and B, with vectors $\vec{t}$, and $\vec{b}$.
+Those 3 vectors are ordered such that $(\vec{n}, \vec{t}, \vec{b})$ is an orthonormal direct basis.
+
+\begin{equation}
+\label{eq:2_rotations_blocked}
+\begin{cases}
+  \vec{n_2}\cdot\vec{n_1} \geq 0 \\
+  \vec{n_2}\cdot\vec{t_1} = 0 \\
+  \vec{n_2}\cdot\vec{b_1} = 0
+\end{cases}
+\end{equation}
+
+In theory, one could simply write that constraint as $\vec{n_1}=\vec{n_2}$, but in practice, this formulation leads to bad numerical behavior of the optimization, thus we prefer~\ref{eq:2_rotations_blocked}.
+
+All those independant sets of constraints can be combined to create a wide variety of geometric constraints.
+For example, one can create a mobile planar contact constraint with normal $\vec{z}_1$ by blocking TZ, RX and RY.
+A punctual contact constraint can be devised by blocking TX, TY and TZ.
+To completely fix the position of $F_2$ w.r.t. $F_1$, one can block TX, TY, TZ, RX, RY, and RZ.
+And many other types of custom constraints can be devised with this formulation.
+
+In the event that the two frames do not have a satisfying configuration to write the desired constraint with this formalism (for example, if one wants to write a planar contact between two surfaces $S_1$ and $S_2$, where $\vec{z_1}$ and $\vec{z_2}$ are outbound normal vectors, then equation~\ref{eq:2_rotations_blocked} is not satisfactory because we want to oppose $\vec{z_1}$ and $\vec{z_2}$, not identify them.), then user is required to define a new frame $F_2'$ that is a constant 3D transformation away from $F_2$ (in that case a rotation of $\pi$ around $(O_1,\vec{x_1})$ would suffice).
 
 \item The stability constraint ensures that the Euler-Newton equation~\Eqref{eq:NewtonWrench} is balanced for the set of external wrenches applied to the robot (gravity $\mathcal{W}_G$ and contact forces $\mathcal{W}_i$).
 \begin{equation}
@@ -262,14 +320,23 @@ Those two sets of equations~\Eqref{eq:planar_contact} and~\Eqref{eq:fix_planar_c
   \label{eq:NewtonWrench}
 \end{equation}
 For each contact that bears forces (`stability' contact), a wrench applied on the robot at the contact point is added to the problem.
-That wrench is parametrized on a subset of $\mathbb{R}^6$ depending on the type of contact.
+If the contact is added through a frame constraint between $F_1$ and $F_2$, the wrench can be formed by a combination of elementary components that are:
+\begin{itemize}
+\item FX: force along $\vec{x_1}$, value $f_x$
+\item FY: force along $\vec{y_1}$, value $f_y$
+\item FZ: force along $\vec{z_1}$, value $f_z$
+\item MX: moment around $(O_1,\vec{x_1})$, value $m_x$
+\item MY: moment around $(O_1,\vec{y_1})$, value $m_y$
+\item MZ: moment around $(O_1,\vec{z_1})$, value $m_z$
+\end{itemize}
+That wrench is parametrized on a $\mathbb{R}^m$ with $m$ the number of components used.
 %For punctual contacts, the moment part is null on the application point.
 %Only a parametrization of the force part on $\mathbb{R}^3$ is needed.
 We model the resultant wrench of planar contacts as a combination of punctual forces applied at each vertex of the contact polygon.
 In the case of interaction forces between 2 robots, only one wrench is created and it is used as is in the stability equation of one robot and its opposite is used for the stability of the second robot.
 That way, we are guaranteed that the forces inbetween the robots are balanced and we can evaluate the stability of each robot separately.
 
-\item The friction cone constraint limits the tangential part of every forces to avoid slippage.
+\item The friction cone constraint can be used to limit the tangential part of any force to avoid slippage.
 We write it as~\Eqref{eq:friction} (with $\mu$ the friction coefficient)
 \begin{equation}
   \begin{split}
@@ -278,6 +345,17 @@ We write it as~\Eqref{eq:friction} (with $\mu$ the friction coefficient)
   \end{split}
   \label{eq:friction}
 \end{equation}
+
+\item The rotational friction limit constraint can be used to limit the friction torque of any force to avoid slippage.
+We write it as~\Eqref{eq:frictionTorque} (with $\sigma$ the rotational friction coefficient)
+\begin{equation}
+  \begin{split}
+    \sigma^2f_z^2-m_z^2 \geq 0 \\
+    f_z \geq 0
+  \end{split}
+  \label{eq:frictionTorque}
+\end{equation}
+
 
 \item The collision avoidance constraint can be defined between any two bodies.
 A convex mesh is attached to each body involved in the constraint.
@@ -297,7 +375,7 @@ Denoting $\tau_i$ the torque in joint $i$ resulting from the robot's configurati
 \end{itemize}
 
 
-The frame in which the constraints are written matters critically.
+%The frame in which the constraints are written matters critically.
 Most often, the frame's configuration depends on a part of the optimization variables, that must be accounted for in computing the constraints' Jacobian.
 Our framework computes such dependencies automatically.
 
@@ -398,7 +476,21 @@ Finally, it can query the resolution of the problem by the solver and return the
 Writing relations between geometric quantities defined in frames allows to describe a large spectrum of contacts.
 %It is especially convenient when the contact points are predefined or when the geometric relations are simple to express, like for the inclusion of 2 convex polygons in each other in the context of a planar contact.
 In particular, it allows to write most types on geometric constraints between canonical geometric shapes (point, line, plan).
-The most common type of contact constraint encountered is the contact between two surfaces.
+The most common type of contact constraint encountered is the contact between two surfaces $S_1$ and $S_2$.
+The set of equations used to defined that type of constraint can be obtained through a frame constraint blocking TZ, RX and RY, and gives(provided that the correct frames are defined, $F_1$ on $S_1$ with $\vec{z_1}$ normal outbound and $F_2$ on $S_2$ with $\vec{z_2}$ normal inbound):
+
+\begin{equation}
+  \left\{
+  \begin{array}{ll}
+    \overrightarrow{O_1O_2}\cdot\vec{z_1} = 0\\
+    \vec{z_2}\cdot\vec{z_1} \geq 0 \\
+    \vec{z_2}\cdot\vec{x_1} = 0 \\
+    \vec{z_2}\cdot\vec{y_1} = 0
+  \end{array}
+  \right.
+\label{eq:planar_contact}
+\end{equation}
+
 When the two surfaces are plan, a contact between them can be written simply with the set of equations~\Eqref{eq:planar_contact}.
 In that case, the quantities involved in the constraint are invariant with the location of the contact point, thus, the equations are valid for any point of the surface (in particular, the normal vector is the same for any point on the surface).
 %When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and pre-defined, the set of equation~\Eqref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
