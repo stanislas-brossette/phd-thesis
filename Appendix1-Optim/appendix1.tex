@@ -66,6 +66,9 @@ We will then focus on constrained optimization problems and the numerous methods
 We will particularly detail one specific constrained problem resolution algorithm that is the Sequential Quadratic Program (SQP).
 The extension of those methods to solving problems on more complex variable spaces that are the non Euclidean manifolds is the topic of Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
 
+This Appendix does not pretend to give a fully detailed overview of numerical optimization methods, it gives the reader a quick overview of some key principles.
+For more detailed information, we invite the reader to refer to the excellent books that we took inspiration from to write this chapter~\cite{nocedal:book:2006, bonnans:book:2003, boyd2004convex}.
+
 \section{Unconstrained Optimization}
 
 An unconstrained optimization problem consists in minimizing an objective function without any constraint.
@@ -77,6 +80,21 @@ This problem, denoted $\mathcal{P}$, can be formulated as follows:
 \end{equation}
 
 The classical approach to solve $\mathcal{P}$ is to use an iterative algorithm, starting from an initial guess $x_0$, and converging toward the solution $x^*$.
+A very basic optimization scheme is Algorithm~\ref{alg:basic_optim}.
+
+\begin{algorithm}
+\begin{algorithmic}
+  \State{Starting from an initial guess $x_0$}
+  \While{Convergence condition not met}
+  \State{Compute descent direction $d_k$}
+  \State{Compute step length $t_k$}
+  \State{Update $x_{k+1}\leftarrow x_k + t_k d_k$}
+  \EndWhile{}
+  \caption{Basic optimization scheme}
+\label{alg:basic_optim}
+\end{algorithmic}
+\end{algorithm}
+
 The objective function is not necessarily completely known, in the sense that we cannot always have an explicit formula. Often, the function $f$ is computed by another program that is able to compute $f(x)$, $\nabla_x f(x)$ and sometimes $\nabla_{xx} f(x)$ for a given value of $x$.
 In order to have an efficient algorithm, we need to avoid any unnecessary computation of $f(x)$ and its derivatives.
 We denote the values taken by $x$ along the iterations as $x_0$, $x_1$, $x_2$,\ldots $x_i$.
@@ -88,12 +106,8 @@ Since our knowledge of the objective function is only partial, it would not be p
   \text{$x^*$ is a global solution of $\mathcal{P}$ on $\mathit{S}$ } \equiv \forall x \in \mathit{S}, f(x^*) \leq f(x)
 \end{equation}
 
-Though, we can find a local solution $x^*$ of $\mathcal{P}$ (a local minimizer of $f$) such that:
-
-\begin{equation}
-  \text{There exist a neighborhood } \mathit{N}\ \text{of }x^*\ \text{such that }\forall x\in \mathit{N}, \ f(x^*) \leq f(x)
-\end{equation}
-
+Though, we can find a local solution $x^*$ of $\mathcal{P}$ (a local minimizer of $f$): such that there exist a neighborhood $\mathit{N}$ of $x^*$ where $\forall x\in \mathit{N}$, $f(x^*) \leq f(x)$.
+Or even a strict local minimizer of $f$: such that there exist a neighborhood $\mathit{N}$ of $x^*$ where $\forall x\in \mathit{N}$, $f(x^*) < f(x)$.
 That is the kind of solution that we are looking for and that our algorithms should find.
 
 Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}^2$), then we have the following sufficient conditions for the optimality of $x^*$ as presented in~\cite{nocedal:book:2006}:
@@ -260,14 +274,15 @@ An inequality constraint $c_i,\ i\in I$ is inactive if $c_i(x)>0$ and active if 
   \end{equation}
 \end{definition}
 
-Most optimization algorithms make the assumption that at the solution, the constraints satisfy the Linear Independence Constraints Qualification (LICQ)
+Most optimization algorithms make the assumption that at the solution, the constraints satisfy the following Linear Independence Constraints Qualification (LICQ) definition:
 
 \begin{definition}
-  Given a point $x$ and an active set $\mathit{A}(x)$, the LICQ holds if the set of active constraint gradient $\{\nabla c_i(x),\ i\in \mathit{A}(x)\}$ is linearly independent
+  Given a point $x$ and an active set $\mathit{A}(x)$, we say that the LICQ holds if the set of active constraint gradient $\{\nabla c_i(x),\ i\in \mathit{A}(x)\}$ is linearly independent
 \end{definition}
 
-In particular, if any gradient of a constraint is null, then the LICQ does not hold.
-The LICQ should be taken into account during the formulation of a problem.
+In general, if LICQ holds, none of the active constraints gradients can be zero.
+%In particular, if any gradient of a constraint is null, then the LICQ does not hold.
+%The LICQ should be taken into account during the formulation of a problem.
 
 \begin{theorem}{First-Order Necessary Conditions}\\
 \label{KKT_conditions}
@@ -307,7 +322,7 @@ And at a KKT solution $(x^*,\lambda^*)$, the critical cone $C(x^*, \lambda^*)$ i
   C(x^*,\lambda^*) = \{w\in F(x^*)|{\nabla c_i(x^*)}^T w=0, \forall i\in\mathit{A}(x^*)\cap I\ \text{with } \lambda_i^*>0\}
 \end{equation}
 
-The critical cone contains the linearly feasible directions for which it is not clear from first derivative information alone if $f$ will increase or decrease.
+%The critical cone contains the linearly feasible directions for which it is not clear from first derivative information alone if $f$ will increase or decrease.
 
 Once the KKT condition is reached for a point $(x^*, \lambda^*)$, for a direction $w$ of $F(x^*)$ for which $w^T\nabla f(x^*)=0$, it is impossible to tell from first derivative information only, if an increment in this direction will have a positive effect on the problem resolution.
 Thus it is possible that the KKT constraint is not enough to determine if a point is a solution or just a stationary point.
@@ -327,13 +342,26 @@ In particular, this condition is always verified if $\nabla_{xx}^2\mathcal{L}(x^
 \section{Resolution of a Non Linear Constrained Optimization Problem}
 \label{sec:resolution_of_a_non_linear_constrained_optimization_problem}
 
-In the previous section, we presented some theoretical tools to describe the solution of a nonlinear constrained optimization problem that only use the derivative terms of order one and two of the problem's functions.
+%In the previous section, we presented some theoretical tools to describe the solution of a nonlinear constrained optimization problem that only use the derivative terms of order one and two of the problem's functions.
+In the previous section, we presented some theoretical tools to decide if a point is solution of a nonlinear constrained optimization problem based on the values of the first and second order derivatives of its functions.
 Here we present some methods for actually solving such problems.
-There exists many different algorithms to solve an nonlinear constrained optimization problem.
-But all have in common to be iterative processes, in which we start from an initial guess $x_0$ for $x^*$.
-From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem~\ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
-And we iterate that operation until a point $x_k$ sufficiently close to a solution is found.
-By sufficiently close to a solution we mean that this point satisfies the optimality conditions with a good enough precision.
+There exists many different algorithms to solve a nonlinear constrained optimization problem.
+But all have in common to be iterative processes that follow the model of Algorithm~\ref{alg:basic_optim_nlcp}.
+%From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem~\ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
+%And we iterate that operation until a point $x_k$ sufficiently close to a solution is found.
+%By sufficiently close to a solution we mean that this point satisfies the optimality conditions with a good enough precision.
+
+\begin{algorithm}
+\begin{algorithmic}
+  \State{Starting from an initial guess $x_0$}
+  \Repeat
+  \State{Compute an increment $z_k$ such that $x_k+z_k$ is closer to the solution }
+  \State{Update $x_{k+1}\leftarrow x_k + z_k$}
+  \Until{Optimality conditions are met with a precision $\epsilon$}
+\caption{Basic scheme for solving a nonlinear constrained optimization problem}
+\label{alg:basic_optim_nlcp}
+\end{algorithmic}
+\end{algorithm}
 
 The resolutions algorithms differ mostly by the method chosen to generate a satisfactory increment $z$. We will list here some of the most popular methods:
 
@@ -350,11 +378,14 @@ The minimum of $p(\mu,x)$ varies with the penalty parameter $\mu$.
 By increasing $\mu$ to $\infty$, we penalize the violation of the constraints with increasing severity until reaching a solution $x^*$.
 
 \paragraph{The interior point method} generates steps by solving a relaxed constrained problem where slack variables are introduced to relax inequality constraints.
-The problem to solve only contains equality, boundary constraints and a cost function that prevents the slack variables from getting too close to 0:
+The problem solved is the following:
+%The problem to solve only contains equality, boundary constraints and a cost function that prevents the slack variables from getting too close to 0:
 
 \begin{equation}
-  \minimize_{x,s}{f(x)- \mu\sum_{i\in I} \log(s_i)}
-  \text{subject to }
+\label{eq:interior_point}
+\begin{aligned}
+  \minimize_{x,s}{} & f(x)\\
+  \text{subject to }&
   \left\{
     \begin{array}{l}
      c_i = 0,\ i\in E\\
@@ -362,10 +393,33 @@ The problem to solve only contains equality, boundary constraints and a cost fun
      s_i \geq 0,\ i\in I
   \end{array}
   \right.
+\end{aligned}
 \end{equation}
 
-\paragraph{The Sequential Quadratic Programming (SQP)} is a method in which, at each iterate $(x_k, \lambda_k)$, the increment $z$ is found by solving a Quadratic Programming (QP).
-The QP is an approximation of the KKT conditions~\ref{KKT_conditions} of the actual problem~\ref{formulation_NLCP} to the first order:
+One way to solve this problem is to consider the following associated barrier problem:
+
+\begin{equation}
+\begin{aligned}
+\label{eq:barrier_question}
+  \minimize_{x,s}{} & f(x)- \mu\sum_{i\in I} \log(s_i)\\
+  \text{subject to } &
+  \left\{
+    \begin{array}{l}
+     c_i = 0,\ i\in E\\
+     c_i - s_i = 0,\ i\in I\\
+  \end{array}
+  \right.
+\end{aligned}
+\end{equation}
+
+and to find its approximate solutions for a sequence of positive barrier parameters $\{\mu_k\}$ that converges to zero.
+The minimization of the barrier term $-\mu\sum_{i\in I} \log(s_i)$ prevents the terms of $s$ from becoming too close to zero.
+The solution for a given $\{\mu_k\}$ is obtained by applying Newton's method to the nonlinear system that represents the KKT conditions for the barrier problem.
+The solution is reached once the optimality conditions of~\ref{eq:interior_point} are met.
+
+\paragraph{The Sequential Quadratic Programming (SQP)} is an approach in which the Newton's method is used to solve the nonlinear problem raised by the KKT conditions of problem~\ref{formulation_NLCP}.
+Basically, it comes down to finding the increment $z^*$ that solves the Quadratic Programming (QP) associated with the problem~\ref{approx_QP}, at each iterate $(x_k, \lambda_k)$.
+%The QP is an approximation of the KKT conditions~\ref{KKT_conditions} of the actual problem~\ref{formulation_NLCP} to the first order:
 
 \begin{equation}
 \label{approx_QP}
@@ -398,13 +452,14 @@ To palliate to that issue, mainly two methods are used:
 \section{Sequential Quadratic Programming}
 \label{sec:sequential_quadratic_programming}
 
-The Sequential Quadratic Programming method is one of the most effective method to solve small and large scale nonlinear constrained optimization problems.
-It has the upper hand on other methods mostly when solving problem with highly nonlinear constraints.
+The Sequential Quadratic Programming (SQP) method is one of the most effective method to solve small and large scale nonlinear constrained optimization problems.
+Together with the interior point method, they are currently considered the most powerful algorithms for large-scale nonlinear programming.
+The SQP methods show their strength when solving problems with nonlinearities in the constraints~\cite{nocedal:book:2006}.
 
 \subsection{Principle}
 \label{sub:principle}
 
-As we stated before, the main idea behind the SQP approach it to solve a subproblem that approximate linearly to the first order the KKT conditions.
+As we stated before, the main idea behind the SQP approach it to use the Newton's method to solve the nonlinear problem raised by the KKT conditions.
 For simplicity, we consider a problem without inequality constraints.
 We denote $C$ the vector of equality constraints.
 We denote $z_x$ and $z_\lambda$ the increments on $x$ and $\lambda$ respectively.
@@ -440,22 +495,24 @@ The first order linearization of~\ref{KKT_equ} gives:
 
 \begin{equation}
   \label{KKT_1st_order}
-  \begin{array}{l}
-
   \left\{
 \begin{array}{l}
   \nabla_{xx}^2\mathcal{L}_k z_x + \nabla_{x\lambda}^2\mathcal{L}_k z_\lambda + \nabla_x\mathcal{L}_k  = 0\\
   \nabla_x C_k z_x + C_k = 0\\
 \end{array}
 \right. \\
-\text{which is equivalent to:}\\
+\end{equation}
+which is equivalent to:
+\begin{equation}
   \left\{
 \begin{array}{l}
   \nabla_{xx}^2\mathcal{L}_k z_x + \nabla_{x}C_k (\lambda_k + z_\lambda) = - \nabla_{x}f_k\\
   \nabla_x C_k z_x = - C_k \\
 \end{array}
 \right. \\
-\text{Or in matrix form:}\\
+\end{equation}
+Or in matrix form:
+\begin{equation}
   \begin{pmatrix}
       \nabla_{xx}^2\mathcal{L}_k & \nabla_x C_k\\
       \nabla_x C_k & 0\\
@@ -469,10 +526,9 @@ The first order linearization of~\ref{KKT_equ} gives:
       -\nabla_{x}f_k\\
       -C_k\\
   \end{pmatrix}
-  \end{array}
 \end{equation}
 
-Solving this problem actually is equivalent to solving a QP problem of the following form:
+Solving this problem is equivalent to solving a QP problem of the following form:
 
 \begin{equation}
   \begin{array}{ll}
@@ -481,7 +537,7 @@ Solving this problem actually is equivalent to solving a QP problem of the follo
   \end{array}
 \end{equation}
 
-The unique solution of this problem satisfies the following matrix equality:
+The solution of this problem satisfies the following matrix equality:
 
 \begin{equation}
   \begin{pmatrix}
@@ -499,11 +555,11 @@ The unique solution of this problem satisfies the following matrix equality:
   \end{pmatrix}
 \end{equation}
 
-Note that this problem has a solution if the following assumptions hold:
-\begin{itemize}
-  \item The constraint Jacobian $\nabla_x C_k$ has full rank.
-  \item The matrix $\nabla_{xx}^2\mathcal{L}_k$ is positive definite on the tangent space of the constraints:\\ $d^T\nabla_{xx}^2\mathcal{L}_k d \geq 0,\ \forall d\neq 0$ such that ${\nabla_x C_k}^T d = 0$.
-\end{itemize}
+%Note that this problem has a solution if the following assumptions hold:
+%\begin{itemize}
+  %\item The constraint Jacobian $\nabla_x C_k$ has full rank.
+  %\item The matrix $\nabla_{xx}^2\mathcal{L}_k$ is positive definite on the tangent space of the constraints:\\ $d^T\nabla_{xx}^2\mathcal{L}_k d \geq 0,\ \forall d\neq 0$ such that ${\nabla_x C_k}^T d = 0$.
+%\end{itemize}
 
 Therefore, the problem raised by the linearization of the KKT conditions to the first order can be solved as a QP problem.
 Denoting the solution of the QP problem $(z_x, l_k)$, the solution to~\ref{KKT_1st_order} is given by
@@ -523,31 +579,39 @@ Denoting the solution of the QP problem $(z_x, l_k)$, the solution to~\ref{KKT_1
 This development can easily be extended to treat the case of problems constrained with inequality constraints:
 
 \begin{equation}
-  \minimize_{x\in\mathbb{R}^n}{f(x)}\ \text{subject to }
+\begin{aligned}
+  \minimize_{x\in\mathbb{R}^n}{}&{f(x)}\\
+  \text{s.t.}&
   \left\{
   \begin{array}{l}
     c_i(x) = 0,\ \forall i\in{E}\\
     c_i(x) \geq 0,\ \forall i\in{I}\\
   \end{array}
   \right.
+\end{aligned}
 \end{equation}
 
 By solving the following Inequality-constrained Quadratic Problem (IQP) system at each iteration:
 
 \begin{equation}
 \label{IQP}
-  \begin{array}{ll}
+  \begin{aligned}
     \minimize\limits_{z_x} &f_k + \nabla_x f_k ^T z_x + \frac{1}{2} z_x^T\nabla_{xx}^2\mathcal{L}_k z_x \\
-    \text{s.t.} & \nabla_x {c_i}_k z_x + {c_i}_k = 0 ,\ \forall i\in E\\
-                & \nabla_x {c_i}_k z_x + {c_i}_k \geq 0 ,\ \forall i\in I\\
+    \text{s.t.} &
+  \left\{
+  \begin{array}{l}
+    \nabla_x {c_i}_k z_x + {c_i}_k = 0 ,\ \forall i\in E\\
+    \nabla_x {c_i}_k z_x + {c_i}_k \geq 0 ,\ \forall i\in I\\
   \end{array}
+  \right.
+  \end{aligned}
 \end{equation}
 
 The main difficulty in solving that QP~\ref{IQP} comes from finding the optimal active set $\mathit{A}_k$.
-It is a necessary but costly operation, especially when starting from a random active set $\mathit{A}_0$.
+It is a necessary but costly operation, especially when starting from an initial active set $\mathit{A}_0$.
 The process is mostly based on a try and guess approach guided by heuristics (that may vary with different resolution algorithms).
 
-To find the optimal active set, the QP starts from a random active set $\mathit{A}_0$ ignore the non-active constraints and try to solve the QP with the remaining active constraints.
+To find the optimal active set, the QP starts from an initial active set $\mathit{A}_0$ ignore the non-active constraints and try to solve the QP with the remaining active constraints.
 At a step $k$ of the resolution of the IQP, all the constraints in the active set $\mathit{A}$ are treated as equality constraints and the others are simply ignored, the QP to solve becomes:
 
 \begin{equation}
@@ -570,18 +634,21 @@ Once the SQP gets close to the solution, the set of active constraints should no
 It is often useful to initialize the IQP's active set with the optimal active set of the previous iterate: $\mathit{A}_0(x_{k+1})\leftarrow\mathit{A}^*(x_k)$. Then the ${(k+1)}^{th}$ QP starts from an active set close to optimal and can be solved much faster.
 That method is called the \textit{warm-start}.
 
-The SQP approach to solving the problem~\ref{formulation_NLCP} as presented above leans on the assumption that at each step, the QP generated is feasible,
-which requires that the Hessian $\nabla_{xx}^2\mathcal{L}$ is positive definite on the tangent space of the active constraints.
-That property is guarantied to hold near the solution, but not when starting from a remote point on a non-convex problem.
+The SQP approach to solving the problem~\ref{formulation_NLCP} as presented above leans on the assumption that at each step, the QP generated is feasible.
+If it is not, a restoration phase is entered and finds a feasible point, see Section~\ref{sub:restoration_phase}.
+%which requires that the Hessian $\nabla_{xx}^2\mathcal{L}$ is positive definite on the tangent space of the active constraints.
+
+Solving the QP problem~\ref{IQP} gives a solution step to to an linearized problem, which in general is not the solution to the original nonlinear problem.
+Thus, taking that step without further verification can be dangerous and lead to bad iterates.
 To cope with that issue, several methods exist.
-In the next few sections, we present the globalisation methods that are the Line Search and Trust Region approaches, they ensure that the QP subproblem is always feasible.
-Then we present some methods used to choose whether to accept of reject an iterate with the merit function and filter methods.
+In the next few sections, we present the globalisation methods that are the Line Search and Trust Region approaches.
+They are used alongside methods to choose whether to accept or reject a step like the merit function and filters in order to monitor the length and direction of the step with regards to the nonlinear problem.
 And finally we discuss some Hessian approximation methods.
 
 \subsection{Globalization methods}
 \label{sub:globalization_methods}
 
-As we stated above, the globalisation phase of an SQP optimization is meant to modify the step generated by the QP resolution in order to improve the global convergence of the algorithm, either by multiplying the step found by the QP with a coefficient $\alpha$ in the Line-Search approach, or by bounding the norm of the step found in the QP by adding a boundary constraint on $z$ directly inside of the QP problem.
+The globalisation phase of an SQP algorithm is meant to modify the steps generated by the QP resolution in order to improve the global convergence of the algorithm, either by multiplying them with a coefficient $\alpha$ in the Line-Search approach, or by bounding the norm of the step found in the QP by adding to the QP a boundary constraint on $z$ that reflects our trust in the quality of the approximated problem.
 
 \subsubsection{The Line-Search Strategy}
 \label{ssub:line_search}
