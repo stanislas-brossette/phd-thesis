@@ -739,6 +739,13 @@ This can be used to alleviate the work to be done by the user, be it a human or 
 
 In this section we presented our approach for formulating a posture generation problem and generating an optimization problem that represents it.
 We presented several tools that are meant to simplify this process for the developper, with the automatic variable management, the use of non-Euclidean manifolds and the geometric expressions framework.
-Leveraging those tools, we were able to devise a method to formulate a contact constraint with a solid for which the only representation available is a mesh.
-And to ensure the continuity properties of that formulation for a better use in optimization algorithms.
+
+Leveraging those tools, we developped methods to formulate constraints involving non-flat surfaces, by adding an extra variable to our optimization problem to parameterize the location of a frame on the surface.
+To avoid optimization issues, we make sure that our formulations have satisfying continuity properties.
+This addition allows to formulate much richer posture generation problems, where the location of a contact on a non-flat surface is abstracted and chosen by the optimization solver.
+We were able to use this approach to represent several kinds of surfaces that could be described by closed-form formulas, such as the wrist of HRP-2, a sphere and a superellipsoid.
+We extended that method to approximate surfaces for which the only available representation is a (star-convex) mesh.
+This allows to formulate constraints on the surface of a very large variety of objects.
+
+In the next section, we evaluate the performances of our solver and our posture generator before presenting some use cases and extensions to real world situations.
 
