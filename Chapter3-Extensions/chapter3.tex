@@ -1322,7 +1322,7 @@ This approach allows to fairly compare the performances of all lifting approache
 And to observe the influence of the number of degrees of freedom of the robot on those performances, we use the n-axis planar robot model.
 We plot the average number of iterations needed to reach convergence against the number of degrees of freedom of the planar robot.
 In figure~\ref{fig:lift_results} we present the results obtained for the resolution with our custom SQP, using BFGS updates and a filter line-search, without cost function, initializing all the variables randomly.
-In figure~\ref{fig:lift_results2} we present the results obtained for the resolution with our custom SQP, using SR1 updates and a filter line-search, without cost function, initializing all the variables such that the lifted equations are satisfied.
+In figure~\ref{fig:lift_results2} we present the best case in favor of the lifted approach that we encountered, those results are obtained for the resolution with our custom SQP, using SR1 updates and a filter line-search, without cost function, initializing all the variables such that the lifted equations are satisfied.
 
 \begin{figure}
 \centering
@@ -1393,10 +1393,14 @@ In figure~\ref{fig:lift_results2} we present the results obtained for the resolu
 \label{fig:lift_results2}
 \end{figure}
 
-Both those results show that the direct formulation tends to outperform every form of lifting for almost all the robots tested.
+The results presented in figure~\ref{fig:lift_results} show that the direct formulation outperforms every form of lifting for almost all the robots tested.
+This is the typical result that we observed in most cases.
+
+In figure~\ref{fig:lift_results2}, we show one specific case where, with long kinematic chains ($\geq10$ DOF), the lifted methods are slightly faster to solve.
+
 We studied many of the possible configurations of resolution methods (22 in total), but not all of them.
 Still, it seems possible to draw some conclusions out of it, because in most cases, the direct approach outperforms the lifted one.
-The only case where we observe a neat advantage in favor of the lifted methods compared to the direct one is when using the interior point method that is built-in in fmincon in Matlab with a randomized initialization and the norm 2 of the articular parameters vector as a cost function.
+%The only case where we observe a neat advantage in favor of the lifted methods compared to the direct one is when using the interior point method that is built-in in fmincon in Matlab with a randomized initialization and the norm 2 of the articular parameters vector as a cost function.
 
 The overall results we extracted from those experiments is that the best performing method is: solving the direct formulation with our custom solver, using BFGS regularization and either Armijo or filter line search and no cost function.
 

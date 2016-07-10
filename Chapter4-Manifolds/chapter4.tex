@@ -84,10 +84,12 @@
 
 Posture generation has been traditionnaly formulated as a problem over a Euclidean space.
 Robots variable may, however, be more naturally expressed over non-Euclidean manifolds.
-The archetypes for this are the rotation part of the root body of a robot, and ball joints, whose variables live in $SO(3)$.
+The archetypes for this in robotics are the rotation part of the root body of a robot, and ball joints, whose variables live in $SO(3)$.
 Some typical tasks are also naturally formulated on different manifolds.
 For example, for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$~\cite{escande:icra:2016}.
 The human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
+A non-Euclidean manifold can be thought of as a space that is locally Euclidean, but not globally.
+Like a sphere, if one looks in a small enough neighborhood, it looks Euclidean, just like the surface of a giant sphere like the earth looks flat for a human standing on it.
 
 Formulating the problem over $\mathbb{R}^n$ leads either to singularities that can prevent the convergence of the optimization solver, or to cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
 In addition, since constraints can be violated during the optimization process, the iterates may not be elements of the search manifold.
@@ -184,7 +186,7 @@ The strategy to compute ${\bf p_i}$ depends on the solver.
 This classical scheme cannot be readily applied to optimization over non-Euclidean manifolds.
 First of all, only (a subset of) the real numbers can be stored in computers.
 To manipulate elements of $\mathcal{M}$ we need to choose a way to represent them in memory.
-This boils down to choosing a representation space $\mathbb{E} = \mathbb{R}^r$ (with $r \geq n$) and a map
+This boils down to choosing a representation space $\mathbb{E} = \mathbb{R}^r$ (with $r \geq n$) and a function
 \begin{equation}
   \psi\ :\
   \begin{array}{ccc}
@@ -237,7 +239,7 @@ So another approach needs to be taken.
 %}}}
 %{{{ LOCAL PARAMETRIZATION
 \subsection{Local parametrization}
-By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth map $\varphi_x$ between an open set of $T_x\mathcal{M}$, the tangent space to $\mathcal{M}$ at $x$(which is isomorphic to $\mathbb{R}^n$), and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
+By definition, there is always, at a point $x$ of a smooth $n$-dimensional manifold $\mathcal{M}$, a smooth function $\varphi_x$ between an open set of $T_x\mathcal{M}$, the tangent space to $\mathcal{M}$ at $x$(which is isomorphic to $\mathbb{R}^n$), and a neighborhood of $x$ in $\mathcal{M}$, with $\varphi_x(0) = x$.
 
 \begin{equation}
   \varphi_x\ :\
@@ -253,7 +255,7 @@ Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through 
 $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplan of a higher dimensionality space.
 For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplan embedded in $\mathbb{R}^3$.
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
-The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local map $\varphi_{x_i}$ at the current iterate $x_i$ at each iteration.
+The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local function $\varphi_{x_i}$ at the current iterate $x_i$ at each iteration.
 Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as:
 \begin{align}
 \label{eq:local_problem}
@@ -277,12 +279,12 @@ We can then reformulate Problem~\Eqref{eq:optim_problem} around $x_{i+1}$, perfo
 However, convergence cannot be achieved without care on the choice of $\varphi_{x_i}$.
 Once the optimization algorithm chooses an increment ${\bf z}_i$, we want to move from $x_i$ in the direction of ${\bf z}_i$ on the manifold.
 In Euclidean spaces($\mathbb{R}^n$), moving in the direction of a vector is straightforward.
-On a manifold, the notion of moving in the direction of a tangent vector, while staying on the manifold, is generalized by the notion of retractation mapping.
+On a manifold, the notion of moving in the direction of a tangent vector, while staying on the manifold, is generalized by the notion of retractation function.
 
-A retractation $R$ at $x$, denoted $R_x$ is a mapping from $T_x{\mathcal{M}}$ to $\mathcal{M}$ with a local rigidity condition that preserves gradients at $x$.
+A retractation $R$ at $x$, denoted $R_x$ is a function from $T_x{\mathcal{M}}$ to $\mathcal{M}$ with a local rigidity condition that preserves gradients at $x$.
 Absil~\cite{absil:book:2008} defines a retractation as follows:
 \begin{definition}
-A retractation on a manifold $\mathcal{M}$ is a smooth mapping $R$ from the tangent bundle $T\mathcal{M}$ onto $\mathcal{M}$ with the following properties.
+A retractation on a manifold $\mathcal{M}$ is a smooth function $R$ from the tangent bundle $T\mathcal{M}$ onto $\mathcal{M}$ with the following properties.
 Let $R_x$ denote the restriction of $R$ to $T_x\mathcal{M}$.
 \begin{enumerate}
   \item $R_x(0_x) = x$, where $0_x$ denotes the zero element of $T_x\mathcal{M}$.
@@ -290,17 +292,17 @@ Let $R_x$ denote the restriction of $R$ to $T_x\mathcal{M}$.
   \begin{equation}
     DR_x(0_x) = \mathbb{I}_{T_x\mathcal{M}}
   \end{equation}
-  Where $DR_x(0_x)$ denotes the gradient of $R_x$ at $0_x$ and $\mathbb{I}_{T_x\mathcal{M}}$ denotes the identity mapping on $T_x\mathcal{M}$.
+  Where $DR_x(0_x)$ denotes the gradient of $R_x$ at $0_x$ and $\mathbb{I}_{T_x\mathcal{M}}$ denotes the identity function on $T_x\mathcal{M}$.
 \end{enumerate}
 \end{definition}
 
 This signifies that for any ${\bf z}$, the curve $t \mapsto \varphi_{x_i}(t{\bf z})$ is tangent to ${\bf z}$, see Fig.~\ref{fig:phimap}, so that the update $x_{i+1} = \varphi_{x_i}({\bf z_i})$ is made in the direction given by ${\bf z_i}$.
 
 The exponential map is a good theoretical candidate, but it is often impractical or expensive to compute.
-Depending on the manifold, cheaper maps can be chosen.
+Depending on the manifold, cheaper functions can be chosen.
 
 With the iterative formulation approach described above, we do not have any parametrization issue, do not need additional constraints, and have the minimum number of optimization parameters.
-We can use the map $\psi:\mathcal{M} \rightarrow \psi(\mathcal{M})$, which is surjective, to represent the $x_i$ and keep track of them in a global way.
+We can use the function $\psi:\mathcal{M} \rightarrow \psi(\mathcal{M})$, which is surjective, to represent the $x_i$ and keep track of them in a global way.
 %But we still need a map $\psi$ and real space $\mathbb{E}$ to represent the $x_i$ and keep track of them in a global way.
 %The ${\bf x_i}$ are guaranteed to be on $\mathcal{M}$ so we can choose a representation with $r>n$ where $\psi$ is singularity-free without any drawback.
 Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it was a function from $\mathbb{E}$ to $\mathbb{R}$ without the need to project on $\psi(\mathcal{M})$ first (same goes for $c' = c \circ \psi^{-1}$).
@@ -471,7 +473,7 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
   \item Transport operator $\mathcal{T}:\ (x,\mathbf{z}, \mathbf{v})\rightarrow \mathcal{T}_{x,\mathbf{z}}(v)$
   \item Projection from $\mathbb{E}$ on $\mathcal{M}$, $\pi_\mathcal{M}$
   \item Projection from $T_x\mathbb{E}$ on $T_x\mathcal{M}$, $\pi_{T_x\mathcal{M}}$
-  \item Limits of the tangent map, $\lim$
+  \item Limits of validity of the retractation on $T_x\mathcal{M}$, $\lim$
 \end{itemize}
 
 We provide the detailed formulas for those operations in Appendix~\ref{appendix:manifolds} for different elementary manifolds:
@@ -690,7 +692,7 @@ Maps $\varphi_{x}$ are only valid locally, and we need to account for this: a st
 We can enforce this by adding the limits of the manifold map to the problem as bound constraints.
 In fact, this comes down to intersecting the original problem's bounds with the limits of the map and imposing the resulting bounds as constraints.
 This leads naturally to trust region methods that we, therefore, favor over line-search approaches.
-We present the classical trust-region strategy in Section~\ref{ssec:the_trust_region_strategy}.
+We present the classical trust-region strategy in Section~\ref{ssub:the_trust_region_strategy}.
 
 In the case of a robotics problem, different variables often have different orders of magnitude, for example, contact forces can be of the order of $100N$ while joint angles are of the order of $1rad$.
 Let $x$ be the variable vector of such problem with $x={[\theta_0, \theta_1, f_0, f_1, f_2]}^T$ where $\theta$ represents an angular variables and $f$ a force.
@@ -1071,7 +1073,7 @@ In Figures~\ref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:sec
 \label{sec:conclusion}
 
 In this chapter, we presented the principle of nonlinear optimization on non-Euclidean manifolds, and detailed the choices we made to implement an SQP algorithm that solves those problems efficiently.
-In addition to being used in our posture generation problems, {\tt PGSolver} has been used successfully in some inertia identification problems as presented in~\cite{traversaro:iros:2016}.
+In addition to being used in our posture generation problems, {\tt PGSolver} has been used successfully in inertia identification problems as presented in~\cite{traversaro:iros:2016}.
 In the next section we will focus on the formulation of optimization problems for posture generation.
 
 %}}}

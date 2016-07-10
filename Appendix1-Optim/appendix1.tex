@@ -71,7 +71,7 @@ For more detailed information, we invite the reader to refer to the excellent bo
 
 \section{Unconstrained Optimization}
 
-An unconstrained optimization problem consists in minimizing an objective function without any constraint.
+An unconstrained optimization problem consists of an objective function to minimize, without any constraint.
 This problem, denoted $\mathcal{P}$, can be formulated as follows:
 
 \begin{equation}
@@ -80,15 +80,14 @@ This problem, denoted $\mathcal{P}$, can be formulated as follows:
 \end{equation}
 
 The classical approach to solve $\mathcal{P}$ is to use an iterative algorithm, starting from an initial guess $x_0$, and converging toward the solution $x^*$.
-A very basic optimization scheme is Algorithm~\ref{alg:basic_optim}.
+A very basic optimization scheme is presented in Algorithm~\ref{alg:basic_optim}.
 
 \begin{algorithm}
 \begin{algorithmic}
   \State{Starting from an initial guess $x_0$}
   \While{Convergence condition not met}
-  \State{Compute descent direction $d_k$}
-  \State{Compute step length $t_k$}
-  \State{Update $x_{k+1}\leftarrow x_k + t_k d_k$}
+  \State{Compute descent direction $p_k$}
+  \State{Update $x_{k+1}\leftarrow x_k + p_k$}
   \EndWhile{}
   \caption{Basic optimization scheme}
 \label{alg:basic_optim}
@@ -100,7 +99,7 @@ In order to have an efficient algorithm, we need to avoid any unnecessary comput
 We denote the values taken by $x$ along the iterations as $x_0$, $x_1$, $x_2$,\ldots $x_i$.
 And $f(x_i)$ is denoted $f_i$.
 
-Since our knowledge of the objective function is only partial, it would not be possible to guarantee that a point $x^*$ is a global solution:
+Since our knowledge of the objective function is only partial, without further assumptions, it is not possible to guarantee that a point $x^*$ is a global solution:
 
 \begin{equation}
   \text{$x^*$ is a global solution of $\mathcal{P}$ on $\mathit{S}$ } \equiv \forall x \in \mathit{S}, f(x^*) \leq f(x)
@@ -110,44 +109,17 @@ Though, we can find a local solution $x^*$ of $\mathcal{P}$ (a local minimizer o
 Or even a strict local minimizer of $f$: such that there exist a neighborhood $\mathit{N}$ of $x^*$ where $\forall x\in \mathit{N}$, $f(x^*) < f(x)$.
 That is the kind of solution that we are looking for and that our algorithms should find.
 
-Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}^2$), then we have the following sufficient conditions for the optimality of $x^*$ as presented in~\cite{nocedal:book:2006}:
+Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}^2$), we have the following sufficient conditions for the optimality of $x^*$:
 
 \begin{theorem}
-  If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$ and that $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite.
+  If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$, $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite.
   Then $x^*$ is a strict local minimizer of $f$.
 \label{optimalityTheorem}
 \end{theorem}
 
-\subsection{Globalization methods (Section NEEDS TO BE REWRITTEN)}
+The same definition can be given for a local minimizer with $\nabla^2f(x^*)$ positive semi-definite.
 
-During the resolution of an optimization problem, the algorithm will generate a
-sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
-usually provided by the user). During the step $k$ of the optimization process,
-the solver, the current point is $x_k$ and we try to find $x_{k+1}$ such that
-$f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only focus
-on 2 of them that are the most popular, the line-search and trust-region
-methods.
-
-\subsubsection{The Line-Search Strategy}
-In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
-point is chosen and then a length of step is calculated to minimize the
-following 1-dimensional problem:
-\begin{align}
-  \minimize_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
-\label{eq:lineSearchNLP}
-\end{align}
-
-Once the best value of $\alpha$ has been found, the next iterate is computed:
-$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
-satisfying solution is found.
-
-It is not always necessary to find the optimal value of $\alpha$, especially if
-that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
-from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
-imprecision on the computation of $\alpha$ will be erased in the other steps of
-the resolution.
-
-There are several ways to choose a descent direction from an iterate $x_k$. The
+There are several ways to choose a descent direction $p_k$ from an iterate $x_k$. The
 most obvious one is probably the steepest descent direction $-\nabla f_k$. This
 method provides the direction along which f decreases most rapidly and only
 requires the evaluation of the first derivative of $f$, but that method can
@@ -167,45 +139,106 @@ the Newton direction.
 The choice of this descent direction implies that the $\nabla^2f_k$ is positive
 definite, in which case an adaptation of the definition of $p_k$ is required. Or
 an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
-used. For example, the symmetric-rank-one (SR1) formula and the BFGS (Broyden,
-Fletcher, Goldfarb, Shanno) formula. Then the step becomes
+used. %For example, the symmetric-rank-one (SR1) formula and the BFGS (Broyden,
+%Fletcher, Goldfarb, Shanno) formula. Then the step becomes
 
 \begin{equation}
   p_k = -B_k^{-1}\nabla f_k
 \end{equation}
 
-\subsubsection{The Trust-Region Strategy}
-\label{ssec:the_trust_region_strategy}
-The Trust-Region Strategy works in an opposite way than the line-search one in
-the sense that during a line-search step, a direction is chosen, and based on
-that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
-maximum step-length is chosen, and based on it, the descent direction and length
-are chosen.
-The principle of the trust region is that along the optimization process, a
-model of the problem is constructed and enriched at every step and at each step,
-the next iterate is the optimum of the model, with the constraint that the step
-to get there lies inside the trust-region. For example, let us consider that
-the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
-constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
-objective function is the quadratic model with approximated Hessian
-\begin{equation}
-  m_k(p) = f(x_k+p) = f_k + p^T \nabla f_k + p^T B_k p
-\end{equation}
-And the optimization problem to solve at each step of the optimization is
+$p_k$ is then added to $x_k$ to compute $x_{k+1} \leftarrow x_k + p_k$ and the process is repeated until convergence is reached.
 
-\begin{align}
-  \minimize_{p} & \quad f_k + p^T \nabla f_k + p^T B_k p \nonumber\\
-\text{s.t.}&
-\quad \|p\| \leq \rho_k
-\label{eq:trustRegionNLP}
-\end{align}
+Many methods and refinements exist to solve this problem and some are presented in~\cite{nocedal:book:2006}.
+Our main focus here is on methods to solve constrained problem as they arise in robotics.
 
-Once the solution $p_k$ to this quadratic problem is found, its quality is
-estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
-is satisfying (compared to the decrease predicted by the model) then the step is
-accepted and the size of the trust-region can be increased. Otherwise, the step
-is refused, the trust-region radius is reduced and a new step from $x_k$ is
-computed on that smaller trust region.
+%\subsection{Globalization methods (Section NEEDS TO BE REWRITTEN)}
+
+%During the resolution of an optimization problem, the algorithm will generate a
+%sequence of iterates $x_k$ starting from the initial iterate $x_0$ (Which is
+%usually provided by the user). During the step $k$ of the optimization process,
+%the solver, the current point is $x_k$ and we try to find $x_{k+1}$ such that
+%$f(x_{k+1}) < f(x_k)$. There are several strategies to do that but we will only focus
+%on 2 of them that are the most popular, the line-search and trust-region
+%methods.
+
+%\subsubsection{The Line-Search Strategy}
+%In the Line-Search strategy, given a point $x_k$, a descent direction $p_k$ from this
+%point is chosen and then a length of step is calculated to minimize the
+%following 1-dimensional problem:
+%\begin{align}
+  %\minimize_{\alpha \in \mathbb{R}^+} f(x_k + \alpha.p_k)
+%\label{eq:lineSearchNLP}
+%\end{align}
+
+%Once the best value of $\alpha$ has been found, the next iterate is computed:
+%$x_{k+1} = x_{k} + \alpha p_k$ and the same process is repeated until a
+%satisfying solution is found.
+
+%It is not always necessary to find the optimal value of $\alpha$, especially if
+%that is expensive. Indeed, $\alpha$ is only used to calculate the next iterate,
+%from which another $p_k$ and $\alpha$ will be calculated. And in the end, the
+%imprecision on the computation of $\alpha$ will be erased in the other steps of
+%the resolution.
+
+%There are several ways to choose a descent direction from an iterate $x_k$. The
+%most obvious one is probably the steepest descent direction $-\nabla f_k$. This
+%method provides the direction along which f decreases most rapidly and only
+%requires the evaluation of the first derivative of $f$, but that method can
+%become extremely slow on complicated problems. Another popular approach is the
+%Newton method, in which the objective function is approximated to the second
+%order
+
+%\begin{equation}
+  %f(x_k+p) = f_k + p^T\nabla f_k + p^T\nabla^2f_k p
+%\end{equation}
+
+%Then the chosen descent direction is the optimum of that approximated function,
+%the Newton direction.
+%\begin{equation}
+  %p^N_k = -{(\nabla^2 f_k)}^{-1} \nabla f_k
+%\end{equation}
+%The choice of this descent direction implies that the $\nabla^2f_k$ is positive
+%definite, in which case an adaptation of the definition of $p_k$ is required. Or
+%an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
+%used. For example, the symmetric-rank-one (SR1) formula and the BFGS (Broyden,
+%Fletcher, Goldfarb, Shanno) formula. Then the step becomes
+
+%\begin{equation}
+  %p_k = -B_k^{-1}\nabla f_k
+%\end{equation}
+
+%\subsubsection{The Trust-Region Strategy}
+%\label{ssec:the_trust_region_strategy}
+%The Trust-Region Strategy works in an opposite way than the line-search one in
+%the sense that during a line-search step, a direction is chosen, and based on
+%that direction, a step-length is chosen. Whereas with a Trust-Region approach, a
+%maximum step-length is chosen, and based on it, the descent direction and length
+%are chosen.
+%The principle of the trust region is that along the optimization process, a
+%model of the problem is constructed and enriched at every step and at each step,
+%the next iterate is the optimum of the model, with the constraint that the step
+%to get there lies inside the trust-region. For example, let us consider that
+%the trust region is a sphere of center $x_k$ and radius $\rho_k$, then the
+%constraint on $p_k$ is $\|p_k\| \leq \rho_k$. A usual model to take for the
+%objective function is the quadratic model with approximated Hessian
+%\begin{equation}
+  %m_k(p) = f(x_k+p) = f_k + p^T \nabla f_k + p^T B_k p
+%\end{equation}
+%And the optimization problem to solve at each step of the optimization is
+
+%\begin{align}
+  %\minimize_{p} & \quad f_k + p^T \nabla f_k + p^T B_k p \nonumber\\
+%\text{s.t.}&
+%\quad \|p\| \leq \rho_k
+%\label{eq:trustRegionNLP}
+%\end{align}
+
+%Once the solution $p_k$ to this quadratic problem is found, its quality is
+%estimated by evaluating the value of $f(x_k+p_k)$. If the actual decrease of $f$
+%is satisfying (compared to the decrease predicted by the model) then the step is
+%accepted and the size of the trust-region can be increased. Otherwise, the step
+%is refused, the trust-region radius is reduced and a new step from $x_k$ is
+%computed on that smaller trust region.
 
 \section{Constrained Optimization}
 
@@ -956,5 +989,5 @@ B_{k+1} = B_k + \frac{(y_k-B_k s_k){(y_k-B_k s_k)}^T}{{(y_k-B_k s_k)}^T s_k}
 Both those formulas proved to be efficient in some cases. It is not yet clear in which cases one is better than the other.
 
 \section{Conclusion}
-This section gives a general introduction to nonlinear constrained optimization without regards for robotics or optimization on manifolds
+This section gives a general introduction to nonlinear constrained optimization without regards for specificities of robotics problem or formulations on manifolds, which are topics considered in the core of this thesis.
 
