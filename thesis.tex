@@ -107,13 +107,16 @@
 
 
 % ******************************** Front Matter ********************************
+\usepackage{pdfpages}
+
 \begin{document}
 
 \frontmatter
+\includepdf[pages=-]{Cover/build/cover}
 
-\begin{titlepage}
-  \maketitle
-\end{titlepage}
+%\begin{titlepage}
+  %\maketitle
+%\end{titlepage}
 
 
 \include{Dedication/dedication}

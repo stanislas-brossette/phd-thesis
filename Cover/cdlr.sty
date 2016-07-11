@@ -1,0 +1,77 @@
+%\RequirePackage{timestamp}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\RequirePackage{setspace}
+
+\makeatletter
+\def\@title{Viable Multi-Contact Posture Computation using Nonlinear Optimization on Manifolds}%\textgreater}
+\def\@author{Stanislas Brossette}
+\def\@date{8 Juillet 2016}
+\def\@email{}
+  \newcommand{\email}[1]{\gdef\@email{#1}}
+\def\@university{\textless{}Universit\'e\textgreater}
+  \newcommand{\university}[1]{\gdef\@university{#1}}
+\def\@researchunit{\textless{}Unit\'e de recherche\textgreater}
+  \newcommand{\researchunit}[1]{\gdef\@researchunit{#1}}
+\def\@specialisation{\textless{}Sp\'ecialit\'e\textgreater}
+  \newcommand{\specialisation}[1]{\gdef\@specialisation{#1}}
+\def\@doctoral{\textless{} \'Ecole doctorale\textgreater}
+  \newcommand{\doctoral}[1]{\gdef\@doctoral{#1}}
+\newcommand{\titletimestamp}{\gdef\@titletimestamp}
+\def\@myquote{\textless{} \MBOX{}.}
+  \newcommand{\myquote}[1]{\gdef\@myquote{#1}}
+\def\@univlogo{logo-um2.png}
+  \newcommand{\univlogo}[1]{\gdef\@univlogo{#1}}
+\def\@jury{}
+ \newcommand{\jury}[4]{\expandafter\def\expandafter\@jury\expandafter{\@jury{} #1 & #2 & #3 & #4 \\}}
+\def\@titlefootnote{}
+\newcommand{\titlefootnote}[1]{\gdef\@titlefootnote{#1}}
+
+\renewcommand{\maketitle}
+{
+  \begin{titlepage}
+
+  \onehalfspacing
+  \begin{tikzpicture}[remember picture, overlay]
+
+    % Include the logo
+    \coordinate[xshift=6cm] (shadewidth) at (current page.north west) {};
+    \coordinate[xshift=6cm] (shadecorner) at (current page.south west) {};
+    \shade[top color=white,bottom color=gray] (current page.north west) rectangle (shadecorner) {};
+    \draw[color=darkgray,line width=1.5pt] (shadewidth) -- (shadecorner);
+    \node[anchor=north west,yshift=-2cm] at (current page.north west) {\includegraphics[width=5.5cm]{logo-cdlr.png}};
+    \node[anchor=north west,yshift=-24cm] at (current page.north west) {\includegraphics[width=5.5cm]{\@univlogo}};
+  %  \node[anchor=north west,yshift=-22cm] at (current page.north west) {\includegraphics[width=5.5cm]{logo-lirmm.png}};
+    \node[anchor=north west,yshift=-2cm,xshift=6.5cm] at (current page.north west) {\includegraphics[width=12cm]{en-tete-cdlr2.png}};
+
+    \coordinate[xshift=3cm] (vcenter) at (current page.north) {};
+
+    \node[yshift=-6cm] at (vcenter) {{\large D\'elivr\'e par l'{\sc\bf \@university}}};
+
+    \node[yshift=-7.8cm,text width=12cm,align=center] at (vcenter) {{\large Pr\'epar\'ee au sein de l'\'ecole doctorale :\\ \centering{\sc\bf\@doctoral}}};
+    \node[yshift=-9.8cm,text width=12cm,align=center] at (vcenter) {{\large Et de l'unit\'e de recherche :\\ \centering{\sc\bf\@researchunit}}};
+
+    \node[yshift=-11.8cm,text width=12cm,align=center] at (vcenter) {{\large Sp\'ecialit\'e : \centering{\sc\bf\@specialisation}}};
+    \node[yshift=-13.5cm] at (vcenter) {{\large Pr\'esent\'ee par {\bf\@author}}};
+    \node[yshift=-14.5cm] at (vcenter) {\tt\@email};
+    \ifx\@titletimestamp\undefined
+    \else
+      \node[yshift=-12cm] at (vcenter) {{\em Version mise \`a jour le \today{} \`a  \xxivtime}};
+    \fi
+    \node (titlenode) [yshift=-17.0cm,draw=black, inner sep=20pt] at (vcenter) {\begin{minipage}{0.7\textwidth}\centering\LARGE\bfseries\noindent\@title\end{minipage}};
+    \node[below of= titlenode, yshift=-5cm, scale=0.72] {\small Soutenue le \@date{} devant le jury compos\'e de };
+
+    \node[below of= titlenode, yshift=-7cm, xshift=-0.2cm, scale=0.72] {{
+      \addtolength{\tabcolsep}{-3pt}
+      \begin{tabular}{llll}
+        \@jury
+      \end{tabular}
+  }};
+
+  % \node[yshift=-28cm,xshift=-2cm,align=left] at (vcenter) {\small{* \textbf{I2S}: \'Ecole Doctorale Information Structures Syst\`emes}};
+
+  \end{tikzpicture}
+  \singlespacing
+  \end{titlepage}
+ % \cleardoublepage
+}
