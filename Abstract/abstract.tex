@@ -1,5 +1,30 @@
 % ************************** Thesis Abstract *****************************
 % Use `abstract' as an option in the document class to print only the titlepage and the abstract.
-\begin{abstract}
-This is where you write your abstract ...
-\end{abstract}
+\begin{abstractpage}
+  \vspace{-5em}
+  \begin{abstract}{english}
+    Humanoid robots are complex poly-articulated structures whose kinematics and dynamics are governed by nonlinear equations.
+    Finding viable postures to realize set-point task objectives under a set of constraints (intrinsic and extrinsic limitations) is a key issue in the planning of robot motion and an important feature of any robotics framework.
+    It is handled by the so called posture generator (PG) that consists in formalizing the viable posture as the solution of a nonlinear optimization problem.
+    We present several extensions to the state-of-the-art by exploring new formulations and resolution methods for the posture generation problems.
+    We reformulate the notion of contact constraints by adding variables to enrich our optimization problem and allow the solver to decide of the shape of the intersection of contact polygons or of the location of a contact point on a non-flat surface.
+    We present a reformulation of the PG problem that encompasses non-Euclidean manifolds natively for a more elegant and efficient mathematical formulation of the problems.
+    To solve such problems, we decided to implement a new SQP solver that is most suited to non-Euclidean manifolds structural objects.
+    By doing so, we have a better mastering in the way to tune and specialize our solver for robotics problems.
+
+    \textbf{Keywords:} posture generation; humanoid robotics; nonlinear optimization; manifolds.
+
+    \begin{center}\Large{\bf R\'esum\'e}\end{center}
+    Un robot humano\"ide est un syst\`eme poly-articul\'e complexe dont la cin\'ematique et la dynamique sont gouvern\'ees par des \'equations non-lin\'eaires.
+    Trouver des postures viables qui minimizent une t\^ache objectif tout en satisfaisant un ensemble de contraintes (intrins\`eques ou extrins\`eques) est un probl\`eme central pour la planification de mouvement robotique et est une fonctionnalit\'e importante de tout logiciel de robotique.
+    Le g\'en\'erateur de posture (PG) a pour r\^ole de trouver une posture viable en formulant puis r\'esolvant un probl\`eme d'optimisation non-lin\'eaire.
+    Nous \'etendons l'\'etat de l'art en proposant de nouvelles formulations et m\'ethodes de r\'esolution de probl\`emes de g\'en\'eration de posture.
+    Nous enrichissons la formulation de contraintes de contact par ajout de variables au probl\`eme d'optimisation, ce qui permet au solveur de d\'ecider automatiquement de la zone d'intersection entre deux polyg\^ones en contact ou encore de d\'ecider du lieu de contact sur une surface non plane.
+    Nous pr\'esentons une reformulation du PG qui g\^ere nativement les vari\'et\'es non Euclidiennes et nous permet de formuler des probl\`emes math\'ematiques plus \'el\'egants et efficaces.
+    Pour r\'esoudre de tels probl\`emes, nous avons developp\'e un solveur non lin\'eaire par SQP qui supporte nativement les variables sur vari\'et\'es.
+    Ainsi, nous avons une meilleure ma\^itrise de notre solveur et pouvons le sp\'ecialiser pour la r\'esolution de probl\`emes de robotique.
+
+    \textbf{Mots-cl\'es:} g\'en\'eration de posture; robot humano\"ide; optimisation non-lin\'eaire; vari\'et\'es.
+  \end{abstract}
+
+\end{abstractpage}

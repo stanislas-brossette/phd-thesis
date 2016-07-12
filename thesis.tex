@@ -90,10 +90,25 @@
 % author name for submission to the Student Registry, use the `abstract' option in
 % the document class.
 
+% Multi-language abstract
+\usepackage[francais,english]{babel}
+\usepackage{csquotes}
+
 \ifdefineAbstract
  \pagestyle{empty}
  \includeonly{Declaration/declaration, Abstract/abstract}
 \fi
+% Renew for abstract with multiple languages
+\newenvironment{abstractpage}
+  {\cleardoublepage\vspace*{\fill}\thispagestyle{empty}}
+  {\vfill\cleardoublepage}
+\renewenvironment{abstract}[1]{%
+  % Normal abstract in the thesis
+  \setsinglecolumn%
+  \bigskip\selectlanguage{#1}%
+  \section*{\centering \Large \abstractname}
+  \thispagestyle{empty}
+}
 
 % ***************************** Chapter Mode ***********************************
 % The chapter mode allows user to only print particular chapters with references
