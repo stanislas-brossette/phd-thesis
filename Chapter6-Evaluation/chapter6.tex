@@ -52,7 +52,7 @@
 %We present 2 planned scenarios with the HRP-2 robot
 
 In this chapter, we first present an approach to make use of posture generation in real-environment with data acquired directly from the robot.
-And then, we study the performances of the method we presented to solve optimization problems on manifolds as well as the performances of our posture generator.
+And then, we study the performances of our solver to solve problems formulated on manifolds as well as the performances of our posture generator.
 
 \section{Application of contact planning on real-environment}
 \label{sec:application_of_contact_planning_on_real_environment}
@@ -64,12 +64,11 @@ The core of the planner consists in the multi-contact search and the posture gen
 The former incrementally builds a tree of contact sets and is presented in~\cite{escande:ras:2013}.
 The children of a node are obtained by adding or removing exactly one contact to its set.
 At each iteration of the search, the best leaf, according to a potential field, is expanded this way.
-The tentative sets of contacts are tested by the posture generator: for a given set of contacts, it attempts to find a configuration of the robot that satisfies the constraints defined by the user (joint and torque limits, minimization of cost function, forces in friction cones, etc\ldots).
+The tentative sets of contacts are tested by the posture generator: for a given set of contacts, it attempts to find a configuration of the robot that satisfies the viability constraints of the robot posture (joint and torque limits, minimization of cost function, forces in friction cones, etc\ldots).
 Upon success, the contact set is validated, and a new leaf is created.
 The goal is written as a set of specific constraints.
 A node is the final node if its associated posture generation problem augmented by these constraints remains feasible.
-By backtracking from this final node to the initial root node, we obtain a sequence of nodes and thus a sequence of contact sets, that can be executed on the robot by a whole-body controller.
-We make use of such a controller based on a quadratic programming (QP) formulation~\cite{bouyarmane:iros:2011}.
+By backtracking from this final node to the initial root node, we obtain a sequence of nodes and thus a sequence of contact sets, that can be executed on the robot by a whole-body controller such the one based on a quadratic programming (QP) formulation presented in~\cite{bouyarmane:iros:2011}.
 
 The potential field is derived from a crude path, made of a few key postures, that does not take contacts into account.
 Such a path is either user-defined or can be the output of a first dedicated planner~\cite{bouyarmane:icra:2009}.
@@ -107,7 +106,7 @@ Our first concern is to build an environment that our multi-contact planner is a
 %The simplest kind of entity that our planner would be able to deal with is an oriented rectangular plan surface. Though, it is clear that the real world cannot be precisely described by such things, so we add another level of detail to our world description by using convex polygonal planar surfaces. Therefore, starting from an acquired point cloud, we try to extract a relevant set of such geometrical entities that will be our first description of the surroundings of the robot.
 
 The simplest entity that our planner would be able to deal with and that could correctly describe the robot's environment is a set of convex polygonal planar surfaces.
-Therefore, starting from an acquired point cloud, we to extract a relevant set of such geometrical entities that will be a first description of the surroundings of the robot.
+Therefore, starting from an acquired point cloud, we extract a relevant set of such geometrical entities that will be used as of the surroundings of the robot.
 
 In this section, we present the different steps we follow to create a set of relevant convex polygonal plane surfaces out of an acquired point cloud.
 %\begin{itemize}
@@ -122,8 +121,7 @@ In this section, we present the different steps we follow to create a set of rel
 \begin{figure}
 \centering
   \includegraphics[width=\linewidth]{complete_pipeline.pdf}
-  \caption{Top: flowchart describing the main elements of our algorithm and the type of data that is passed between them.\newline
-  \hspace*{27pt} Bottom: the data throughout the process, illustrated in the case of our first experiment.}
+  \caption{Top: flowchart describing the main elements of our algorithm and the type of data that is passed between them. Bottom: the data throughout the process, illustrated in the case of our first experiment.}
 \label{fig:full_pipeline}
 \end{figure}
 
@@ -134,7 +132,7 @@ We use Willow Garage's Point Cloud Library\footnote{\url{http://pointclouds.org/
 
 The point cloud representing the scene is acquired by an Asus Xtion Pro camera.
 The points are defined by their space coordinates and colors.
-We do not use the color information for now except for display purpose.
+We do not use the color information except for display purpose.
 It may however be useful for future developments in matching object models with sensor data and to perform color-based segmentation algorithms.
 
 \paragraph{Filtering}
@@ -165,7 +163,7 @@ The outlying points can then be either filtered, or we can try to find another p
 
 We extract the convex hull of the projection of each cluster on their respective fitting plan.
 %The exact knowledge of all the data points contained in the plane model of a flat area is not necessary for our planning; we can reduce the point cloud to its convex hull without loss of information (except if the surface is concave, but this issue will be tackled in future works). In order to obtain the convex hull of each set of points, we first project every point of the set on its plane model ({\tt pcl::ProjectInliers} class) and then compute the 2D convex hull of the projected set of points ({\tt pcl::ConvexHull} class).
-After this step, each plane surface of the scene is represented by a frame composed on the barycentre of the set of points and the convex hull of the surface.
+After this step, each plane surface of the scene is represented by a frame composed of the barycentre of the set of points and the convex hull of the surface.
 
 \paragraph{Re-orientation and transfer to the planner}
 
@@ -216,7 +214,7 @@ The collision avoidance is then computed by using the {\tt GJK} algorithm implem
 \subsection{Results}
 \label{sub:results_pcl_plannif}
 
-We illustrate our approach with two experiments where the HRP-2 robot is asked to move $2$m forward.
+We illustrate this approach with two experiments where the HRP-2 robot is asked to move $2$m forward.
 In both scenarios, this results in climbing on a table (The first one is $71$cm-high and the second one is $53$cm-high) with the help of various surrounding objects.
 The knowledge of the environment and surrounding objects is obtained from a point cloud captured with an RGBD camera.
 
@@ -294,11 +292,11 @@ If the surface is not, this is another kind of discrepancy in the plan than need
 The simulation results revealed that our MCP does not require major adjustments to handle egocentric sensory data.
 %Of course, this does not mean that we are fully satisfied since our results also suggest additional future work.
 
-First, although we choose to treat the case of not having 3D models, we believe that the implementation of an MCP with knowledge of the 3D model is necessary.
+Although we choose to treat the case of not having 3D models, we believe that the implementation of an MCP with knowledge of the 3D model is necessary.
 For example, even in a disaster situations as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc\ldots).
-So having their model would then still permit our MCP to rely on 3D models to plan contacts for motion.
+So having their models would then still permit our MCP to rely on 3D models to plan contacts for motion.
 PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
-Of course, our ultimate future plan is to handle uncertainties, control and planning recovery of discrepancies when they occur.
+%Of course, our ultimate future plan is to handle uncertainties, control and planning recovery of discrepancies when they occur.
 
 
 \section{On the performance of formulation with Manifolds}
@@ -313,7 +311,7 @@ Thus it may be difficult to extract the actual influence of the use of manifold 
 In order to evaluate the influence of the formulation and resolution with manifolds, we choose to study a problem different from a typical robotic posture generation.
 
 We choose to study a problem of cube stacking.
-Given a set of cubes, which pose is defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, and are not penetrating each other.
+Given a set of cubes, which pose is defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not penetrating each other.
 For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertex, $\vec{t}\in\mathbb{R}^3$ and $R\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
 To ensure that the cubes are inside the box, we write a constraint that forces each corners of each cube to be inside the box.
 For each plan composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plan to the origin along $\vec{n}$.
@@ -344,7 +342,7 @@ In order to simulate gravity, we minimize the sum of all the cubes' vertical coo
 \end{equation}
 
 We consider the problem of stacking $n$ cubes in an open-top box composed of 5 plans (the ground and 4 walls).
-Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plan in parametrized on $\mathbb{R}\times S2$.
+Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plan is parametrized on $\mathbb{R}\times S2$.
 In figure~\ref{fig:cubes}, we illustrate the case of stacking 3 cubes.
 With the initial condition on the left side and the solution on the right.
 \begin{figure}
@@ -364,12 +362,12 @@ We have a problem of dimension $4.5n+1.5n^2$ with $32n+8n^2$ constraint.
 
 In order to compare the resolution with and without use of manifolds, we also formulate this problem over $\mathbb{R}^n$.
 To do so, each variable on $SO(3)$ is replaced by a variable on $\mathbb{R}^4$, while each variable on $S2$ is replaced by one on $\mathbb{R}^3$.
-In both cases, a norm-1 constraint on the variable is added to the problem.
+In both cases, a norm-1 constraint on the variable is added to the problem to force those variables on the manifolds.
 This gives rise to a problem on
 \begin{equation}
   \mathcal{M}={\left( \mathbb{R}^3\times \mathbb{R}^4 \right)}^n \times {\left( \mathbb{R} \times \mathbb{R}^3 \right)}^{\frac{n(n-1)}{2}} = \mathbb{R}^{5n+2n^2} \nonumber
 \end{equation}
-We have a problem of dimension $5n+2n^2$ with $32.5n+8.5n^2$ constraint.
+We have a problem of dimension $5n+2n^2$ with ,$32.5n+8.5n^2$ constraints, which is $\frac{n(n+1)}{2}$ more variables and constraints than with the manifold formulation.
 
 We solve those problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, time taken to converge and time spent per iterations.
 In each resolution, both problems are initialized with the same randomized initial guess, and the solver is setup with the same set of parameters.
@@ -383,7 +381,7 @@ We display the results of these tests in figure~\ref{fig:timings-cubes}.
 \label{fig:timings-cubes}
 \end{figure}
 
-With 300 resolution per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ in with a non manifold formulation.
+With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ in with a non manifold formulation.
 We observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spend per iteration is consistantly smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with the manifold formulation.
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
@@ -393,4 +391,4 @@ Values outside of that span tend to degrade both resolutions.
 Too high values tend to damp the hessian, which translates into bigger numbers of iterations.
 Too small values make the hessian closer to be rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
 
-This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds, not only allow the user to profit of a simpler and more intuitive formulation of the problem, but also outperforms the classical approach.
+This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds not only allows the user to profit of a simpler and more intuitive formulation of the problem, but also outperforms the classical approach.
