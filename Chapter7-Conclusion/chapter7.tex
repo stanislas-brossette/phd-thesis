@@ -7,3 +7,11 @@
 \addcontentsline{toc}{chapter}{Conclusion}
 \label{cha:conclusion}
 
+In this Ph.D. thesis, we investigated the formulation and the resolution of robotics posture generation problems.
+Such problems aim at finding a robot configuration that satisfies some high level requests such as making a contact with a part of the environment, while ensuring its viability, in the sense that, in this configuration, the robot is stable and respects its intrinsic limitations.
+This problem can be formulated and solves as an optimization problem with a collection of geometric and static constraints to satisfy while minimizing a cost function.
+We present a formulation of the posture generation problem that takes into account the fact that some variables such as the 3D rotations live in non-Euclidean manifolds while making the writing of problems and of specific constraints more versatile.
+In order to solve nonlinear optimization problems on manifolds, we developped our own solver, which not only allows us to formulate mathematical problems more elegantly and ensure the validity of our variables at every step of the optimization process, but also enables us to have a better understanding and mastering in the way to tune our solver for robotic problems, and allows us to try new ways of solving those problems.
+We proposed several new types of constraint formulation that make the spectrum of discoverable viable postures larger.
+We presented a formulation of non-inclusive flat contacts that allows to generate contacts between two surfaces while monitoring the size of their intersections.
+Leveraging our problem formulation and its ability to manage manifolds allowed us to generate contacts with

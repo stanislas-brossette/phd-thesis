@@ -392,3 +392,69 @@ Too high values tend to damp the hessian, which translates into bigger numbers o
 Too small values make the hessian closer to be rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
 
 This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds not only allows the user to profit of a simpler and more intuitive formulation of the problem, but also outperforms the classical approach.
+
+
+\section{Evaluation of the Posture Generation}
+\label{sec:evaluation_of_the_posture_generation}
+
+In addition to evaluating the efficiency of our solver, we want to evaluate the one of our posture generator.
+We propose to study its ability to find a solution to problems that are known to be feasible.
+
+We generate feasible problems by setting a HRP-2 Kai robot's configuration variable to a random value $x$ within the joint limits of the robot and recording the poses of the frames  on its end-effectors, namely, at the tip of its grippers and below its foot that we denote $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
+Then we check whether in that configuration violates the auto-collision constraints, if it does, it is discarded and the process is restarted with another random configuration.
+
+Once a collision free configuration is found, we generate a problem with the constraints that both gripper are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the foot are in unilateral contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability and torque limits must be respected.
+To help the resolution, we initialize the robot's configuration variable to $x$, which is a solution to the geometric part of the problem.
+If a solution is found, the problem is known to be feasible and recorded for further use.
+
+We evaluate the performance of our posture generator by solving the recorded problems, with the difference that the initial guess is the half-sitting posture of the robot.
+This approach tests the ability to find a feasible posture when starting from a remote posture.
+The optimization algorithm is exited as soon as the restoration phase is finished.
+The resolution is successful in only approximately 30\% of the problems.
+This shows that the restoration phase of our solver is quite inefficient and needs to be improved.
+
+\section{Application to Inertial Parameters Identification}
+\label{sec:inertial_parameters}
+
+Altough it was developped with the idea of solving posture generation problems, our solver and the formulation on manifolds can be used for different types of problems.
+In this section, we present an application of our optimization algorithm to solve a problem of inertial parameters identification that was published in~\cite{traversaro:iros:2016}.
+The dynamics of a rigid body is completely defined by its mass distribution, which is itself completely described by 10 inertial parameters.
+The identification of those parameters can in some cases be obtained from the Computer-Aided Design (CAD) model of the body, but often, it is necessary to evaluate those parameters experimentally.
+The inertial parameters of a rigid body can be represented by spacial inertia matrix M:
+\begin{equation}
+  \begin{bmatrix}
+    m\mathbb{I}_3 & -m\hat{c} \\
+    m\hat{c} & I_B
+  \end{bmatrix}
+\end{equation}
+Where:
+\begin{itemize}
+  \item $m\in\mathbb{R}$ is the mass of the rigid body
+  \item $\hat{c}$ denotes the skew symmetric matrix associated with $c\in\mathbb{R}^3$, the position of the center of mass of the rigid body
+  \item $I_B\in\mathbb{R}^{3\times 3}$ is its 3D inertia matrix
+\end{itemize}
+They can be represented by 10 parameters called the inertial parameters of the rigid body that are defined as $\pi\in\mathbb{R}^{10}$
+\begin{equation}
+  \pi = \begin{bmatrix}
+    m \\
+    mc \\
+    \text{vech}(I_B)
+  \end{bmatrix}
+\end{equation}
+Where $\text{vech}(.)$ denotes the serialization operation on symmetric matrices.
+
+Identifying the inertial parameters of a rigid body comes down to finding $\pi$ that minimizes the error in the Newton-Euler equation.
+\begin{equation}
+  Y(A^g,V)\pi = M A^g + V\bar{\times}^*MV = F
+\end{equation}
+Where given $V = \begin{bmatrix} v^\top & \omega^\top \end{bmatrix}^\top \in \mathbb{R}^6$,  $V \bar \times^*$ is the 6D force cross product operator \cite{featherstone:book:2007}, defined as:
+$$
+V \bar \times^*
+=
+\begin{bmatrix}
+S(\omega) & 0_{3\times3} \\
+S(v)      & S(\omega)
+\end{bmatrix}
+$$
+
+To ensure that
