@@ -2,6 +2,8 @@
 \chapter{State of the art and Problem definition}
 \label{cha:state_of_the_art_and_problem_definition}
 
+\graphicspath{{Chapter1-State-of-the-art/Figs/}}
+
 \section{State of the art}
 \label{sec:state_of_the_art}
 
@@ -151,62 +153,122 @@ In this thesis, we develop a nonlinear solver on manifolds that can handle const
 %                     SECTION PROBLEM DEFINITION                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We consider the problem where we have a robotic system and we want it to do some tasks, like for example to make a contact between a point on a body of the robot and a point of the environment.
-This contact task can be modelized as a simple equality.
-We denote $q$ the joint configuration (joint + base) of the robot, $g(q)$ is the 3D position of the point of interest on the robot and $P$ is the point of the environment.
-Then our problem comes down to finding a configuration $q^*$ such that $g(q^*) = P$.
-For robots like humanoids, the equations describing their kinematics are quite complicated, and, in the presence of angular joints, they are nonlinear.
-In the general case, even for simple tasks, a closed form solution of the problem does not exist.
-
-We denote $\mathcal{C}$ the configuration space of our robotic system.
-It is the manifold in which $q$ lives. The dimension of $\mathcal{C}$ is equal to the number of degrees of freedom of the robot.
-Note that if all the joints of the robot are actuated, this is the number of motors of the robot.
-And if the robot has a free-floating basis (is not fixed) then the position in $\mathbb{R}^3$ and rotation in $SO(3)$ of its basis are part of $q$.
-
-We can formulate that problem as follows:
-
+We consider the problem where we have a robotic system and we want it to realize a set of tasks $T_i$.
+We denote $\bf q$ the joint configuration ($n$ joints + base) of the robot, and $\mathbf{f} =\{\mathbf{f}_i\,, i\in[1,m]\}$ represents the $m$ contact forces applied on the robot.
+Each task $T_i$ can be represented by a set of equality and inequality equations:
 \begin{equation}
-  \text{find}\ q\in\mathcal{C}\ \text{such that}\ g(q)=P
+  \left\{
+    \begin{aligned}
+    g_i(\mathbf{q},\mathbf{f}) = 0\\
+    h_i(\mathbf{q},\mathbf{f}) \geq 0
+    \end{aligned}
+  \right.
 \end{equation}
+For example, the task of making contact between a body of the robot and a part of the environment can be represented in such a way.
 
-The space of solution of this problem is a submanifold of $\mathcal{C}$ that we call ${\mathcal{C}}_F$ the feasible configuration space (which can be empty).
+In addition to satisfying the tasks $T_i$, the solution configuration to our problem must describe a viable posture of the robotic system, in the sense that it ensures its integrity.
+Which translates into the following list of constraints.
+It must respect the joint limits of the robot~\eqref{subeq:bounds}, as well as its torque limits~\eqref{subeq:tau}.
+Equation~\eqref{subeq:autocoll} translates the auto-collision avoidance constraint between a pair of bodies $\{r_i, r_j\}$ given by $\mathcal{I}_\text{auto}$ where $d$ is the minimal distance between two bodies.
+Equation~\eqref{subeq:coll} denotes the collision avoidance constraint between a robot body $r_i$ and an object of the environment $O_k$ defined in $\mathcal{I}_\text{coll}$.
+$\epsilon_{ij}$ and $\epsilon_{ik}$ denote the minimal acceptable distance for their respective constraints.
+The stability of the robot is ensured by the respect of equation~\eqref{subeq:stab}, which is the Euler-Newton equation(or a simplification of it).
+To avoid slippage of the contacts, the contact force must remain in the Coulomb friction cone, which is enforced by equation~\eqref{subeq:friction}.
+Equations~\eqref{subeq:gi} and~\eqref{subeq:hi} translate the constraints to satisfy task $T_i$.
 
-In addition to the equality constraint abovementioned, the problem can feature some inequality constraints.
-For example, each joint variable can be limited to a certain range of value: $\forall i,\ q_i\in [q_i^-,\ q_i^+]$.
-Then the problem becomes a combination of equality and inequality constraints.%, and can be written as:
+The set of satisfying configurations can be defined by $\mathcal{Q}$:
+
+\begin{empheq}[left={\mathcal{Q}=\{\mathbf{q}, \mathbf{f}\}:\empheqlbrace}]{align}
+      & q_i^- \leq q_i \leq q_i^+ \quad \forall i\in[1,n] & \text{joint limits} \label{subeq:bounds}\\
+      & \tau_i^- \leq \tau_i(\mathbf{q}, \mathbf{f}) \leq \tau_i^+ \quad \forall i\in[1,n] & \text{torque limits}\label{subeq:tau}\\
+      & \epsilon_{ij} \leq d(r_i(\mathbf{q}), r_j(\mathbf{q})),\quad \forall (i,j)\in\mathcal{I}_\text{auto} & \text{auto-collision}\label{subeq:autocoll}\\
+      & \epsilon_{ik} \leq d(r_i(\mathbf{q}), O_k),\quad \forall (i,k)\in\mathcal{I}_\text{coll} & \text{collision}\label{subeq:coll}\\
+      & s(\mathbf{q}, \mathbf{f}) = 0 & \text{stability} \label{subeq:stab}\\
+      & c(\mathbf{f}_i) \geq 0 \quad i\in[1,m] & \text{slippage avoidance} \label{subeq:friction}\\
+      & g_i(\mathbf{q}, \mathbf{f}) = 0 & \text{task i's equalities}\label{subeq:gi}\\
+      & h_i(\mathbf{q}, \mathbf{f}) \geq 0 & \text{task i's inequalities} \label{subeq:hi}
+\end{empheq}
+
+We illustrate those constraints in figure~\ref{fig:PG} and will explicit them in more details in Chapter~\ref{cha:posture_generation_problem_formulation}.
+
+%Where inequalities~\eqref{subeq:bounds} represent the joint limits, and~\eqref{subeq:tau} the torque limits.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.7\textwidth]{PG.pdf}
+  \caption{HRP4 on a stack of cubes. The color of each box corresponds to the color of the constraint it depicts.}
+\label{fig:PG}
+\end{figure}
+
+In addition to satisfying the set of constraints $T_i$ while being viable, one can require the searched posture to be optimal in the sense of some cost function $f$.
+Defining a cost function can help the user control the result of the problem, by for example minimizing the distance to a reference posture or maximizing the contact force applied by one end-effector.
+In~\cite{escande2009} the cost function was used to guide the posture toward the end of a planning problem.
+A sum of different criterions can be used as cost function.
+The optimization problem that describes the posture generation problem becomes:
+
+
+%We consider the problem where we have a robotic system and we want it to do some tasks, like for example to make a contact between a point on a body of the robot and a point of the environment.
+%This contact task can be modelized as a simple equality.
+%We denote $q$ the joint configuration (joint + base) of the robot, $g(q)$ is the 3D position of the point of interest on the robot and $P$ is the point of the environment.
+%Then our problem comes down to finding a configuration $q^*$ such that $g(q^*) = P$.
+%For robots like humanoids, the equations describing their kinematics are quite complicated, and, in the presence of angular joints, they are nonlinear.
+%In the general case, even for simple tasks, a closed form solution of the problem does not exist.
+
+%We denote $\mathcal{C}$ the configuration space of our robotic system.
+%It is the manifold in which $q$ lives. The dimension of $\mathcal{C}$ is equal to the number of degrees of freedom of the robot.
+%Note that if all the joints of the robot are actuated, this is the number of motors of the robot.
+%And if the robot has a free-floating basis (is not fixed) then the position in $\mathbb{R}^3$ and rotation in $SO(3)$ of its basis are part of $q$.
+
+%We can formulate that problem as follows:
+
 %\begin{equation}
-  %\text{find}\ q\in\mathcal{C}\ \text{such that}\left\{
+  %\text{find}\ q\in\mathcal{C}\ \text{such that}\ g(q)=P
+%\end{equation}
+
+%The space of solution of this problem is a submanifold of $\mathcal{C}$ that we call ${\mathcal{C}}_F$ the feasible configuration space (which can be empty).
+
+%In addition to the equality constraint abovementioned, the problem can feature some inequality constraints.
+%For example, each joint variable can be limited to a certain range of value: $\forall i,\ q_i\in [q_i^-,\ q_i^+]$.
+%Then the problem becomes a combination of equality and inequality constraints.%, and can be written as:
+%%\begin{equation}
+  %%\text{find}\ q\in\mathcal{C}\ \text{such that}\left\{
+  %%\begin{array}{l}
+    %%g(q)=P \\
+    %%\forall i,\ q_i^- \leq q_i \leq q_i^+
+  %%\end{array}
+  %%\right.
+%%\end{equation}
+%Finally, we can also require finding the point of $\mathcal{C}_F$ that minimizes a criterion, such as the distance to a goal posture $q_0$.
+%Our problem becomes:
+
+%\begin{equation}
+  %\left\{
   %\begin{array}{l}
-    %g(q)=P \\
-    %\forall i,\ q_i^- \leq q_i \leq q_i^+
+    %\minimize\limits_{q\in\mathcal{C}}{\|q-q_0\|_2}\\
+    %\text{ s.t. }
+    %\left\{
+    %\begin{array}{l}
+      %g(q)=P\\
+      %\forall i,\ q_i^- \leq q_i \leq q_i^+
+    %\end{array}
+    %\right.
   %\end{array}
   %\right.
 %\end{equation}
-Finally, we can also require finding the point of $\mathcal{C}_F$ that minimizes a criterion, such as the distance to a goal posture $q_0$.
-Our problem becomes:
 
 \begin{equation}
-  \left\{
   \begin{array}{l}
-    \minimize\limits_{q\in\mathcal{C}}{\|q-q_0\|_2}\\
-    \text{ s.t. }
-    \left\{
-    \begin{array}{l}
-      g(q)=P\\
-      \forall i,\ q_i^- \leq q_i \leq q_i^+
-    \end{array}
-    \right.
+    \minimize\limits_{\mathbf{q}, \mathbf{f}}{f(\mathbf{q}, \mathbf{f})}\\
+    \text{ s.t. }\{\mathbf{q}, \mathbf{f}\}\in\mathcal{Q}
   \end{array}
-  \right.
 \end{equation}
 
 This type of problem is called a nonlinear constrained optimization problem and can be formulated in a more generic fashion as:
 
 \begin{equation}
 \label{eq:optim_form_PG}
-  \left\{
   \begin{array}{l}
-    \minimize\limits_{x\in\mathcal{C}}{f(x)}\\
+    \minimize\limits_{x}{f(x)}\\
     \text{ s.t. }
     \left\{
     \begin{array}{l}
@@ -215,11 +277,9 @@ This type of problem is called a nonlinear constrained optimization problem and 
     \end{array}
     \right.
   \end{array}
-  \right.
 \end{equation}
 
-Where $x$ is the optimization variable (in space $\mathcal{C}$) we want to find that minimizes the cost function $f(x)$ while satisfying the equality constraints $c_i(x) = 0,\ \forall i\in{E}$ and inequality constraints $c_i(x) \geq 0,\ \forall i\in{I}$
-
+Where $x$ is the optimization variable we want to find that minimizes the cost function $f(x)$ while satisfying the equality constraints $c_i(x) = 0,\ \forall i\in{E}$ and inequality constraints $c_i(x) \geq 0,\ \forall i\in{I}$.
 Such problems can be solved by a nonlinear optimization solver.
 In Appendix~\ref{chapter:optimization}, we present some principles of nonlinear optimization in unconstrained and constrained cases.
 %Several off-the-shelf solvers are available and have been widely used in for solving robotics problems.
@@ -228,7 +288,6 @@ In Appendix~\ref{chapter:optimization}, we present some principles of nonlinear 
 %The SNOPT solver~\cite{gill2005snopt} was used in~\cite{dai2014whole} to plan dynamic whole-body trajectories.
 %Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver, the solver that we develop in this thesis.
 
-In this thesis, we use the off-the-shelf solvers IPOPT~\cite{wachter:mathprog:2006} in the beginning and later we
-
+In this thesis, we use the off-the-shelf solvers IPOPT~\cite{wachter:mathprog:2006} in the beginning and later we tackle the development of our own nonlinear solver and then use it.
 From this point forward, we formulate and solve posture generation problems as nonlinear constrained optimization problem.
 And in the next chapter, we focus on formulating all the basic functions and algorithms used to describe robotics constraints and cost function in the formalism of nonlinear optimization.
