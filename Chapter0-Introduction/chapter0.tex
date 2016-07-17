@@ -21,7 +21,7 @@ For example, it can be a robotic arm building a car in a factory, a surgeon robo
 \label{fig:various}
 \end{figure}
 
-The DARPA Robotics Challenge has brought some light on the humanoid robots.
+The DARPA Robotics Challenge has shone some light on the humanoid robots.
 This competition brought together a large scope of robotics groups from universities, laboratories and private companies around a common goal: teleoperate a robot to make it succeed in several challenges without any human physical intervention.
 The robots were expected to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
 All those tasks can usually be broken down into sets of elementary tasks in human language.
@@ -36,9 +36,9 @@ Those are by themselves some complete fields of robotics, and they have one thin
 Finding those configurations is the job of what we call the Posture Generator (PG).
 
 There are two types of robots. The fixed-base robots and the mobile ones.
-The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated (But not always, as they sometimes have underactuated joints).
+The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated.
 This means that the robot has as many degrees of freedom (DoF) as actuators, Thus, for any joint configuration, a unique robots position can be achieved.
-On the contrary, mobile robots are always under actuated, the robot has more DoF than actuators.
+On the contrary, mobile robots are always underactuated, the robot has more DoF than actuators.
 Each link of the robot is actuated, but the position of the basis of the robot depends on the configuration of the joints as a well as on the locations of the contacts that the robot makes with the environment.
 
 %A mobile robot's position depends on the location of its contacts with the environment.
@@ -56,10 +56,10 @@ Narrow passages may even require other parts of our body (knees, elbows, back\do
 Planning the sequence of contacts to achieve is a necessary step in devising a motion for a robot.
 Once the key stances of the motion have been identified by the planner, they can be used by the controller or the trajectory planner and finally the motion can be achieved by the robot.
 
-All the aforementioned planning methods rely on the fact that we have a tool to decide if a proposed set of contact is feasible or not for the robot.
+All the aforementioned planning methods rely on the fact that we have a tool to decide if a proposed set of contacts is feasible or not for the robot.
 The tool used for finding a robot configuration that satisfies a set of various constraints like the geometric constraints of contact or the stability of the robot is called a `Posture Generator' (PG) and the development of that tool is the main topic of this dissertation.
 
-The mission of a posture generator is, for a poly articulated system, to find a configuration so that the system satisfies a set of constraints.
+The mission of a posture generator is, for a polyarticulated system, to find a configuration so that the system satisfies a set of constraints.
 For simple systems, with simple constraints, like a 6 DoF robotic arm having to reach a point with its end effector, some closed-form expressions can sometimes be devised.
 But computing robot configuration to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
 When the robotic problem studied becomes too complex for closed-form formulas, it is formulated as a nonlinear optimization program and solved using optimization algorithms.
@@ -77,7 +77,7 @@ It is then possible to solve those problems with classical solvers at the cost o
 There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
-During this thesis, we develop our own nonlinear solver on manifolds, that we use to solve optimization problems on their native search manifolds, should they be posture generation problems or others.
+During this thesis, we develop our own nonlinear constrained optimization solver on manifolds, that we use to solve optimization problems on their native search manifolds, should they be posture generation problems or others.
 This has the added advantage that unlike off-the-shelf solver, which are often a black box on which the user has a very limited level of control, we have full control over that solver and can specialize/modify it to fit our needs.
 
 %\paragraph{Specificities of our approach}
@@ -98,7 +98,7 @@ This has the added advantage that unlike off-the-shelf solver, which are often a
 
 \paragraph{Contributions and plan}
 The main focus of this thesis is the formulation and resolution of problems of posture generation for robotics systems using nonlinear optimization on manifolds.
-Our contributions are of two types, on one hand we propose some extensions and improvements on the way to formulate a posture generation problem, and on the other hand, we investigate new ways of solving them.
+Our contributions are of two types, on one hand we propose some extensions and improvements on the way to formulate a posture generation problem, and on the other hand, we investigate new ways of solving those problems.
 The organization of this thesis is as follows:
 %In Chapters~\ref{cha:state_of_the_art} and~\ref{cha:posture_generation_problem_formulation}, we present the background of posture generation, with respectively a state of the art and a presentation of the detailed formulation of a posture generation problem.
 %We present several
@@ -109,7 +109,7 @@ The organization of this thesis is as follows:
   Then we present our endeavor to use the `Lifted Newton Method' to solve posture generation problems.
   \item Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} describes the principles of nonlinear optimization over non-Euclidean manifolds and our implementation of a solver based on those principles.
   \item In Chapter~\ref{ch:PG}, we present a framework that simplifies and extends the formulation of posture generation problems by formulating and solving the optimization problem over native non-Euclidean manifolds, managing automatically the variables of the problems and proposing a framework that formalizes and simplifies the writing of functions on geometric entities often used in robotics.
-  \item In Chapter~\ref{cha:evaluation_and_experimentation}, we evaluate the performances of our solver on manifolds and of our posture generator. And then present a preliminary work on how to generate postures on a sensory acquired environment.
+  \item In Chapter~\ref{cha:evaluation_and_experimentation}, we evaluate the performances of our solver on manifolds and of our posture generator, and then present a preliminary work on how to generate postures on a sensory acquired environment.
 \end{itemize}
 
 
