@@ -418,22 +418,19 @@ This shows that the restoration phase of our solver is quite inefficient and nee
 
 Altough it was developped with the idea of solving posture generation problems, our solver and the formulation on manifolds can be used for different types of problems.
 In this section, we present an application of our optimization algorithm to solve a problem of inertial parameters identification that was published in~\cite{traversaro:iros:2016}.
-The dynamics of a rigid body is completely defined by its mass distribution, which is itself completely described by 10 inertial parameters.
-The identification of those parameters can in some cases be obtained from the Computer-Aided Design (CAD) model of the body, but often, it is necessary to evaluate those parameters experimentally.
-The inertial parameters of a rigid body can be represented by spacial inertia matrix M:
+
+\subsection{Physical Consistency of Inertial Parameters}
+\label{sub:physical_consistency_of_inertial_parameters}
+
+The dynamics of a rigid body is completely defined by its mass distribution:
 \begin{equation}
-  \begin{bmatrix}
-    m\mathbb{I}_3 & -m\hat{c} \\
-    m\hat{c} & I_B
-  \end{bmatrix}
+  \rho(.):\mathbb{R}^3 \mapsto\mathbb{R}_{\geq 0}
 \end{equation}
-Where:
-\begin{itemize}
-  \item $m\in\mathbb{R}$ is the mass of the rigid body
-  \item $\hat{c}$ denotes the skew symmetric matrix associated with $c\in\mathbb{R}^3$, the position of the center of mass of the rigid body
-  \item $I_B\in\mathbb{R}^{3\times 3}$ is its 3D inertia matrix
-\end{itemize}
-They can be represented by 10 parameters called the inertial parameters of the rigid body that are defined as $\pi\in\mathbb{R}^{10}$
+That function defines the density of a rigid body in the 3D space, it is strictly positive on points that belong to the rigid body and null everywhere else.
+It can be reduced to 10 inertial parameters $\pi\in\mathbb{R}^{10}$ to describe the dynamics of the rigid body~\cite{hollerbach2008}.
+%which is itself completely described by 10 inertial parameters~\cite{hollerbach2008}.
+%The dynamics of a rigid body is completely defined by its mass distribution, which is itself completely described by 10 inertial parameters~\cite{hollerbach2008}.
+We denote $\text{vech}(.)$ the serialization operation on symmetric matrices.
 \begin{equation}
   \pi = \begin{bmatrix}
     m \\
@@ -441,20 +438,196 @@ They can be represented by 10 parameters called the inertial parameters of the r
     \text{vech}(I_B)
   \end{bmatrix}
 \end{equation}
-Where $\text{vech}(.)$ denotes the serialization operation on symmetric matrices.
+\begin{itemize}
+  \item $m\in\mathbb{R}$ is the mass of the rigid body
+  \item $\hat{c}$ denotes the skew symmetric matrix associated with $c\in\mathbb{R}^3$, the position of the center of mass of the rigid body
+  \item $I_B\in\mathbb{R}^{3\times 3}$ is its 3D inertia matrix
+\end{itemize}
 
-Identifying the inertial parameters of a rigid body comes down to finding $\pi$ that minimizes the error in the Newton-Euler equation.
+%Those parameters are defined as functionals of the mass distribution of the rigid body:
+%\begin{equation}
+  %\rho(.):\mathbb{R}^3 \mapsto\mathbb{R}_{\geq 0}
+%\end{equation}
+%That function defines the density of a rigid body in the 3D space, is is null outside of the body and strictly positive inside it.
+
+By definition, the inertial parameters are functionals of the mass distribution $\rho(.)$, and can be written as $\pi_d:(\mathbb{R}^3\mapsto\mathbb{R})\mapsto\mathbb{R}^{10}$
+
+%\begin{equation}
+  %\pi_d\ :\
+  %\begin{array}{ccc}
+%(\mathbb{R}^3 \mapsto \mathbb{R}) & \mapsto & \mathbb{R}^{10}\\
+%\rho(.)
+   %& \rightarrow &
+  %\begin{bmatrix}
+    %\iiint\limits_{\mathbb{R}^3} \rho(r) dr \\
+    %\iiint\limits_{\mathbb{R}^3} r \rho(r) dr \\
+    %\operatorname{vech}\left(
+    %\iiint\limits_{\mathbb{R}^3} {\hat{r}}^\top \hat{r} \rho({r}) d{r} \right)
+  %\end{bmatrix}
+  %\end{array}\nonumber%
+%\end{equation}
+
 \begin{equation}
-  Y(A^g,V)\pi = M A^g + V\bar{\times}^*MV = F
+\pi_d(\rho(.))
+  =
+  \begin{bmatrix}
+    \iiint\limits_{\mathbb{R}^3} \rho(r) dr \\
+    \iiint\limits_{\mathbb{R}^3} r \rho(r) dr \\
+    \operatorname{vech}\left(
+    \iiint\limits_{\mathbb{R}^3} {\hat{r}}^\top \hat{r} \rho({r}) d{r} \right)
+  \end{bmatrix}
 \end{equation}
-Where given $V = \begin{bmatrix} v^\top & \omega^\top \end{bmatrix}^\top \in \mathbb{R}^6$,  $V \bar \times^*$ is the 6D force cross product operator \cite{featherstone:book:2007}, defined as:
+
+The identification of those parameters can in some cases be obtained from the Computer-Aided Design (CAD) model of the body, but it is often necessary to evaluate those parameters experimentally.
+Their identification can be done by measuring the body acceleration $A^g$, twist $V$ and the external wrench applied to it $F$ for $N$ different situation and finding $\pi^*$ that minimizes the error in the Newton-Euler equation equation for those values:
+\begin{equation}
+\label{eq:classicIdentif}
+  \pi^* = \argmin_{\pi\in\mathbb{R}^{10}} \|Y(A^g_i,V_i)\pi -F_i\|^2
+\end{equation}
+%Identifying the inertial parameters of a rigid body comes down to finding $\pi$ that minimizes the error in the Newton-Euler equation~\ref{eq:NewtonEuler}.
+Where $Y(A^g,V)$ is such that:
+$$
+Y(A^g,V)\pi = M A^g + V\bar{\times}^*MV
+$$
+M is the spacial inertia matrix:
+\begin{equation}
+M=
+  \begin{bmatrix}
+    m\mathbb{I}_3 & -m\hat{c} \\
+    m\hat{c} & I_B
+  \end{bmatrix}
+\end{equation}
+and $V \bar \times^*$ is the 6D force cross product operator \cite{featherstone:book:2007} that, for $V = \begin{bmatrix} v^\top & \omega^\top \end{bmatrix}^\top \in \mathbb{R}^6$, gives:
 $$
 V \bar \times^*
 =
 \begin{bmatrix}
-S(\omega) & 0_{3\times3} \\
-S(v)      & S(\omega)
+\omega^\top & 0_{3\times3} \\
+v^\top      & \omega^\top
 \end{bmatrix}
 $$
 
-To ensure that
+However, this optimization problem~\ref{eq:classicIdentif} does not take into account the physical properties of the inertial parameters.
+For this, the \emph{physical consistency} constraint is introduced~\cite{yoshida1994} and added to the problem:
+\begin{definition}
+  A vector of inertial parameters $\pi\in\mathbb{R}^{10}$ is called \emph{physical consistent} if:
+\begin{equation}
+  \begin{aligned}
+    m(\pi) \geq 0\\
+    I_C(\pi) \succeq 0
+  \end{aligned}
+\end{equation}
+\end{definition}
+Where $I_C(\pi)$ is the 3D inertial matrix at the center of mass.
+Inertial parameters satisfying the \emph{physical consistency} conditions have nice properties ($M$ is invertible), but it is still possible to find some \emph{physical consistent} inertial parameters that cannot be generated by a mass distribution of a rigid body.
+In~\cite{traversaro:iros:2016}, we propose the \emph{full physical consistent} condition that assesses that a vector of inertial parameters can be generated from a physical rigid body.
+
+\begin{definition}
+  A vector of inertial parameters $\pi\in\mathbb{R}^{10}$ is called \emph{fully physical consistent} if:
+  \begin{equation}
+    \exists\rho(.):\mathbb{R}^3\mapsto\mathbb{R}_{\geq 0}\ \text{s.t.}\ \pi = \pi_d(\rho(.))
+  \end{equation}
+\end{definition}
+
+We propose a new parametrisation of the inertial parameters by an element $\theta \in \mathfrak{P} = \mathbb{R}_{\ge 0} \times \mathbb{R}^3 \times  SO(3) \times \mathbb{R}_{\ge 0}^3$ that ensures the \emph{full physical consistency}. In particular the components of $\theta$ are:
+\begin{itemize}
+    \item $m \in \mathbb{R}_{\ge 0}$ the mass of body
+    \item $c \in \mathbb{R}^3$ the center of mass of the body
+    \item $Q \in SO(3)$ the rotation matrix between the body frame and the frame of principal axis at the center of mass
+    \item $L \in \mathbb{R}_{\ge 0}^3$ the second central moment of mass along the principal axes
+\end{itemize}
+And a function $\pi_p(\theta):\mathfrak{P}\mapsto\mathbb{R}^{10}$ that maps this new parametrization to the corresponding inertial parameters.
+\begin{equation}
+  \label{eq:pip}
+  \pi_p(\theta)
+  =
+  \begin{bmatrix}
+    m(\theta) \\
+    mc(\theta) \\
+    \operatorname{vech}\left(I_B(\theta)\right) \\
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    m \\
+    mc \\
+    \operatorname{vech}\left( Q \operatorname{diag}{(\left[\begin{smallmatrix}
+    0 & 1 & 1 \\
+    1 & 0 & 1 \\
+    1 & 1 & 0
+    \end{smallmatrix}\right] L)}  Q^\top - m \hat{c} \hat{c} \right) \\
+  \end{bmatrix} \nonumber
+\end{equation}
+In~\cite{traversaro:iros:2016}, we prove that every $\theta\in\mathfrak{P}$ generates \emph{fully physical consistent} inertial parameters.
+However, the optimization variable now lives on a non-Euclidean manifold, because $\mathfrak{P}$ includes $SO(3)$.
+Thus, we propose to solve that problem with our solver on manifolds.
+
+\subsection{Resolution with optimization on Manifolds}
+\label{sub:resolution_with_optimization_on_manifolds}
+
+The formulation of the problem becomes:
+
+\begin{equation}
+\begin{aligned}
+\label{eq:finalProblem}
+    \argmin_{\theta \in \mathbb{R}\times\mathbb{R}^3\times SO(3) \times \mathbb{R}^3} &\ \sum_{i = 1}^N \left\| Y(A^g_i, V_i) \pi(\theta) - F_i \right\|^2 \\
+    \mbox{s.t.} &\ m \geq 0,\ L_x \geq 0,\ L_y \geq 0,\ L_z \geq 0
+\end{aligned}
+\end{equation}
+
+It has an immediate advantage: we can write directly the problem ~\eqref{eq:finalProblem} without the need to add any parametrization-related constraints.
+Because there is less variables and less constraints, it is also faster to solve.
+To check this, we compared the resolution of~\eqref{eq:finalProblem} formulated with each of the three parametrizations (native $SO(3)$, unit quaternion, rotation matrix).
+We solved the three formulations with the solver presented in~\cite{brossette:Humanoids:2015}, and the two last with an off-the-shelf solver (CFSQP~\cite{cfsqp:manual}), using the dataset presented in section~\ref{sub:experiments}.
+The formulation with native $SO(3)$ was consistently solved faster.
+We observed timings around $0.5$s for it, and over $1$s for non-manifold formulations with CFSQP.
+The mean time for an iteration was also the lowest with the native formulation (at least $30\%$ when compared to all other possibilities).
+
+Working directly with manifolds has also an advantage that we do not leverage here, but could be useful for future work: at each iteration, the variables of the problem represent a \emph{fully physical consistent} set of inertial parameters.
+This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
+Having physically meaningful intermediate values can be useful to evaluate additional functions that pre-suppose it (additional constraints, external monitoring $\ldots$).
+It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the inertial identification, so that when the optimization process is stopped after a few iterations, the output is physically valid.
+
+\subsection{Experiments}
+\label{sub:experiments}
+We ran some experiments with the iCub robot.
+It is a full-body humanoid with 53 degrees of freedom \cite{metta2010icub}.
+For validating the presented approach, we used the six axis force/torque (F/T) sensor embedded in iCub right arm to collect experimental F/T measurements.
+We locked the elbow, wrist and hands joints of the arm, simulating the presence of a rigid body directly attached to the F/T sensor, a scenario similar to the one in which an unknown payload needs to be identified \cite{kubus2008line}.
+
+\begin{figure}[htb]
+\centering
+\begin{overpic}[width=0.68\textwidth,natwidth=1235,natheight=742]{arm3.png}
+\put(5,10){FT sensor}
+\put(13,13){\vector(1,1){18}}
+\put(38,50){Upper arm}
+\put(43,49){\vector(0,-1){12}}
+\put(65,45){Forearm}
+\put(70,44){\vector(-1,-2){7}}
+\end{overpic}
+\caption{CAD drawing of the iCub arm used in the experiments. The six-axis F/T sensor used for validation is visible in the middle of the upper arm link.}
+\label{fig:cadArm}
+\end{figure}
+
+We generated five 60 seconds trajectories in which the three shoulder joints were reaching successive random joint positions using minimum-jerk like trajectories.
+Each trajectory is decomposed is subtrajectories to travel between two consecutive random positions in respectively $10$s, $5$s, $2$s, $1$s and $0.5$s (As a result, the trajectory are ordered from the slowest to the fastest).
+We played those trajectories on the robot and we sampled at $100$Hz the F/T sensors and joint encoders output.
+%We filtered the joint positions and obtained joint velocities and accelerations using a Savitzky-Golay filtering of order 2 and with a windows size of $499$, $41$, $21$, $9$, $7$ samples.
+We used joint positions, velocities and accelerations with the kinematic model of the robot to compute $A^g$ and $V$ of the F/T sensor for each time sample.
+%We removed the unknown offset from the F/T measurements using the offset removal technique described in \cite{traversaro2015situ}.
+We solved the inertial identification problem~\eqref{eq:classicIdentif} using a classical linear algorithm and the one using the proposed \emph{fully physical consistent} parametrization \eqref{eq:finalProblem} with our solver on manifolds.
+We report the identified inertial parameters in Table \ref{table:results}.
+It is interesting to highlight that for slow datasets (subtrajectory times of $10$s or $5$s) the unconstrained optimization problem \eqref{eq:classicIdentif} results in inertial parameters that are not \emph{fully physical consistent}.
+In particular, this is due to the low values of angular velocities and acceleration, that do not properly excites the inertial parameters, which are then \emph{numerically not identifiable}.
+The proposed optimization problem clearly cannot identify those parameters anyway, as the identified parameters are an order of magnitude larger than the ones estimated for faster dataset, nevertheless it always estimates inertial parameters that are \emph{fully physical consistent}.
+For faster datasets (trajectory time of $1$s or $0.5$s) the results of the two optimization problems are the same because the high values of angular velocities and accelerations permit to identify all the parameters perfectly.
+While this is possible to identify all the inertial parameters of a single rigid body, this is not the case when identifying the inertial parameters of a complex structure such as a humanoid robot, for which both structural \cite{ayusawa2014identifiability} and numerical \cite{pham1991essential} not identifiable parameters exists.
+In this later application, the enforcement of \emph{full physical consistency}  will always be necessary to get meaningful results.
+
+\begin{figure}
+\centering
+  \includegraphics[width=\linewidth]{tableResults.png}
+  \caption{Inertial parameters identified with the different datasets and the different optimization problems.
+  Inertial parameters identified on $\mathbb{R}^{10}$ optimization manifold that are not \emph{fully physical consistent} are highlighted.
+Masses are expressed in $kg$, first moment of masses in $kg.m$, inertia matrix elements in $kg.m^2$.}
+\label{table:results}
+\end{figure}
