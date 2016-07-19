@@ -397,21 +397,49 @@ This study shows that on a simple example that makes heavy use of non-Euclidean 
 \section{Evaluation of the Posture Generation}
 \label{sec:evaluation_of_the_posture_generation}
 
-In addition to evaluating the efficiency of our solver, we want to evaluate the one of our posture generator.
+In addition to evaluating our solver, we want to evaluate the efficiency of our posture generator.
 We propose to study its ability to find a solution to problems that are known to be feasible.
 
-We generate feasible problems by setting a HRP-2 Kai robot's configuration variable to a random value $x$ within the joint limits of the robot and recording the poses of the frames  on its end-effectors, namely, at the tip of its grippers and below its foot that we denote $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
-Then we check whether in that configuration violates the auto-collision constraints, if it does, it is discarded and the process is restarted with another random configuration.
-
-Once a collision free configuration is found, we generate a problem with the constraints that both gripper are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the foot are in unilateral contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability and torque limits must be respected.
-To help the resolution, we initialize the robot's configuration variable to $x$, which is a solution to the geometric part of the problem.
+First, we generate a list of feasible problems.
+To do so, we set the HRP-2 Kai robot in a random configuration $q_\text{rand}$ within its joint limits and record the 3D poses of its end-effectors' frames: at the tip of its grippers and below its foot,we denote them $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
+Then we generate a problem with the constraints that both gripper are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the foot are in unilateral frictional contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability, torque limits, and auto-collision avoidance constraints must be respected.
+To help the resolution, we initialize the robot's configuration variable to $q_\text{rand}$, which is a solution to the geometric part of the problem.
 If a solution is found, the problem is known to be feasible and recorded for further use.
 
-We evaluate the performance of our posture generator by solving the recorded problems, with the difference that the initial guess is the half-sitting posture of the robot.
-This approach tests the ability to find a feasible posture when starting from a remote posture.
-The optimization algorithm is exited as soon as the restoration phase is finished.
-The resolution is successful in only approximately 30\% of the problems.
-This shows that the restoration phase of our solver is quite inefficient and needs to be improved.
+%We generate feasible problems by setting a HRP-2 Kai robot's in a random configuration variable $q_\text{rand}$ within its joint limits and recording the poses of its end-effectors' frames: at the tip of its grippers and below its foot,we denote them $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
+%Then we check whether that configuration violates the auto-collision constraints, if it does, it is discarded and the process is restarted with another random configuration.
+
+%Once a collision free configuration is found, we generate a problem with the constraints that both gripper are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the foot are in unilateral contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability and torque limits must be respected.
+%To help the resolution, we initialize the robot's configuration variable to $q_\text{rand}$, which is a solution to the geometric part of the problem.
+%If a solution is found, the problem is known to be feasible and recorded for further use.
+
+We evaluate the performance of our posture generator by solving the recorded problems, starting from the half-sitting configuration $q_\text{half-sitting}$ of the robot.
+This approach tests the ability to find a feasible posture when starting from a remote configuration.
+Since there is no cost function, the optimization algorithm is exited as soon as the restoration phase is finished.
+The resolution is successful for approximately 35\% of the problems.
+Which is not surprising, as the configuration to reach is very remote from the initial posture.
+We noticed that most often, the randomly generated configuration puts the robot in a very twisted posture that is difficult to reach for the optimization algorithm when starting from the half-sitting configuration.
+
+We ran another set of tests in which the value of $q_\text{rand}$ is modified to be closer to the half-sitting, to do so, we simply take:
+\begin{equation}
+  q_\text{rand} \leftarrow \frac{q_\text{rand}+q_\text{half-sitting}}{2}
+\end{equation}
+And generate our set of feasible problems from those configurations.
+In that case, a solution is found in 85\% of the tests.
+This shows that the choice of the initial guess has a crucial importance and should be chosen wisely by the user.
+
+To study that influence, we propose to estimate the effect of the distance between the initial posture and the solution on the success rate of the posture generator.
+The distance between 2 configurations $q_0$ and $q^*$ is defined as $d=\|q_0-q^*\|^2$.
+In that experiment, each feasible problem is solved several times, with a value of the initial guess increasingly close to the solution.
+Given an initial guess chosen randomly $q_0$, and $q^*$ being the solution of the problem found when generating the list of feasible problems, we solve the problem starting from configurations $q_0^{n\%}$ defined as:
+\begin{equation}
+  q_0^{n\%} = n q_0 + (1-n)q^*
+\end{equation}
+With $n$ taking successively the values $1.0$, $0.8$, $0.6$, $0.4$,and $0.2$.
+After aggregating the results, we are able to estimate the influence of the distante between the initial posture and the solution on the success rate of the optimization and report those results in the following charts:
+
+
+
 
 \section{Application to Inertial Parameters Identification}
 \label{sec:inertial_parameters}

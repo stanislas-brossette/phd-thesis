@@ -647,10 +647,10 @@ Right: it is to put the cube as far as possible in a given direction}
 \section{Contact with Complex Surfaces}
 \label{sec:contact_with_complex_surfaces}
 
-We have presented some methods to formulate contact constraint with parameterized surfaces.
+We have presented some methods to formulate contact constraints with parameterized surfaces.
 The surfaces that we used so far could all be approximately represented by closed-form equations (sphere, superellipsoid, wrist of HRP-2).
 %We showed that to generate contacts between a body of a robot and simple geometric surfaces (sphere, superellipsoid, wrist of HRP2) we can devise some ad hoc parametrization of the surface and write constraints on the resulting approximated surface.
-This is sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014}~\cite{vaillant:autonomousrobots:2016}.
+This is sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014} \cite{vaillant:autonomousrobots:2016}.
 However, contacts with more complex objects are needed too, for unstructured environment or for manipulating objects.
 
 To work with derivative-based optimization algorithms, such as SQP or Interior Points, the functions involved in the optimization problem need to be at least $C^1$ and gradients must be full rank at the solution (for ensuring constraints qualification, see~\cite{nocedal:book:2006}).
@@ -665,6 +665,23 @@ The problem of finding a parametrization satisfying the continuity requirements 
 
 In~\cite{escande:icra:2016}, we provide a systematic way to obtain a parametric surface closely approximating a mesh and meeting the regularity requirements mentioned above, for a large class of objects, namely star-convex objects.
 To that end, we combine the use of Catmull-Clark subdivision surfaces with a tailored ray casting algorithm, and propose an efficient and robust numerical method to evaluate a point, a normal and their derivatives at a given set of parameters.
+
+The Catmull-Clark algorithm is used to create a smooth surface modeling a given \emph{control mesh}.
+It iteratively subdivides a control mesh by following a set of rules; The limit surface of this subdivision process is called the Catmull-Clark Surface(CCS), see~\ref{fig:CCIterations}.
+\begin{figure}
+\centering
+  \includegraphics[height = 2cm]{cube1.png}
+  \includegraphics[height = 2cm, trim=20pt 0 50pt 0, clip]{cube2.png}
+  \includegraphics[height = 2cm, trim=50pt 0 50pt 0, clip]{cube3.png}
+  \includegraphics[height = 2cm, trim=50pt 0 50pt 0, clip]{cube4.png}
+\caption{Several Catmull-Clark subdivisions of a cube. From left to right: original mesh, after $1$, $2$ and $6$ iterations}
+\label{fig:CCIterations}
+\end{figure}
+It was shown by Stam in a seminal paper~\cite{stam:siggraph:1998} that points on CCS can be computed by direct analytical formula without explicitly subdividing the control mesh.
+A map between each face of the control mesh and the patch of the CCS associated to it $s(u,v)$ can be devised(with $(u,v)$ a 2D parametrization of a face).
+To find the point of the CCS associated with a value $d \in S2$, we use a raycast algorithm: given $c$, a center point of the star-convex control mesh(a point seeing all the surface of the control mesh), we solve numerically $c+td=s(u,v)$ in $(u,v,t)$ with a Newton method.
+This gives us a mapping from $S2$ to the CCS.
+From there, we propose methods to compute the normal to the CCS point associated with an element of $S2$ and we devise the derivations of both those mappings.
 
 As a result, we get a smooth parametrization of the input mesh that satisfies the continuity requirements.
 In Fig:\ref{fig:CCS}, we show the Catmull-Clark surface (in blue) corresponding to the mesh (in green) of an HRP-2 link, for two different levels of smoothness.
@@ -682,7 +699,7 @@ The red line is the image of a great circle of the unit sphere through our param
 Because this parametrization respects the continuity requirements for being used efficiently in optimization, we can use it freely in our posture generation problems.
 
 We now show some examples of PG using the proposed approach to introduce complex objects to contact with.
-We make use of the capacity of our optimization solver to directly work with a variable $d$ on $S^2$ to parametrize our surfaces.
+We make use of the capacity of our optimization solver to directly work with a variable $d\in S2$ to parametrize our surfaces.
 %When using more classical nonlinear solvers, it is sufficient to take $d$ in $\mathbb{R}^3$ and to add a constraints of unit norm for $d$: the parametrization algorithm do not need a unit $d$ to work, and at the solution, the gradient will be full rank on the null-space of this constraint, which is enough for a good convergence.
 %However, working directly on $S^2$ presents several advantages\cite{brossette:Humanoids:2015}.
 
@@ -729,7 +746,7 @@ Once again, contact points are fixed on the robot and free on the surface.
 The surface is modeled by a single object. That object is not convex, thus it cannot be used as is for collision avoidance.
 For collisions, we model the stack of cubes with a set of 21 cubes all slightly smaller than the actual cubes see:~\ref{fig:HRP4_cubes} (Right), and we require the robot to avoid collision with those cubes.
 The optimization takes around $115$ iteration to converge to a solution.
-Since their is a single surface to contact with, we do not need to specify with which faces, edges or corners the robot needs to be in contact with.
+Since there is a single surface to contact with, we do not need to specify with which faces, edges or corners the robot needs to be in contact with.
 The optimization decides it automatically.
 This is a very attractive feature of our approach as it allows to include discrete choices directly into our PG\@.
 This can be used to alleviate the work to be done by the user, be it a human or a planning algorithm: the user still has to specify the bodies in contact, but part of the combinatorics relative to the matching of a body with a particular surface or object is handled directly by the PG\@.
