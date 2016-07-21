@@ -50,9 +50,9 @@ In our PG, we propose an architecture automating most of the problematic tasks, 
 \begin{itemize}
   \item A system of geometrical and mathematical expression trees that automatically computes the mathematical expressions behind geometric relations
   \item An automatic mapping between the submanifold of each function and the global manifold of the problem
-  \item A problem generator that aggregates all the informations from the abovementionned items to generate an optimization problem that can be passed to the solver
+  \item A problem generator that aggregates all the informations from the above mentionned items to generate an optimization problem that can be passed to the solver
 \end{itemize}
-We then propose an extension to classic posture generation by developping a constraint of contact with parametrized surfaces which takes advantage of out framework.
+We then propose an extension to classic posture generation by developing a constraint of contact with parametrized surfaces which takes advantage of our framework.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,10 +121,10 @@ C.diff(x) = A.value().transpose()*B.diff(x) \\ + B.value().transpose()*A.diff(x)
 
 It is easy to extend the capabilities of this framework by implementing additional operations.
 By following this approach, we can easily compute the values and derivatives of expressions that are the outcome of complex arithmetic trees.
-Currently, the following binary operators are available: cross product, dot product, classic product, addition, substraction, transformation.
+Currently, the following binary operators are available: cross product, dot product, classic product, addition, subtraction, transformation.
 And the following unary operators are available: component extraction, inverse, norm, rotation, squareroot, transformation and vectorization.
 
-The geometric layer consists of physical or geometric objects, named features, which exist independently of their mathematical expression in a given reference frame.
+The geometric layer consists of physical or geometric objects, called features, which exist independently of their mathematical expression in a given reference frame.
 We have so far four objects:
 \begin{enumerate}
   \item A Frame, defined by a Transformation expression and a reference frame.
@@ -142,7 +142,7 @@ The geometric logic resides in the change of frame and those operations.
 Based on that expression system, the robot's geometry can simply be represented by a set of frames representing all its links, and functions that keep track and update the transformations of the frames of all its bodies, with respect to an Array expression on entry, its articular parameters.
 The forward kinematics algorithm~\ref{alg:FK} and the jacobian computation algorithm~\ref{alg:jacobian_computation} are used to define those functions.
 For a given articular parameter array, the user can query the frame of any body on the robot, and by composition, any feature defined on a frame of the robot, as well as its derivatives.
-This tool allows for a simplified writting of robotics constraints as a combination of operations on geometric features, without worrying about the vectors and matrices and without having to write the derivatives.
+This tool allows for a simplified writing of robotics constraints as a combination of operations on geometric features, without worrying about the vectors and matrices and without having to write the derivatives.
 
 Let us consider a simple constraint and its expression in this framework:
 we define a point $P_h$ on a body of a robot and a point $P_e$ in the environment.
@@ -182,13 +182,13 @@ But for the developer, writing a function on the complete $\mathbb{E}$ is cumber
 A user-written function $f$ is usually defined on a subset of $\mathbb{E}$, say $\mathbb{E}_I=\mathbb{E}_i\times\mathbb{E}_j\times\mathbb{E}_k\hdots$, that is minimalistic for that function, and should not account for unrelated manifolds.
 One does not want to think about the values of the forces when writing a geometric constraint for example.
 
-We developped an automatic mapping tool that keeps track of all the necessary mappings for each function added and upon the instantiation of the problem, generates the correct projection functions $\pi_I$ such that the developer can write a function $f$ on $\mathbb{E}_I$ while the solver receives it as a function $f \circ \pi_I$ on $\mathbb{E}$.
+We developed an automatic mapping tool that keeps track of all the necessary mappings for each function added and upon the instantiation of the problem, generates the correct projection functions $\pi_I$ such that the developer can write a function $f$ on $\mathbb{E}_I$ while the solver receives it as a function $f \circ \pi_I$ on $\mathbb{E}$.
 
-This tool was built as an add-on to the RobOptim~\cite{moulard:jsme:2013} framework called {\bf roboptim-core-manifold} and its goal is to extend the notion of function to take into account its application manifold and map the correspondance between the values in the input of the problem and the input of the function.
+This tool was built as an add-on to the RobOptim~\cite{moulard:jsme:2013} framework called {\bf roboptim-core-manifold} and its goal is to extend the notion of function to take into account its application manifold and map the correspondence between the values in the input of the problem and the input of the function.
 We define a class called DescriptiveWrapper that contains a RobOptim function and a description of its application manifold.
 Once a function is wrapped in a DescriptiveWrapper and the optimization problem is set, we need to establish the mapping between the variable of the problem, which is defined on the global manifold of the problem, and the input of the function that must match the description of its application manifold.
 That is the role fulfilled by the WrapperOnManifold layer, that compares the two manifolds, matches them and computes an input mapping from the problem's input vector to the function's, which we denote $\pi_I$.
-This mapping is computed once during the instanciation of the problem and then used at each call of the function.
+This mapping is computed once during the instantiation of the problem and then used at each call of the function.
 The use of the input mapping is illustrated by the example in Fig.~\ref{fig:auto_map}
 %\begin{equation}
   %\begin{split}
@@ -267,7 +267,7 @@ For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, the
 %\end{align}
 %Those two sets of equations~\Eqref{eq:planar_contact} and~\Eqref{eq:fix_planar_contact} can easily be recombined to generate other types of constraints (e.g.\ fixing only the translation, or only the rotations\ldots).
 
-\item The Frame constraint is a generic type of constraint that consists in blocking a pre-defined set of degrees of freedom of one frame $F_2$ w.r.t. another frame $F_1$.
+\item The Frame constraint is a generic type of constraint that consists in blocking a predefined set of degrees of freedom of one frame $F_2$ w.r.t. another frame $F_1$.
 By default, the frame $F_2$ has 6 degrees of freedom w.r.t. $F_1$, three translational degrees of freedom TX, TY, and TZ, respectively along $\vec{x_1}$, $\vec{y_1}$ and $\vec{z_1}$ and three rotational ones RX, RY, and RZ, respectively around $(O_1,\vec{x_1})$, $(O_1,\vec{y_1})$ and $(O_1,\vec{z_1})$.
 We can write constraints such that any combination of the translational degrees of freedom is blocked:
 
@@ -306,7 +306,7 @@ Those 3 vectors are ordered such that $(\vec{n}, \vec{t}, \vec{b})$ is an orthon
 
 In theory, one could simply write that constraint as $\vec{n_1}=\vec{n_2}$, but in practice, this formulation leads to bad numerical behavior of the optimization, thus we prefer~\ref{eq:2_rotations_blocked}.
 
-All those independant sets of constraints can be combined to create a wide variety of geometric constraints.
+All those independent sets of constraints can be combined to create a wide variety of geometric constraints.
 For example, one can create a mobile planar contact constraint with normal $\vec{z}_1$ by blocking TZ, RX and RY.
 A punctual contact constraint can be devised by blocking TX, TY and TZ.
 To completely fix the position of $F_2$ w.r.t. $F_1$, one can block TX, TY, TZ, RX, RY, and RZ.
@@ -334,7 +334,7 @@ That wrench is parametrized on a $\mathbb{R}^m$ with $m$ the number of component
 %Only a parametrization of the force part on $\mathbb{R}^3$ is needed.
 We model the resultant wrench of planar contacts as a combination of punctual forces applied at each vertex of the contact polygon.
 In the case of interaction forces between 2 robots, only one wrench is created and it is used as is in the stability equation of one robot and its opposite is used for the stability of the second robot.
-That way, we are guaranteed that the forces inbetween the robots are balanced and we can evaluate the stability of each robot separately.
+That way, we are guaranteed that the forces in between the robots are balanced and we can evaluate the stability of each robot separately.
 
 \item The friction cone constraint can be used to limit the tangential part of any force to avoid slippage.
 We write it as~\Eqref{eq:friction} (with $\mu$ the friction coefficient)
@@ -413,8 +413,8 @@ In this section, we provide an overview of some of the key elements of the frame
 
 \paragraph{Problem's configuration:}
 The implementation of the core structure of a posture generation problem is written in \texttt{C++}.
-A text file in yaml format can be used to configures the solver and some custom parameters of the problem; It is parsed at runtime to avoid having to recompile the problem for every configuration's change.
-Also, some \texttt{Python} bindings have been developped to allow writing the core structure of the problem without compilation.
+A text file in yaml format can be used to configures the solver and some custom parameters of the problem; It is parsed at runtime to avoid having to recompile the problem for every configuration change.
+Also, some \texttt{Python} bindings have been developed to allow writing the core structure of the problem without compilation.
 %We use two types of configuration files:
 %\begin{itemize}
   %\item A default configuration file contains all the usual data, like the paths to robots description directories, as well as some data about each robot, like the lists of usual self-collisions used per robot, etc\ldots\\ {\tt problem-generator/configs/problemGeneratorConfig.yml.in}
@@ -422,12 +422,12 @@ Also, some \texttt{Python} bindings have been developped to allow writing the co
 %\end{itemize}
 
 \paragraph{The Robot class:}
-%It is instanciated from a Robot::Init structure that contains all the necessary data for its construction.
+%It is instantiated from a Robot::Init structure that contains all the necessary data for its construction.
 %Which includes its name, its urdf path, the path of its collision meshes, some booleans defining if the robot is fixed, has torque limits, etc\ldots
-%On instanciation of a robot, we use this urdf to instanciate the RBDyn objects that are used to compute the Forward Kinematics and Inverse Statics of the robot: a MultiBody, a MultiBodyGraph and a MultiBodyConfig, as well as its joint, torque limits, and the manifold in which the variables of the robot live.
+%On instantiation of a robot, we use this urdf to instantiate the RBDyn objects that are used to compute the Forward Kinematics and Inverse Statics of the robot: a MultiBody, a MultiBodyGraph and a MultiBodyConfig, as well as its joint, torque limits, and the manifold in which the variables of the robot live.
 %The robot object is equipped with an external\_forces object that handles the external forces applied to it, and a torques object that handles its joint torques.
 %A Frame is created on each of the bodies of the robot.
-%A set of pre-defined surfaces on bodies can be loaded from an rsdf file.
+%A set of predefined surfaces on bodies can be loaded from an rsdf file.
 %A set of collision convex meshes attached to the bodies of the robot is created based on a provided list of mesh files.
 %The configuration of a robot depends on its articular parameters, to hanble that, the robot object contains an update method that runs the Forward Kinematics algorithm and updates the transformations of each body and its jacobian, which, by extension updates the its body frames. Every body frames get their transformation's values and derivatives from those quantities.
 The RBDyn library contains all the low level tools and algorithm to compute the kinematics and statics of a robot.
@@ -438,14 +438,14 @@ It also maintains the transformations of all the collision meshes, and contains 
 Additionally, it contains some useful objects used to maintain and update the external forces applied on the robot, as well as the joint torques.
 
 \paragraph{The Function Class:}
-The functions that we use derivates from the Roboptim's functions.
+The functions that we use derives from the Roboptim's functions.
 As such, they are able to compute their return value and derivative for a given input.
 Functions can conveniently be defined through our expression framework to take advantage of their automatic derivation.
 
 \paragraph{The Constraint class:}
 A constraint object contains all the necessary elements for the description of a mathematical constraint.
 That is, a function $h$, and the manifold $\mathcal{M}_c$ on which it should be applied, as well as its lower bound $l$, upper bound $u$ and scaling factor of the constraint.
-Once a constraint is instanciated by the problem, the input mapping $\pi$ from the problem's complete manifold $\mathcal{M}$ to the function's application manifold is computed.
+Once a constraint is instantiated by the problem, the input mapping $\pi$ from the problem's complete manifold $\mathcal{M}$ to the function's application manifold is computed.
 The constraint that will then be used in the optimization for a given iterate $x$ can be written as:
 \begin{equation}
   l \leq h\circ\pi(x) \leq u
@@ -462,7 +462,7 @@ It implements the Frame constraint that we described in Section~\ref{sec:problem
 This specific constraint is composed of four distinct parts:
 \begin{itemize}
   \item The geometric constraint generates the constraints associated with the user's choice of combination of degrees of freedom to block amongst TX, TY, TZ, RX, RY, RZ.
-  \item The static constraint part (optional) instanciates the wrench to be added to the stability constraint of the problem based on the user's choice of components FX, FY, FZ, MX, MY, MZ.
+  \item The static constraint part (optional) instantiates the wrench to be added to the stability constraint of the problem based on the user's choice of components FX, FY, FZ, MX, MY, MZ.
   \item A custom geometric additional function field (optional) allows the user to add extra geometry constraints to the problem (through a \texttt{C++11} lambda that is executed after the geometric constraints are added to the problem).
   \item A custom static additional function field (optional) allows the user to add extra static constraints to the problem (through a \texttt{C++11} lambda that is executed after the constraint's wrench has been created and added to the problem).
 \end{itemize}
@@ -482,7 +482,7 @@ Each function is likely to bring additional variables with it.
 For each contact contributing to the balance, a variable representing the contact force is added to the problem.
 The associated wrench is added to the stability constraints.
 %Once the registration is complete, the complete manifold of the problem is generated and uses the information of the automatic mapping to `plug' each function with the correct sub-manifold.
-Once the registration is complete, the complete manifold of the problem is generated and all the functions on manifold used in the problem will generate theit input mapping that will project the complete variable of the problem onto the submanifold that the function is interested in.
+Once the registration is complete, the complete manifold of the problem is generated and all the functions on manifold used in the problem will generate their input mapping that will project the complete variable of the problem onto the submanifold that the function is interested in.
 Subsequently, the optimization problem can be generated and passed to the solver.
 The communication between the solver and the generated problem is made through the RobOptim framework\footnote{\url{http://www.roboptim.net/}}~\cite{moulard:jsme:2013, moulard:jrsj:2014}.
 After creating the complete manifold, the PostureProblem class can be used to facilitate the individual initialization of all the separate variables of the problem without the user having to worry about the indexes.
@@ -493,7 +493,7 @@ Finally, it can query the resolution of the problem by the solver and return the
 
 In this section, we present some scenarios solved with our posture generator and solver.
 \paragraph{Application of a desired force}
-In the context of using a robot to help humans in the construction of an aircraft, we formulate a problem where the HRP-4 robot is required to apply a desired force on a given point of the airplanes structure.
+In the context of using a robot to help humans in the construction of an aircraft, we formulate a problem where the HRP-4 robot is required to apply a desired force on a given point of the airplane's structure.
 We denote $f_g$ the target value of the force in direction $\vec{d}$ and $\vec{f_c}$ the actual force at the contact point and the could simply implement the following function $f_{target}(f_c)$ to minimize to get the desired result:
 \begin{equation}
   f_{target}(f_c) = {\left(\vec{f_c}\cdot\vec{d}-f_g\right)}^2
@@ -510,7 +510,7 @@ The result is depicted in figure~\ref{fig:comanoid}
 
 \paragraph{Generating postures in highly constrained environment}
 In this scenario, the HRP-4 robot is required to evolve in a highly constrained environment, in the sense that many obstacles limit its displacement, and it must avoid collision with them.
-The goal is to real a pannel of circuit breakers (in green on figure~\ref{fig:getafe}) to activate them.
+The goal is to real a panel of circuit breakers (in green on figure~\ref{fig:getafe}) to activate them.
 We generated a sequence of steps to reach that panel and then some postures to reach different points of this panel.
 In figure~\ref{fig:getafe}, we show some extracts of this sequence of postures.
 In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance and stability constraints.
@@ -518,7 +518,7 @@ On the last posture the top left corner of the panel is reached with the tip of 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{getafeSequence.png}
-  \caption{Extracts of a sequence of postures with HRP-4 entering a constrained environments to reach a point on a pannel of circuit breakers (in green)}
+  \caption{Extracts of a sequence of postures with HRP-4 entering a constrained environments to reach a point on a panel of circuit breakers (in green)}
 \label{fig:getafe}
 \end{figure}
 
@@ -531,7 +531,7 @@ On the last posture the top left corner of the panel is reached with the tip of 
 
 Writing relations between geometric quantities defined in frames allows to describe a large variety of contacts.
 %It is especially convenient when the contact points are predefined or when the geometric relations are simple to express, like for the inclusion of 2 convex polygons in each other in the context of a planar contact.
-In particular, it allows to write most types on geometric constraints between canonical geometric shapes (point, line, plan).
+In particular, it allows to write most types on geometric constraints between canonical geometric shapes (point, line, plane).
 The most common type of contact constraint encountered is the contact between two surfaces $S_1$ and $S_2$.
 The set of equations used to define that type of constraint can be obtained through a frame constraint blocking TZ, RX and RY. Provided that the correct frames are defined, $F_1$ on $S_1$ with $\vec{z_1}$ normal outbound and $F_2$ on $S_2$ with $\vec{z_2}$ normal inbound, the constraint writes as:
 
@@ -549,8 +549,8 @@ The set of equations used to define that type of constraint can be obtained thro
 
 When the two surfaces are plan, a contact between them can be written simply with the set of equations~\Eqref{eq:planar_contact}.
 In that case, the quantities involved in the constraint are invariant with the location of the contact point, thus, the equations are valid for any point of the surface (in particular, the normal vector is the same for any point on the surface).
-%When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and pre-defined, the set of equation~\Eqref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
-When it comes to non-flat surfaces, the location of the frames used in equations~\Eqref{eq:planar_contact} matters, as the quantities in the constraint's equations depend on it.
+%When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and predefined, the set of equation~\Eqref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
+When it comes to non-flat surfaces, the location of the frames used in equations~\Eqref{eq:planar_contact} matters, as the quantities in the constraint equations depend on it.
 %(in particular, the normal vector can vary for any point on the surface).
 
 %We propose to describe that type of contact by parametrizing the contact surface, and using an additional variable on which the location of the contact point and its normal vector are parametrized.
@@ -671,7 +671,7 @@ The cube is free to move (parametrized by $\mathbb{R}^3 \times SO(3)$) and has i
   \setlength\fboxsep{0pt}
   \setlength\fboxrule{1pt}
   \fbox{\includegraphics[width=.8\linewidth]{hrp4CubeOnSphere.png}}
-\caption{HRP4 carrying a 2kg cube.
+\caption{HRP4 carrying a 2 kg cube.
 Left: the objective function is to maintain the cube at a given position.
 Right: it is to put the cube as far as possible in a given direction}
 \label{fig:hrp4_cube}
@@ -696,7 +696,7 @@ On the contrary, we usually have an approximation of the object as a mesh.
 We can consider two types of surface parametrizations, the surfaces of closed topology, like a sphere, which are a large part of the objects of interest in our application, that we parametrize on $S2$ (because there is no diffeomorphism between the unit sphere and a subset of $\mathbb{R}^2$) and the surfaces of open topology, that generally can be parametrized on $\mathbb{R}^2$.
 The problem of finding a parametrization satisfying the continuity requirements exists for both of those when the surface's representation comes as a mesh.
 
-In~\cite{escande:icra:2016}, we provide a systematic way to obtain a parametric surface closely approximating a mesh and meeting the regularity requirements mentioned above, for a large class of objects, namely star-convex objects.
+In~\cite{escande:icra:2016}, we provide a systematic way to obtain a parametric surface closely approximating a mesh and meeting the continuity requirements mentioned above, for a large class of objects, namely star-convex objects.
 To that end, we combine the use of Catmull-Clark subdivision surfaces with a tailored ray casting algorithm, and propose an efficient and robust numerical method to evaluate a point, a normal and their derivatives at a given set of parameters.
 
 The Catmull-Clark algorithm is used to create a smooth surface modeling a given \emph{control mesh}.
@@ -788,9 +788,9 @@ This can be used to alleviate the work to be done by the user, be it a human or 
 \label{sec:conclusion_ch4}
 
 In this section we presented our approach for formulating a posture generation problem and generating an optimization problem that represents it.
-We presented several tools that are meant to simplify this process for the developper, with the automatic variable management, the use of non-Euclidean manifolds and the geometric expressions framework.
+We presented several tools that are meant to simplify this process for the developer, with the automatic variable management, the use of non-Euclidean manifolds and the geometric expressions framework.
 
-Leveraging those tools, we developped methods to formulate constraints involving non-flat surfaces, by adding an extra variable to our optimization problem to parameterize the location of a frame on the surface.
+Leveraging those tools, we developed methods to formulate constraints involving non-flat surfaces, by adding an extra variable to our optimization problem to parameterize the location of a frame on the surface.
 To avoid optimization issues, we make sure that our formulations have satisfying continuity properties.
 This addition allows to formulate much richer posture generation problems, where the location of a contact on a non-flat surface is abstracted and chosen by the optimization solver.
 We were able to use this approach to represent several kinds of surfaces that could be described by closed-form formulas, such as the wrist of HRP-2, a sphere and a superellipsoid.

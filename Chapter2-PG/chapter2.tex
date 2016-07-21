@@ -90,7 +90,7 @@ In Figure~\ref{fig:PG}, we illustrate those constraints with the result of a pos
 In this section, we present a formulation of robotic systems that allows specifying most of the typical constraints encountered in robotics problems.
 
 We consider a robotic system made of $n_B$ bodies and $n_J(=n_B+1)$ joints.
-The global structure of the robot is described by an ordered graph called multi-body graph.
+The global structure of the robot is described by an ordered graph called multibody graph.
 The base body (World) has index $0$ and other bodies get different positive integer index.
 We denote the body of index $i$, $B_i$.
 $B_0$ refers to the World.
@@ -104,8 +104,8 @@ The number of degrees of freedom of $J_i$ is denoted $dof^J_i$ and the number of
 Figure~\ref{fig:mbg} illustrates this numbering system for a simple robot with 4 joints and 5 bodies (including the basis)
 
 The geometric relations between bodies and joints are described through transformations between their reference frames.
-We use transformations as described in the Spacial Vector Algebra chapter of `Rigid Body Dynamics Algorithm' by Roy Featherstone~\cite{featherstone:book:2007}.
-Motion vectors (vectors describing motion quatities as positions, velocities and accelerations) and their force counterpart are defined in~\cite{featherstone:book:2007}.
+We use transformations as described in the Spatial Vector Algebra chapter of `Rigid Body Dynamics Algorithm' by Roy Featherstone~\cite{featherstone:book:2007}.
+Motion vectors (vectors describing motion quantities as positions, velocities and accelerations) and their force counterpart are defined in~\cite{featherstone:book:2007}.
 
 For any 3D vector $v\in\mathbb{R}^3$, $\hat{v}$ denotes the $3\times 3$ skew-symmetric matrix such that $\hat{v}u = v\wedge u$.
 Where $\wedge$ denotes the cross product operator.
@@ -347,7 +347,7 @@ The rotation matrix for such a rotation is given by:
 
 Euler Angle formulations have the advantage to be simple and intuitive.
 There are many other possible choices of axes to define a Euler Angle 3D rotation.
-But they all suffer from singularities (the gimbal lock), which happens when two of the three rotation axis become aligned.
+But they all suffer from singularities (the gimbal lock), which happens when two of the three rotation axes become aligned.
 In such a configuration, the only rotations possible are one rotation around the two aligned axis and one rotation around the third axis.
 Thus, one degree of freedom is lost.
 Those singularities are prohibitive for the use of that type of formulation in a posture generation.
@@ -449,7 +449,7 @@ The transformations ${}^i X_0$ are used in many functions, therefore, having an 
 Given a static transformation ${}^p X_i$ defined in body $B_i$.
 Its expression in the world frame is ${}^p X_0 = {}^p X_i\ {}^i X_0$ and its expression in the frame of $B_j$ is ${}^p X_j = {}^p X_i\ {}^i X_0\ {{}^j X_i}^{-1}$.
 
-We denote $\text{Jac}_i$ the Jacobian of body $i$, and $\text{Jac}_i(X)$ the jacobian of the frame defined by $X$ in the referencial of body $i$.
+We denote $\text{Jac}_i$ the Jacobian of body $i$, and $\text{Jac}_i(X)$ the jacobian of the frame defined by $X$ in the referential of body $i$.
 $q_i$ is the part of $q$ that corresponds to the degrees of freedom of joint $J_i$.
 We denote $\text{Jac}_i.\text{cols}(j)$ the columns of $\text{Jac}_i$ associated with joint $J_j$.
 The jacobian of the frame defined by ${}^p X_i$ in $B_i$ with respect to $q_j$ is given by
@@ -731,7 +731,7 @@ This equation can be simplified by applying it at the center of mass of the body
 \end{equation}
 
 Satisfying equation~\Eqref{eq:stability} ensures the stability of a rigid body.
-If the robots actuators are powerful enough to maintain its posture under any external perturbation, namely, when they can generate infinite or at least large enough torques, then the robot can be approximated as a rigid body and satisfying equation~\Eqref{eq:stability} is enough to ensure its stability.
+If the robot's actuators are powerful enough to maintain its posture under any external perturbation, namely, when they can generate infinite or at least large enough torques, then the robot can be approximated as a rigid body and satisfying equation~\Eqref{eq:stability} is enough to ensure its stability.
 %In some cases, an articulated robot is considered as a rigid body and this equation alone can be used to ensure its stability.
 %It is only valid if the robot can generate infinite torques in its articulations, or at least if we have some guarantee that the robot is able to generate large enough torques.
 Otherwise, it is necessary to verify that the robot's actuators can generate large enough torques to maintain that posture.
@@ -1016,7 +1016,7 @@ Various types of cost functions can be chosen, for example, we can minimize the 
 
 The effect of that type of cost function is illustrated in~\Figref{fig:cost}.
 On both images, the HRP-2 Kai robot is stable, respects its joints and torques limits.
-The only difference is that the right one mimimizes the distance to a reference posture (standing straight with bent knees) while the left result does not use a cost function.
+The only difference is that the right one minimizes the distance to a reference posture (standing straight with bent knees) while the left result does not use a cost function.
 
 \begin{figure}[htpb]
   \centering

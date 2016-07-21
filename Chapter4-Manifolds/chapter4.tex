@@ -82,7 +82,7 @@
 \section{Introduction to optimization on Manifolds}
 \label{sec:introduction_to_optimization_on_manifolds}
 
-Posture generation has been traditionnaly formulated as a problem over a Euclidean space.
+Posture generation has been traditionally formulated as a problem over a Euclidean space.
 Robots variable may, however, be more naturally expressed over non-Euclidean manifolds.
 The archetypes for this in robotics are the rotation part of the root body of a robot, and ball joints, whose variables live in $SO(3)$.
 Some typical tasks are also naturally formulated on different manifolds.
@@ -91,7 +91,7 @@ The human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as pro
 A non-Euclidean manifold can be thought of as a space that is locally Euclidean, but not globally.
 Like a sphere, if one looks in a small enough neighborhood, it looks Euclidean, just like the surface of a giant sphere like the earth looks flat for a human standing on it.
 
-Formulating the problem over $\mathbb{R}^n$ leads either to singularities that can prevent the convergence of the optimization solver, or to cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
+Formulating the problem over $\mathbb{R}^n$ leads either to singularities that can prevent the convergence of the optimization solver, or cumbersome writing to specify that the variable is actually living on a manifold (see~\cite{bouyarmane:humanoids:2012}).
 In addition, since constraints can be violated during the optimization process, the iterates may not be elements of the search manifold.
 
 For example, let us consider an optimization problem over the $SO(3)$ manifold:
@@ -196,10 +196,10 @@ This boils down to choosing a representation space $\mathbb{E} = \mathbb{R}^r$ (
 \end{equation}
 %In the following, we identify $\mathcal{M}$ with the set $\psi(\mathcal{M}) \subseteq \mathbb{E}$.
 $\psi(\mathcal{M})$ is the subset of $\mathbb{E}$ containing the representation of all the elements of $\mathcal{M}$.
-The projection operator $\pi_\mathcal{M}$ that we mentionned in Section~\ref{sec:introduction_to_optimization_on_manifolds} is actually a projection from $\mathbb{E}$ to $\psi(\mathcal{M})$.
+The projection operator $\pi_\mathcal{M}$ that we mentioned in Section~\ref{sec:introduction_to_optimization_on_manifolds} is actually a projection from $\mathbb{E}$ to $\psi(\mathcal{M})$.
 
 With this representation, it is tempting to simply transform problem~\Eqref{eq:optim_problem} as an optimization over $\mathbb{R}^r$ with objective $f \circ \psi^{-1}$ and constraint $c \circ \psi^{-1}$, and solve it with a classical solver.
-But, as we stated in Section~\ref{sec:introduction_to_optimization_on_manifolds}, if $r=n$ we will get singulatities, and if $r>n$ we will add parametrization-related variables and constraints to our problem and the iterates may not lie on the manifold and need to be projected on it.
+But, as we stated in Section~\ref{sec:introduction_to_optimization_on_manifolds}, if $r=n$ we will get singularities, and if $r>n$ we will add parametrization-related variables and constraints to our problem and the iterates may not lie on the manifold and need to be projected on it.
 So another approach needs to be taken.
 %But depending on the representation choice, one of the two following problems arises:\\
 %(i) $r=n$, then it is not possible in the general non-Euclidean case to find $\psi$ without derivative discontinuities.
@@ -252,8 +252,8 @@ By definition, there is always, at a point $x$ of a smooth $n$-dimensional manif
 $\varphi_x$ gives us a local parametrization for $\mathcal{M}$.
 Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi_x$ in optimization on manifolds and a step followed by a projection $\pi_\mathcal{M}$ as it can be done in classical optimization.
 
-$T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplan of a higher dimensionality space.
-For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplan embedded in $\mathbb{R}^3$.
+$T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplane of a higher dimensionality space.
+For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplane embedded in $\mathbb{R}^3$.
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local function $\varphi_{x_i}$ at the current iterate $x_i$ at each iteration.
 Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as:
@@ -478,7 +478,7 @@ To summarize, for each elementary manifold $\mathcal{M}$, we need to implement t
 
 We provide the detailed formulas for those operations in Appendix~\ref{appendix:manifolds} for different elementary manifolds:
 \begin{itemize}
-  \item The Realspace of dimension $n$ in~\ref{sec:the_real_space}
+  \item The Real space of dimension $n$ in~\ref{sec:the_real_space}
   \item The 3D rotations manifold SO(3) with matrix formulation in~\ref{sec:the_3d_rotation_manifold_matrix_representation}
   \item The 3D rotations manifold SO(3) with quaternion formulation in~\ref{sec:the_3d_rotation_manifold_quaternion_representation}
   \item The unit sphere manifold S2 in~\ref{sec:the_unit_sphere_manifold_s2}
@@ -518,7 +518,7 @@ They inherit from the Manifold class and implement all their mathematical operat
 The Cartesian Product class is used to build compound manifolds by being `multiplied' with other elementary manifolds.
 The Point class represents a point on a manifold, it contains the data that represents its numerical value.
 It can only be constructed by a manifold, and provides some proxy to its manifolds operations, in particular, it is equipped with an increment method, that applied a retractation on it.
-Figure~\ref{fig:uml_manifold} presents a simplified class diagram of this project, ommiting all the settors, accessors, bookkeeping mechanics and accessory functions.
+Figure~\ref{fig:uml_manifold} presents a simplified class diagram of this project, omitting all the settor, gettor, bookkeeping mechanics and accessory functions.
 
 \begin{figure}[htpb]
   \centering
@@ -721,7 +721,7 @@ Our algorithm is an adaptation of Fletcher's filter SQP~\cite{fletcher:mathprog:
 
 An iterate $\{x,\lambda\}$ is considered to be a solution of the optimization problem if it satisfies the first-order optimality conditions (presented in Section~\ref{sub:optimality_conditions}) to within certain tolerances.
 We use the same criterion as the one used in \href{http://www.sbsi-sol-optimize.com/asp/sol_product_snopt.htm}{{\tt SNOPT}} and presented in~\cite{gill:snopt:2002}.
-It has the advantage of using two different tolerance constants: $\tau_P$ monitores the primal optimality conditions, which means the satisfaction of the constraints, and $\tau_D$ monitores the dual conditions, which means the optimality of the cost function and of the Lagrange multipliers.
+It has the advantage of using two different tolerance constants: $\tau_P$ monitors the primal optimality conditions, which means the satisfaction of the constraints, and $\tau_D$ monitors the dual conditions, which means the optimality of the cost function and of the Lagrange multipliers.
 That gives the user more control over the quality of the solution.
 
 Dropping the distinction between Linear and NonLinear Constraints,
@@ -1010,7 +1010,7 @@ Then $Q$ can be fed to {\tt LSSOL} directly.
 
 For all those reasons, this update method is very attractive.
 We implemented it in our solver, but so far the results have not been very conclusive and some more work will be dedicated to that issue in the future.
-As of now, the best results where observed when using the self-scaling BFGS update method.
+As of now, the best results were observed when using the self-scaling BFGS update method.
 
 \subsection{Hessian Update in Restoration phase}
 \label{sub:hessian_update_in_restoration_phase}
@@ -1045,7 +1045,7 @@ Those tests can also be used in a non-regression criterion for our software.
 \section{Diagrams of the algorithms}
 \label{sec:diagrams_of_the_algorithms}
 
-In Figures~\ref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:second_order_correction}, we summarize the functionning of the algorithms that are respectively the main loop of the SQP, the restoration phase and the second order correction phase.
+In Figures~\ref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:second_order_correction}, we summarize the functioning of the algorithms that are respectively the main loop of the SQP, the restoration phase and the second order correction phase.
 
 \begin{figure}[H]
   \centering

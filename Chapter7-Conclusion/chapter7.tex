@@ -17,7 +17,7 @@ Robotics problems often contain variables that live in non-Euclidean spaces, we 
 Not only does it allow us to formulate mathematical problems more elegantly and ensures the validity of our variables at every step of the optimization process, it also enables us to have a better understanding and mastering in the way to tune our solver for robotics problems, and allows us to try new ways of solving those problems.
 
 We present a formulation of the posture generation problem that takes into account the inherent structure of its configuration space being a cartesian product of submanifolds representing different quantities(translations, rotations, joint angles, contact forces, etc.).
-Each submanifold of the search space is considered as a separate entity, and variables on it can be considered separately from eachother.
+Each submanifold of the search space is considered as a separate entity, and variables on it can be considered separately from each other.
 We take advantage of that structure to propose a posture generation framework where the variables, submanifolds and functions derivations are managed automatically, which simplifies the work of the developper.
 This allows to easily and elegantly write custom constraints on a selected set of variables defined on the submanifolds of our search space.
 We exploit the capabilities of our framework to generate configurations with contacts on non-flat surfaces by parametrizing the location of the contact point on additional variables.

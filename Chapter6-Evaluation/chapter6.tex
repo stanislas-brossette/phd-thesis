@@ -69,8 +69,8 @@ We choose to study a problem of cube stacking.
 Given a set of cubes, which pose is defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not penetrating each other.
 For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertex, $\vec{t}\in\mathbb{R}^3$ and $R\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
 To ensure that the cubes are inside the box, we write a constraint that forces each corners of each cube to be inside the box.
-For each plan composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plan to the origin along $\vec{n}$.
-The constraint for each cube $C_i$ being `above' a plan defined by $\{d, \vec{n}\}$ is of dimension 8 (1 per vertex) and can be written as:
+For each plane composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plane to the origin along $\vec{n}$.
+The constraint for each cube $C_i$ being `above' a plane defined by $\{d, \vec{n}\}$ is of dimension 8 (1 per vertex) and can be written as:
 \begin{equation}
   \forall v\in V,\ (\vec{t} + R v)\cdot \vec{n} \geq d
 \end{equation}
@@ -78,9 +78,9 @@ The constraint for each cube $C_i$ being `above' a plan defined by $\{d, \vec{n}
 To avoid interpenetration of the cubes, we could use the usual collision avoidance constraints as presented in Section~\ref{sec:problem_formulations}.
 In that case, the use of the exact mesh of the cubes would generate gradient discontinuities of the constraints.
 Approximating the mesh with STPBV would allow to avoid those discontinuities, but then, if the STPBV approximates the exact mesh closely, we would have a gradient close to discontinuous.
-Instead, we propose another approach that uses non-Euclidean manifolds: for each pair of cubes $C_i,\ C_j$, we require a plan $P_{ij}$ to fit in-between them.
-The plan's location can be parametrized by its normal $\vec{n}\in S2$ and $d\in\mathbb{R}$, the signed distance from the plan to the origin along $\vec{n}$.
-Each plan's pose can be represented by a variable on $\mathbb{R} \times S2$.
+Instead, we propose another approach that uses non-Euclidean manifolds: for each pair of cubes $C_i,\ C_j$, we require a plane $P_{ij}$ to fit in-between them.
+The plane's location can be parametrized by its normal $\vec{n}\in S2$ and $d\in\mathbb{R}$, the signed distance from the plane to the origin along $\vec{n}$.
+Each plane's pose can be represented by a variable on $\mathbb{R} \times S2$.
 Thus we can write a constraint of dimension 16 (1 per vertex) such that $C_i$ is above $P_{ij}$ and $C_j$ is below $P_{ij}$ as follows:
 
 \begin{align}
@@ -97,17 +97,17 @@ In order to simulate gravity, we minimize the sum of all the cubes' vertical coo
 \end{equation}
 
 We consider the problem of stacking $n$ cubes in an open-top box composed of 5 plans (the ground and 4 walls).
-Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plan is parametrized on $\mathbb{R}\times S2$.
+Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plane is parametrized on $\mathbb{R}\times S2$.
 In figure~\ref{fig:cubes}, we illustrate the case of stacking 3 cubes.
 With the initial condition on the left side and the solution on the right.
 \begin{figure}
 \centering
   \includegraphics[width=.8\linewidth]{3cubes.png}
-  \caption{Problem of stacking 3 red cubes in a blue box, separating each pair of cubes by a yellow plan. Initial (left) and final (right) configurations}
+  \caption{Problem of stacking 3 red cubes in a blue box, separating each pair of cubes by a yellow plane. Initial (left) and final (right) configurations}
 \label{fig:cubes}
 \end{figure}
 
-There is one plan for each pair of cubes, so, $n(n-1)/2$ plans.
+There is one plane for each pair of cubes, so, $n(n-1)/2$ plans.
 Thus the search manifold is:
 \begin{equation}
   \mathcal{M} = {\left( \mathbb{R}^3\times SO(3) \right)}^n \times {\left( \mathbb{R} \times S2 \right)}^{\frac{n(n-1)}{2}} \nonumber
@@ -125,8 +125,8 @@ This gives rise to a problem on
 We have a problem of dimension $5n+2n^2$ with ,$32.5n+8.5n^2$ constraints, which is $\frac{n(n+1)}{2}$ more variables and constraints than with the manifold formulation.
 
 We solve those problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, time taken to converge and time spent per iterations.
-In each resolution, both problems are initialized with the same randomized initial guess, and the solver is setup with the same set of parameters.
-The initial positions of the cubes are chosen randomly, and each plan is initialized at a position between the two cubes it separates.
+In each resolution, both problems are initialized with the same randomized initial guess, and the solver is set up with the same set of parameters.
+The initial positions of the cubes are chosen randomly, and each plane is initialized at a position between the two cubes it separates.
 We display the results of these tests in figure~\ref{fig:timings-cubes}.
 
 \begin{figure}[htpb]
@@ -137,11 +137,11 @@ We display the results of these tests in figure~\ref{fig:timings-cubes}.
 \end{figure}
 
 With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non manifold formulation.
-We observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spend per iteration is consistantly smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with the manifold formulation.
+We observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spent per iteration is consistently smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with the manifold formulation.
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
 In particular, the minimum value for the diagonal terms $\mu$ is important.
-We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistant (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$, and the formulation with manifolds is consistently faster than the one without manifolds.
+We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$, and the formulation with manifolds is consistently faster than the one without manifolds.
 Values outside of that span tend to degrade both resolutions.
 Too high values tend to damp the hessian, which translates into bigger numbers of iterations.
 Too small values make the hessian closer to be rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
@@ -215,7 +215,7 @@ It would be interesting to run more tests like those to study the influence of t
 \section{Application to Inertial Parameters Identification}
 \label{sec:inertial_parameters}
 
-Altough it was developped with the idea of solving posture generation problems, our solver and the formulation on manifolds can be used for different types of problems.
+Although it was developed with the idea of solving posture generation problems, our solver and the formulation on manifolds can be used for different types of problems.
 In this section, we present an application of our optimization algorithm to solve a problem of inertial parameters identification that was published in~\cite{traversaro:iros:2016}.
 
 \subsection{Physical Consistency of Inertial Parameters}
@@ -289,7 +289,7 @@ Where $Y(A^g,V)$ is such that:
 $$
 Y(A^g,V)\pi = M A^g + V\bar{\times}^*MV
 $$
-M is the spacial inertia matrix:
+M is the spatial inertia matrix:
 \begin{equation}
 M=
   \begin{bmatrix}
@@ -329,7 +329,7 @@ In~\cite{traversaro:iros:2016}, we propose the \emph{full physical consistent} c
   \end{equation}
 \end{definition}
 
-We propose a new parametrisation of the inertial parameters by an element $\theta \in \mathfrak{P} = \mathbb{R}_{\ge 0} \times \mathbb{R}^3 \times  SO(3) \times \mathbb{R}_{\ge 0}^3$ that ensures the \emph{full physical consistency}. In particular the components of $\theta$ are:
+We propose a new parametrization of the inertial parameters by an element $\theta \in \mathfrak{P} = \mathbb{R}_{\ge 0} \times \mathbb{R}^3 \times  SO(3) \times \mathbb{R}_{\ge 0}^3$ that ensures the \emph{full physical consistency}. In particular the components of $\theta$ are:
 \begin{itemize}
     \item $m \in \mathbb{R}_{\ge 0}$ the mass of body
     \item $c \in \mathbb{R}^3$ the center of mass of the body
@@ -357,7 +357,7 @@ And a function $\pi_p(\theta):\mathfrak{P}\mapsto\mathbb{R}^{10}$ that maps this
     \end{smallmatrix}\right] L)}  Q^\top - m \hat{c} \hat{c} \right) \\
   \end{bmatrix} \nonumber
 \end{equation}
-In~\cite{traversaro:iros:2016}, we prove that every $\theta\in\mathfrak{P}$ generates \emph{fully physical consistent} inertial parameters.
+In~\cite{traversaro:iros:2016}, we prove that every $\theta\in\mathfrak{P}$ generates \emph{fully physically consistent} inertial parameters.
 However, the optimization variable now lives on a non-Euclidean manifold, because $\mathfrak{P}$ includes $SO(3)$.
 Thus, we propose to solve that problem with our solver on manifolds.
 
@@ -382,9 +382,9 @@ The formulation with native $SO(3)$ was consistently solved faster.
 We observed timings around $0.5$s for it, and over $1$s for non-manifold formulations with CFSQP.
 The mean time for an iteration was also the lowest with the native formulation (at least $30\%$ when compared to all other possibilities).
 
-Working directly with manifolds has also an advantage that we do not leverage here, but could be useful for future work: at each iteration, the variables of the problem represent a \emph{fully physical consistent} set of inertial parameters.
+Working directly with manifolds has also an advantage that we do not leverage here, but could be useful for future work: at each iteration, the variables of the problem represent a \emph{fully physically consistent} set of inertial parameters.
 This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
-Having physically meaningful intermediate values can be useful to evaluate additional functions that pre-suppose it (additional constraints, external monitoring $\ldots$).
+Having physically meaningful intermediate values can be useful to evaluate additional functions that presuppose it (additional constraints, external monitoring $\ldots$).
 It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the inertial identification, so that when the optimization process is stopped after a few iterations, the output is physically valid.
 
 \subsection{Experiments}
@@ -409,25 +409,25 @@ We locked the elbow, wrist and hands joints of the arm, simulating the presence 
 \end{figure}
 
 We generated five 60 seconds trajectories in which the three shoulder joints were reaching successive random joint positions using minimum-jerk like trajectories.
-Each trajectory is decomposed is subtrajectories to travel between two consecutive random positions in respectively $10$s, $5$s, $2$s, $1$s and $0.5$s (As a result, the trajectory are ordered from the slowest to the fastest).
+Each trajectory is decomposed is sub-trajectories to travel between two consecutive random positions in respectively $10$s, $5$s, $2$s, $1$s and $0.5$s (As a result, the trajectory are ordered from the slowest to the fastest).
 We played those trajectories on the robot and we sampled at $100$Hz the F/T sensors and joint encoders output.
 %We filtered the joint positions and obtained joint velocities and accelerations using a Savitzky-Golay filtering of order 2 and with a windows size of $499$, $41$, $21$, $9$, $7$ samples.
 We used joint positions, velocities and accelerations with the kinematic model of the robot to compute $A^g$ and $V$ of the F/T sensor for each time sample.
 %We removed the unknown offset from the F/T measurements using the offset removal technique described in \cite{traversaro2015situ}.
-We solved the inertial identification problem~\eqref{eq:classicIdentif} using a classical linear algorithm and the one using the proposed \emph{fully physical consistent} parametrization \eqref{eq:finalProblem} with our solver on manifolds.
+We solved the inertial identification problem~\eqref{eq:classicIdentif} using a classical linear algorithm and the one using the proposed \emph{fully physically consistent} parametrization \eqref{eq:finalProblem} with our solver on manifolds.
 We report the identified inertial parameters in Table \ref{table:results}.
-It is interesting to highlight that for slow datasets (subtrajectory times of $10$s or $5$s) the unconstrained optimization problem \eqref{eq:classicIdentif} results in inertial parameters that are not \emph{fully physical consistent}.
+It is interesting to highlight that for slow datasets (sub-trajectory times of $10$s or $5$s) the unconstrained optimization problem \eqref{eq:classicIdentif} results in inertial parameters that are not \emph{fully physically consistent}.
 In particular, this is due to the low values of angular velocities and acceleration, that do not properly excites the inertial parameters, which are then \emph{numerically not identifiable}.
 \begin{figure}
 \centering
   \includegraphics[width=\linewidth]{tableResults.png}
   \caption{Inertial parameters identified with the different datasets and the different optimization problems.
-  Inertial parameters identified on $\mathbb{R}^{10}$ optimization manifold that are not \emph{fully physical consistent} are highlighted.
+  Inertial parameters identified on $\mathbb{R}^{10}$ optimization manifold that are not \emph{fully physically consistent} are highlighted.
 Masses are expressed in $kg$, first moment of masses in $kg.m$, inertia matrix elements in $kg.m^2$.}
 \label{table:results}
 \end{figure}
 \FloatBarrier
-The proposed optimization problem clearly cannot identify those parameters anyway, as the identified parameters are an order of magnitude larger than the ones estimated for faster dataset, nevertheless it always estimates inertial parameters that are \emph{fully physical consistent}.
+The proposed optimization problem clearly cannot identify those parameters anyway, as the identified parameters are an order of magnitude larger than the ones estimated for faster dataset, nevertheless it always estimates inertial parameters that are \emph{fully physically consistent}.
 For faster datasets (trajectory time of $1$s or $0.5$s) the results of the two optimization problems are the same because the high values of angular velocities and accelerations permit to identify all the parameters perfectly.
 While this is possible to identify all the inertial parameters of a single rigid body, this is not the case when identifying the inertial parameters of a complex structure such as a humanoid robot, for which both structural \cite{ayusawa2014identifiability} and numerical \cite{pham1991essential} not identifiable parameters exists.
 In this later application, the enforcement of \emph{full physical consistency}  will always be necessary to get meaningful results.
@@ -461,7 +461,7 @@ Subsequently, we must deal with two kinds of situations:
 \begin{enumerate}
   \item the models of the objects in the environment are known: in this case adapting the MCP consists mainly in dealing with recognition, model superposition and handling uncertainties.
   In brief, once model superposition is achieved, we can use the 3D model for MCP as in~\cite{escande:ras:2013,bouyarmane:ar:2012}, yet some adjustments are needed.
-  \item the models of the hurdles and the environment are not known (e.g.\ disaster or outdoor environments, for example related to the Fukushima disaster that inspired the DARPA Robotic Challenge), MCP is to be achieved in an ego-centric way with models built from the robot's embedded sensors.
+  \item the models of the hurdles and the environment are not known (e.g.\ disaster or outdoor environments, for example related to the Fukushima disaster that inspired the DARPA Robotic Challenge), MCP is to be achieved in an egocentric way with models built from the robot's embedded sensors.
   This chapter deals with this case and we describe how the MCP is modified to achieve this goal.
   In a nutshell, we construct planar surfaces from the 3D point clouds data and feed them to the MCP.\@
 \end{enumerate}
@@ -548,7 +548,7 @@ Or more simply a constraint of convex polygon inclusion, which is sufficient for
 %The main modification made in the posture generator deals with properly writing the constraints that enforce the inclusion of one surface into another one.
 %In our previous implementation, contacts are searched between rectangular patches attached to the robot body or the environment.
 
-Such constraint can be written by enforcing that all the points of polygon $S_i$ are located on the left side of all the segments of polygon $S_j$ (provided that the points of $S_j$ are ordered counter-clockwise around its normal).
+Such constraint can be written by enforcing that all the points of polygon $S_i$ are located on the left side of all the segments of polygon $S_j$ (provided that the points of $S_j$ are ordered counterclockwise around its normal).
 %For a couple of coplanar surfaces $S_i$, $S_j$ respectively represented by $n$ and $m$ points, this gives rise to a constraint of dimension $n \times m$:
 Given $S_i$ and $S_j$ two surfaces which contours are defined respectively by the sets of points ${p_0, p_1, \ldots, p_n}$ and ${q_0, q_1, \ldots, q_m}$ and $\vec{n}$ a vector normal to $S_i$, the inclusion of $S_i$ in $S_j$ can be written as the following constraint:
 
@@ -705,7 +705,7 @@ PCL provides only partial information, it is then necessary to drive the planner
 \label{sec:conclusion_chap_6}
 
 In this section, we presented several evaluations and applications of our solver and posture generator.
-We first evaluated the influence of the formulation on manifolds on a problem making heavy use of them and showed that, as expected, this formulation outperforms the classical approach in terms of convergence times.
+We first evaluated the influence of the formulation on manifolds on a problem making heavy usage of them and showed that as expected, this formulation outperforms the classical approach in terms of convergence times.
 Then we propose an approach to estimate the success rate of our posture generator with respect to the distance between the initial guess and the solution.
 We then present a different application of our solver to the problem of inertial identification of a rigid body.
 In which case, working with manifolds allows to ensure the \emph{full physical consistency} of the inertial parameters in any situation and all along the optimization process.

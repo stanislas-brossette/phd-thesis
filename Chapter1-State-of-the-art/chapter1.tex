@@ -32,7 +32,7 @@ It uses a second order tracking scheme to guarantee satisfactory tracking perfor
 Some statistical resolution approaches have been proposed in~\cite{courty2008inverse, hecker2008real}, with respectively a sequential Monte Carlo method and a particle filtering approach, they have the advantage to only use direct calculations and thus never require matrix inversions, thus, their strength shows particularly when solving problems with high numbers of degrees of freedom.
 
 In~\cite{AristidouFABRIK, Aristidou:2016_ExtFABRIK} the forward and backward reaching inverse kinematics(FABRIK) resolution method is introduced.
-It is based on a geometric iterative heuristic approach, where the bodies of a robot are moved iteratively and separately to reach a target with the end effector while maintaining the integrity of the robots' structure.
+It is based on a geometric iterative heuristic approach, where the bodies of a robot are moved iteratively and separately to reach a target with the end effector while maintaining the integrity of the robot's structure.
 This approach is simple, does not suffer from singularities and requires less iterations than most other IK methods.
 But it cannot easily be extended to take non-geometric constraints into account.
 
@@ -42,17 +42,17 @@ Finding a solution to an IK problem without regards for the stability of the sol
 \subsection{Generalized Inverse Kinematics}
 \label{sub:generalized_inverse_kinematics}
 
-All the previously mentionned approaches are used to find a robot configuration solution to the geometric IK problem.
+All the previously mentioned approaches are used to find a robot configuration solution to the geometric IK problem.
 To solve a Generalized Inverse Kinematics problem with stability constraints, one can first solve the associated IK with one of the methods presented above, and then test the stability of the IK solution, using methods such as the ones presented in~\cite{bretl:itro:2008} or~\cite{rimon2008general} that determine if the configuration can be statically stable.
 This gives a rejection criterion for the proposed solution.
 If the solution can be stable, the optimal contact forces can be computed using method proposed in~\cite{boyd2007fast} (which in turn allow to compute the joint torques).
 Otherwise, another IK solution is generated and tested.
 And the process is repeated until a satisfactory solution is found.
-This type of sequencial approach of posture generation problem resolution features a rejection criterion that can in some cases be difficult to overcome, making this approach costly, for example, if there is a small number of contacts and very few configurations are stable.
+This type of sequential approach of posture generation problem resolution features a rejection criterion that can in some cases be difficult to overcome, making this approach costly, for example, if there is a small number of contacts and very few configurations are stable.
 
 %Those approach lead to a sequential resolution of the posture generation problem where a solution to the IK problem is searched, then tested for stability, if it is stable, the optimal forces are computed, otherwise, another solution is searched for.
 
-Another way to solve the posture generation problem is to consider the complete problem as one, with the IK targets and all the other constraints (stability, collisions, toque limits, etc\ldots) in a single nonlinear constrained optimization problem.
+Another way to solve the posture generation problem is to consider the complete problem as one, with the IK targets and all the other constraints (stability, collisions, torque limits, etc\ldots) in a single nonlinear constrained optimization problem.
 In~\cite{Zhao1994}, Zhao uses that approach to solve the IK problem.
 That is the approach that we and many others use to solve Generalized Inverse Kinematics problems.
 In~\cite{escande:iros:2006}, that approach is employed to generate postures that are used to grow a tree of usable postures in a multi-contact planning algorithm.
@@ -65,7 +65,7 @@ In~\cite{hauser:ijrr:2008}, a similar posture generation approach is used to fin
 In~\cite{bouyarmane2010static}, Bouyarmane proposes a generalization of the formulation of posture generation problems for systems of multiple robots and manipulated objects.
 Also, he generalizes the notion of contacts by allowing contacts to bear contact forces or not and to not necessarily be coplanar or horizontal.
 This generic formulation enables the generation of postures with inter-robot contacts.
-The complete posture generation problem is then solved within a single nonlinear constrained optimization query, computing the contact forces and joint configuration at the same time, while ensuring the stability of all the actors, avoiding collision and respecting the robots joint and torque limits.
+The complete posture generation problem is then solved within a single nonlinear constrained optimization query, computing the contact forces and joint configuration at the same time, while ensuring the stability of all the actors, avoiding collision and respecting the robot's joint and torque limits.
 
 In the past few years, our team has dedicated considerable efforts in proposing a general multi-contact motion planner to solve cases of non-gaited acyclic planning, using a posture generator as a backbone to select valid configurations.
 Given a humanoid robot, an environment, a start and a final desired postures, the planner generates a sequence of contact stances allowing any part of the humanoid to make contact with any part of the environment to achieve motion towards the goal.
@@ -75,7 +75,7 @@ For each set of contact to add to the tree, a posture generation problem is solv
 A typical experiment with a HRP-2 robot achieving such an acyclic motion is presented in~\cite{escande:iser:2008}, and the planner is thoroughly described in~\cite{escande:ras:2013}.
 Extensions of this multi-contact planner to multi-agent robots and objects gathering locomotion and manipulation are presented in~\cite{bouyarmane:ar:2012}, and preliminary validations with some DARPA challenge scenarios, such as climbing a ladder, ingress/egress a utility car or crossing through a relatively constrained pathway are presented in~\cite{bouyarmane:humanoids:2012}.
 Another way of planning a multi-contact scenario, which is actually often used when planners fail to find satisfactory solutions, is to do it by manually, choosing iteratively which contacts to add and remove until the goal is reached.
-This type of approach is used when the plan to execute is very complex and when a lot of fine tunning of the postures is required, as in~\cite{vaillant:autonomousrobots:2016}, where a sequence of postures allowing the HRP-2 robot to climb a vertical ladder is generated and tuned manually.
+This type of approach is used when the plan to execute is very complex and when a lot of fine tuning of the postures is required, as in~\cite{vaillant:autonomousrobots:2016}, where a sequence of postures allowing the HRP-2 robot to climb a vertical ladder is generated and tuned manually.
 Those postures are provided as input to a finite state machine that builds additional intermediary tasks accounting for geometric uncertainties and specific grasps procedures to be realized on the real robot by a multi-objective model-based QP controller.
 
 In many planning approaches~\cite{kuffner2005motion, chestnutt2007navigation, hauser:ijrr:2008, kolter2008control, bouyarmane:icra:2011} the planning problem is decomposed in two stages, first the sets of contacts and associated postures are planned and then the motions to go from one set to another are computed.
@@ -124,14 +124,14 @@ The IPOPT solver~\cite{wachter:mathprog:2006} has been used in~\cite{vaillant:hu
 The SNOPT solver~\cite{gill2005snopt} was used in~\cite{dai2014whole} to plan dynamic whole-body trajectories.
 Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver(the solver that we develop in this thesis).
 
-Traditionnaly, optimization problems are solved over Euclidean spaces.
+Traditionally, optimization problems are solved over Euclidean spaces.
 When the need comes to find a solution to an optimization problem in a non-Euclidean space $\mathcal{M}$, the commonly used method is to represent the elements of $\mathcal{M}$ in an Euclidean manifold of higher dimension, and enforcing the solution of the optimization problem to lie on $\mathcal{M}$ by adding the necessary constraints to the problem.
 We will detail the drawbacks of such approaches in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
 Alternatively, there exist some method to run an optimization algorithm directly on a non-Euclidean manifold, as it is presented in great details in the book~\cite{absil:book:2008}.
 A non-Euclidean manifold, can be thought of as a space that is locally Euclidean, but not globally.
 For example a sphere, if one looks in a small enough neighborhood, looks Euclidean, just like the surface of a giant sphere like the earth looks flat for a human standing on it.
 Based on the fact that manifolds are locally Euclidean, the classic properties of distance, derivatives, and in general all the Euclidean geometry can be used locally.
-Based on that property, several optimization methods traditionnaly used on Euclidean manifolds have been extended to manifolds.
+Based on that property, several optimization methods traditionally used on Euclidean manifolds have been extended to manifolds.
 The gradient methods have been extended to manifolds in~\cite{luenberger1972gradient, gabay1982minimizing}.
 The Newton methods on manifolds which have better convergence rates were extended to manifolds in~\cite{gabay1982minimizing, stuart1998dynamical, smith2013geometric}.
 And Quasi-Newton methods in~\cite{gabay1982minimizing}.
