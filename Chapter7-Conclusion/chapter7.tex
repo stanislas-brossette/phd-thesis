@@ -7,11 +7,29 @@
 \addcontentsline{toc}{chapter}{Conclusion}
 \label{cha:conclusion}
 
-In this Ph.D. thesis, we investigated the formulation and the resolution of robotics posture generation problems.
+In this Ph.D. work, we studied the formulation and the resolution of robotics posture generation problems.
 Such problems aim at finding a robot configuration that satisfies some high level requests such as making a contact with a part of the environment, while ensuring its viability, in the sense that, in this configuration, the robot is stable and respects its intrinsic limitations.
-This problem can be formulated and solves as an optimization problem with a collection of geometric and static constraints to satisfy while minimizing a cost function.
-We present a formulation of the posture generation problem that takes into account the fact that some variables such as the 3D rotations live in non-Euclidean manifolds while making the writing of problems and of specific constraints more versatile.
-In order to solve nonlinear optimization problems on manifolds, we developped our own solver, which not only allows us to formulate mathematical problems more elegantly and ensure the validity of our variables at every step of the optimization process, but also enables us to have a better understanding and mastering in the way to tune our solver for robotic problems, and allows us to try new ways of solving those problems.
-We proposed several new types of constraint formulation that make the spectrum of discoverable viable postures larger.
-We presented a formulation of non-inclusive flat contacts that allows to generate contacts between two surfaces while monitoring the size of their intersections.
-Leveraging our problem formulation and its ability to manage manifolds allowed us to generate contacts with
+This problem is traditionally formulated and solved as an optimization problem with a collection of geometric and static constraints to satisfy while minimizing a cost function.
+
+We present the expression of the classical building blocks of such problems before proposing some extensions, among which a smooth formulation of non-inclusive contact constraints between two polygons that relies on the idea of adding to the problem a set of variables that represent an ellipse included in both polygons.
+
+Robotics problems often contain variables that live in non-Euclidean spaces, we present a generic way to handle such variables in our formulation, and most importantly, we propose an approach to adapt existing optimization techniques to solve constrained nonlinear optimization problems defined on non-Euclidean manifolds, we then present our implementation of such an algorithm, based on an SQP approach.
+Not only does it allow us to formulate mathematical problems more elegantly and ensures the validity of our variables at every step of the optimization process, it also enables us to have a better understanding and mastering in the way to tune our solver for robotics problems, and allows us to try new ways of solving those problems.
+
+We present a formulation of the posture generation problem that takes into account the inherent structure of its configuration space being a cartesian product of submanifolds representing different quantities(translations, rotations, joint angles, contact forces, etc.).
+Each submanifold of the search space is considered as a separate entity, and variables on it can be considered separately from eachother.
+We take advantage of that structure to propose a posture generation framework where the variables, submanifolds and functions derivations are managed automatically, which simplifies the work of the developper.
+This allows to easily and elegantly write custom constraints on a selected set of variables defined on the submanifolds of our search space.
+We exploit the capabilities of our framework to generate configurations with contacts on non-flat surfaces by parametrizing the location of the contact point on additional variables.
+We proposed a generic way to parametrize the surface of a solid represented by a mesh, based on Catmull-Clark subdivision algorithm.
+We used that method to compute configurations where the optimal location of contact on a complex object is chosen by the solver.
+
+
+
+%We present a formulation of the posture generation problem that takes into account the fact that some variables such as the 3D rotations live in non-Euclidean manifolds while making the writing of problems and of specific constraints more versatile.
+
+%In order to solve nonlinear optimization problems on manifolds, we developped our own solver, which not only allows us to formulate mathematical problems more elegantly and ensure the validity of our variables at every step of the optimization process, but also enables us to have a better understanding and mastering in the way to tune our solver for robotic problems, and allows us to try new ways of solving those problems.
+
+%We proposed several new types of constraint formulation that make the spectrum of discoverable viable postures larger.
+%We presented a formulation of non-inclusive flat contacts that allows to generate contacts between two surfaces while monitoring the size of their intersections.
+%Leveraging our problem formulation and its ability to manage manifolds allowed us to generate contacts with

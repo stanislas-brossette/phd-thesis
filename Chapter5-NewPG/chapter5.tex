@@ -488,6 +488,39 @@ The communication between the solver and the generated problem is made through t
 After creating the complete manifold, the PostureProblem class can be used to facilitate the individual initialization of all the separate variables of the problem without the user having to worry about the indexes.
 Finally, it can query the resolution of the problem by the solver and return the result.
 
+\section{Examples of postures generation}
+\label{sec:examples_of_postures_generation}
+
+In this section, we present some scenarios solved with our posture generator and solver.
+\paragraph{Application of a desired force}
+In the context of using a robot to help humans in the construction of an aircraft, we formulate a problem where the HRP-4 robot is required to apply a desired force on a given point of the airplanes structure.
+We denote $f_g$ the target value of the force in direction $\vec{d}$ and $\vec{f_c}$ the actual force at the contact point and the could simply implement the following function $f_{target}(f_c)$ to minimize to get the desired result:
+\begin{equation}
+  f_{target}(f_c) = {\left(\vec{f_c}\cdot\vec{d}-f_g\right)}^2
+\end{equation}
+In addition to that cost function, the robot needs keep its foot on the ground, its left hand is used to lean on a beam of the structure to allow a longer reach with the right hand that is in contact with the wall.
+Those constraints must be satisfied while respecting the joint and torque limits of the robot, maintaining balance and avoiding auto-collisions.
+The result is depicted in figure~\ref{fig:comanoid}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\linewidth]{comanoid.png}
+  \caption{HRP-4 applying a desired force on a contact point with its right hand}
+\label{fig:comanoid}
+\end{figure}
+
+\paragraph{Generating postures in highly constrained environment}
+In this scenario, the HRP-4 robot is required to evolve in a highly constrained environment, in the sense that many obstacles limit its displacement, and it must avoid collision with them.
+The goal is to real a pannel of circuit breakers (in green on figure~\ref{fig:getafe}) to activate them.
+We generated a sequence of steps to reach that panel and then some postures to reach different points of this panel.
+In figure~\ref{fig:getafe}, we show some extracts of this sequence of postures.
+In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance and stability constraints.
+On the last posture the top left corner of the panel is reached with the tip of the right hand of the robot.
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{getafeSequence.png}
+  \caption{Extracts of a sequence of postures with HRP-4 entering a constrained environments to reach a point on a pannel of circuit breakers (in green)}
+\label{fig:getafe}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     CONTACT ON NON-FLAT SURFACE                     %

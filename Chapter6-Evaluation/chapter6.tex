@@ -181,9 +181,9 @@ We ran another set of tests in which the value of $q_\text{rand}$ is modified to
 \end{equation}
 We generate the set of feasible problems from those configurations.
 In that case, a solution is found in 85\% of the tests.
-This shows that the initial guess and its distance from the solution are of crucial importance and should be chosen wisely by the user.
+This shows that the initial guess and its distance from the solution which we coin the \emph{initial distance} are of crucial importance and should be chosen wisely by the user.
 
-To study that influence, we propose to estimate the effect of the distance between the initial posture and the solution on the success rate of the posture generator.
+To study that influence, we propose to estimate the effect of the initial distance on the success rate of the posture generator.
 The distance between 2 configurations $q_0$ and $q^*$ is defined as $d=\|q_0-q^*\|^2$.
 In that experiment, each feasible problem is solved several times, with a value of the initial guess increasingly close to the solution.
 Given an initial guess chosen randomly $q_0$, and $q^*$ being the solution of the problem found when generating the list of feasible problems, we solve the problem starting from a configuration $q_0^{n\%}$ defined as:
@@ -191,21 +191,25 @@ Given an initial guess chosen randomly $q_0$, and $q^*$ being the solution of th
   q_0^{n\%} = n q_0 + (1-n)q^*
 \end{equation}
 With $n$ taking successively the values $1.0$, $0.8$, $0.6$, $0.4$,and $0.2$.
-After aggregating the results, we are able to estimate the influence of the distance between the initial posture and the solution on the success rate of the optimization.
-We run this experiment with different hessian approximation methods, namely, the BFGS and the BFGS with self-scaling.
-We report those results in the histogram~\ref{hist:dist}:
+After aggregating the results, we are able to estimate the influence of the initial distance on the success rate of the optimization.
+During all our work with our solver, we observed that the choice of hessian approximation method influences a lot the resolution.
+We take here the opportunity to verify this observation by solving series of problems with the solver using different hessian update methods.
+As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraints second derivative is maintained and combined in the global hessian matrix.
+We compare the results obtained with BFGS with or without self-scaling and using whole or individual updates.
+We gather and report those results in figure~\ref{hist:dist}:
 
 \begin{figure}[htb]
 \centering
-  \includegraphics[width=0.8\linewidth]{histogramDist.png}
+  \includegraphics[width=0.8\linewidth]{histogram4BFGS.png}
   \caption{Rate of success of the posture generation compared to the distance between initial guess and solution.}
 \label{hist:dist}
 \end{figure}
 
-This experiment shows that the further the initial guess is from the solution, the more likely the solver is to fail to find a solution.
-Overall, solving those problems with a solver using the BFGS with self-scaling approach is more successful than with a simple BFGS.
+This experiment shows that the closer the initial guess is from the solution, the more likely the solver is to converge to a solution and gives us a quantitative estimate of the expected success rate with respect to the distance.
+Overall, solving those problems with our solver using the BFGS with self-scaling and individual updates approach is more successful than with other methods.
+With that Hessian update method, for any distance between initial configuration and solution, the resolution converges in more than 60\% of the cases.
 
-It would be interesting to run more tests like those to study the influence of the different solver options and find a set of options that is optimal to solve the kind of problems we are mostly interested in.
+It would be interesting to run more tests like those to study the influence of the different solver options and find a set of options that is optimal to solve posture generation problems.
 
 \FloatBarrier
 \section{Application to Inertial Parameters Identification}
@@ -662,46 +666,46 @@ So having their models would then still permit our MCP to rely on 3D models to p
 PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
 %Of course, our ultimate future plan is to handle uncertainties, control and planning recovery of discrepancies when they occur.
 
-\section{Examples of postures generation}
-\label{sec:examples_of_postures_generation}
+%\section{Examples of postures generation}
+%\label{sec:examples_of_postures_generation}
 
-In this section, we present some scenarios solved with our posture generator and solver.
-\paragraph{Application of a desired force}
-In the context of using a robot to help humans in the construction of an aircraft, we formulate a problem where the HRP-4 robot is required to apply a desired force on a given point of the airplanes structure.
-We denote $f_g$ the target value of the force in direction $\vec{d}$ and $\vec{f_c}$ the actual force at the contact point and the could simply implement the following function $f_{target}(f_c)$ to minimize to get the desired result:
-\begin{equation}
-  f_{target}(f_c) = {\vec{f_c}\cdot\vec{d}-f_g)}^2
-\end{equation}
-In addition to that cost function, the robot needs keep its foot on the ground, its left hand is used to lean on a beam of the structure to allow a longer reach with the right hand that is in contact with the wall.
-Those constraints must be satisfied while respecting the joint and torque limits of the robot, maintaining balance and avoiding auto-collisions.
-The result is depicted in figure~\ref{fig:comanoid}
-\begin{figure}
-  \centering
-  \includegraphics[width=0.6\linewidth]{comanoid.png}
-  \caption{HRP-4 applying a desired force on a contact point with its right hand}
-\label{fig:comanoid}
-\end{figure}
+%In this section, we present some scenarios solved with our posture generator and solver.
+%\paragraph{Application of a desired force}
+%In the context of using a robot to help humans in the construction of an aircraft, we formulate a problem where the HRP-4 robot is required to apply a desired force on a given point of the airplanes structure.
+%We denote $f_g$ the target value of the force in direction $\vec{d}$ and $\vec{f_c}$ the actual force at the contact point and the could simply implement the following function $f_{target}(f_c)$ to minimize to get the desired result:
+%\begin{equation}
+  %f_{target}(f_c) = {\vec{f_c}\cdot\vec{d}-f_g)}^2
+%\end{equation}
+%In addition to that cost function, the robot needs keep its foot on the ground, its left hand is used to lean on a beam of the structure to allow a longer reach with the right hand that is in contact with the wall.
+%Those constraints must be satisfied while respecting the joint and torque limits of the robot, maintaining balance and avoiding auto-collisions.
+%The result is depicted in figure~\ref{fig:comanoid}
+%\begin{figure}
+  %\centering
+  %\includegraphics[width=0.6\linewidth]{comanoid.png}
+  %\caption{HRP-4 applying a desired force on a contact point with its right hand}
+%\label{fig:comanoid}
+%\end{figure}
 
-\paragraph{Generating postures in highly constrained environment}
-In this scenario, the HRP-4 robot is required to evolve in a highly constrained environment, in the sense that many obstacles limit its displacement, and it must avoid collision with them.
-The goal is to real a pannel of circuit breakers (in green on figure~\ref{fig:getafe}) to activate them.
-We generated a sequence of steps to reach that panel and then some postures to reach different points of this panel.
-In figure~\ref{fig:getafe}, we show some extracts of this sequence of postures.
-In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance and stability constraints.
-On the last posture the top left corner of the panel is reached with the tip of the right hand of the robot.
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{getafeSequence.png}
-  \caption{Extracts of a sequence of postures with HRP-4 entering a constrained environments to reach a point on a pannel of circuit breakers (in green)}
-\label{fig:getafe}
-\end{figure}
+%\paragraph{Generating postures in highly constrained environment}
+%In this scenario, the HRP-4 robot is required to evolve in a highly constrained environment, in the sense that many obstacles limit its displacement, and it must avoid collision with them.
+%The goal is to real a pannel of circuit breakers (in green on figure~\ref{fig:getafe}) to activate them.
+%We generated a sequence of steps to reach that panel and then some postures to reach different points of this panel.
+%In figure~\ref{fig:getafe}, we show some extracts of this sequence of postures.
+%In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance and stability constraints.
+%On the last posture the top left corner of the panel is reached with the tip of the right hand of the robot.
+%\begin{figure}
+  %\centering
+  %\includegraphics[width=\linewidth]{getafeSequence.png}
+  %\caption{Extracts of a sequence of postures with HRP-4 entering a constrained environments to reach a point on a pannel of circuit breakers (in green)}
+%\label{fig:getafe}
+%\end{figure}
 
 
 \section{Conclusion}
 \label{sec:conclusion_chap_6}
 
 In this section, we presented several evaluations and applications of our solver and posture generator.
-We first evaluated the influence of the formulation on manifolds on a problem making heavy usage of them and showed that as expected, this formulation outperforms the classical approach in terms of convergence times.
+We first evaluated the influence of the formulation on manifolds on a problem making heavy use of them and showed that, as expected, this formulation outperforms the classical approach in terms of convergence times.
 Then we propose an approach to estimate the success rate of our posture generator with respect to the distance between the initial guess and the solution.
 We then present a different application of our solver to the problem of inertial identification of a rigid body.
 In which case, working with manifolds allows to ensure the \emph{full physical consistency} of the inertial parameters in any situation and all along the optimization process.
