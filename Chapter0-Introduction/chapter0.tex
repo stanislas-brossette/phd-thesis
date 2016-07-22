@@ -15,7 +15,7 @@
 
 The ultimate goal of robotics is to make robots realize some tasks.
 The tasks, as well as the robot used to fulfill them are various.
-For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human, a submarine robot exploring the wreckages of a ship, a humanoid robot exploring and fixing a destroyed plant.
+For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human, a submarine robot exploring the wreckage of a ship, or a humanoid robot exploring and fixing a destroyed plant.
 
 \begin{figure}[ht]
   \centering
@@ -39,10 +39,10 @@ Those are by themselves some complete fields of robotics, and they have one thin
 Finding those configurations is the job of what we call the Posture Generator (PG).
 
 There are two types of robots. The fixed-base robots and the mobile ones.
-The first type of robots have fixed basis, the area that they can reach is predefined by their geometry and they are usually fully actuated.
-This means that the robot has as many degrees of freedom (DoF) as actuators, Thus, for any joint configuration, a unique robot's position can be achieved.
-On the contrary, mobile robots are always underactuated, the robot has more DoF than actuators.
-Each link of the robot is actuated, but the position of the basis of the robot depends on the configuration of the joints as a well as on the locations of the contacts that the robot makes with the environment.
+As the name suggests, the first type of robots have fixed bases, their workspace is predefined by their geometry and they are usually fully actuated.
+This means that the robot has as many degrees of freedom (DoF) as they have actuators. Thus, any particular joint configuration leads to a unique robot posture.
+On the contrary, mobile robots are always underactuated such that the robot has more DoF than actuators.
+Each link of the robot is actuated, but the position of the base of the robot depends on the configuration of the joints as a well as on the locations of the contacts that the robot makes with the environment.
 
 %A mobile robot's position depends on the location of its contacts with the environment.
 %For biped robots evolving on a flat surface, a footstep planner can be used to decide of the sequence of steps to take so the robot can walk to its goal.
@@ -56,32 +56,32 @@ Since we are biped, we mostly use our feet to move.
 As the environment becomes more difficult to cross, hands may come into play together with feet to help with the motion.
 Narrow passages may even require other parts of our body (knees, elbows, back\dots) to make contact in order to support the motion.
 
-Planning the sequence of contacts to achieve is a necessary step in devising a motion for a robot.
+Planning a sequence of contacts is thus a necessary step in devising a motion for a robot.
 Once the key stances of the motion have been identified by the planner, they can be used by the controller or the trajectory planner and finally the motion can be achieved by the robot.
 
-All the aforementioned planning methods rely on the fact that we have a tool to decide if a proposed set of contacts is feasible or not for the robot.
-The tool used for finding a robot configuration that satisfies a set of various constraints like the geometric constraints of contact or the stability of the robot is called a `Posture Generator' (PG) and the development of that tool is the main topic of this dissertation.
+All the aforementioned planning methods rely on the fact that we have a tool to decide if a proposed set of contacts is feasible or not for a given robot.
+The tool used for finding a robot configuration that satisfies a set of constraints, like the geometric constraints of contact or the stability of the robot, is called a `Posture Generator' (PG) and the development of this tool is the main topic of this dissertation.
 
-The mission of a posture generator is, for a poly articulated system, to find a configuration so that the system satisfies a set of constraints.
-For simple systems, with simple constraints, like a 6 DoF robotic arm having to reach a point with its end effector, some closed-form expressions can sometimes be devised.
-But computing robot configuration to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
-When the robotic problem studied becomes too complex for closed-form formulas, it is formulated as a nonlinear optimization program and solved using optimization algorithms.
-The Posture Generator is a key tool of many robotics applications and as such, it is an important component of any robotics framework.
-It needs to be efficient at finding a solution when one exists and at figuring when a problem is not feasible.
-The speed of generating a multi-contact sequence is directly related to the quality of the posture generator, which is directly related to the quality of the optimization algorithm that it uses.
+The mission of a posture generator, for a polyarticulated system, is to find a configuration in which the system satisfies a set of constraints.
+Closed-form solutions may be possible for relatively simple systems and tasks, like a 6 DoF robotic arm that is required to reach a point with its end effector.
+However, computing robot configurations to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
+When the robotic problem studied becomes too complex for closed-form solutions, it is formulated as a nonlinear optimization program and solved using optimization algorithms.
+The PG is a key tool for many robotics applications and as such, it is an important component of any robotics framework.
+It needs to be efficient at finding a solution when one exists, and at figuring out if a problem is not feasible.
+The speed of generating a multi-contact sequence is directly related to the quality of the PG, which is directly related to the quality of the optimization algorithm that it uses.
 
 The variables of a robotics problem sometimes naturally belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
-A manifold is a topological space that locally resembles Euclidean space near each point.
+A manifold is a topological space that locally resembles a Euclidean space near each point.
 Each point of an n-dimensional manifold has a neighbourhood that is homeomorphic to the Euclidean space of dimension n.
 An n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
 Most of the optimization solvers available make the assumption that the search space is Euclidean and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
-But it is often possible to parametrize $\mathcal{M}$ over a higher dimensional Euclidean space with added constraint (e.g. unit quaternions, rotation matrices).
+But it is often possible to parametrize $\mathcal{M}$ over a Euclidean space of higher dimension with added constraints (e.g. unit quaternions, rotation matrices).
 It is then possible to solve those problems with classical solvers at the cost of additional variables, constraints and special treatments in the optimization problem.
-There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
+There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters. However to our knowledge, these are focused on addressing non-constrained optimization.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
-During this thesis, we develop our own nonlinear constrained optimization solver on manifolds, that we use to solve optimization problems on their native search manifolds, should they be posture generation problems or others.
-This has the added advantage that unlike off-the-shelf solver, which are often a black box on which the user has a very limited level of control, we have full control over that solver and can specialize/modify it to fit our needs.
+Through this thesis, we develop our own nonlinear constrained optimization solver on manifolds and use it to solve optimization problems on their native search manifolds. We will exhibit their utility for posture generation problems as well as a few other types of problems.
+This has the advantage that, unlike off-the-shelf solvers which are often a black box on which the user has very limited control, we have full control over that solver and can specialize/modify it to fit our needs.
 
 %\paragraph{Specificities of our approach}
 %If we consider a problem of posture generation on a mobile robot with $n$ joints, the configuration space of the joints of the robot is $\mathbb{R}^n$ and the configuration space of the position and orientation of its base body is $SE(3) = \mathbb{R}^3\times SO(3)$.
