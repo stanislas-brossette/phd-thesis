@@ -34,8 +34,8 @@ A robot is made of a collection of bodies that are linked together by joints act
 A robots configuration consists of the position and orientation of its base body, and the configuration of each of its joints.
 Satisfying a task requires that the joints of the robot reach a configuration for which the task is satisfied.
 The action of satisfying a task comes down to moving from an initial configuration to a goal.
-Computing the trajectory to follow and actually following it are the jobs of the trajectory generation and the control of the robot.
-Those are by themselves some complete fields of robotics, and they have one thing in common, they both need to be given an initial and a final configuration, and sometimes some intermediate ones.
+Computing the trajectory to follow and actually following it, are handled by the trajectory generator and controller of the robot.
+Trajectory generation and control are by themselves complete sub-fields in robotics, and they both often rely on being given some key postures to help guide the robot's motion(e.g. initial, intermediate and final configurations).
 Finding those configurations is the job of what we call the Posture Generator (PG).
 
 There are two types of robots. The fixed-base robots and the mobile ones.
