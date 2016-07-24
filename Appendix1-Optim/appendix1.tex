@@ -57,15 +57,15 @@ Most often, an optimization process is used.
 
 The goal of an optimization algorithm is to find an optimal solution $x^*$ to a problem.
 Optimal in the sense that the solution is an optimum of a given objective function $f$.
-And solution of a problem in the sense that is satisfies a set of $m$ constraints $\{c_i,\ i\in [1,m]\}$.
+And solution of a problem in the sense that it satisfies a set of $m$ constraints $\{c_i,\ i\in [1,m]\}$.
 Both the constraints and the objective function are defined on the variable space $\mathit{S}$, which is the space in which the variable $x$ lives and in which we search a solution $x^*$ to our problem.
 
-In order to present the principles of optimization, in this chapter we will always consider that the variable space is $\mathit{S}=\mathbb{R}^n$.
+In order to present the principles of optimization, in this chapter, we will always consider that the variable space is $\mathit{S}=\mathbb{R}^n$.
 We first consider unconstrained problems.
 That type of problem will not be used in the rest of our dissertation, therefore, we will just present them shortly.
 We will then focus on constrained optimization problems and the numerous methods used in their resolution.
 We will particularly detail one specific constrained problem resolution algorithm that is the Sequential Quadratic Program (SQP).
-The extension of those methods to solving problems on more complex variable spaces that are the non Euclidean manifolds is the topic of Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
+The extension of those methods to solving problems on more complex variable spaces that are the non-Euclidean manifolds is the topic of Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
 
 This Appendix does not pretend to give a fully detailed overview of numerical optimization methods, it gives the reader a quick overview of some key principles.
 For more detailed information, we invite the reader to refer to the excellent books that we took inspiration from to write this chapter~\cite{nocedal:book:2006, bonnans:book:2003, boyd2004convex}.
@@ -113,7 +113,7 @@ That is the kind of solution that we are looking for and that our algorithms sho
 Under the assumption that the objective function is smooth and sufficiently continuous ($\mathcal{C}^2$), we have the following sufficient conditions for the optimality of $x^*$:
 
 \begin{theorem}
-  If $\nabla^2f$ is continuous in an open-neighborhood of $x^*$, $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite.
+  If $\nabla^2f$ is continuous in an open neighborhood of $x^*$, $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is positive definite.
   Then $x^*$ is a strict local minimizer of $f$.
 \label{optimalityTheorem}
 \end{theorem}
@@ -139,7 +139,7 @@ the Newton direction.
 \end{equation}
 The choice of this descent direction implies that the $\nabla^2f_k$ is positive
 definite, in which case an adaptation of the definition of $p_k$ is required. Or
-an approximation $B_k$ of $\nabla^2f_k$ that guaranties definite positiveness can be
+an approximation $B_k$ of $\nabla^2f_k$ that guarantees definite positiveness can be
 used. %For example, the symmetric-rank-one (SR1) formula and the BFGS (Broyden,
 %Fletcher, Goldfarb, Shanno) formula. Then the step becomes
 
@@ -264,7 +264,7 @@ A general formulation for such problems (that we denote $\mathcal{P}$) is:
   \right.
 \end{equation}
 
-Where $f$ and $c_i$ are real valued functions on a subset of $\mathbb{R}^n$.
+Where $f$ and $c_i$ are real-valued functions on a subset of $\mathbb{R}^n$.
 $f$ is the objective function, and the $c_i$ are the constraint functions.
 ${I}$ and ${E}$ are sets of index such that $c_i,\ i\in{E}$ are the equality constraints, and $c_i,\ i\in{I}$ are the inequality constraints.
 
@@ -377,9 +377,9 @@ In particular, this condition is always verified if $\nabla_{xx}^2\mathcal{L}(x^
 \label{sec:resolution_of_a_non_linear_constrained_optimization_problem}
 
 %In the previous section, we presented some theoretical tools to describe the solution of a nonlinear constrained optimization problem that only use the derivative terms of order one and two of the problem's functions.
-In the previous section, we presented some theoretical tools to decide if a point is solution of a nonlinear constrained optimization problem based on the values of the first and second order derivatives of its functions.
+In the previous section, we presented some theoretical tools to decide if a point is a solution to a nonlinear constrained optimization problem based on the values of the first and second order derivatives of its functions.
 Here we present some methods for actually solving such problems.
-There exists many different algorithms to solve a nonlinear constrained optimization problem.
+There exist many different algorithms to solve a nonlinear constrained optimization problem.
 But all have in common to be iterative processes that follow the model of Algorithm~\ref{alg:basic_optim_nlcp}.
 %From the first and (sometimes) second-order informations on the functions $f$ and $c_i$ that constitute the problem~\ref{formulation_NLCP}, we find a suitable increment $z$ such that $x_k+z$ is closer to the solution than $x_k$.
 %And we iterate that operation until a point $x_k$ sufficiently close to a solution is found.
@@ -486,8 +486,8 @@ To palliate to that issue, mainly two methods are used:
 \section{Sequential Quadratic Programming}
 \label{sec:sequential_quadratic_programming}
 
-The Sequential Quadratic Programming (SQP) method is one of the most effective method to solve small and large scale nonlinear constrained optimization problems.
-Together with the interior point method, they are currently considered the most powerful algorithms for large-scale nonlinear programming.
+The Sequential Quadratic Programming (SQP) method is one of the most effective methods to solve small and large scale nonlinear constrained optimization problems.
+Together with the interior point method, they are currently considered to be the most powerful algorithms for large-scale nonlinear programming.
 The SQP methods show their strength when solving problems with nonlinearities in the constraints~\cite{nocedal:book:2006}.
 
 \subsection{Principle}
@@ -660,8 +660,8 @@ At a step $k$ of the resolution of the IQP, all the constraints in the active se
 
 This EQP is solved, and its solution is checked against the constraints that were previously ignored.
 If some of them are violated then the solution is not satisfactory and the active set is updated by adding one or several of the violated constraints to it.
-This operation is repeated until there is no more constraints to be added.
-Once all the constraints have been added as active constraints to the EQP, the problem may be over constrained.
+This operation is repeated until there are no more constraints to be added.
+Once all the constraints have been added as active constraints to the EQP, the problem may be over-constrained.
 To detect that, the Lagrange multipliers are computed and if some of them do not agree with the KKT conditions of the IQP~\ref{IQP}, then one of them is removed from the active set and the resulting EQP is solved, and the process continues until a satisfactory solution is found.
 The heuristics used to choose which constraints to add or remove from the active set and to avoid cycling between active sets are out of the scope of this dissertation.
 
@@ -673,17 +673,17 @@ The SQP approach to solving the problem~\ref{formulation_NLCP} as presented abov
 If it is not, a restoration phase is entered and finds a feasible point, see Section~\ref{sub:restoration_phase}.
 %which requires that the Hessian $\nabla_{xx}^2\mathcal{L}$ is positive definite on the tangent space of the active constraints.
 
-Solving the QP problem~\ref{IQP} gives a solution step to to an linearized problem, which in general is not the solution to the original nonlinear problem.
+Solving the QP problem~\ref{IQP} gives a solution step to a linearized problem, which in general is not the solution to the original nonlinear problem.
 Thus, taking that step without further verification can be dangerous and lead to bad iterates.
 To cope with that issue, several methods exist.
-In the next few sections, we present the globalisation methods that are the Line Search and Trust Region approaches.
+In the next few sections, we present the globalization methods that are the Line Search and Trust Region approaches.
 They are used alongside methods to choose whether to accept or reject a step like the merit function and filters in order to monitor the length and direction of the step with regards to the nonlinear problem.
-And finally we discuss some Hessian approximation methods.
+And finally, we discuss some Hessian approximation methods.
 
 \subsection{Globalization methods}
 \label{sub:globalization_methods}
 
-The globalisation phase of an SQP algorithm is meant to modify the steps generated by the QP resolution in order to improve the global convergence of the algorithm, either by multiplying them with a coefficient $\alpha$ in the Line-Search approach, or by bounding the norm of the step found in the QP by adding to the QP a boundary constraint on $z$ that reflects our trust in the quality of the approximated problem.
+The globalization phase of an SQP algorithm is meant to modify the steps generated by the QP resolution in order to improve the global convergence of the algorithm, either by multiplying them with a coefficient $\alpha$ in the Line-Search approach, or by bounding the norm of the step found in the QP by adding to the QP a boundary constraint on $z$ that reflects our trust in the quality of the approximated problem.
 
 \subsubsection{The Line-Search Strategy}
 \label{ssub:line_search}
@@ -795,10 +795,10 @@ Denoting $h_i = h(x_i)$ and $f_i = f(x_i)$, we define the notion of domination a
 \end{definition}
 
 The filter maintains a list of pairs $p_i=\{f_i, h_i\}$ such that no pair dominates any other pair.
-When a new point $x$ is submitted to the filter for acceptance, the values $f(x)$ and $h(x)$ are computed and the pair $p = \{f(x), h(x)\}$ is compared to every pairs $p_i$.
+When a new point $x$ is submitted to the filter for acceptance, the values $f(x)$ and $h(x)$ are computed and the pair $p = \{f(x), h(x)\}$ is compared to every pair $p_i$.
 If there is at least one pair $p_i$ in the filter that dominates $p$, the point is refused.
 Otherwise, no pair of the filter dominates $p$, then $p$ is accepted and added to the filter.
-Once $p$ is added to the filter, any pair in the filter that is dominated by $p$ is removed from it to ensure to keep a list of pairs non dominated by each other in the filter.
+Once $p$ is added to the filter, any pair in the filter that is dominated by $p$ is removed from it to ensure to keep a list of pairs non-dominated by each other in the filter.
 In order to ensure global convergence, this method requires several refinements as explained in~\cite{fletcher:mathprog:2000}.
 First, it needs to avoid accepting pairs that are excessively close to each other. For that, the domination criterion is modified with a sloping envelope, as proposed in Chin~\cite{chin:mathprog:2003}.
 The sloping envelope definition takes user defined parameters $\beta$ and $\gamma$ in $[0,\ 1]$.
@@ -826,9 +826,9 @@ A representation of the filter method is given in figure~\ref{fig:Filter}
 
 The filter method is convenient because it does not require the same complicated updates as can be found in penalty based methods where the penalty parameter needs to be updated regularly.
 Also, with the filter method, no derivative computation is required.
-That method is generally more permissive than merit based method in the sense that it refuses less points.
+That method is generally more permissive than merit-based method in the sense that it refuses fewer points.
 
-The filter method, as well as the merit function based methods can be used in line-search and trust-region algorithms.
+The filter method, as well as the merit function based methods, can be used in line-search and trust-region algorithms.
 
 \subsubsection{The Trust-Region Strategy}
 \label{ssub:the_trust_region_strategy}
@@ -867,7 +867,7 @@ The linearisation of the constraint is represented by the green line, and the tr
 If $\rho$ is too small, there is no intersection between the linearization of the constraint and the trust region.
 The QP is then infeasible.
 An obvious solution for that would be to increase the size of the trust region, but that goes against the core idea of the trust region strategy and it would harm the convergence properties of the algorithm.
-A more appropriate solution is to enter a restoration phase when that event occur.
+A more appropriate solution is to enter a restoration phase when that event occurs.
 The purpose of a restoration phase is to reduce the infeasibility of a problem by relaxing infeasible constraints without regards for the cost function.
 The restoration phase is exited once a feasible point is found, and the course of the SQP is continued from that point.
 
@@ -890,7 +890,7 @@ The goal of the restoration is to find a solution to the following problem:
 \end{equation}
 
 The restoration phase proceeds in a similar way to the original SQP algorithm described earlier.
-At each step, an approximated QP is solved, then its result is compared to an acceptance criterion, if it is accepted, the trust region can be increased and the algorithm continue.
+At each step, an approximated QP is solved, then its result is compared to an acceptance criterion, if it is accepted, the trust region can be increased and the algorithm continues.
 Otherwise, the trust region is reduced and the problem is solved again.
 The acceptance criterion must be tailored for the restoration problem, meaning that it is based on the values of the cost function of the restoration problem and of its constraints.
 The big difference comes from the way the quadratic problem is constructed during this phase.
@@ -940,7 +940,7 @@ One possible approach is to compute it as the sum of the Hessians of all the ind
 In the SPQ algorithm, it is necessary to have access to the Hessian of the Lagrangian $\nabla_{xx}^2\mathcal{L}$ to be able to devise the QP subproblem to solve.
 %For some strategies like the Line-Search, it is necessary that $\nabla_{xx}^2\mathcal{L}$ is definite positive.
 Sometimes the exact Hessian of the problem is not positive definite.
-Also it is often difficult or computationally expensive to compute an exact Hessian of the Lagrangian.
+Also, it is often difficult or computationally expensive to compute an exact Hessian of the Lagrangian.
 Since we are following an iterative process, it is not necessary to have an exact knowledge of the Hessian and using an approximation of it is usually enough.
 Also, an approximate Hessian is in most cases less expensive to compute than the exact one.
 
