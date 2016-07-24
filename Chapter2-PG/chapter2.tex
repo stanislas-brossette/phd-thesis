@@ -98,7 +98,7 @@ Each body $B_i$ has its reference frame $F_i$ attached to it.
 $F_0$ denotes the World frame.
 Bodies are linked together by joints that also are indexed by positive integers, we denote the joint of index $i$, $J_i$, and the body that comes after it is $B_i$.
 Each joint defines the relation between its predecessor and successor bodies.
-For joint $J_i$ they are respectively denoted $pred(i)$ and $succ(i)$, and $B_{pred(i)}$ is called the parent body of $B_{succ(i)}$.
+For joint $J_i$, they are respectively denoted $pred(i)$ and $succ(i)$, and $B_{pred(i)}$ is called the parent body of $B_{succ(i)}$.
 We denote $\lambda(j)$ the index of the parent body of $B_j$.
 The number of degrees of freedom of $J_i$ is denoted $dof^J_i$ and the number of degrees of freedom of the whole robot is denoted $dof$.
 Figure~\ref{fig:mbg} illustrates this numbering system for a simple robot with 4 joints and 5 bodies (including the basis)
@@ -193,7 +193,7 @@ It can easily be computed by adding iteratively the parent of the current body:
 \end{algorithm}
 
 The transformation from the World base to $B_i$ is denoted \\ ${}^i X_0 (q) = \{{}^i \mathbf{R}_0 (q), {}^i \mathbf{t}_0 (q)\}$.
-The formula~\Eqref{eq:PtS} can be used iteratively on every body of the robot to obtain the expression of ${}^i X_0 (q)$.
+The formula~\Eqref{eq:PtS} can be used iteratively on all bodies of the robot to obtain the expression of ${}^i X_0 (q)$.
 
 We obtain the full expression of ${}^i X_0$ as:
 \begin{equation}
@@ -233,7 +233,7 @@ In this section, we explicit the descriptions and formulations of several useful
 
 Let us consider a joint $J$ that governs the transformation between two frames $F_1=\{O_1, x_1, y_1, z_1\}$ and $F_2=\{O_2, x_2, y_2, z_2\}$.
 The most common type of joint encountered in robotics systems is the revolute joint, that allows a rotation around a fixed axis.
-If $J$ is a revolute joint around the axis $(O_1,z_1)$ with parameter $q$, its motion subspace, rotation and translation are as follows:
+If $J$ is a revolute joint around the axis $(O_1,z_1)$ with parameter $q$, its motion subspace, rotation, and translation are as follows:
 
 \begin{table} [ht]
 \centering
@@ -360,7 +360,7 @@ The most common ones are the set of unit quaternion embedded in $\mathbb{R}^4$ a
 %The unit quaternions space is the subset of $\mathbb{R}^4$ where all elements have unit norm.
 With the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters $q = [q_w, q_x, q_y, q_z]$, and it is necessary to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
 Similarly, if a variable is parameterized by a rotation matrix, then the matrix $M$ representing it has 9 parameters and M must be orthogonal and have determinant 1: $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
-Similar issues can be found with the parameterization of other non-Euclidean manifold, like $S2$ for example.
+Similar issues can be found with the parameterization of other non-Euclidean manifolds, like $S2$ for example.
 
 A quaternion $q = [q_w, q_x, q_y, q_z]$ is a unit quaternion iff $q_w^2+q_x^2+q_y^2+q_z^2 = 1$.
 It represents a rotation of angle $\theta$ around an axis ${\bf u}$ such that:
@@ -552,7 +552,7 @@ A planar contact constraint is used when a planar surface of a robot is put in c
 We denote $F_1 = \{O_1, \vec{x_1}, \vec{y_1}, \vec{z_1}\}$ a frame defined on $S_1$, the surface of the first body involved in the contact, such that the 3D point $O_1$ is on $S_1$ and the vector $\vec{z_1}$ is normal to $S_1$ and pointing toward the inside the body.
 $F2 = \{O_2, \vec{x_2}, \vec{y_2}, \vec{z_2}\}$ is a frame on $S_2$, the surface of the second body involved, such that $O_2$ is on $S_2$ and the vector $\vec{z_2}$ is normal to $S_2$ and pointing away from the body.
 
-Constraining $S_1$ and $S_2$ to be coplanar comes down to aligning $\vec{z_1}$ and $\vec{z_2}$ and to ensure that the projection of the distance between $O_1$ and $O_2$ along $\vec{z_1}$ is null.
+Constraining $S_1$ and $S_2$ to be coplanar comes down to aligning $\vec{z_1}$ with $\vec{z_2}$ and to ensure that the projection of the distance between $O_1$ and $O_2$ along $\vec{z_1}$ is null.
 Note that we avoid using the dot product of two vectors that are meant to be aligned e.g. $\vec{z_1}\cdot\vec{z_2} = 1$ because when that constraint is satisfied, its gradient is zero, which implies that in the optimization context it is unqualified.
 That is why we prefer imposing orthogonality constraints.
 This translates into adding the following set of constraints to our problem:
@@ -580,7 +580,7 @@ This contact has 3 degrees of freedom.
 \label{fig:contactConstraint}
 \end{figure}
 
-If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such that $O_1$ and $O_2$ are superimposed and $\vec{x_1}$, $\vec{y_1}$, $\vec{z_1}$ are aligned with respectively $\vec{x_2}$, $\vec{y_2}$, $\vec{z_2}$, we obtain a fixed contact with zero degree of freedom.
+If we constrain the location of $F_2$ in $\{O_1, \vec{x_1}, \vec{y_1}\}$ such that $O_1$ and $O_2$ are superimposed and $\vec{x_1}$, $\vec{y_1}$, $\vec{z_1}$ are aligned with respectively $\vec{x_2}$, $\vec{y_2}$, $\vec{z_2}$, we obtain a fixed contact with zero degrees of freedom.
 This translates into adding the following set of constraints to our problem:
 
 \begin{equation}
@@ -700,7 +700,7 @@ The wrench associated with the action of gravity on a body of mass $M$ which cen
  \end{array}\right\}^G_{F_0}
 \end{equation}
 
-A solid is statically stable if it satisfy the Euler-Newton Equation.
+A solid is statically stable if it satisfies the Euler-Newton Equation.
 We consider a robot on which $m$ external wrench $w_i = \left\{ \begin{array}{r}
     \vec{m_i}\\
     \vec{f_i}\\
@@ -841,7 +841,7 @@ Since all the contacts are unilateral, all the $f_i^z$ are positive.
 For any set of $f_i^z\geq0$, $G_P$ is a barycenter with positive coefficients of the $P_i$.
 Any point $G_P$ that is included in the convex hull of all the $P_i$ is a solution.
 
-Thus, we have the property: a rigid body that has all its contacts with the environment being punctual, unilateral and all laying on the same horizontal plane $H$ is stable if and only if the projection of its center of mass on $H$ is inside the convex hull of all its contact points.
+Thus, we have the property: a rigid body that has all its contacts with the environment being punctual, unilateral and all lying on the same horizontal plane $H$ is stable if and only if the projection of its center of mass on $H$ is inside the convex hull of all its contact points.
 
 
 
@@ -1075,4 +1075,4 @@ h_i(q,f) \geq 0\ \ \forall\mathcal{T}_i.
 \label{eq:PG}
 \end{align}
 
-In the next chapter, we present an extension to the contact constraint formulation that allows to generate non-inclusive contacts, an algorithm to compute the exact derivatives of the torques in robot's joints, and our endeavor to apply a different optimization approach to solving posture generation problems.
+In the next chapter, we present an extension to the contact constraint formulation that allows generating non-inclusive contacts, an algorithm to compute the exact derivatives of the torques in robot's joints, and our endeavor to apply a different optimization approach to solving posture generation problems.

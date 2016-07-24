@@ -68,7 +68,7 @@ In order to evaluate the influence of the formulation and resolution with manifo
 We choose to study a problem of cube stacking.
 Given a set of cubes, which pose is defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not penetrating each other.
 For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertex, $\vec{t}\in\mathbb{R}^3$ and $R\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
-To ensure that the cubes are inside the box, we write a constraint that forces each corners of each cube to be inside the box.
+To ensure that the cubes are inside the box, we write a constraint that forces each corner of each cube to be inside the box.
 For each plane composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plane to the origin along $\vec{n}$.
 The constraint for each cube $C_i$ being `above' a plane defined by $\{d, \vec{n}\}$ is of dimension 8 (1 per vertex) and can be written as:
 \begin{equation}
@@ -77,7 +77,7 @@ The constraint for each cube $C_i$ being `above' a plane defined by $\{d, \vec{n
 
 To avoid interpenetration of the cubes, we could use the usual collision avoidance constraints as presented in Section~\ref{sec:problem_formulations}.
 In that case, the use of the exact mesh of the cubes would generate gradient discontinuities of the constraints.
-Approximating the mesh with STPBV would allow to avoid those discontinuities, but then, if the STPBV approximates the exact mesh closely, we would have a gradient close to discontinuous.
+Approximating the mesh with STPBV would allow avoiding those discontinuities, but then, if the STPBV approximates the exact mesh closely, we would have a gradient close to discontinuous.
 Instead, we propose another approach that uses non-Euclidean manifolds: for each pair of cubes $C_i,\ C_j$, we require a plane $P_{ij}$ to fit in-between them.
 The plane's location can be parametrized by its normal $\vec{n}\in S2$ and $d\in\mathbb{R}$, the signed distance from the plane to the origin along $\vec{n}$.
 Each plane's pose can be represented by a variable on $\mathbb{R} \times S2$.
@@ -115,7 +115,7 @@ Thus the search manifold is:
 and the problem contains 5 constraints of dimension 8 per cube to fit them in the box and $n(n-1)/2$ constraints of dimension 16 to avoid the interpenetration of cubes.
 We have a problem of dimension $4.5n+1.5n^2$ with $32n+8n^2$ constraint.
 
-In order to compare the resolution with and without use of manifolds, we also formulate this problem over $\mathbb{R}^n$.
+In order to compare the resolution with and without the use of manifolds, we also formulate this problem over $\mathbb{R}^n$.
 To do so, each variable on $SO(3)$ is replaced by a variable on $\mathbb{R}^4$, while each variable on $S2$ is replaced by one on $\mathbb{R}^3$.
 In both cases, a norm-1 constraint on the variable is added to the problem to force those variables on the manifolds.
 This gives rise to a problem on
@@ -136,7 +136,7 @@ We display the results of these tests in figure~\ref{fig:timings-cubes}.
 \label{fig:timings-cubes}
 \end{figure}
 
-With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non manifold formulation.
+With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non-manifold formulation.
 We observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spent per iteration is consistently smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with the manifold formulation.
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
@@ -144,9 +144,9 @@ In particular, the minimum value for the diagonal terms $\mu$ is important.
 We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$, and the formulation with manifolds is consistently faster than the one without manifolds.
 Values outside of that span tend to degrade both resolutions.
 Too high values tend to damp the hessian, which translates into bigger numbers of iterations.
-Too small values make the hessian closer to be rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
+Too small values make the hessian closer to being rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
 
-This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds not only allows the user to profit of a simpler and more intuitive formulation of the problem, but also outperforms the classical approach.
+This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds not only allows the user to profit of a simpler and more intuitive formulation of the problem but also outperforms the classical approach.
 
 
 \section{Evaluation of the Posture Generation}
@@ -157,7 +157,7 @@ We propose to study its ability to find a solution to problems that are known to
 
 First, we generate a list of feasible problems.
 To do so, we set the HRP-2 Kai robot in a random configuration $q_\text{rand}$ within its joint limits and record the 3D poses of its end-effectors' frames: at the tip of its grippers and below its foot,we denote them $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
-Then we generate a problem with the constraints that both gripper are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the foot are in unilateral frictional contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability, torque limits, and auto-collision avoidance constraints must be respected.
+Then we generate a problem with the constraints that both grippers are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the feet are in unilateral frictional contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability, torque limits, and auto-collision avoidance constraints must be respected.
 To help the resolution, we initialize the robot's configuration variable to $q_\text{rand}$, which is a solution to the geometric part of the problem.
 If a solution is found, the problem is known to be feasible and is recorded for further use.
 
@@ -194,7 +194,7 @@ With $n$ taking successively the values $1.0$, $0.8$, $0.6$, $0.4$,and $0.2$.
 After aggregating the results, we are able to estimate the influence of the initial distance on the success rate of the optimization.
 During all our work with our solver, we observed that the choice of hessian approximation method influences a lot the resolution.
 We take here the opportunity to verify this observation by solving series of problems with the solver using different hessian update methods.
-As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraints second derivative is maintained and combined in the global hessian matrix.
+As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraint's second-order derivative is maintained and combined in the global hessian matrix.
 We compare the results obtained with BFGS with or without self-scaling and using whole or individual updates.
 We gather and report those results in figure~\ref{hist:dist}:
 
@@ -205,7 +205,7 @@ We gather and report those results in figure~\ref{hist:dist}:
 \label{hist:dist}
 \end{figure}
 
-This experiment shows that the closer the initial guess is from the solution, the more likely the solver is to converge to a solution and gives us a quantitative estimate of the expected success rate with respect to the distance.
+This experiment shows that the closer the initial guess is to the solution, the more likely the solver is to converge to a solution and gives us a quantitative estimate of the expected success rate with respect to the distance.
 Overall, solving those problems with our solver using the BFGS with self-scaling and individual updates approach is more successful than with other methods.
 With that Hessian update method, for any distance between initial configuration and solution, the resolution converges in more than 60\% of the cases.
 
@@ -240,7 +240,7 @@ We denote $\text{vech}(.)$ the serialization operation on symmetric matrices.
 \end{equation}
 \begin{itemize}
   \item $m\in\mathbb{R}$ is the mass of the rigid body
-  \item $\hat{c}$ denotes the skew symmetric matrix associated with $c\in\mathbb{R}^3$, the position of the center of mass of the rigid body
+  \item $\hat{c}$ denotes the skew-symmetric matrix associated with $c\in\mathbb{R}^3$, the position of the center of mass of the rigid body
   \item $I_B\in\mathbb{R}^{3\times 3}$ is its 3D inertia matrix
 \end{itemize}
 
@@ -279,7 +279,7 @@ By definition, the inertial parameters are functionals of the mass distribution 
 \end{equation}
 
 The identification of those parameters can in some cases be obtained from the Computer-Aided Design (CAD) model of the body, but it is often necessary to evaluate those parameters experimentally.
-Their identification can be done by measuring the body acceleration $A^g$, twist $V$ and the external wrench applied to it $F$ for $N$ different situation and finding $\pi^*$ that minimizes the error in the Newton-Euler equation equation for those values:
+Their identification can be done by measuring the body acceleration $A^g$, twist $V$ and the external wrench applied to it $F$ for $N$ different situation and finding $\pi^*$ that minimizes the error in the Newton-Euler equation for those values:
 \begin{equation}
 \label{eq:classicIdentif}
   \pi^* = \argmin_{\pi\in\mathbb{R}^{10}} \|Y(A^g_i,V_i)\pi -F_i\|^2
@@ -375,7 +375,7 @@ The formulation of the problem becomes:
 \end{equation}
 
 It has an immediate advantage: we can write directly the problem ~\eqref{eq:finalProblem} without the need to add any parametrization-related constraints.
-Because there is less variables and less constraints, it is also faster to solve.
+Because there are fewer variables and fewer constraints, it is also faster to solve.
 To check this, we compared the resolution of~\eqref{eq:finalProblem} formulated with each of the three parametrizations (native $SO(3)$, unit quaternion, rotation matrix).
 We solved the three formulations with the solver presented in~\cite{brossette:Humanoids:2015}, and the two last with an off-the-shelf solver (CFSQP~\cite{cfsqp:manual}), using the dataset presented in section~\ref{sub:experiments}.
 The formulation with native $SO(3)$ was consistently solved faster.
@@ -391,7 +391,7 @@ It can also be leveraged for real-time applications where only a short time is a
 \label{sub:experiments}
 We ran some experiments with the iCub robot.
 It is a full-body humanoid with 53 degrees of freedom \cite{metta2010icub}.
-For validating the presented approach, we used the six axis force/torque (F/T) sensor embedded in iCub right arm to collect experimental F/T measurements.
+For validating the presented approach, we used the six-axis force/torque (F/T) sensor embedded in iCub's right arm to collect experimental F/T measurements.
 We locked the elbow, wrist and hands joints of the arm, simulating the presence of a rigid body directly attached to the F/T sensor, a scenario similar to the one in which an unknown payload needs to be identified \cite{kubus2008line}.
 
 \begin{figure}[htb]
@@ -427,7 +427,7 @@ Masses are expressed in $kg$, first moment of masses in $kg.m$, inertia matrix e
 \label{table:results}
 \end{figure}
 \FloatBarrier
-The proposed optimization problem clearly cannot identify those parameters anyway, as the identified parameters are an order of magnitude larger than the ones estimated for faster dataset, nevertheless it always estimates inertial parameters that are \emph{fully physically consistent}.
+The proposed optimization problem clearly cannot identify those parameters anyway, as the identified parameters are an order of magnitude larger than the ones estimated for faster datasets, nevertheless, it always estimates inertial parameters that are \emph{fully physically consistent}.
 For faster datasets (trajectory time of $1$s or $0.5$s) the results of the two optimization problems are the same because the high values of angular velocities and accelerations permit to identify all the parameters perfectly.
 While this is possible to identify all the inertial parameters of a single rigid body, this is not the case when identifying the inertial parameters of a complex structure such as a humanoid robot, for which both structural \cite{ayusawa2014identifiability} and numerical \cite{pham1991essential} not identifiable parameters exists.
 In this later application, the enforcement of \emph{full physical consistency}  will always be necessary to get meaningful results.
@@ -435,19 +435,19 @@ In this later application, the enforcement of \emph{full physical consistency}  
 \section{Application to contact planning on real-environment}
 \label{sec:application_of_contact_planning_on_real_environment}
 
-In this section we present our approach to generate multi-contact planning scenarios in an sensory acquired environment. This work was done prior to the development of our posture generator and therefore make use of a previous version of it that is presented in~\cite{bouyarmane:humanoids:2010}.
+In this section, we present our approach to generate multi-contact planning scenarios in a sensory acquired environment. This work was done prior to the development of our posture generator and therefore make use of a previous version of it that is presented in~\cite{bouyarmane:humanoids:2010}.
 
 Generating isolated postures is not sufficient to make a robot move or achieve tasks in ways similar to humans.
 It needs to plan entire motions, with sequences of contact creations and releases, and trajectories in-between.
-That's the role of the Multi Contact Planner (MCP).
-The core of the planner consists in the multi-contact search and the posture generator.
+That's the role of the Multi-Contact Planner (MCP).
+The core of the planner consists of the multi-contact search and the posture generator.
 The former incrementally builds a tree of contact sets and is presented in~\cite{escande:ras:2013}.
 The children of a node are obtained by adding or removing exactly one contact to its set.
 At each iteration of the search, the best leaf, according to a potential field, is expanded this way.
 The tentative sets of contacts are tested by a posture generator.
 Upon success, the contact set is validated, and a new leaf is created.
 The goal is written as a set of specific constraints.
-A node is the final node if its associated posture generation problem augmented by these constraints remains feasible.
+A node is a final node if its associated posture generation problem augmented by these constraints remains feasible.
 By backtracking from this final node to the initial root node, we obtain a sequence of nodes and thus a sequence of contact sets, that can be executed on the robot by a whole-body controller such as the one based on a quadratic programming (QP) formulation presented in~\cite{bouyarmane:iros:2011}.
 
 The potential field is derived from a crude path, made of a few key postures, that does not take contacts into account.
@@ -459,20 +459,20 @@ The contact transition for the robot are planned off-line and later executed by 
 We aim at extending our MCP to deal directly with real data acquired by the robot.
 Subsequently, we must deal with two kinds of situations:
 \begin{enumerate}
-  \item the models of the objects in the environment are known: in this case adapting the MCP consists mainly in dealing with recognition, model superposition and handling uncertainties.
+  \item the models of the objects in the environment are known: in this case adapting the MCP consists mainly in dealing with recognition, model superposition, and handling uncertainties.
   In brief, once model superposition is achieved, we can use the 3D model for MCP as in~\cite{escande:ras:2013,bouyarmane:ar:2012}, yet some adjustments are needed.
-  \item the models of the hurdles and the environment are not known (e.g.\ disaster or outdoor environments, for example related to the Fukushima disaster that inspired the DARPA Robotic Challenge), MCP is to be achieved in an egocentric way with models built from the robot's embedded sensors.
+  \item the models of the hurdles and the environment are not known (e.g.\ disaster or outdoor environments, for example, related to the Fukushima disaster that inspired the DARPA Robotic Challenge), MCP is to be achieved in an egocentric way with models built from the robot's embedded sensors.
   This chapter deals with this case and we describe how the MCP is modified to achieve this goal.
   In a nutshell, we construct planar surfaces from the 3D point clouds data and feed them to the MCP.\@
 \end{enumerate}
 
-In robotics, the use of 3D-based vision for recognition and navigation in environment known or partially unknown has first been used on mobile robots, evolving in flat environment, for example by coupling it with a SLAM system~\cite{whitty:acra:2012}.
+In robotics, the use of 3D-based vision for recognition and navigation in environments known or partially unknown has first been used on mobile robots, evolving in a flat environment, for example by coupling it with a SLAM system~\cite{whitty:acra:2012}.
 Another approach consists in extracting the surfaces from the point cloud, and then link them to the known environment or simply consider them as obstacles to be avoided~\cite{poppinga:iros:2008}.
 Since working on raw point clouds is costly because of the high number of data points, this extraction has also been enhanced~\cite{biswas:icra:2012} in order to be run in real-time.
-This approach has been recently experimented on a humanoid robot in~\cite{maier:humanoids:2012}, that combines two methods: the surface extraction from a point cloud, and the voxel-based 3D decomposition of the environment~\cite{nakhaei:humanoids:2008}.
+This approach has recently been experimented on a humanoid robot in~\cite{maier:humanoids:2012}, where two methods are combined: the surface extraction from a point cloud, and the voxel-based 3D decomposition of the environment~\cite{nakhaei:humanoids:2008}.
 Still, since the robot only navigates in a flat environment, and does not realize manipulation tasks, the surfaces extracted from the 3D point cloud are down projected to a 2D plan, on which are based the navigation and collision avoidance processes.
 
-The use of humanoid robots allows to navigate in more complex environment, some work has been done to make a humanoid robot go down a ramp~\cite{lutz:iros:2012} or climb stairs~\cite{osswald:iros:2012}.
+The use of humanoid robots allows to navigate in more complex environments, some work has been done to make a humanoid robot go down a ramp~\cite{lutz:iros:2012} or climb stairs~\cite{osswald:iros:2012}.
 Yet, those methods use laser-based vision rather than point-cloud-based vision, so as to have a precise analysis of a known environment.
 
 In this work, we aim at enabling a robot to analyze and plan a motion into a 3D environment.
@@ -499,15 +499,15 @@ The different steps we follow to create a set of relevant convex polygonal plane
 The Figure~\ref{fig:full_pipeline} illustrates the major steps of this point cloud treatment.
 We use Willow Garage's Point Cloud Library\footnote{\url{http://pointclouds.org/}} (PCL)~\cite{rusu:icra:2011} extensively for processing the point cloud.
 
-\paragraph{Acquisition of point cloud from a RGB and depth sensor}
+\paragraph{Acquisition of point cloud from an RGB and depth sensor}
 The point cloud representing the scene is acquired by an Asus Xtion Pro camera.
 The points are defined by their space coordinates and colors.
 We do not use the color information except for display purpose.
-It may however be useful for future developments in matching object models with sensor data and to perform color-based segmentation algorithms.
+It may, however, be useful for future developments in matching object models with sensor data and to perform color-based segmentation algorithms.
 
 \paragraph{Filtering}
-In order to reduce the computation time and improve the efficiency of our point cloud treatment algorithm we filter out the points that are too far and use a voxelized grid approach to downsample the remaining point cloud.
-This consists in creating a 3D voxel grid over the point clout and replacing the points in each voxel by their centroid.
+In order to reduce the computation time and improve the efficiency of our point cloud treatment algorithm, we filter out the points that are too far and use a voxelized grid approach to downsample the remaining point cloud.
+This consists of creating a 3D voxel grid over the point cloud and replacing the points in each voxel by their centroid.
 (We use this step to reduce the number of points to treat by a factor 5 to 6)
 
 %, it is necessary to reduce the overall size of the data set. We first remove all points further than 5 meters from the camera: such points are not reliable enough and thus a potential source of error for the following steps.
@@ -523,7 +523,7 @@ We divide a global point cloud scene into clusters of points that belong to the 
 %It is used right before the planar extraction algorithm in order to obtain an accurate list of points and plane models they represent.
 
 \paragraph{Planar extraction}
-For each cluster, we use a plane segmentation to find the plan model that fits the highest number of points.
+For each cluster, we use a plane segmentation to find the plane model that fits the highest number of points.
 The outlying points can then be either filtered, or we can try to find another plan to fit them.
 
 \paragraph{Planar projection and hull convex generation}
@@ -532,7 +532,7 @@ We extract the convex hull of the projection of each cluster on their respective
 After this step, each plane surface of the scene is represented by a frame composed of the barycentre of the set of points and the convex hull of the surface.
 
 \paragraph{Re-orientation and transfer to the planner}
-After re-orienting each frame to get their expression with respect to the world frame, the list of \{frame + convex hull\} can be send to the planner as a list of contact surface candidates.
+After re-orienting each frame to get their expression with respect to the world frame, the list of \{frame + convex hull\} can be sent to the planner as a list of contact surface candidates.
 %Before sending the previously computed data to the planner, it is necessary to take into account the initial orientation of the camera. Indeed, if the camera was not aiming in a perfectly horizontal direction, then the entire point cloud would be misoriented. Therefore, it is necessary to re-orientate the surfaces before sending them to the planner. To do so, we simply apply a rotation matrix (that is computed from the initial camera orientation) to each of our data set's frame and origin to settle that problem. From there, the transfer of the surfaces to the planner can be done without any specific issue.
 
 %Re-orientation is done as a last step for the sake of performance: obviously we need to re-orient only a few frames, compared to an early re-orientation of the point cloud that would require to apply a transformation on thousands of points.
@@ -540,7 +540,7 @@ After re-orienting each frame to get their expression with respect to the world 
 
 \subsection{Constraints for surfaces extracted from point clouds}
 
-Generating postures in which a contact between convex polygonal plane surfaces requires to ensure that the intersection area between the two surfaces is large enough to support the contact.
+Generating postures in which a contact between convex polygonal plane surfaces requires ensuring that the intersection area between the two surfaces is large enough to support the contact.
 One could use the formulation presented in Section~\ref{sec:integration_on_non_inclusive_contacts_in_posture generation}.
 Or more simply a constraint of convex polygon inclusion, which is sufficient for cases such as the ones we study here, where the support surfaces are wide enough for the robot to lean on.
 
@@ -578,7 +578,7 @@ If we want the robot to walk on various surfaces, only surfaces that have a norm
 Similarly, only surfaces located at a certain height can be considered for hand contact, etc.
 
 For collision avoidance with the environment, we consider each surface generated by our point cloud treatment algorithm as a thin 3D body.
-Basically, we extrude each surface by few centimetres in the direction opposite to its normal (provided that this normal is pointing toward the outside of the real body) and create a convex hull surface using {\tt QHull}~\cite{qhull:acm:1996}.
+Basically, we extrude each surface by few centimeters in the direction opposite to its normal (provided that this normal is pointing toward the outside of the real body) and create a convex hull surface using {\tt QHull}~\cite{qhull:acm:1996}.
 
 \subsection{Results}
 \label{sub:results_pcl_plannif}
@@ -593,7 +593,7 @@ All the computations of the following experiments are performed on a single thre
 In this first experiment, the robot has to walk up some irregular stairs made of several random pieces of furniture to reach its goal.
 The filtered point cloud was split into 6 plane surfaces.
 The whole cloud processing was done in $2.7$ s.
-The planner computations generates a path of 11 nodes, some of which are depicted in~\Figref{fig:table-climbing-simulation-stair}{}.
+The planner generates a sequence of 11 nodes, some of which are depicted in~\Figref{fig:table-climbing-simulation-stair}{}.
 We notice that the robot climbs the stairs one by one without ever putting its two feet on the same step and without any noticeable problem.
 In total, 23 nodes were generated and the planning time was $98.4$ s.
 
@@ -627,7 +627,7 @@ It raises several interesting questions on the way to adapt our MCP\@.
 
 One advantage of our approach is to avoid having to precisely position the robot in the environment prior to the plan execution.
 Yet, for now, the positioning is done once and for all with the acquisition of the point cloud, before planning.
-When executing the plan, the robot might still deviate from it, for example a support might move, or a foot might contact a few centimetres away from where it was planned to, or the support might not be at its expected position because of measurement errors in the acquired point cloud.
+When executing the plan, the robot might still deviate from it, for example, a support might move, or a foot might contact a few centimeters away from where it was planned to, or the support might not be at its expected position because of measurement errors in the acquired point cloud.
 We thus need to close the loop between the planning and its execution.
 To do so, we need robust detection of discrepancies to be made by the robot.
 This can be achieved by combining point-cloud-based SLAM with contact sensing.
@@ -645,13 +645,13 @@ This partial planning approach can also be seen in the context of semi-autonomou
 The operator is thus in charge of preventing the robot from getting stuck while the planner only concentrates on finding the correct contacts over a short time window.
 
 Another question stems from the partial knowledge of the environment: it is not possible to give a guide path as we used to do with the 3D models.
-This guide path will necessarily be very crude, either a line to a desired position, or a plan in a known environment before it was changed (for example in the case of a disaster in a plant).
+This guide path will necessarily be very crude, either a straight line to the desired position or a plan in a known environment before it was changed (for example in the case of a disaster in a plant).
 The planning must then be driven also by the need of getting information about the environment, for example reaching a viewpoint allowing to see parts of the environment that were hidden before, filling empty spaces and possibly adding new supports on-the-fly.
 Planning is then only partial since necessary part of the environment might be unknown.
 
 Later on, the discovery of the environment might be improved by the use of other sensors.
-One can then imagine having the robot test for a contact to ensure a given surface is fit for support or that it is precisely at the position measured by vision.
-If the surface is not, this is another kind of discrepancy in the plan than needs to be handled by re-planning.
+One can then imagine having the robot test a contact to ensure a given surface is fit for support or that it is precisely at the position measured by vision.
+If the surface is not, this is another kind of discrepancy in the plan that needs to be handled by re-planning.
 
 %We present preliminary results in extending our previous work in multi-contact planning to operate directly on environment that is built on-the-fly from a robot's embedded sensors.
 %This first study makes use of depth camera and implemented modules from the PCL which extract planar surfaces that are fed to our MCP\@.
@@ -661,7 +661,7 @@ The simulation results revealed that our MCP does not require major adjustments 
 %Of course, this does not mean that we are fully satisfied since our results also suggest additional future work.
 
 Although we choose to treat the case of not having 3D models, we believe that the implementation of an MCP with knowledge of the 3D model is necessary.
-For example, even in a disaster situations as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc\ldots).
+For example, even in a disaster situation as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc\ldots).
 So having their models would then still permit our MCP to rely on 3D models to plan contacts for motion.
 PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
 %Of course, our ultimate future plan is to handle uncertainties, control and planning recovery of discrepancies when they occur.
@@ -708,7 +708,7 @@ In this section, we presented several evaluations and applications of our solver
 We first evaluated the influence of the formulation on manifolds on a problem making heavy usage of them and showed that as expected, this formulation outperforms the classical approach in terms of convergence times.
 Then we propose an approach to estimate the success rate of our posture generator with respect to the distance between the initial guess and the solution.
 We then present a different application of our solver to the problem of inertial identification of a rigid body.
-In which case, working with manifolds allows to ensure the \emph{full physical consistency} of the inertial parameters in any situation and all along the optimization process.
+In which case, working with manifolds ensures the \emph{full physical consistency} of the inertial parameters in any situation and all along the optimization process.
 There again, the formulation with manifolds outperforms the classical approach.
-We then present an application of posture generation to the problem of planning in real environment, where we propose a method to segment a sensory acquired environment to allow the generation of postures on it.
+We then present an application of posture generation to the problem of planning in a real environment, where we propose a method to segment a sensory acquired environment to allow the generation of postures on it.
 Finally, we present some use case scenarios in which our posture generator has been used efficiently.

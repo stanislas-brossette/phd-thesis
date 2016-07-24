@@ -14,7 +14,7 @@
 \graphicspath{{Chapter0-Introduction/Figs/Vector/}{Chapter0-Introduction/Figs/}}
 
 The ultimate goal of robotics is to make robots realize some tasks.
-The tasks, as well as the robot used to fulfill them are various.
+The tasks, as well as the robot used to fulfill them, are various.
 For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human, a submarine robot exploring the wreckage of a ship, or a humanoid robot exploring and fixing a destroyed plant.
 
 \begin{figure}[ht]
@@ -25,7 +25,7 @@ For example, it can be a robotic arm building a car in a factory, a surgeon robo
 \end{figure}
 
 The DARPA Robotics Challenge has shone some light on the humanoid robots.
-This competition brought together a large scope of robotics groups from universities, laboratories and private companies around a common goal: tele operate a robot to make it succeed in several challenges without any human physical intervention.
+This competition brought together a large scope of robotics groups from universities, laboratories, and private companies around a common goal: teleoperate a robot to make it succeed in several challenges without any human physical intervention.
 The robots were expected to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
 All those tasks can usually be broken down into sets of elementary tasks in human language.
 Some typical examples of tasks for a robot can be `Put hand in contact with target', `Put foot on next step', `Avoid collision with that object', `Maintain stability' or `Look in that direction'.
@@ -72,12 +72,12 @@ The speed of generating a multi-contact sequence is directly related to the qual
 
 The variables of a robotics problem sometimes naturally belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
 A manifold is a topological space that locally resembles a Euclidean space near each point.
-Each point of an n-dimensional manifold has a neighbourhood that is homeomorphic to the Euclidean space of dimension n.
+Each point of an n-dimensional manifold has a neighborhood that is homeomorphic to the Euclidean space of dimension n.
 An n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
 Most of the optimization solvers available make the assumption that the search space is Euclidean and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
 But it is often possible to parametrize $\mathcal{M}$ over a Euclidean space of higher dimension with added constraints (e.g. unit quaternions, rotation matrices).
 It is then possible to solve those problems with classical solvers at the cost of additional variables, constraints and special treatments in the optimization problem.
-There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters. However to our knowledge, these are focused on addressing non-constrained optimization.
+There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters. However to our knowledge, these are focused on addressing non-constrained optimization.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
 Through this thesis, we develop our own nonlinear constrained optimization solver on manifolds and use it to solve optimization problems on their native search manifolds. We will exhibit their utility for posture generation problems as well as a few other types of problems.
@@ -101,7 +101,7 @@ This has the advantage that, unlike off-the-shelf solvers which are often a blac
 
 \paragraph{Contributions and plan}
 The main focus of this thesis is the formulation and resolution of problems of posture generation for robotics systems using nonlinear optimization on manifolds.
-Our contributions are of two types, on one hand we propose some extensions and improvements on the way to formulate a posture generation problem, and on the other hand, we investigate new ways of solving those problems.
+Our contributions are of two types, on one hand, we propose some extensions and improvements on the way to formulate a posture generation problem, and on the other hand, we investigate new ways of solving those problems.
 The organization of this thesis is as follows:
 %In Chapters~\ref{cha:state_of_the_art} and~\ref{cha:posture_generation_problem_formulation}, we present the background of posture generation, with respectively a state of the art and a presentation of the detailed formulation of a posture generation problem.
 %We present several

@@ -106,7 +106,7 @@ We start by defining convex areas of contact on the robot's body and the environ
 We can generate contacts with an arbitrary intersection of a pair of any of these predefined contact patches.
 Virtually any planar surface can be a contact patch.
 In our previous works, the constraints formulating a new contact in the posture generator, states that a contact patch is totally included into another, which is obviously a limitation of the posture generation.
-A simple example is when a human climbs stairs. He usually contact only the front half of its foot with each step, the heel almost never touches the steps.
+A simple example is when a human climbs stairs. He usually contacts only the front half of its foot with each step, the heel almost never touches the steps.
 Our new geometric contact modeling writes very simply as additional constraints and variables added to the optimization problem, translating the search for an ellipse inscribed in the intersection of the pair of patches we want in contact.
 The result of our posture generator is then a configuration where contact patches are not necessarily included in one another and the shape and area of their intersection can be monitored.
 This allows our posture generator to propose contacts of different shapes with a non-predefined number of contact points (used later to compute reaction/contact forces).
@@ -360,7 +360,7 @@ Then we get the following constraint:
 \label{eq:pseudo-distance}
 \end{equation}
 
-The combination of these equations~\Eqref{eq:F0-to-FE} and \Eqref{eq:pseudo-distance} applied for each edge of the polygons gives us all the necessary tools to develop a set of constraints that ensures that an ellipse is in the intersection of two polygons.
+The combination of these equations~\Eqref{eq:F0-to-FE} and \Eqref{eq:pseudo-distance} applied for each edge of the polygons gives us all the necessary tools to develop a set of constraints that ensures that an ellipse is inside the intersection of two polygons.
 
 
 
@@ -1031,7 +1031,7 @@ This algorithm efficiently computes the exact joint torques Jacobian for a robot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section, we present our work on the use of lifted variables for robotics posture generation.
-The goal of this thesis is on one hand, to enable writing more complex and various problems in simpler ways by improving the formulation of posture generation problems, and on the other hand, to improve and adapt the resolution methods for those problems.
+The goal of this thesis is, on one hand, to enable writing more complex and various problems in simpler ways by improving the formulation of posture generation problems, and on the other hand, to improve and adapt the resolution methods for those problems.
 This section focuses on the later.
 We formulate posture generation problems in an optimization friendly way in order to solve them using nonlinear constrained optimization algorithms.
 In the following, we propose to apply the methods of lifted optimization presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to posture generation problems.
@@ -1128,7 +1128,7 @@ This observation extends to the case of any robot composed of the joints present
 The operators `addition', `subtraction', `multiplication', `sinus' and `cosinus' are enough to describe the kinematics of a robot.
 
 We developed a generic lifting algorithm that allows to automatically lift symbolic functions, and in particular, polynomials of trigonometric functions, based on a given criterion.
-To do so, we use symbolic variables. A symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn be explored and truncated at appropriate places where we insert additional variables.
+To do so, we use symbolic variables. A symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn, be explored and truncated at appropriate places where we insert additional variables.
 Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the original variables, the yellow ones represent the lifted variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the end effector equations.
 \begin{figure}
   \centering
@@ -1417,9 +1417,9 @@ Even though intuitively, the idea of lifting seems to apply naturally to robotic
 \section{Conclusion}
 \label{sec:chap3_conclusion}
 
-In this chapter we presented three different and unrelated contributions to the field.
-First we proposed a convenient formulation of contact constraints that allows to generate non-inclusive contacts between two surfaces while ensuring that the size of the intersection is satisfactory.
-Second we presented a generic differentiation of the torque computation algorithm, allowing to compute the joint torque jacobian of a robotic system.
-And finally we described our endeavor to use the idea of variable lifting in optimization to solve posture generation problems, which unfortunately proved inefficient to accelerate the convergence of our solvers on those problems.
+In this chapter, we presented three different and unrelated contributions to the field.
+First, we proposed a convenient formulation of contact constraints that allows generating non-inclusive contacts between two surfaces while ensuring that the size of the intersection is satisfactory.
+Second, we presented a generic differentiation of the torque computation algorithm, allowing to compute the joint torque jacobian of a robotic system.
+And finally, we described our endeavor to use the idea of variable lifting in optimization to solve posture generation problems, which unfortunately proved inefficient to accelerate the convergence of our solvers on those problems.
 
 In the next chapter, we will dive deeper in the field of nonlinear optimization on manifolds, study how an SQP algorithm can be modified to be able to deal with manifolds and finally present our own implementation of such an algorithm.

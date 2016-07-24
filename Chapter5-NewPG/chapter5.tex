@@ -46,11 +46,11 @@
 Writing a posture generation problem can easily become cumbersome without the appropriate tools.
 Common pitfalls are for example writing the derivative of a function, managing how the Jacobian matrices of the already implemented functions are modified when a variable is added to the problem, adding a new type of constraint, or correctly writing a function on a sub-manifold of the problem manifold.
 A fair amount of bookkeeping is always necessary, which should not be the charge of the user writing the constraints.
-In our PG, we propose an architecture automating most of the problematic tasks, so that the user can focus on the mathematical formulation of the problem:
+In our PG, we propose an architecture automating most of the problematic tasks so that the user can focus on the mathematical formulation of the problem:
 \begin{itemize}
   \item A system of geometrical and mathematical expression trees that automatically computes the mathematical expressions behind geometric relations
   \item An automatic mapping between the submanifold of each function and the global manifold of the problem
-  \item A problem generator that aggregates all the informations from the above mentionned items to generate an optimization problem that can be passed to the solver
+  \item A problem generator that aggregates all the information from the above-mentioned items to generate an optimization problem that can be passed to the solver
 \end{itemize}
 We then propose an extension to classic posture generation by developing a constraint of contact with parametrized surfaces which takes advantage of our framework.
 
@@ -80,7 +80,7 @@ At the mathematical level, we consider 5 types of expressions which can be eithe
 \end{itemize}
 The meaningful unary (inverse, opposite, norm\ldots) and binary (multiplication, addition, subtraction, dot product\ldots) operations (with their derivatives by chain rule) are implemented.
 We also have a Function class for more complicated expressions, for example expressing $q \mapsto T_i(q)$ where $T_i$ is the transformation between the reference frame of the robot and the frame of its $i$-th body~\footnote{The kinematics of rigid body systems is handled by the RBDyn library (\url{git@github.com:jrl-umi3218/RBDyn.git})}.
-The combinations of those elementary operations defines a computation graph, just like in many symbolic calculation frameworks.
+The combinations of those elementary operations define a computation graph, just like in many symbolic calculation frameworks.
 
 Each expression is able to compute its own value and the value of its derivative with respect to another expression.
 For example, let $A$ and $B$ be two unrelated expressions.
@@ -122,7 +122,7 @@ C.diff(x) = A.value().transpose()*B.diff(x) \\ + B.value().transpose()*A.diff(x)
 It is easy to extend the capabilities of this framework by implementing additional operations.
 By following this approach, we can easily compute the values and derivatives of expressions that are the outcome of complex arithmetic trees.
 Currently, the following binary operators are available: cross product, dot product, classic product, addition, subtraction, transformation.
-And the following unary operators are available: component extraction, inverse, norm, rotation, squareroot, transformation and vectorization.
+And the following unary operators are available: component extraction, inverse, norm, rotation, square root, transformation, and vectorization.
 
 The geometric layer consists of physical or geometric objects, called features, which exist independently of their mathematical expression in a given reference frame.
 We have so far four objects:
@@ -160,7 +160,7 @@ In the case of a scalar expression like $(P_e - P_r)\cdot \overrightarrow{V_r} =
 \end{center}
 
 This mathematical and geometric expression framework simplifies the task of the constraints developers.
-And it helps avoiding calculation mistakes, because we only ever need to write the code for elementary functions and their combination is computed automatically by chain rule.
+And it helps to avoid calculation mistakes because we only ever need to write the code for elementary functions and their combination is computed automatically by chain rule.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -277,7 +277,7 @@ We can write constraints such that any combination of the translational degrees 
   \text{If TZ is blocked: } \overrightarrow{O_1 O_2} \cdot \vec{z_1} = 0
 \end{align}
 
-Similarly, any pair of rotational degrees, or the three of them can be blocked (blocking only one rotation is not possible with that formalism).
+Similarly, any pair of rotational degrees or the three of them can be blocked (blocking only one rotation is not possible with that formalism).
 If the three rotations RX, RY, RZ are blocked, we get the set of constraints~\ref{eq:3_rotations_blocked}:
 \begin{equation}
 \label{eq:3_rotations_blocked}
@@ -367,7 +367,7 @@ For each collision avoidance constraint, we require that the distance between th
   d(C_1, C_2)\geq d_{\min}
 \end{equation}
 
-\item The torque limit constraint makes use of the Inverse Statics algorithm~\ref{alg:ISmatrix} to compute the torques in all the joints of each robots and their derivatives are computed by algorithm~\ref{alg:TJC}.
+\item The torque limit constraint makes use of the Inverse Statics algorithm~\ref{alg:ISmatrix} to compute the torques in all the joints of every robots and their derivatives are computed by algorithm~\ref{alg:TJC}.
 Denoting $\tau_i$ the torque in joint $i$ resulting from the robot's configuration and the external forces applied on it, and its lower and upper limits as $\tau_i^-$ and $\tau_i^+$. The torque limit constraint writes as follows:
 \begin{equation}
   \forall i,\ \tau_i^- \leq \tau_i \leq \tau_i^+
@@ -413,7 +413,7 @@ In this section, we provide an overview of some of the key elements of the frame
 
 \paragraph{Problem's configuration:}
 The implementation of the core structure of a posture generation problem is written in \texttt{C++}.
-A text file in yaml format can be used to configures the solver and some custom parameters of the problem; It is parsed at runtime to avoid having to recompile the problem for every configuration change.
+A text file in YAML format can be used to configures the solver and some custom parameters of the problem; It is parsed at runtime to avoid having to recompile the problem for every configuration change.
 Also, some \texttt{Python} bindings have been developed to allow writing the core structure of the problem without compilation.
 %We use two types of configuration files:
 %\begin{itemize}
@@ -423,18 +423,18 @@ Also, some \texttt{Python} bindings have been developed to allow writing the cor
 
 \paragraph{The Robot class:}
 %It is instantiated from a Robot::Init structure that contains all the necessary data for its construction.
-%Which includes its name, its urdf path, the path of its collision meshes, some booleans defining if the robot is fixed, has torque limits, etc\ldots
-%On instantiation of a robot, we use this urdf to instantiate the RBDyn objects that are used to compute the Forward Kinematics and Inverse Statics of the robot: a MultiBody, a MultiBodyGraph and a MultiBodyConfig, as well as its joint, torque limits, and the manifold in which the variables of the robot live.
+%Which includes its name, its URDF path, the path of its collision meshes, some booleans defining if the robot is fixed, has torque limits, etc\ldots
+%On instantiation of a robot, we use this URDF to instantiate the RBDyn objects that are used to compute the Forward Kinematics and Inverse Statics of the robot: a MultiBody, a MultiBodyGraph and a MultiBodyConfig, as well as its joint, torque limits, and the manifold in which the variables of the robot live.
 %The robot object is equipped with an external\_forces object that handles the external forces applied to it, and a torques object that handles its joint torques.
 %A Frame is created on each of the bodies of the robot.
 %A set of predefined surfaces on bodies can be loaded from an rsdf file.
 %A set of collision convex meshes attached to the bodies of the robot is created based on a provided list of mesh files.
 %The configuration of a robot depends on its articular parameters, to hanble that, the robot object contains an update method that runs the Forward Kinematics algorithm and updates the transformations of each body and its jacobian, which, by extension updates the its body frames. Every body frames get their transformation's values and derivatives from those quantities.
-The RBDyn library contains all the low level tools and algorithm to compute the kinematics and statics of a robot.
-The robot class is built on top of RBDyn to provide high level functionalities while adapting it to our manifold formalism (which RBDyn does not handle natively).
-The basic structure of the robot is extracted from its urdf description file.
+The RBDyn library contains all the low-level tools and algorithm to compute the kinematics and statics of a robot.
+The robot class is built on top of RBDyn to provide high-level functionalities while adapting it to our manifold formalism (which RBDyn does not handle natively).
+The basic structure of the robot is extracted from its URDF description file.
 The main functionality of the robot class is to create a Frame attached to each of its bodies and to update their transformations and derivatives based on the robots articular variables.
-It also maintains the transformations of all the collision meshes, and contains the joint and torque limits, as well as the manifold on which its variables live.
+It also maintains the transformations of all the collision meshes and contains the joint and torque limits, as well as the manifold on which its variables live.
 Additionally, it contains some useful objects used to maintain and update the external forces applied on the robot, as well as the joint torques.
 
 \paragraph{The Function Class:}
@@ -444,7 +444,7 @@ Functions can conveniently be defined through our expression framework to take a
 
 \paragraph{The Constraint class:}
 A constraint object contains all the necessary elements for the description of a mathematical constraint.
-That is, a function $h$, and the manifold $\mathcal{M}_c$ on which it should be applied, as well as its lower bound $l$, upper bound $u$ and scaling factor of the constraint.
+That is, a function $h$ and the manifold $\mathcal{M}_c$ on which it should be applied, as well as its lower bound $l$, upper bound $u$ and the scaling factor of the constraint.
 Once a constraint is instantiated by the problem, the input mapping $\pi$ from the problem's complete manifold $\mathcal{M}$ to the function's application manifold is computed.
 The constraint that will then be used in the optimization for a given iterate $x$ can be written as:
 \begin{equation}
@@ -453,7 +453,7 @@ The constraint that will then be used in the optimization for a given iterate $x
 %A constraint is a function accompanied by its application manifold, bounds and scaling factors.
 %It is convenient to use a function built by our expression framework here, to take advantage of their automatic derivation and variables.
 %Every constraint has a geometric part and a stability part that are added separately to the problem.
-Constraint can be equipped with an `addStabilityToProblem' method that is used to specify the forces generated by the constraint to add to the stability constraint of the problem.
+Constraints can be equipped with an `addStabilityToProblem' method that is used to specify the forces generated by the constraint to add to the stability constraint of the problem.
 %The stability part is mainly used to add contact forces to the stability constraint.
 
 \paragraph{The Frame Constraint class:}
@@ -498,7 +498,7 @@ We denote $f_g$ the target value of the force in direction $\vec{d}$ and $\vec{f
 \begin{equation}
   f_{target}(f_c) = {\left(\vec{f_c}\cdot\vec{d}-f_g\right)}^2
 \end{equation}
-In addition to that cost function, the robot needs keep its foot on the ground, its left hand is used to lean on a beam of the structure to allow a longer reach with the right hand that is in contact with the wall.
+In addition to that cost function, the robot needs to keep its foot on the ground, its left hand is used to lean on a beam of the structure to allow a longer reach with the right hand that is in contact with the wall.
 Those constraints must be satisfied while respecting the joint and torque limits of the robot, maintaining balance and avoiding auto-collisions.
 The result is depicted in figure~\ref{fig:comanoid}
 \begin{figure}
@@ -513,8 +513,8 @@ In this scenario, the HRP-4 robot is required to evolve in a highly constrained 
 The goal is to real a panel of circuit breakers (in green on figure~\ref{fig:getafe}) to activate them.
 We generated a sequence of steps to reach that panel and then some postures to reach different points of this panel.
 In figure~\ref{fig:getafe}, we show some extracts of this sequence of postures.
-In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance and stability constraints.
-On the last posture the top left corner of the panel is reached with the tip of the right hand of the robot.
+In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance, and stability constraints.
+On the last posture, the top left corner of the panel is reached with the tip of the right hand of the robot.
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{getafeSequence.png}
@@ -547,7 +547,7 @@ The set of equations used to define that type of constraint can be obtained thro
 \label{eq:planar_contact}
 \end{equation}
 
-When the two surfaces are plan, a contact between them can be written simply with the set of equations~\Eqref{eq:planar_contact}.
+When the two surfaces are flat, a contact between them can be written simply with the set of equations~\Eqref{eq:planar_contact}.
 In that case, the quantities involved in the constraint are invariant with the location of the contact point, thus, the equations are valid for any point of the surface (in particular, the normal vector is the same for any point on the surface).
 %When it comes to non-flat surfaces, the orientation of the normal vector changes with the location of the contact point, if the contact point is fixed and predefined, the set of equation~\Eqref{eq:planar_contact} can describe the constraint, otherwise, it is not sufficient.
 When it comes to non-flat surfaces, the location of the frames used in equations~\Eqref{eq:planar_contact} matters, as the quantities in the constraint equations depend on it.
@@ -558,7 +558,7 @@ When it comes to non-flat surfaces, the location of the frames used in equations
 
 %If any(either or both) of the two surfaces in contact is non-plane, finding the exact location of the contact point on the surface is necessary, because then, the normal to the contact is not known in advance.
 
-We propose to add an additional variable $u_S$ to our optimization problem to represent the location of the contact frame on non-flat surface.
+We propose to add an additional variable $u_S$ to our optimization problem to represent the location of the contact frame on a non-flat surface.
 This gives the ability to our solver to choose the optimal contact position on a non-flat surface.
 Depending on its shape, the manifold $\mathcal{M}_S$ on which the surface is parameterized can be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$.
 Then we can write the contact constraint on that parametrized frame with ease.
@@ -596,7 +596,7 @@ In every situation, the projection of the CoM is outside the polygon of support,
   \setlength\fboxrule{1pt}
   \fbox{\includegraphics[width=.95\textwidth]{4directionsStrokesWithCoM.png}}
   %\fbox{\includegraphics[width=.95\linewidth]{papers/Humanoids2015/figure/contact_plan_sphere_4_directions.png}}}
-  \caption{HRP2-Kai leaning on sphere with right wrist to point the left gripper as far as possible in 4 cardinal directions.
+  \caption{HRP2-Kai leaning on a sphere with its right wrist to point its left gripper as far as possible in 4 cardinal directions.
   Top row: semi-predefined contact; Bottom row: free contact with parametrized wrist.
   Projection of the CoM on the ground (green dots)}
 \label{fig:contact_plan_sphere}
@@ -621,11 +621,11 @@ The section of HRP2-Kai's wrist is a square with rounded edges.
 We parametrize this shape as shown in Fig.~\ref{fig:param_wrist_detail}:
 we consider the angular coordinate $\theta$ of the point on the section.
 It is added as a variable on $\mathbb{R}$ to the problem.
-The shape of a quarter of section $[0;\pi/2]$ is a succession of a vertical line, a quarter of circle and a horizontal line.
+The shape of the quarter of section $[0;\pi/2]$ is a succession of a vertical line, a quarter of a circle and a horizontal line.
 This pattern is repeated for the 3 other quarters.
 The equations are given in Fig.~\ref{fig:param_wrist_detail}.
 In our framework, we define the function describing the shape of the wrist, create a frame parametrized by that function and then define the contact between that frame and the point and normal on the sphere.
-This formulation not only is very easy to implement, but most importantly, allows for richer posture generations.
+This formulation not only is very easy to implement but most importantly, allows for richer posture generations.
 The optimization algorithm chooses the contact point on the sphere as well as the contact point on the wrist, which leads to a wider accessibility range, and a better satisfaction of the cost function.
 
 The bottom row of Fig.~\ref{fig:contact_plan_sphere} displays the results of this simulation for the robot pointing in 4 directions.
@@ -638,12 +638,12 @@ The numbers of iterations are similar.
 
 %Also, that kind of formulation makes it easier for the user to generate satisfactory postures, as he does not need to specify the plan contact surface anymore.
 This method is certainly scalable, and can be used for any kind of humanoid robot and environment.
-Yet, it requires to have a parametric equation of the surface.
+Yet, it requires having a parametric equation of the surface.
 
 \subsection{Contact with an object parametrized on S2}
 
 In this case, we want the HRP-4 robot to carry a cube with its two hands.
-The most general way to do it is to select a face of the cube for each contact, and enforce the contact between that face and the hand's surface.
+The most general way to do it is to select a face of the cube for each contact and to enforce the contact between that face and the hand's surface.
 We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S2$, thus adding a variable on $S2$ to our problem.
 The implicit equation of a superellipsoid is $S(x,y,z) = 0$, with
 \begin{equation}
@@ -725,13 +725,13 @@ The red line is the image of a great circle of the unit sphere through our param
   \centering
     \includegraphics[width = 0.2\paperwidth]{leg3smooth.png}
     \includegraphics[width = 0.2\paperwidth]{leg3smoothSharp.png}
-\caption{Catmull Clark Surfaces (in blue) approximating the mesh of a link on HRP-2 (in green)}
+\caption{Catmull-Clark Surfaces (in blue) approximating the mesh of a link on HRP-2 (in green)}
 \label{fig:CCS}
 \end{figure}
 
 Because this parametrization respects the continuity requirements for being used efficiently in optimization, we can use it freely in our posture generation problems.
 
-We now show some examples of PG using the proposed approach to introduce complex objects to contact with.
+We now show some examples of PG using the proposed approach to generate contacts with complex objects.
 We make use of the capacity of our optimization solver to directly work with a variable $d\in S2$ to parametrize our surfaces.
 %When using more classical nonlinear solvers, it is sufficient to take $d$ in $\mathbb{R}^3$ and to add a constraints of unit norm for $d$: the parametrization algorithm do not need a unit $d$ to work, and at the solution, the gradient will be full rank on the null-space of this constraint, which is enough for a good convergence.
 %However, working directly on $S^2$ presents several advantages\cite{brossette:Humanoids:2015}.
@@ -787,15 +787,15 @@ This can be used to alleviate the work to be done by the user, be it a human or 
 \section{Conclusion}
 \label{sec:conclusion_ch4}
 
-In this section we presented our approach for formulating a posture generation problem and generating an optimization problem that represents it.
+In this section, we presented our approach for formulating a posture generation problem and generating an optimization problem that represents it.
 We presented several tools that are meant to simplify this process for the developer, with the automatic variable management, the use of non-Euclidean manifolds and the geometric expressions framework.
 
 Leveraging those tools, we developed methods to formulate constraints involving non-flat surfaces, by adding an extra variable to our optimization problem to parameterize the location of a frame on the surface.
 To avoid optimization issues, we make sure that our formulations have satisfying continuity properties.
-This addition allows to formulate much richer posture generation problems, where the location of a contact on a non-flat surface is abstracted and chosen by the optimization solver.
-We were able to use this approach to represent several kinds of surfaces that could be described by closed-form formulas, such as the wrist of HRP-2, a sphere and a superellipsoid.
+This addition allows formulating much richer posture generation problems, where the location of a contact on a non-flat surface is abstracted and chosen by the optimization solver.
+We were able to use this approach to represent several kinds of surfaces that could be described by closed-form formulas, such as the wrist of HRP-2, a sphere, and a superellipsoid.
 We extended that method to approximate surfaces for which the only available representation is a (star-convex) mesh.
-This allows to formulate constraints on the surface of a very large variety of objects.
+This allows formulating constraints on the surface of a very large variety of objects.
 
 In the next section, we evaluate the performances of our solver and our posture generator before presenting some use cases and extensions to real world situations.
 

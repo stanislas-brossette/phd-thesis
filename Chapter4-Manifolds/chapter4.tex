@@ -106,7 +106,7 @@ For example, let us consider an optimization problem over the $SO(3)$ manifold:
 \end{align}
 
 $SO(3)$ is a 3-dimensional manifold.
-As such, it can be parametrized \emph{locally} by $3$ variables, for example a choice of Euler angles. But any such parametrization necessarily exhibits singularities when taken as a global map (e.g.\ gimbal lock for Euler angles), which can be detrimental to our optimization process.
+As such, it can be parametrized \emph{locally} by $3$ variables, for example, a choice of Euler angles. But any such parametrization necessarily exhibits singularities when taken as a global map (e.g.\ gimbal lock for Euler angles), which can be detrimental to our optimization process.
 
 For this reason, when addressing $SO(3)$ with classical optimization algorithms, it is often preferred to use one of the two following parametrizations:
 \begin{itemize}
@@ -137,7 +137,7 @@ It is then needed to project them on it.
 %For example, all the functions involved in the problem can be composed with a normalization of the quaternion.
 %Which in turn must be taken into account in the constraints and cost functions differentiations, which is an additional programming burden.
 Denoting $\pi_\mathcal{M}$ the projection (for example $\pi_\mathcal{M} = \frac{q}{\left\|q\right\|}$ in the unit quaternion formulation), to evaluate a function $f$ on a manifold, we need to compute $f \circ \pi_\mathcal{M}$.
-If further the gradient is needed, that projection must also be accounted for (authors in~\cite{bouyarmane:humanoids:2012} explain that issue in great details for robotics problems with free-floating bases).
+If further the gradient is needed, that projection must also be accounted for (authors in~\cite{bouyarmane:humanoids:2012} explain that issue in great details for robotics problems with free-floating basis).
 
 Similar issues can be found with the $\mathbb{R}^{3\times 3}$ matrix representation.
 
@@ -149,8 +149,8 @@ Having intermediate values naturally staying on the manifold can be useful to ev
 It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the optimization, so that when the optimization process is stopped after a few iterations, the output is still meaningful in the sense that it is always a point of the manifold.
 
 In this chapter, we present a new nonlinear optimization solver able to work on generic smooth manifolds.
-We take inspiration from the approach used for unconstrained optimization on manifold~\cite{absil:book:2008} and adapt it to constrained optimization.
-To the best of our knowledge, constrained optimization on manifold has drawn few research for now.
+We take inspiration from the approach used for unconstrained optimization on manifolds~\cite{absil:book:2008} and adapt it to constrained optimization.
+To the best of our knowledge, constrained optimization on manifolds has drawn few research for now.
 This is likely due to the fact that in most problems the only constraint is to be on the manifold.%, in that case, unconstrained optimization on manifold is enough.
 We are only aware of the work of Schulman \emph{et al.}~\cite{Schulman2014}, where the authors explain the adaptation of their solver to work on $SE(3)$.
 This adaptation is however not valid for general manifolds without more care about hessian computation.
@@ -253,7 +253,7 @@ $\varphi_x$ gives us a local parametrization for $\mathcal{M}$.
 Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi_x$ in optimization on manifolds and a step followed by a projection $\pi_\mathcal{M}$ as it can be done in classical optimization.
 
 $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplane of a higher dimensionality space.
-For example in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplane embedded in $\mathbb{R}^3$.
+For example, in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplane embedded in $\mathbb{R}^3$.
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local function $\varphi_{x_i}$ at the current iterate $x_i$ at each iteration.
 Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as:
@@ -306,7 +306,7 @@ We can use the function $\psi:\mathcal{M} \rightarrow \psi(\mathcal{M})$, which 
 %But we still need a map $\psi$ and real space $\mathbb{E}$ to represent the $x_i$ and keep track of them in a global way.
 %The ${\bf x_i}$ are guaranteed to be on $\mathcal{M}$ so we can choose a representation with $r>n$ where $\psi$ is singularity-free without any drawback.
 Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it was a function from $\mathbb{E}$ to $\mathbb{R}$ without the need to project on $\psi(\mathcal{M})$ first (same goes for $c' = c \circ \psi^{-1}$).
-For example if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}=\psi(x_i)$ is always a rotation matrix and can be used directly as such when writing the function.
+For example, if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}=\psi(x_i)$ is always a rotation matrix and can be used directly as such when writing the function.
 
 %}}}
 %{{{ LOCAL SQP ON MANIFOLDS
@@ -346,7 +346,7 @@ The basic SQP approach adapted to manifolds can be summarized as follows
   \item set $k=0$ and $x_k$ to the initial value
   \item compute ${\bf z}$ from Problem~\Eqref{eq:SQPStep} for current $x_k$
   \item set $x_{k+1} = \varphi_{x_k}({\bf z})$ and $k=k+1$
-  \item if convergence is not yet achieved go-to step 2
+  \item if convergence is not yet achieved go to step 2
 \end{enumerate}
 
 Computations of function values and derivatives are based on the fact that $f \circ \varphi = f' \circ \psi \circ \varphi$ (and same for $c$), and
@@ -375,10 +375,10 @@ In figure~\ref{fig:diagram_function}, we present a summary of the different func
 \subsection{Vector transport}
 \label{sub:vector_transport}
 
-Nonlinear optimization algorithm such as the SQP rely on the second order information on the problem that is contained in the Hessian.
+Nonlinear optimization algorithms such as the SQP rely on the second order information on the problem that is contained in the Hessian.
 The exact value the Hessian is not always available, or might be too expensive to compute.
-In those cases, we approximate the second order derivative by comparing first order information (tangent vectors) taken a distinct points of the manifold.
-Much like in the case of the retractation operation, comparing tangent vectors is straightforward on an Euclidean space is straightforward, but not on a manifold.
+In those cases, we approximate the second order derivative by comparing first order information (tangent vectors) taken on distinct points of the manifold.
+Much like in the case of the retractation operation, comparing tangent vectors is straightforward on a Euclidean space is straightforward, but not on a manifold.
 
 Given $x_1\in\mathcal{M}$ and $\mathbf{z}\in T_{x_1}\mathcal{M}$, we denote $x_2=\varphi_{x_1}(\mathbf{z})$.
 We consider two vectors $\mathbf{v}_1 \in T_{x_1}\mathcal{M}$ and $\mathbf{v}_2 \in T_{x_2}\mathcal{M}$ that we want to compare, it is necessary to transport $\mathbf{v}_1$ into $T_{x_2}\mathcal{M}$.
@@ -435,7 +435,7 @@ In some cases, this quantity is invariant w.r.t $x$ and can be computed once and
 
 \paragraph{Pseudo-logarithm and distances:}
 It is interesting to compute distances on manifolds.
-For that, we define the pseudo-logarithm (aka pseudolog), which is the inverse of the retractation operator.
+For that, we define the pseudo-logarithm (denoted pseudolog), which is the inverse of the retractation operator.
 \begin{equation*}
   \zeta_x:\mathcal{M}\rightarrow T_x\mathcal{M}
 \end{equation*}
@@ -509,9 +509,9 @@ For example, the retractation is computed as follows, and that scheme can be rep
 \subsection{Implementation of Manifolds}
 \label{sub:implementation_of_manifolds}
 
-In order to use the manifold formulation described above in other softwares, and particularly in a numerical solver, we wrote an independant C++ project.
+In order to use the manifold formulation described above in other software, and particularly in a numerical solver, we wrote an independent C++ project.
 This implementation is open-source and available at \href{https://github.com/stanislas-brossette/manifolds}{https://github.com/stanislas-brossette/manifolds}.
-The implementation consists in 3 types of classes: the Manifold class, the elementary manifold classes, and the Point class.
+The implementation consists of 3 types of classes: the Manifold class, the elementary manifold classes, and the Point class.
 The Manifold class describes the abstract mathematical structure of a non-Euclidean manifold and defines a common interface for all elementary manifolds to implement (retractation, pseudoLog,\ldots).
 Elementary Manifold classes ($\mathbb{R}^n$, $SO(3)$, $S2$, and the Cartesian Product) are the concrete manifolds.
 They inherit from the Manifold class and implement all their mathematical operations.
@@ -536,7 +536,7 @@ The SQP algorithm presented in Section~\ref{local_sqp_on_manifolds} works locall
 In practice, various refinements are made to ensure convergence from any starting point, it is called the globalization.
 We detail hereafter the choices we made for the implementation of our solver called {\tt PGSolver}.
 
-We summarize the entire SQP algorithm in Diagrams~\ref{fig:main_sqp_loop},~\ref{fig:restoration_loop} and~\ref{fig:second_order_correction}, which represent respectively the main SQP loop, the restoration phase and the second order correction algorithm.
+We summarize the entire SQP algorithm in Diagrams~\ref{fig:main_sqp_loop},~\ref{fig:restoration_loop} and~\ref{fig:second_order_correction}, which represent respectively the main SQP loop, the restoration phase, and the second order correction algorithm.
 
 \subsection{Linear and quadratic problems resolution}
 \label{sub:linear_and_quadratic_problems_resolution}
@@ -584,7 +584,7 @@ As stated in Eq~\Eqref{eq:pb_on_SO3} we want to solve a nonlinear constrained op
   \end{array}
 \end{align}
 
-The list of constraints can be separated in 3 categories: Bounds, Linear, and Nonlinear.
+The list of constraints can be separated into 3 categories: Bounds, Linear, and Nonlinear.
 For convenience, we formulate our optimization problem in a way that is compatible with {\tt LSSOL} by changing all equality constraints into inequality constraints:
 
 \begin{equation}
@@ -625,7 +625,7 @@ With ${\bf z}_{\text{map}}^-$ and ${\bf z}_{\text{map}}^+$ being respectively th
 After this reformulation, we note that if $\phi_x$ is nonlinear, then the bounds and linear constraints of problem~\Eqref{eq:optim_problem_on_manifold} become nonlinear in problem~\Eqref{eq:optim_problem_on_txm}.
 It is then necessary to treat the problem and evaluate which constraint is linear and which is not, in order to go back to a formulation of the same type as in problem~\Eqref{eq:optim_problem_on_manifold}.
 Basically, for each constraint $c_j$ in problem~\Eqref{eq:optim_problem_on_txm}, if the submanifold of $\mathcal{M}$ on which that constraint is applied is a real space $\mathbb{R}^m$ then the constraint maintains its bound, linearity or nonlinearity status, otherwise, it becomes a nonlinear constraint\footnote{At the time of writing those lines. This treatment of the constraints is a planned work, it has not been implemented yet.}.
-It is however unusual to write linear constraints on non-Euclidean manifolds.
+It is, however, unusual to write linear constraints on non-Euclidean manifolds.
 %Once again, this may look like a drawback of optimization on manifolds, but it is usually the same with classical optimization.
 %Indeed, a linear constraint on the representation space of a non-Euclidean manifold might not often make much sense.
 %For example, a linear constraint on the elements of a unit quaternion, although one can obviously be devised, does not seem to make much sense.
@@ -682,7 +682,7 @@ The new iterate that will be considered is:
   \lambda_{k+1} & \leftarrow \lambda^*
 \end{align}
 
-Note that the only additional computation due to the formulation on manifold is the multiplication of the gradients of constraints and cost by the map's gradient at $0$.
+Note that the only additional computation due to the formulation on manifolds is the multiplication of the gradients of constraints and cost by the map's gradient at $0$.
 The computation time related to those products can be reduced by taking advantage of the fact that $\nabla \phi_x(0)$ is block-diagonal.
 
 \subsection{Trust-region and limit map}
@@ -695,7 +695,7 @@ This leads naturally to trust region methods that we, therefore, favor over line
 We present the classical trust-region strategy in Section~\ref{ssub:the_trust_region_strategy}.
 
 In the case of a robotics problem, different variables often have different orders of magnitude, for example, contact forces can be of the order of $100N$ while joint angles are of the order of $1rad$.
-Let $x$ be the variable vector of such problem with $x={[\theta_0, \theta_1, f_0, f_1, f_2]}^T$ where $\theta$ represents an angular variables and $f$ a force.
+Let $x$ be the variable vector of such problem with $x={[\theta_0, \theta_1, f_0, f_1, f_2]}^T$ where $\theta_i$ represent angular variables and $f_i$ forces.
 The shape of the trust-region should reflect those differences, but we want to keep the simplicity of the classical trust-region strategy.
 For that, we propose to separate the trust-region $\rho$ in two parts: its scale $\rho_\text{scale}$ which is a scalar, and its shape $\rho_\text{shape}$ which in a vector of dimension $n$ (that value is actually stored in the instance of manifold).
 $\rho_\text{shape}$ is constant and set at the beginning of the optimization, the i-th element of $\rho_\text{shape}$ is the order of magnitude of the i-th dimension of the optimization variable.
@@ -791,7 +791,7 @@ This allows to reduce the KKT system to the following:
 \end{equation}
 
 To evaluate the satisfaction of this system, we approximate it with the tolerance constants.
-First we scale the tolerance constants with respect to the values of the iterate $x$ and $\lambda$:
+First, we scale the tolerance constants with respect to the values of the iterate $x$ and $\lambda$:
 
 \begin{align}
 \begin{split}
@@ -826,7 +826,7 @@ And we get the following convergence criterion:
 
 Along the optimization process, the set of linearized constraints in the QP Problem~\Eqref{eq:QP_txm} can become unfeasible, for example after a reduction of the trust-region, see Section~\ref{ssub:the_trust_region_strategy}.
 In that case the QP~\Eqref{eq:QP_txm} cannot be solved and the resolution as presented above cannot proceed.
-To quope with this issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
+To cope with this issue, the algorithm enters a phase called of restoration, that aims at finding a feasible point without regards for the value of the cost function.
 The basic idea is the following: at the beginning of an iteration, the list of unfeasible constraints is computed and stored in $\mathcal{U}_l$ if the lower bound in unfeasible and in $\mathcal{U}_u$ if the upper bound is unfeasible and the list of feasible constraints is stored in $\mathcal{F}$.
 The unfeasible constraints are removed from the restoration problems' constraints list and their violation is added to its cost function (that becomes the sum of all constraints violation).
 We get the following restoration cost function:
@@ -966,7 +966,7 @@ This system is solved iteratively by updating $\mathbf{z}_k$ (but never changing
 \subsection{Hessian update on manifolds}
 \label{sub:hessian_update_on_manifolds}
 
-Aside from the manifold adaptation, our main departure from Fletcher is in the Hessian computation where we used an approximation, since the exact one is too expensive to compute in our problems.
+Aside from the manifold adaptation, our main departure from Fletcher is in the Hessian computation where we used an approximation because the exact one is too expensive to compute in our problems.
 After testing several possibilities, we settled for a self-scaling damped BFGS update~\cite{nocedal:mp:1993,nocedal:book:2006}, adapted to the manifold framework.
 More precisely, given the Hessian approximation $H_k$ at iteration $k$, we compute the approximation $H_{k+1}$ as follows:
 Note that as explained in Section~\ref{sub:vector_transport}, the gradients are transformed through vector transport before being compared.
@@ -988,7 +988,7 @@ where $\mathcal{T}_{\bf z}$ is a vector transport along ${\bf z}$ (see~\cite{abs
 Despite Powell's update, $H_{k}$ might not be positive definite (but still symmetric).
 We regularize it as follows: we first perform a Bunch-Kaufman factorization $P_k H_k P_k^T= L_k B_k L_k^T$ where $P_k$ is a permutation matrix, $L_k$ is unit lower triangular and $B_k$ is block diagonal with blocks of size $1 \times 1$ or $2\times 2$ (obtaining $B_k$ as a diagonal matrix is not numerically stable for Cholesky-like decomposition of indefinite matrices), see~\cite{golub:book:1996}.
 The eigenvalue decomposition $B_k = Q_k D_k Q_k^T$ is immediate and cheap to compute.
-From the diagonal matrix $D_k$ we form $D'_k$ such that $d'_{ii} = \max\left(d_{ii},\mu_{\min}\right)$ where $\mu_{\min}>0$ is user-defined (we typically set it to $0.1$).
+From the diagonal matrix $D_k$, we form $D'_k$ such that $d'_{ii} = \max\left(d_{ii},\mu_{\min}\right)$ where $\mu_{\min}>0$ is user-defined (we typically set it to $0.1$).
 Defining $L'_k = L_k Q_k {(D'_k)}^{1/2}$, we get a regularized matrix $H'_k = P_k^T L_k L_k^T P_k = (L_k^T P_k)^T L_k^T P_k$.
 %In our case, we use {\tt LSSOL}~\cite{gill:techrep:1986} for solving the QP~\Eqref{eq:SQPStep}, which directly accepts the factorized form $(P_k, L'_k)$.
 We take advantage of {\tt LSSOL}'s capability to receive $H$ in the factorized form $H=A^TA$ with $A=L_k^T P_k$ upper-trapezoidal as an input.
@@ -999,10 +999,10 @@ This avoids an internal Cholesky factorization so that our regularization does n
 
 In~\cite{Fletcher:ifip:2006}, Fletcher presents a new Hessian update method that maintains and update the Hessian $H$ in the form $H=U U^T$, which is obviously always symmetric and it ensures that it is always positive semi-definite.
 Since a decomposition of $H$ is readily available with this method, we can get rid of the regularization of the Hessian in our algorithm.
-The matrix $U$ of size $(n,m)$ is smaller than $H$ and contains only informations from the last $m$ iteration, this means that this method has a built-in limited memory capability.
+The matrix $U$ of size $(n,m)$ is smaller than $H$ and contains only information from the last $m$ iteration, this means that this method has a built-in limited memory capability.
 In our robotics problems, using limited memory Hessian updates is useful because along the iteration process, the variables may change a lot, and the Hessian value near the solution may be very different from the one approximated around the first iterations.
 Thus, it can be helpful to `forget' about the old components of the approximation to leave room for the latest ones.
-At each iteration, the matrix $U$ is updated with either BFGS, or SR1, or a hybrid method, based on some tests on the value of the latest step.
+At each iteration, the matrix $U$ is updated with either BFGS or SR1, or a hybrid method, based on some tests on the value of the latest step.
 When possible, the SR1 update is preferred, because some results suggest that it allows faster convergence when the SR1 denominator is positive, otherwise, a BFGS or the hybrid method are used.
 
 Although this method provides a decomposition of $H$ as $U U^T$, $U$ is not trapezoidal, so we need to apply a QR on $U^T$ it so that we get $U^T=QR$, then $H=R^T Q^T Q R=Q^T Q$ with Q trapezoidal and R an orthogonal matrix.
@@ -1017,7 +1017,7 @@ As of now, the best results were observed when using the self-scaling BFGS updat
 
 The hessian $H$ computed through whichever method presented above is meant to approximate the value of $\nabla^2 \mathcal{L}_{xx}(x,\lambda) = \nabla^2 f(x) + \lambda^T \nabla^2 c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
 But during the restoration phase, the definitions of $f$ and $c$ change at each iteration, depending on the sets of unfeasible and feasible constraints ($\mathcal{I}$ and $\mathcal{F}$).
-In order to account for that change, we propose to compute an approximation of each constraints second derivative separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the hessians based on the current set of feasible constraints.
+In order to account for that change, we propose to compute an approximation of each constraints second derivative separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the Hessians based on the current set of feasible constraints.
 
 \begin{align}
   \begin{split}
@@ -1038,14 +1038,14 @@ The roboptim framework provides a list of 72 canonical optimization problems com
 Although those problems are all on $\mathbb{R}^n$, thus, do not try the non-Euclidean capabilities of our solver, it is a good way compare its performances with those of other solvers.
 As of now, {\tt PGSolver} finds a solution for 51 tests out of 72, using its default parameters.
 In the same conditions, {\tt IPOPT} solves 65 problems, {\tt CFSQP} 46 and {\tt NAG} 58.
-This result serves only as indication of the correct behavior of a solver, because default parameters are usually not good and a solver reaches its full potential once its parameters have been tuned for a type of problem.
+This result serves only as an indication of the correct behavior of a solver because default parameters are usually not good and a solver reaches its full potential once its parameters have been tuned for a type of problem.
 Those tests can also be used in a non-regression criterion for our software.
 
 
 \section{Diagrams of the algorithms}
 \label{sec:diagrams_of_the_algorithms}
 
-In Figures~\ref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:second_order_correction}, we summarize the functioning of the algorithms that are respectively the main loop of the SQP, the restoration phase and the second order correction phase.
+In Figures~\ref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:second_order_correction}, we summarize the functioning of the algorithms that are respectively the main loop of the SQP, the restoration phase, and the second order correction phase.
 
 \begin{figure}[H]
   \centering
@@ -1074,7 +1074,7 @@ In Figures~\ref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:sec
 
 In this chapter, we presented the principle of nonlinear optimization on non-Euclidean manifolds, and detailed the choices we made to implement an SQP algorithm that solves those problems efficiently.
 In addition to being used in our posture generation problems, {\tt PGSolver} has been used successfully in inertia identification problems as presented in~\cite{traversaro:iros:2016}.
-In the next section we will focus on the formulation of optimization problems for posture generation.
+In the next section, we will focus on the formulation of optimization problems for posture generation.
 
 %}}}
 
