@@ -57,7 +57,7 @@ We then present an approach to make use of posture generation in real-environmen
 \section{On the performance of formulation with Manifolds}
 \label{sec:On_the_performance_of_formulation_with_manifolds}
 
-In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our approach to develop a nonlinear SQP solver on non-Euclidean Manifolds.
+In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our approach developing a nonlinear SQP solver on non-Euclidean Manifolds.
 We then proposed to take advantage of it in the posture generator presented in Chapter~\ref{ch:PG}.
 The choice of using optimization on manifolds was driven by the intuition that such approach would lead to generally faster and more robust convergence of resolution when the search space is a non-Euclidean manifold (due to the reduction of the numbers of constraints and variables).
 
@@ -154,16 +154,17 @@ This study shows that on a simple example that makes heavy use of non-Euclidean 
 
 In an effort to evaluate the performances of our posture generator framework and solver on manifolds, we ran a campaign of tests in which we solve problems that are known to be feasible and compare the success rates and computation times of different resolution approaches for different types of problems.
 We always search viable solutions, where the joint and torque limits are respected, collisions are avoided and static stability is guaranteed.
-To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper(that we denote respectively $F_\text{rightFoot}$, $F_\text{leftFoot}$, $F_\text{rightGripper}$, $F_\text{leftGripper}$), by querrying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
+To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper%(that we denote respectively $F_\text{rightFoot}$, $F_\text{leftFoot}$, $F_\text{rightGripper}$, $F_\text{leftGripper}$)
+, by querying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
 Given those 4 frames, we can create a posture generation problem where the robot has to reach those frames with its end-effectors while respecting its viability constraints.
-In particular, we require the contacts on the foot to be fixed unilateral friction contacts (with the forces in the friction cones) and the contacts on the ones on the hands to be fixed bilateral contacts (where the forces can be in applied in any direction.
+In particular, we require the contacts on the foot to be fixed unilateral friction contacts (with the forces in the friction cones) and the contacts on the hands to be fixed bilateral contacts (where the forces can be in applied in any direction).
 If feasible, this problem can easily be solved by providing as initial guess the configuration $q_\text{rand}$.
-If a solution is found, the problem is feasible and is recorded for further use.
+If a solution $q^*$ is found, the problem is deemed feasible and is recorded for further use.
 
-Using this process, we compute three types of problems with different degrees of constraints:
+Using this process, we compute three types of problems with different sets of constraints:
 \begin{itemize}
   \item 2 Contacts: only the foot are in contact, the hands are free of constraints.
-  \item 3 Contacts: both foot and the right gripper are in contact, the left hands is free.
+  \item 3 Contacts: both foot and the right gripper are in contact, the left hand is free.
   \item 4 Contacts: both foot and hands are in contact.
 \end{itemize}
 
@@ -184,7 +185,7 @@ Using this process, we compute three types of problems with different degrees of
 %To help the resolution, we initialize the robot's configuration variable to $q_\text{rand}$, which is a solution to the geometric part of the problem.
 %If a solution is found, the problem is known to be feasible and recorded for further use.
 
-Some initial testings where we solved the recorded problems with 4 contacts with the half-sitting configuration $q_\text{half-sitting}$ as initial guess shows that a solution is found for only 35\% of the problems.
+Some initial testings where we solved the recorded problems with 4 contacts with the half-sitting configuration $q_\text{half-sitting}$ as initial guess showed that a solution is found for only 35\% of the problems.
 This is not a surprising result, as the configuration to reach is very far from the initial posture.
 We noticed that most of the randomly generated configurations put the robot in a very twisted posture that seems difficult to reach for the optimization algorithm when starting from the half-sitting configuration.
 
@@ -195,15 +196,15 @@ We noticed that most of the randomly generated configurations put the robot in a
 %Which is not surprising, as the configuration to reach is very far from the initial posture.
 %We noticed that most of the randomly generated configurations put the robot in a very twisted posture that seems difficult to reach for the optimization algorithm when starting from the half-sitting configuration.
 
-We ran another set of tests in which the value of $q_\text{rand}$ is taken closer to the half-sitting, to do so, we simply take the average between the random configuration and the half-sitting:
+We computed another set of feasible problems in which the value of $q_\text{rand}$ is taken closer to the half-sitting, by taking the average between a random configuration and the half-sitting:
 \begin{equation}
   q_\text{rand} \leftarrow \frac{q_\text{rand}+q_\text{half-sitting}}{2}
 \end{equation}
 %We generate a set of feasible problems from those configurations.
 %In that case, a solution is found in 85\% of the tests.
 The resolution of those feasible problems showed a rate of success of 85\%.
-This implies that the initial guess and its distance from the solution which we coin the \emph{initial distance} have a crucial importance in the resolution of posture generation problems.
-The initial distance between for a problem where $q_0$ is the initial guess and $q^*$ is a solution is defined as: $d=\|q_0-q^*\|^2$.
+This implies that the initial guess and its distance from the solution, which we coin the \emph{initial distance}, have a crucial importance in the resolution of posture generation problems.
+The initial distance for a problem where $q_0$ is the initial guess and $q^*$ is a solution is defined as: $d=\|q_0-q^*\|^2$.
 
 %The topology of the problem to solve is also an important factor of the resolution, thus, we generated several sets of feasible problems with different numbers of contact constraints.
 %In the first set, contact constraints are only imposed on the two feet of the robot, we denote this set `2 Contacts'.
@@ -212,8 +213,8 @@ The initial distance between for a problem where $q_0$ is the initial guess and 
 %We study the influence of the initial distance on each of those sets separately.
 
 We propose to evaluate the effect of the initial distance on the success rate and on the convergence time of the posture generator.
-In that experiment, each feasible problem is solved several times, with a value of the initial guess increasingly close to the solution.
-Given an initial guess chosen randomly $q_0$, and $q^*$ being the solution of the problem found when generating the list of feasible problems, we solve the problem starting from a configuration $q_0^{n\%}$ defined as:
+In that experiment, each feasible problem is solved several times, with a value of the initial guess increasingly closer to the solution.
+Given a randomly chosen initial guess $q_0$, and $q^*$ being the known solution of the problem, we solve the problem starting from a configuration $q_0^{n\%}$ defined as:
 \begin{equation}
   q_0^{n\%} = n q_0 + (1-n)q^*
 \end{equation}
@@ -224,7 +225,7 @@ We take here the opportunity to verify this observation by solving series of pro
 As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraint's second-order derivative is maintained and combined in the global hessian matrix.
 We compare the results obtained with the three update methods that are BFGS, BFGS with self-scaling and SR1 and using whole or individual updates for each of them.
 We gather those results after solving 250 different posture generation problems, 5 times each, starting increasingly close from the solution.
-We sample the range of initial distances into 20 segments of same length and report the average results on each segment as a data point in figure~\ref{fig:evalPG}.
+We sample the range of initial distances into 20 segments of the same length and report the average results on each segment as a data point in figure~\ref{fig:evalPG}.
 
 %\begin{figure}[htb]
 %\centering
@@ -239,17 +240,19 @@ We sample the range of initial distances into 20 segments of same length and rep
 \label{fig:evalPG}
 \end{figure}
 
-The results obtained show that, unlike what we expected, there is not one Hessian update method that is much better than all others in every case.
-The BFGS and SR1 approaches with individual or grouped approaches present similar and consistent behaviors on the 3 types of problems.
+The results obtained show that there is not one Hessian update method that is much better than all others in every case.
+The BFGS and SR1 approaches with individual or grouped Hessians present similar and consistent behaviors on the 3 types of problems.
 The BFGS with self-scaling update is quite inconsistent, as it shows the best success rates and convergence speeds on problems with 4 contact constraints, but the worst ones for problems with 2, and on problems with 3 contacts, the individual update fairs correctly while the grouped one has the worst computation times.
-We observed that those slow convergence times were due to high numbers of iterations and not to high computation times per iteration.
+%We observed that those slow convergence times were due to high numbers of iterations and not to high computation times per iteration.
 %Whereas the BFGS with and without self
 
-This experiment shows that the closer the initial guess is to the solution, the more likely the solver is to converge to a solution and gives us a quantitative estimate of the expected success rate with respect to the initial distance.
-Overall, solving those problems with our solver using the BFGS method on individual Hessians seems to be the safest choice as it has consistently good success rates and convergence times on the 3 types of problems.
+Aside from the BFGS with self-scaling methods, all others usually reach convergence in a few seconds, taking longer when starting further from the solution.
+On average, a solution is found faster for problems with only 2 contacts, within 2 seconds, problems with 3 contacts take a little longer, up to 3 seconds, and problems with 4 contacts are the longest to solve, taking up to 4 seconds.
 
-It would be interesting to run more tests like those to study the influence of the different solver options and find a set of options that is optimal to solve posture generation problems.
-Perhars choosing automatically the update method based on the structure of the problem at hand would allow to increase the general performance of our solver.
+This experiment shows that the closer the initial guess is to the solution, the more likely the solver is to converge to a solution and it gives us a quantitative estimate of the expected success rate and convergence times with respect to the initial distance.
+
+It would be interesting to run more tests like those to study the influence of the different solver options and find optimal strategies to set the solver's option to solve posture generation problems.
+Perhaps choosing automatically the update method and other options based on the structure of the problem at hand would allow increasing the general performance of our posture generator.
 
 \FloatBarrier
 \section{Application to Inertial Parameters Identification}
@@ -516,7 +519,7 @@ The use of humanoid robots allows to navigate in more complex environments, some
 Yet, those methods use laser-based vision rather than point-cloud-based vision, so as to have a precise analysis of a known environment.
 
 In this work, we aim at enabling a robot to analyze and plan a motion into a 3D environment.
-Hence, we use the surface extraction of a point cloud to directly have a global picture of the environment and determine the convex planar surfaces that the robot can use at its advantage to progress using the MCP.\@
+Hence, we use the surface extraction of a point cloud to directly have a global picture of the environment and determine the convex planar surfaces that the robot can use to its advantage to progress using the MCP.\@
 In our approach to make such an extension, we intentionally seek for technical solutions that minimize changes to be done on the existing MCP software.
 
 \subsection{Building an understandable environment}
@@ -612,7 +615,7 @@ Given $S_i$ and $S_j$ two surfaces which contours are defined respectively by th
 %\end{algorithm}
 
 Once the surfaces are defined, we can choose which ones are suitable for the robot to make contact with.
-Although it is not a mandatory step, it allows to reduce the exploration during the planning phase by removing undesired or inappropriate pairs of robot/environment surfaces.
+Although it is not a mandatory step, it allows to reduce the amount of exploration during the planning phase by removing undesired or inappropriate pairs of robot/environment surfaces.
 For the time being, this is determined by heuristics that are defined depending on the situation.
 If we want the robot to walk on various surfaces, only surfaces that have a normal vector closely aligned with the gravity field would be selected as potential candidates (so as to eliminate the walls and other surfaces on which the robot cannot walk).
 Similarly, only surfaces located at a certain height can be considered for hand contact, etc.
@@ -624,7 +627,7 @@ Basically, we extrude each surface by few centimeters in the direction opposite 
 \label{sub:results_pcl_plannif}
 
 We illustrate this approach with two experiments where the HRP-2 robot is required to move $2$m forward.
-In both scenarios, this results in climbing on a table (The first one is $71$cm-high and the second one is $53$cm-high) with the help of various surrounding objects.
+In both scenarios, this results in climbing on a table (The first one is $71$cm high and the second one is $53$cm high) with the help of various surrounding objects.
 The knowledge of the environment and surrounding objects is obtained from a point cloud captured with an RGBD camera.
 
 All the computations of the following experiments are performed on a single thread of an Intel (R) Core (TM) i7--3840QM CPU at 2.80GHz, with 16Go of RAM\@.
