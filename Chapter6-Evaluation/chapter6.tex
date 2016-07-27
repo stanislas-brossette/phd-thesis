@@ -152,14 +152,30 @@ This study shows that on a simple example that makes heavy use of non-Euclidean 
 \section{Evaluation of the Posture Generation}
 \label{sec:evaluation_of_the_posture_generation}
 
-In addition to evaluating our solver, we want to evaluate the efficiency of our posture generator.
-We propose to study its ability to find a solution to problems that are known to be feasible.
+In an effort to evaluate the performances of our posture generator framework and solver on manifolds, we ran a campaign of tests in which we solve problems that are known to be feasible and compare the success rates and computation times of different resolution approaches for different types of problems.
+We always search viable solutions, where the joint and torque limits are respected, collisions are avoided and static stability is guaranteed.
+To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper(that we denote respectively $F_\text{rightFoot}$, $F_\text{leftFoot}$, $F_\text{rightGripper}$, $F_\text{leftGripper}$), by querrying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
+Given those 4 frames, we can create a posture generation problem where the robot has to reach those frames with its end-effectors while respecting its viability constraints.
+In particular, we require the contacts on the foot to be fixed unilateral friction contacts (with the forces in the friction cones) and the contacts on the ones on the hands to be fixed bilateral contacts (where the forces can be in applied in any direction.
+If feasible, this problem can easily be solved by providing as initial guess the configuration $q_\text{rand}$.
+If a solution is found, the problem is feasible and is recorded for further use.
 
-First, we generate a list of feasible problems.
-To do so, we set the HRP-2 Kai robot in a random configuration $q_\text{rand}$ within its joint limits and record the 3D poses of its end-effectors' frames: at the tip of its grippers and below its foot,we denote them $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
-Then we generate a problem with the constraints that both grippers are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the feet are in unilateral frictional contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability, torque limits, and auto-collision avoidance constraints must be respected.
-To help the resolution, we initialize the robot's configuration variable to $q_\text{rand}$, which is a solution to the geometric part of the problem.
-If a solution is found, the problem is known to be feasible and is recorded for further use.
+Using this process, we compute three types of problems with different degrees of constraints:
+\begin{itemize}
+  \item 2 Contacts: only the foot are in contact, the hands are free of constraints.
+  \item 3 Contacts: both foot and the right gripper are in contact, the left hands is free.
+  \item 4 Contacts: both foot and hands are in contact.
+\end{itemize}
+
+%In addition to evaluating our solver, we want to evaluate the efficiency of our posture generator.
+%We propose to study its ability to find a solution to problems that are known to be feasible.
+
+%First, we generate a list of feasible problems.
+%To do so, we set the HRP-2 Kai robot in a random configuration $q_\text{rand}$ within its joint limits and record the 3D poses of its end-effectors' frames: at the tip of its grippers and below its foot,we denote them $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
+%Then we generate a problem with the constraints that both grippers are in fixed bilateral contact (forces can be applied in any direction) with their associated frames $F_\text{rightGripper}$ and $F_\text{leftGripper}$, while the feet are in unilateral frictional contact (forces in friction cones) with their associated frames $F_\text{rightFoot}$ and $F_\text{leftFoot}$ and the stability, torque limits, and auto-collision avoidance constraints must be respected.
+%We solve those problems starting from a configuration close to the solution to estimate their feasibility.
+%To make the resolution easier, we initialize the robot's configuration variable to $q_\text{rand}$, which is a solution to the geometric part of the problem.
+%If a solution is found, the problem is feasible and is recorded for further use.
 
 %We generate feasible problems by setting a HRP-2 Kai robot's in a random configuration variable $q_\text{rand}$ within its joint limits and recording the poses of its end-effectors' frames: at the tip of its grippers and below its foot,we denote them $F_\text{rightGripper}$, $F_\text{leftGripper}$, $F_\text{rightFoot}$, $F_\text{leftFoot}$.
 %Then we check whether that configuration violates the auto-collision constraints, if it does, it is discarded and the process is restarted with another random configuration.
@@ -168,48 +184,72 @@ If a solution is found, the problem is known to be feasible and is recorded for 
 %To help the resolution, we initialize the robot's configuration variable to $q_\text{rand}$, which is a solution to the geometric part of the problem.
 %If a solution is found, the problem is known to be feasible and recorded for further use.
 
-We evaluate the performance of our posture generator by solving the recorded problems, starting from the half-sitting configuration $q_\text{half-sitting}$ of the robot.
-This approach tests the ability to find a feasible posture when starting from a configuration remote from the solution.
-Since there is no cost function, the optimization algorithm is exited as soon as the restoration phase terminates.
-The resolution is successful for approximately 35\% of the problems.
-Which is not surprising, as the configuration to reach is very remote from the initial posture.
-We noticed that most of the randomly generated configuration put the robot in a very twisted posture that seems difficult to reach for the optimization algorithm when starting from the half-sitting configuration.
+Some initial testings where we solved the recorded problems with 4 contacts with the half-sitting configuration $q_\text{half-sitting}$ as initial guess shows that a solution is found for only 35\% of the problems.
+This is not a surprising result, as the configuration to reach is very far from the initial posture.
+We noticed that most of the randomly generated configurations put the robot in a very twisted posture that seems difficult to reach for the optimization algorithm when starting from the half-sitting configuration.
 
-We ran another set of tests in which the value of $q_\text{rand}$ is modified to be closer to the half-sitting, to do so, we simply take the average between the random configuration and the half-sitting:
+%We evaluate the performance of our posture generator by solving the recorded problems, starting from the half-sitting configuration $q_\text{half-sitting}$ of the robot.
+%This approach tests the ability to find a feasible posture when starting from a configuration far from the solution.
+%Since there is no cost function, the optimization algorithm is exited as soon as the restoration phase terminates.
+%The resolution is successful for approximately 35\% of the problems.
+%Which is not surprising, as the configuration to reach is very far from the initial posture.
+%We noticed that most of the randomly generated configurations put the robot in a very twisted posture that seems difficult to reach for the optimization algorithm when starting from the half-sitting configuration.
+
+We ran another set of tests in which the value of $q_\text{rand}$ is taken closer to the half-sitting, to do so, we simply take the average between the random configuration and the half-sitting:
 \begin{equation}
   q_\text{rand} \leftarrow \frac{q_\text{rand}+q_\text{half-sitting}}{2}
 \end{equation}
-We generate the set of feasible problems from those configurations.
-In that case, a solution is found in 85\% of the tests.
-This shows that the initial guess and its distance from the solution which we coin the \emph{initial distance} are of crucial importance and should be chosen wisely by the user.
+%We generate a set of feasible problems from those configurations.
+%In that case, a solution is found in 85\% of the tests.
+The resolution of those feasible problems showed a rate of success of 85\%.
+This implies that the initial guess and its distance from the solution which we coin the \emph{initial distance} have a crucial importance in the resolution of posture generation problems.
+The initial distance between for a problem where $q_0$ is the initial guess and $q^*$ is a solution is defined as: $d=\|q_0-q^*\|^2$.
 
-To study that influence, we propose to estimate the effect of the initial distance on the success rate of the posture generator.
-The distance between 2 configurations $q_0$ and $q^*$ is defined as $d=\|q_0-q^*\|^2$.
+%The topology of the problem to solve is also an important factor of the resolution, thus, we generated several sets of feasible problems with different numbers of contact constraints.
+%In the first set, contact constraints are only imposed on the two feet of the robot, we denote this set `2 Contacts'.
+%In the secont set, contact constraints are imposed on the two feet and the right hand of the robot, we denote this set `3 Contacts'.
+%And the last set is the one described previously where contact constraints are imposed on both feet and hands, we denote it `4 Contacts'.
+%We study the influence of the initial distance on each of those sets separately.
+
+We propose to evaluate the effect of the initial distance on the success rate and on the convergence time of the posture generator.
 In that experiment, each feasible problem is solved several times, with a value of the initial guess increasingly close to the solution.
 Given an initial guess chosen randomly $q_0$, and $q^*$ being the solution of the problem found when generating the list of feasible problems, we solve the problem starting from a configuration $q_0^{n\%}$ defined as:
 \begin{equation}
   q_0^{n\%} = n q_0 + (1-n)q^*
 \end{equation}
 With $n$ taking successively the values $1.0$, $0.8$, $0.6$, $0.4$,and $0.2$.
-After aggregating the results, we are able to estimate the influence of the initial distance on the success rate of the optimization.
-During all our work with our solver, we observed that the choice of hessian approximation method influences a lot the resolution.
+After aggregating the results, we are able to estimate the influence of the initial distance on the success rate and convergence time of the optimization.
+During all our work with our solver, we observed that the choice of hessian approximation method influenced a lot the resolutions.
 We take here the opportunity to verify this observation by solving series of problems with the solver using different hessian update methods.
 As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraint's second-order derivative is maintained and combined in the global hessian matrix.
-We compare the results obtained with BFGS with or without self-scaling and using whole or individual updates.
-We gather and report those results in figure~\ref{hist:dist}:
+We compare the results obtained with the three update methods that are BFGS, BFGS with self-scaling and SR1 and using whole or individual updates for each of them.
+We gather those results after solving 250 different posture generation problems, 5 times each, starting increasingly close from the solution.
+We sample the range of initial distances into 20 segments of same length and report the average results on each segment as a data point in figure~\ref{fig:evalPG}.
 
+%\begin{figure}[htb]
+%\centering
+  %\includegraphics[width=0.8\linewidth]{histogram4BFGS.png}
+  %\caption{Rate of success of the posture generation compared to the distance between initial guess and solution.}
+%\label{hist:dist}
+%\end{figure}
 \begin{figure}[htb]
 \centering
-  \includegraphics[width=0.8\linewidth]{histogram4BFGS.png}
-  \caption{Rate of success of the posture generation compared to the distance between initial guess and solution.}
-\label{hist:dist}
+  \includegraphics[width=\linewidth]{evalPG/resWithSR1Grouped.png}
+  \caption{Comparison of rate of success and convergence times of the posture generation problem resolution with respect to the distance between initial guess and solution for sets of feasible problems with 2, 3 and 4 contact constraints and for different choices of Hessian update methods.}
+\label{fig:evalPG}
 \end{figure}
 
-This experiment shows that the closer the initial guess is to the solution, the more likely the solver is to converge to a solution and gives us a quantitative estimate of the expected success rate with respect to the distance.
-Overall, solving those problems with our solver using the BFGS with self-scaling and individual updates approach is more successful than with other methods.
-With that Hessian update method, for any distance between initial configuration and solution, the resolution converges in more than 60\% of the cases.
+The results obtained show that, unlike what we expected, there is not one Hessian update method that is much better than all others in every case.
+The BFGS and SR1 approaches with individual or grouped approaches present similar and consistent behaviors on the 3 types of problems.
+The BFGS with self-scaling update is quite inconsistent, as it shows the best success rates and convergence speeds on problems with 4 contact constraints, but the worst ones for problems with 2, and on problems with 3 contacts, the individual update fairs correctly while the grouped one has the worst computation times.
+We observed that those slow convergence times were due to high numbers of iterations and not to high computation times per iteration.
+%Whereas the BFGS with and without self
+
+This experiment shows that the closer the initial guess is to the solution, the more likely the solver is to converge to a solution and gives us a quantitative estimate of the expected success rate with respect to the initial distance.
+Overall, solving those problems with our solver using the BFGS method on individual Hessians seems to be the safest choice as it has consistently good success rates and convergence times on the 3 types of problems.
 
 It would be interesting to run more tests like those to study the influence of the different solver options and find a set of options that is optimal to solve posture generation problems.
+Perhars choosing automatically the update method based on the structure of the problem at hand would allow to increase the general performance of our solver.
 
 \FloatBarrier
 \section{Application to Inertial Parameters Identification}
