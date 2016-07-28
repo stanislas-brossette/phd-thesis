@@ -7,21 +7,19 @@
 \addcontentsline{toc}{chapter}{Conclusion}
 \label{cha:conclusion}
 
-In this work, we contributed to the formulation and the resolution of the posture generation problem for robotics.
+In this Ph.D., we contributed to the formulation and the resolution of the posture generation problem for robotics.
 %Such problems aim at finding a robot configuration that satisfies some high-level requests while ensuring its viability, in the sense that, in this configuration, the robot is stable, avoid collisions and respects its intrinsic limitations.
 Posture generation aims at finding a robot configuration that is statically stable, avoids collisions and respects intrinsic limitations while satisfying given high-level requests.
 This problem is traditionally formulated and solved as an optimization problem by minimizing a specific cost function under given geometric and static constraints.
 
-We presented a formulation of the basic building blocks of posture generation problems.
-We proposed some extensions, such as a 'smooth' formulation of non-inclusive contact constraints between two polygons; this allows to find optimal contact configurations in complex situations where the two surfaces in contact cannot be included in each other.
-This formulation proved very helpful for planning complex scenarios such as making the HRP-2 robot climb a ladder, by allowing to automatically find some contact configurations that would otherwise take a long time to find manually by trial and errors.
+We presented a formulation of the basic building blocks of posture generation problems, then proposed some extensions, such as a 'smooth' formulation of non-inclusive contact constraints between two polygons; this allows to find optimal contact configurations in complex situations where the two surfaces in contact cannot be included in each other.
+This formulation proved very helpful for planning complex scenarios such as making the HRP-2 robot climb a ladder, it allowed to automatically find some contact configurations that would otherwise take a long time to find manually by trial and errors.
 %even when generate viable configurations of contact that would otherwise not be considered by usual formulations; it relies on the idea of adding to the problem a set of variables that represent an ellipse included in both polygons.
 
-Robotics problems often contain variables that belong to non-Euclidean spaces.
-Such variables are traditionally handled by modifying the mathematical definition of the problem and adding extra variables and constraints to it.
+Robotics problems often contain variables that belong to non-Euclidean manifolds, they are traditionally handled by modifying the mathematical definition of the problem and adding extra variables and constraints to it.
 We present a generic way to handle such variables in our formulation without modifying the mathematical problem, and most importantly, we propose an adaptation of existing optimization techniques to solve constrained nonlinear optimization problems defined on non-Euclidean manifolds, which, to our knowledge has never been done before.
 We then detail our implementation of such an algorithm, based on an SQP approach.
-This, not only allows us to formulate mathematical problems more elegantly and ensure the validity of our variables at every step of the optimization process, but also enables us to have a better understanding of our solver, and flexibility in tuning our solver for robotics problems.
+This, not only allows us to formulate mathematical problems more elegantly and ensure the validity of our variables at every step of the optimization process, but also enables us to have a better understanding of our solver, and flexibility in tuning it for robotics problems.
 In turn, this allows us to investigate new ways of solving posture generation problems.
 
 The search space of a posture generation problem is the Cartesian product of several (sub)manifolds in which different quantities/variables are defined (e.g.translations, rotations, joint angles, contact forces, etc.).
@@ -30,26 +28,26 @@ The search space of a posture generation problem is the Cartesian product of sev
 %Each submanifold of the search space is considered as a separate entity, and variables on it can be considered separately from each other.
 %We take advantage of that structure to propose a posture generation framework where the variables, submanifolds, and function's derivations are managed automatically, and geometric expressions can be written intuitively, which simplifies the work of the developer of new functions.
 We take advantage of that structure to propose a posture generation framework where the variables and submanifolds are managed automatically, and geometric expressions can be written intuitively and are differentiated automatically.
-This framework helps reducing the work the developer of new functions has to do, as functions on geometric quantities can be quickly prototyped and their derivatives are computed automatically, and the variable management allows to simply write the function on its input space without worrying about the location of said input space in the global space.
+This framework helps reducing the work the developer of new functions has to do, as functions of geometric expressions can be quickly prototyped and their derivatives are computed automatically, and the variable management allows to simply write the function on its input space without worrying about the location of said input space in the global space.
 Our framework allows to easily and elegantly write custom constraints on selected sets of variables defined on the submanifolds of the search space.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 We exploit the capabilities of our framework to generate viable robot's configurations with contacts on non-flat surfaces by parametrizing the location of the contact point with additional variables.
 That approach allowed us to compute manipulation and locomotion postures involving solids defined only by their meshes and where the choice of the contact location was left entirely to the solver.
-That way, we computed some posture of an HRP-4 robot holding the leg of an HRP-2 robot in its hands, and others, where it is climbing on a stack of cubes and the contacts locations are chosen automatically.
-This was made possible by proposing a generic way to parametrize the surface of a solid represented by a mesh, based on Catmull-Clark subdivision algorithm, and using it to compute configurations where the optimal location of contact on a complex object is chosen by the solver.
-The genericity of our framework allows the definition and use of a wide range of functions applied to any variables of the problem, should it be the joint angles, the forces, the torques or some additional variables.
-Such function can then be used to define and solve custom posture generation problems with our solver on manifolds, and compute viable postures that satisfy any user-defined tasks.
+That way, we computed some postures of an HRP-4 robot holding the leg of an HRP-2 robot in its hands, and others, where it is climbing on a stack of cubes and the contacts locations are chosen automatically.
+This was made possible by proposing a generic way to parametrize the surface of a solid represented by a mesh, based on the Catmull-Clark subdivision algorithm, and using it to compute configurations where the optimal location of contact on a complex object is chosen by the solver.
+We took a great care to eliminate many of the cumbersome aspects of writing a posture generation problems, and in the end, the genericity of our framework allows the definition and use of a wide range of functions applied to any variables of the problem (joint angles, forces, torques or any additional variables).
+Such function can then be used to define and solve custom posture generation problems with our solver, and compute viable postures that satisfy any user-defined tasks.
 
-We then evaluate the performances of our solver on problems relying heavily on the manifold formulation and show that it is superior to the classic approach in terms of convergence time and time spent per iteration.
+We evaluate the performances of our solver on problems relying heavily on the manifold formulation and show that it is superior to the classic approach in terms of convergence speed and time spent per iteration.
 %We then present some evaluations of our solver and posture generator: we solved a cube stacking problem that relies heavily on the manifold formulation to showcase that, the manifold formulation performs better than the traditional one in that problem and in particular, the time spent per iteration is, as expected, shorter.
 %We studied the influence of the distance between the initial guess and the problem's solution on the success rate of the posture generation problem.
 %This showed that when starting close to the solution, convergence is almost always reached whereas when starting remotely, it is more difficult to find the solution, and more work on the solver could help increase this success rate.
 %Such study allowed us to compare results for different solver options.
 %We showed that in terms of hessian update method, the self-scaling BFGS update on individual Hessians gives us the best results.
-We also presented an approach to compare the performances of different resolution methods on solving several types of posture generation problems, which could help develop strategies to tune our solver based on the problem at hand.
+We then present an approach to evaluate and compare the performances of different resolution methods for solving several types of posture generation problems, which could help develop strategies to tune our solver based on the problem at hand.
 
-Although it was made to solve posture generation problems, we show that our solver's capabilities can be leveraged to solve other kinds of problems such as the identification of inertial parameters, where the manifold formulation guarantees that the optimization iterates are always physically valid.
+We developped our solver in order to solve posture generation problems, but we show that its capabilities can be leveraged to solve other kinds of problems such as the identification of inertial parameters, where the manifold formulation guarantees that the optimization iterates are always physically valid.
 For this problem, our solver and formulation proved more efficient than the traditional formulation solved with an off-the-shelf solver.
 Finally, we presented our preliminary work in using posture generation in multi-contact planning in real sensory acquired environment.
 
@@ -57,13 +55,19 @@ Finally, we presented our preliminary work in using posture generation in multi-
 %The framework is designed such that creating custom functions and constraints to the problem is simple.
 
 %Although our solver fairs correctly, compared to other solvers on some problems (Schittkowsky, Inertial identification), we believe that some improvements could still be made to it.
-Although we manage to get some satisfying results out of our posture generator, the solver still requires some tuning of its options and of the initial guess.
-We believe that improvements could be made to make our solver more reliable and to specialize it for the resolution of posture generation problems.
+%This study showed that our solver is able to solve posture generation problems in times comparable to the state of the art, but we are fully aware that those computation times could be improved.
+Although we manage to get some satisfying results out of our posture generator, the solver still requires some tuning of its options and of the initial guess to ensure convergence.
+We are fully aware that even though the computation times that we observe are comparable to the ones found in the litterature, improvements could and should be made in the future to make our posture generator more robust and faster, by not only improving the solver's implementation, but also specializing it for posture generation problems.
+%We believe that improvements could be made to make our solver more reliable and to specialize it for the resolution of posture generation problems.
 In particular, we believe that the restoration phase, especially the treatment of the Hessian updates, can be improved.
 We can also try using other QP solvers than LSSOL.
 A sparse solver, for example, may be more suited to take advantage of the structure of our problem.
 Most importantly, future works need to develop the solver to make it specialized for posture generation problems, either by finding optimal solver options or by modifying the optimization algorithm.
-In future research, having an open solver and being able to modify it will be a crucial element of our ability to find and use the most suited algorithm to solve each optimization problem that we encounter in robotics.
+In future research, having an open solver and being able to modify it will be a crucial element of our ability to find and use the most suited algorithm to solve posture generation and other problems encountered in robotics more efficiently.
+%An initial study of the problem to solve, followed by an automatic tuning of the solver seems like a promising idea to improve the posture generator's performances.
+One could for example choose an initial guess from a database of robot postures and some solver options automatically, based on an initial study of the structure of the problem.
+It would also be possible to take into account the very specific structure of a robot in the resolution algorithm.
+
 %Having an open and functionnal solver is a crutial tool in
 %Our open solver, which can be modified to suit the needs [xxx of what], can be crutial tool to achieve this goal.
 %This is made possible by the fact that we now have an open solver that we can modify to suit our needs.
@@ -74,9 +78,6 @@ In future research, having an open solver and being able to modify it will be a 
 
 It would be interesting to use our posture generator in a higher level software, like a multi-contact stance planner, to automatically generate sequences of viable configuration to use to guide the control of the robot.
 Ideally, we would like to integrate the posture generation with our multi-contact control framework to allow on-the-fly replanning of postures when the initial plan becomes not feasible because of issues, such as drift of the robot motion from the original plan.
-
-
-
 
 
 %We present a formulation of the posture generation problem that takes into account the fact that some variables such as the 3D rotations live in non-Euclidean manifolds while making the writing of problems and of specific constraints more versatile.

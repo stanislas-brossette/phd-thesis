@@ -204,13 +204,18 @@ The BFGS with self-scaling update is quite inconsistent, as it shows the best su
 %We observed that those slow convergence times were due to high numbers of iterations and not to high computation times per iteration.
 %Whereas the BFGS with and without self
 
+This experiment shows that the closer the initial guess is to the solution, the more likely the solver is to converge to a solution and it gives us a quantitative estimate of the expected success rate and convergence times with respect to the initial distance.
+
 Aside from the BFGS with self-scaling methods, all others usually reach convergence in a few seconds, taking longer when starting further from the solution.
 On average, a solution is found faster for problems with only 2 contacts, within 2 seconds, problems with 3 contacts take a little longer, up to 3 seconds, and problems with 4 contacts are the longest to solve, taking up to 4 seconds.
 
-This experiment shows that the closer the initial guess is to the solution, the more likely the solver is to converge to a solution and it gives us a quantitative estimate of the expected success rate and convergence times with respect to the initial distance.
+Although those computation times are long, and make it inconvenient to compute large numbers of postures, as is often done in contact planning, they remain of the same order of magnitude as the ones reported in~\cite{brossette:RAM:2013}, \cite{escande:iros:2006}, \cite{bouyarmane2011autonomous} and \cite{hauser:ijrr:2008}, that were all based on off-the-shelf solvers, while we use an open solver that we developped and are able to modify.
 
 It would be interesting to run more tests like those to study the influence of the different solver options and find optimal strategies to set the solver's option to solve posture generation problems.
 Perhaps choosing automatically the update method and other options based on the structure of the problem at hand would allow increasing the general performance of our posture generator.
+%An initial study of the problem to solve, followed by an automatic tuning of the solver seems like a promising idea to improve the posture generator's performances.
+%One could for example choose an initial guess amongst a database based on the structure of the problem.
+%It would also be possible to take into account the very specific structure of a robot in the resolution algorithm.
 
 \FloatBarrier
 \section{Application to Inertial Parameters Identification}
