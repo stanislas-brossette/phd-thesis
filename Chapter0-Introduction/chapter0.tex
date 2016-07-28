@@ -32,7 +32,7 @@ Some typical examples of tasks for a robot can be `Put hand in contact with targ
 As is, those tasks do not mean anything for the robot.
 A robot is made of a collection of bodies that are linked together by joints actuated by motors.
 A robots configuration consists of the position and orientation of its base body, and the configuration of each of its joints.
-Satisfying a task requires that the joints of the robot reach a configuration for which the task is satisfied.
+Satisfying a task requires that the joints of the robot reach a configuration for which the task is completed.
 The action of satisfying a task comes down to moving from an initial configuration to a goal.
 Computing the trajectory to follow and actually following it, are handled by the trajectory generator and controller of the robot.
 Trajectory generation and control are by themselves complete sub-fields in robotics, and they both often rely on being given some key postures to help guide the robot's motion(e.g. initial, intermediate and final configurations).
@@ -40,7 +40,7 @@ Finding those configurations is the job of what we call the Posture Generator (P
 
 There are two types of robots. The fixed-base robots and the mobile ones.
 As the name suggests, the first type of robots have fixed bases, their workspace is predefined by their geometry and they are usually fully actuated.
-This means that the robot has as many degrees of freedom (DoF) as they have actuators. Thus, any particular joint configuration leads to a unique robot posture.
+This means that the robot has as many degrees of freedom (DoF) as it has actuators. Thus, any particular joint configuration leads to a unique robot posture.
 On the contrary, mobile robots are always underactuated such that the robot has more DoF than actuators.
 Each link of the robot is actuated, but the position of the base of the robot depends on the configuration of the joints as a well as on the locations of the contacts that the robot makes with the environment.
 
@@ -74,10 +74,11 @@ The variables of a robotics problem sometimes naturally belong to a non-Euclidea
 A manifold is a topological space that locally resembles a Euclidean space near each point.
 Each point of an n-dimensional manifold has a neighborhood that is homeomorphic to the Euclidean space of dimension n.
 An n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
-Most of the optimization solvers available make the assumption that the search space is Euclidean and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
+Most of the optimization solvers available make the assumption that the search space is Euclidean, and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
 But it is often possible to parametrize $\mathcal{M}$ over a Euclidean space of higher dimension with added constraints (e.g. unit quaternions, rotation matrices).
-It is then possible to solve those problems with classical solvers at the cost of additional variables, constraints and special treatments in the optimization problem.
-There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters. However to our knowledge, these are focused on addressing non-constrained optimization.
+It is then possible to solve those problems with classical solvers at the cost of additional variables, constraints and special treatments in the resolution of the optimization problem.
+There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters.
+However, to our knowledge, these are focused on addressing non-constrained optimization.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
 Through this thesis, we develop our own nonlinear constrained optimization solver on manifolds and use it to solve optimization problems on their native search manifolds. We will exhibit their utility for posture generation problems as well as a few other types of problems.
