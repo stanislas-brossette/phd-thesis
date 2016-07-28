@@ -360,7 +360,7 @@ The most common ones are the set of unit quaternion embedded in $\mathbb{R}^4$ a
 %The unit quaternions space is the subset of $\mathbb{R}^4$ where all elements have unit norm.
 With the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters $q = [q_w, q_x, q_y, q_z]$, and it is necessary to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
 Similarly, if a variable is parameterized by a rotation matrix, then the matrix $M$ representing it has 9 parameters and M must be orthogonal and have determinant 1: $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
-Similar issues can be found with the parameterization of other non-Euclidean manifolds, like $S2$ for example.
+Similar issues can be found with the parameterization of other non-Euclidean manifolds, like $S^2$ for example.
 
 A quaternion $q = [q_w, q_x, q_y, q_z]$ is a unit quaternion iff $q_w^2+q_x^2+q_y^2+q_z^2 = 1$.
 It represents a rotation of angle $\theta$ around an axis ${\bf u}$ such that:
@@ -533,7 +533,7 @@ A common approach to limit shoulder joint, inspired from the biomechanics field,
 \label{fig:ballAndSocket}
 \end{figure}
 
-The spherical motion can be parameterized by a vector of the 3D unit sphere $S2$ and constrained to lay within a limit cone, the axial motion can be parameterized in $\mathbb{R}$ and limited by equation~\Eqref{eq:joint_limits}.
+The spherical motion can be parameterized by a vector of the 3D unit sphere $S^2$ and constrained to lay within a limit cone, the axial motion can be parameterized in $\mathbb{R}$ and limited by equation~\Eqref{eq:joint_limits}.
 This type of formulation is presented in~\cite{baerlocher}.
 
 

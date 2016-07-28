@@ -18,7 +18,7 @@
         %\begin{itemize}
           %\item $\mathbb{R}^n$
           %\item $SO(3)$
-          %\item $S2$
+          %\item $S^2$
           %\item Cartesian Products
         %\end{itemize}
       %\item Representation space vs Tangent space vs manifold
@@ -86,8 +86,8 @@ Posture generation has been traditionally formulated as a problem over a Euclide
 Robots variable may, however, be more naturally expressed over non-Euclidean manifolds.
 The archetypes for this in robotics are the rotation part of the root body of a robot, and ball joints, whose variables live in $SO(3)$.
 Some typical tasks are also naturally formulated on different manifolds.
-For example, for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S2$~\cite{escande:icra:2016}.
-The human shoulder can be elegantly parametrized on $S2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
+For example, for making contact with any object that can be mapped on a sphere, the contact point position for this object can be parametrized in $S^2$~\cite{escande:icra:2016}.
+The human shoulder can be elegantly parametrized on $S^2\times\mathbb{R}$, as proposed in~\cite{baerlocher}.
 A non-Euclidean manifold can be thought of as a space that is locally Euclidean, but not globally.
 Like a sphere, if one looks in a small enough neighborhood, it looks Euclidean, just like the surface of a giant sphere like the earth looks flat for a human standing on it.
 
@@ -481,7 +481,7 @@ We provide the detailed formulas for those operations in Appendix~\ref{appendix:
   \item The Real space of dimension $n$ in~\ref{sec:the_real_space}
   \item The 3D rotations manifold SO(3) with matrix formulation in~\ref{sec:the_3d_rotation_manifold_matrix_representation}
   \item The 3D rotations manifold SO(3) with quaternion formulation in~\ref{sec:the_3d_rotation_manifold_quaternion_representation}
-  \item The unit sphere manifold S2 in~\ref{sec:the_unit_sphere_manifold_s2}
+  \item The unit sphere manifold $S^2$ in~\ref{sec:the_unit_sphere_manifold_s2}
 \end{itemize}
 
 %{{{ CARTESIAN PRODUCT OF MANIFOLDS
@@ -513,7 +513,7 @@ In order to use the manifold formulation described above in other software, and 
 This implementation is open-source and available at \href{https://github.com/stanislas-brossette/manifolds}{https://github.com/stanislas-brossette/manifolds}.
 The implementation consists of 3 types of classes: the Manifold class, the elementary manifold classes, and the Point class.
 The Manifold class describes the abstract mathematical structure of a non-Euclidean manifold and defines a common interface for all elementary manifolds to implement (retractation, pseudoLog,\ldots).
-Elementary Manifold classes ($\mathbb{R}^n$, $SO(3)$, $S2$, and the Cartesian Product) are the concrete manifolds.
+Elementary Manifold classes ($\mathbb{R}^n$, $SO(3)$, $S^2$, and the Cartesian Product) are the concrete manifolds.
 They inherit from the Manifold class and implement all their mathematical operations.
 The Cartesian Product class is used to build compound manifolds by being `multiplied' with other elementary manifolds.
 The Point class represents a point on a manifold, it contains the data that represents its numerical value.

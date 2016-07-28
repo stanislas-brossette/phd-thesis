@@ -61,45 +61,45 @@ In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our
 We then proposed to take advantage of it in the posture generator presented in Chapter~\ref{ch:PG}.
 The choice of using optimization on manifolds was driven by the intuition that such approach would lead to generally faster and more robust convergence of resolution when the search space is a non-Euclidean manifold (due to the reduction of the numbers of constraints and variables).
 
-In a typical robotic posture generation problem, the search manifold is a composition of several instances of $\mathbb{R}^n$ and one $SO(3)$ per robot, and the equations involving the $SO(3)$ variables are quite complex.
-Thus it may be difficult to extract the actual influence of the use of manifold formulation on the resolution.
-In order to evaluate the influence of the formulation and resolution with manifolds, we choose to study a problem different from a typical robotic posture generation.
-
-We choose to study a problem of cube stacking.
-Given a set of cubes, which pose is defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not penetrating each other.
-For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertex, $\vec{t}\in\mathbb{R}^3$ and $R\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
+Robotics optimization problems may be complex and many aspects play a role in the efficiency of their resolution.
+To isolate the influence of optimizing on manifolds, we consider a toy problem: cube stacking.
+%In a typical robotic posture generation problem, the search manifold is a composition of several instances of $\mathbb{R}^n$ and one $SO(3)$ per robot, and the equations involving the $SO(3)$ variables are quite complex.
+%Thus it may be difficult to extract the actual influence of the use of manifold formulation on the resolution.
+%In order to evaluate the influence of the formulation and resolution with manifolds, we choose to study a problem different from a typical robotic posture generation.
+Given a set of unit cubes, each one defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not penetrating each other.
+For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertex, $\vec{t_i}\in\mathbb{R}^3$ and $R_i\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
 To ensure that the cubes are inside the box, we write a constraint that forces each corner of each cube to be inside the box.
 For each plane composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plane to the origin along $\vec{n}$.
 The constraint for each cube $C_i$ being `above' a plane defined by $\{d, \vec{n}\}$ is of dimension 8 (1 per vertex) and can be written as:
 \begin{equation}
-  \forall v\in V,\ (\vec{t} + R v)\cdot \vec{n} \geq d
+  \forall v\in V_i,\ (\vec{t_i} + R_i v)\cdot \vec{n} \geq d
 \end{equation}
 
 To avoid interpenetration of the cubes, we could use the usual collision avoidance constraints as presented in Section~\ref{sec:problem_formulations}.
-In that case, the use of the exact mesh of the cubes would generate gradient discontinuities of the constraints.
+But the use of the exact mesh of the cubes would generate gradient discontinuities of the constraints.
 Approximating the mesh with STPBV would allow avoiding those discontinuities, but then, if the STPBV approximates the exact mesh closely, we would have a gradient close to discontinuous.
-Instead, we propose another approach that uses non-Euclidean manifolds: for each pair of cubes $C_i,\ C_j$, we require a plane $P_{ij}$ to fit in-between them.
-The plane's location can be parametrized by its normal $\vec{n}\in S2$ and $d\in\mathbb{R}$, the signed distance from the plane to the origin along $\vec{n}$.
-Each plane's pose can be represented by a variable on $\mathbb{R} \times S2$.
+Instead, we propose another approach that uses non-Euclidean manifolds: for each pair of cubes $C_i,\ C_j$, we require a plane $P_{ij}$ to separate them.
+The plane's location can be parametrized by its normal $\vec{n}\in S^2$ and $d\in\mathbb{R}$, the signed distance from the plane to the origin along $\vec{n}$.
+Each plane's pose can be represented by a variable on $\mathbb{R} \times S^2$.
 Thus we can write a constraint of dimension 16 (1 per vertex) such that $C_i$ is above $P_{ij}$ and $C_j$ is below $P_{ij}$ as follows:
 
 \begin{align}
   \begin{split}
-    &\forall v\in V_i,\ (\vec{t} + R v)\cdot \vec{n} \geq d \\
-    &\forall v\in V_j,\ (\vec{t} + R v)\cdot \left(-\vec{n}\right) \geq -d
+    &\forall v\in V_i,\ (\vec{t_i} + R_i v)\cdot \vec{n} \geq d \\
+    &\forall v\in V_j,\ (\vec{t_j} + R_j v)\cdot \left(-\vec{n}\right) \geq -d
   \end{split}
 \end{align}
 
-In order to simulate gravity, we minimize the sum of all the cubes' vertical coordinates:
+In order to simulate gravity, we minimize the potential energy of the all the cubes (simplified by a factor mass times gravity):
 
 \begin{equation}
   f = \sum\limits_i \vec{t_i}\cdot \vec{z}
 \end{equation}
 
 We consider the problem of stacking $n$ cubes in an open-top box composed of 5 plans (the ground and 4 walls).
-Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plane is parametrized on $\mathbb{R}\times S2$.
+%Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plane is parametrized on $\mathbb{R}\times S^2$.
 In figure~\ref{fig:cubes}, we illustrate the case of stacking 3 cubes.
-With the initial condition on the left side and the solution on the right.
+With the initial condition on the left side and a solution on the right.
 \begin{figure}
 \centering
   \includegraphics[width=.8\linewidth]{3cubes.png}
@@ -107,16 +107,16 @@ With the initial condition on the left side and the solution on the right.
 \label{fig:cubes}
 \end{figure}
 
-There is one plane for each pair of cubes, so, $n(n-1)/2$ plans.
+There is one plane for each pair of cubes, so, $n(n-1)/2$ planes.
 Thus the search manifold is:
 \begin{equation}
-  \mathcal{M} = {\left( \mathbb{R}^3\times SO(3) \right)}^n \times {\left( \mathbb{R} \times S2 \right)}^{\frac{n(n-1)}{2}} \nonumber
+  \mathcal{M} = {\left( \mathbb{R}^3\times SO(3) \right)}^n \times {\left( \mathbb{R} \times S^2 \right)}^{\frac{n(n-1)}{2}} \nonumber
 \end{equation}
-and the problem contains 5 constraints of dimension 8 per cube to fit them in the box and $n(n-1)/2$ constraints of dimension 16 to avoid the interpenetration of cubes.
+The problem contains 5 constraints of dimension 8 per cube to fit them in the box and $n(n-1)/2$ constraints of dimension 16 to avoid the interpenetration of cubes.
 We have a problem of dimension $4.5n+1.5n^2$ with $32n+8n^2$ constraint.
 
 In order to compare the resolution with and without the use of manifolds, we also formulate this problem over $\mathbb{R}^n$.
-To do so, each variable on $SO(3)$ is replaced by a variable on $\mathbb{R}^4$, while each variable on $S2$ is replaced by one on $\mathbb{R}^3$.
+To do so, each variable on $SO(3)$ is replaced by a variable on $\mathbb{R}^4$, while each variable on $S^2$ is replaced by one on $\mathbb{R}^3$.
 In both cases, a norm-1 constraint on the variable is added to the problem to force those variables on the manifolds.
 This gives rise to a problem on
 \begin{equation}
@@ -132,7 +132,7 @@ We display the results of these tests in figure~\ref{fig:timings-cubes}.
 \begin{figure}[htpb]
   \centering
   \input{Chapter6-Evaluation/Figs/timingsCubes.tikz}
-  \caption{Comparison of resolutions with and without using manifolds}
+  \caption{Comparison of resolutions with and without using manifolds with $\mu=10^{-8}$}
 \label{fig:timings-cubes}
 \end{figure}
 
@@ -141,7 +141,7 @@ We observe that the numbers of iterations are sensibly similar for the two types
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
 In particular, the minimum value for the diagonal terms $\mu$ is important.
-We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$, and the formulation with manifolds is consistently faster than the one without manifolds.
+We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$(presented in figure~\ref{fig:timings-cubes}), and the formulation with manifolds is consistently faster than the one without manifolds.
 Values outside of that span tend to degrade both resolutions.
 Too high values tend to damp the hessian, which translates into bigger numbers of iterations.
 Too small values make the hessian closer to being rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
@@ -479,6 +479,7 @@ In this later application, the enforcement of \emph{full physical consistency}  
 \label{sec:application_of_contact_planning_on_real_environment}
 
 In this section, we present our approach to generate multi-contact planning scenarios in a sensory acquired environment. This work was done prior to the development of our posture generator and therefore make use of a previous version of it that is presented in~\cite{bouyarmane:humanoids:2010}.
+The plan is now to use our Posture Generator in this framework.
 
 Generating isolated postures is not sufficient to make a robot move or achieve tasks in ways similar to humans.
 It needs to plan entire motions, with sequences of contact creations and releases, and trajectories in-between.
@@ -505,7 +506,7 @@ Subsequently, we must deal with two kinds of situations:
   \item the models of the objects in the environment are known: in this case adapting the MCP consists mainly in dealing with recognition, model superposition, and handling uncertainties.
   In brief, once model superposition is achieved, we can use the 3D model for MCP as in~\cite{escande:ras:2013,bouyarmane:ar:2012}, yet some adjustments are needed.
   \item the models of the hurdles and the environment are not known (e.g.\ disaster or outdoor environments, for example, related to the Fukushima disaster that inspired the DARPA Robotic Challenge), MCP is to be achieved in an egocentric way with models built from the robot's embedded sensors.
-  This chapter deals with this case and we describe how the MCP is modified to achieve this goal.
+  This section deals with this case and we describe how the MCP is modified to achieve this goal.
   In a nutshell, we construct planar surfaces from the 3D point clouds data and feed them to the MCP.\@
 \end{enumerate}
 
@@ -583,21 +584,21 @@ After re-orienting each frame to get their expression with respect to the world 
 
 \subsection{Constraints for surfaces extracted from point clouds}
 
-Generating postures in which a contact between convex polygonal plane surfaces requires ensuring that the intersection area between the two surfaces is large enough to support the contact.
-One could use the formulation presented in Section~\ref{sec:integration_on_non_inclusive_contacts_in_posture generation}.
-Or more simply a constraint of convex polygon inclusion, which is sufficient for cases such as the ones we study here, where the support surfaces are wide enough for the robot to lean on.
+%Generating postures in which a contact between convex polygonal plane surfaces requires ensuring that the intersection area between the two surfaces is large enough to support the contact.
+%One could use the formulation presented in Section~\ref{sec:integration_on_non_inclusive_contacts_in_posture generation}.
+%Or more simply a constraint of convex polygon inclusion, which is sufficient for cases such as the ones we study here, where the support surfaces are wide enough for the robot to lean on.
 
-%We adjusted slightly our planner and posture generator to handle contacts between convex polygonal plane surfaces.
-%The main modification made in the posture generator deals with properly writing the constraints that enforce the inclusion of one surface into another one.
-%In our previous implementation, contacts are searched between rectangular patches attached to the robot body or the environment.
+%%We adjusted slightly our planner and posture generator to handle contacts between convex polygonal plane surfaces.
+%%The main modification made in the posture generator deals with properly writing the constraints that enforce the inclusion of one surface into another one.
+%%In our previous implementation, contacts are searched between rectangular patches attached to the robot body or the environment.
 
-Such constraint can be written by enforcing that all the points of polygon $S_i$ are located on the left side of all the segments of polygon $S_j$ (provided that the points of $S_j$ are ordered counterclockwise around its normal).
-%For a couple of coplanar surfaces $S_i$, $S_j$ respectively represented by $n$ and $m$ points, this gives rise to a constraint of dimension $n \times m$:
-Given $S_i$ and $S_j$ two surfaces which contours are defined respectively by the sets of points ${p_0, p_1, \ldots, p_n}$ and ${q_0, q_1, \ldots, q_m}$ and $\vec{n}$ a vector normal to $S_i$, the inclusion of $S_i$ in $S_j$ can be written as the following constraint:
+%Such constraint can be written by enforcing that all the points of polygon $S_i$ are located on the left side of all the segments of polygon $S_j$ (provided that the points of $S_j$ are ordered counterclockwise around its normal).
+%%For a couple of coplanar surfaces $S_i$, $S_j$ respectively represented by $n$ and $m$ points, this gives rise to a constraint of dimension $n \times m$:
+%Given $S_i$ and $S_j$ two surfaces which contours are defined respectively by the sets of points ${p_0, p_1, \ldots, p_n}$ and ${q_0, q_1, \ldots, q_m}$ and $\vec{n}$ a vector normal to $S_i$, the inclusion of $S_i$ in $S_j$ can be written as the following constraint:
 
-\begin{equation}
-\forall k \in [0, n],\ \forall l \in [0, m],\ \left[\overrightarrow{q_l p_k}\times\overrightarrow{q_l q_{l+1}}\right].\vec{n} \leq 0
-\end{equation}
+%\begin{equation}
+%\forall k \in [0, n],\ \forall l \in [0, m],\ \left[\overrightarrow{q_l p_k}\times\overrightarrow{q_l q_{l+1}}\right].\vec{n} \leq 0
+%\end{equation}
 
 %\begin{algorithm}
 %\caption{Surface inclusion constraints}
@@ -615,6 +616,7 @@ Given $S_i$ and $S_j$ two surfaces which contours are defined respectively by th
 %\end{algorithm}
 
 Once the surfaces are defined, we can choose which ones are suitable for the robot to make contact with.
+Using flat contact constraints formulations as described previously.
 Although it is not a mandatory step, it allows to reduce the amount of exploration during the planning phase by removing undesired or inappropriate pairs of robot/environment surfaces.
 For the time being, this is determined by heuristics that are defined depending on the situation.
 If we want the robot to walk on various surfaces, only surfaces that have a normal vector closely aligned with the gravity field would be selected as potential candidates (so as to eliminate the walls and other surfaces on which the robot cannot walk).

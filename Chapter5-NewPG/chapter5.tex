@@ -34,7 +34,7 @@
   %\item{Implementation of new types of constraints in our formulation}
     %\begin{itemize}
       %\item Contact with parametrized surfaces on Rn
-      %\item Contact with parametrized surfaces on S2: Sphere, SuperEllipsoid
+      %\item Contact with parametrized surfaces on S^2: Sphere, SuperEllipsoid
       %\item Contact with Catmull-Clark Subdivision surfaces
     %\end{itemize}
   %\item{Contact with desired force}
@@ -225,7 +225,7 @@ Here is a list of constraints that we consider in our problems:
 \begin{itemize}
 \item Joint limits ${q^-} \leq q_r \leq {q^+}$:\\
 These cannot be directly translated on manifolds other than $\mathbb{R}^n$.
-For example, spherical joints can be parametrized on $S2 \times \mathbb{R}$, then the $S2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds(in that case the limit constraint is not a simple bound constraint, but writes as $f(q_r)\leq 0$).
+For example, spherical joints can be parametrized on $S^2 \times \mathbb{R}$, then the $S^2$ part can be limited by a cone, and the $\mathbb{R}$ part can have real bounds(in that case the limit constraint is not a simple bound constraint, but writes as $f(q_r)\leq 0$).
 
 %\item The contact constraint consists in identifying the features of two frames $F_1$ and $F_2$.
 %For example, for a planar contact, we can write the constraints~\Eqref{eq:planar_contact_bad}.
@@ -560,7 +560,7 @@ When it comes to non-flat surfaces, the location of the frames used in equations
 
 We propose to add an additional variable $u_S$ to our optimization problem to represent the location of the contact frame on a non-flat surface.
 This gives the ability to our solver to choose the optimal contact position on a non-flat surface.
-Depending on its shape, the manifold $\mathcal{M}_S$ on which the surface is parameterized can be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$.
+Depending on its shape, the manifold $\mathcal{M}_S$ on which the surface is parameterized can be $\mathbb{R}$, $\mathbb{R}^2$ or $S^2$.
 Then we can write the contact constraint on that parametrized frame with ease.
 \begin{equation}
 \label{eq:param_frame}
@@ -568,7 +568,7 @@ Then we can write the contact constraint on that parametrized frame with ease.
 \end{equation}
 In this section, we will successively present several ways to parameterize various non-flat surfaces to generate contacts with them.
 
-%We propose to handle that case by paramaterizing the contact frame on the surface with a variable $u_S$ on a 1 or 2-dimensional manifold $\mathcal{M}_S$ (which, depending on the shape, could be $\mathbb{R}$, $\mathbb{R}^2$ or $S2$), and adding this variable to our optimization problem.
+%We propose to handle that case by paramaterizing the contact frame on the surface with a variable $u_S$ on a 1 or 2-dimensional manifold $\mathcal{M}_S$ (which, depending on the shape, could be $\mathbb{R}$, $\mathbb{R}^2$ or $S^2$), and adding this variable to our optimization problem.
 %Then we can write the contact constraint on that parametrized frame with ease.
 %\begin{equation}
 %\label{eq:param_frame}
@@ -580,8 +580,8 @@ In this section, we will successively present several ways to parameterize vario
 \subsection{Application to plan-sphere contact}
 We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal on $S_s$.
 The most general way to express such a constraint is to ensure that $p_s$ is on $S_B$ and that $n_s$ and $n_B$ are opposite.
-To do that, we create a variable $v_{S2}$ on $S2$, add it to our optimization problem and map $p_S$ and $n_S$ on it.
-In our framework, this constraint is expressed exactly as the contact between 2 planar surfaces, once the mappings of $p_s(v_{S2})$ and $n_s(v_{S2})$ are done.
+To do that, we create a variable $v_{S^2}$ on $S^2$, add it to our optimization problem and map $p_S$ and $n_S$ on it.
+In our framework, this constraint is expressed exactly as the contact between 2 planar surfaces, once the mappings of $p_s(v_{S^2})$ and $n_s(v_{S^2})$ are done.
 In a framework that does not handle manifolds, it would require to setup a specific constraint, ensuring that the distance between $c_s$ and $S_B$ is equal to $r_S$.
 
 In Fig.~\ref{fig:contact_plan_sphere} we show the results obtained by solving a problem where the HRP2-Kai robot has to keep its feet in contact with the ground at fixed positions, touch a sphere with a side of its right wrist and point as far as possible in a given direction $d$ with its left hand, under balance constraints.
@@ -640,18 +640,18 @@ The numbers of iterations are similar.
 This method is certainly scalable, and can be used for any kind of humanoid robot and environment.
 Yet, it requires having a parametric equation of the surface.
 
-\subsection{Contact with an object parametrized on S2}
+\subsection{Contact with an object parametrized on the unit sphere}
 
 In this case, we want the HRP-4 robot to carry a cube with its two hands.
 The most general way to do it is to select a face of the cube for each contact and to enforce the contact between that face and the hand's surface.
-We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S2$, thus adding a variable on $S2$ to our problem.
+We propose to approximate the cube with a superellipsoid and to parametrize the resulting shape on $S^2$, thus adding a variable on $S^2$ to our problem.
 The implicit equation of a superellipsoid is $S(x,y,z) = 0$, with
 \begin{equation}
   S(x,y,z) = {\left( \left|\frac{x}{A}\right|^r + \left|\frac{y}{B}\right|^r\right)}^\frac{t}{r} + \left|\frac{z}{C}\right|^t - 1
   \label{eq:super_ellipsoid}
 \end{equation}
 
-A point in $S2$ is represented by a vector $v=(x,y,z)$ in $\mathbb{E} = \mathbb{R}^3$.
+A point in $S^2$ is represented by a vector $v=(x,y,z)$ in $\mathbb{E} = \mathbb{R}^3$.
 To a given unit vector $v$ we associate a point $\alpha v$ on the surface of the superellipsoid by solving $S(\alpha v) = 0$ for $\alpha$.
 At this point, the normal is given by $\dfrac{\nabla S(\alpha v)}{\left\|\nabla S(\alpha v)\right\|}$ which simplifies into $\dfrac{\nabla S(v)}{\left\|\nabla S(v)\right\|}$.
 %It returns the intersection between any unit vector and the surface of the super ellipsoid.
@@ -662,7 +662,7 @@ In Fig.~\ref{fig:hrp4_cube} we present some results for a posture generation pro
 The hands must be in contact with the cube.
 The cube is free to move (parametrized by $\mathbb{R}^3 \times SO(3)$) and has it own set of Euler-Newton equations, which must be fulfilled.
 %On the accompanying video, one can observe how the contact points on the cube evolve along with the optimization.
-%For each contact with the cube, a variable on $S2$ is added to the problem to parametrize the contact point.
+%For each contact with the cube, a variable on $S^2$ is added to the problem to parametrize the contact point.
 %Each hand is in contact with a point and normal on the cube.
 
 \begin{figure}
@@ -693,7 +693,7 @@ In the previously presented parametrizations of typical geometric shapes (sphere
 But for a given object, a parametrization of its surface is rarely available, especially a parametrization conforming with the continuity requirements.
 On the contrary, we usually have an approximation of the object as a mesh.
 
-We can consider two types of surface parametrizations, the surfaces of closed topology, like a sphere, which are a large part of the objects of interest in our application, that we parametrize on $S2$ (because there is no diffeomorphism between the unit sphere and a subset of $\mathbb{R}^2$) and the surfaces of open topology, that generally can be parametrized on $\mathbb{R}^2$.
+We can consider two types of surface parametrizations, the surfaces of closed topology, like a sphere, which are a large part of the objects of interest in our application, that we parametrize on $S^2$ (because there is no diffeomorphism between the unit sphere and a subset of $\mathbb{R}^2$) and the surfaces of open topology, that generally can be parametrized on $\mathbb{R}^2$.
 The problem of finding a parametrization satisfying the continuity requirements exists for both of those when the surface's representation comes as a mesh.
 
 In~\cite{escande:icra:2016}, we provide a systematic way to obtain a parametric surface closely approximating a mesh and meeting the continuity requirements mentioned above, for a large class of objects, namely star-convex objects.
@@ -712,9 +712,9 @@ It iteratively subdivides a control mesh by following a set of rules; The limit 
 \end{figure}
 It was shown by Stam in a seminal paper~\cite{stam:siggraph:1998} that points on CCS can be computed by direct analytical formula without explicitly subdividing the control mesh.
 A map between each face of the control mesh and the patch of the CCS associated to it $s(u,v)$ can be devised(with $(u,v)$ a 2D parametrization of a face).
-To find the point of the CCS associated with a value $d \in S2$, we use a raycast algorithm: given $c$, a center point of the star-convex control mesh(a point seeing all the surface of the control mesh), we solve numerically $c+td=s(u,v)$ in $(u,v,t)$ with a Newton method.
-This gives us a mapping from $S2$ to the CCS.
-From there, we propose methods to compute the normal to the CCS point associated with an element of $S2$ and we devise the derivations of both those mappings.
+To find the point of the CCS associated with a value $d \in S^2$, we use a raycast algorithm: given $c$, a center point of the star-convex control mesh(a point seeing all the surface of the control mesh), we solve numerically $c+td=s(u,v)$ in $(u,v,t)$ with a Newton method.
+This gives us a mapping from $S^2$ to the CCS.
+From there, we propose methods to compute the normal to the CCS point associated with an element of $S^2$ and we devise the derivations of both those mappings.
 
 As a result, we get a smooth parametrization of the input mesh that satisfies the continuity requirements.
 In Fig:\ref{fig:CCS}, we show the Catmull-Clark surface (in blue) corresponding to the mesh (in green) of an HRP-2 link, for two different levels of smoothness.
@@ -732,7 +732,7 @@ The red line is the image of a great circle of the unit sphere through our param
 Because this parametrization respects the continuity requirements for being used efficiently in optimization, we can use it freely in our posture generation problems.
 
 We now show some examples of PG using the proposed approach to generate contacts with complex objects.
-We make use of the capacity of our optimization solver to directly work with a variable $d\in S2$ to parametrize our surfaces.
+We make use of the capacity of our optimization solver to directly work with a variable $d\in S^2$ to parametrize our surfaces.
 %When using more classical nonlinear solvers, it is sufficient to take $d$ in $\mathbb{R}^3$ and to add a constraints of unit norm for $d$: the parametrization algorithm do not need a unit $d$ to work, and at the solution, the gradient will be full rank on the null-space of this constraint, which is enough for a good convergence.
 %However, working directly on $S^2$ presents several advantages\cite{brossette:Humanoids:2015}.
 
