@@ -13,7 +13,7 @@
 
 \graphicspath{{Chapter0-Introduction/Figs/Vector/}{Chapter0-Introduction/Figs/}}
 
-The ultimate goal of robotics is to make robots realize some tasks.
+The ultimate goal of robotics is to make robots realize some tasks to assist humans in their various fields of work.
 The tasks, as well as the robot used to fulfill them, are various.
 For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human, a submarine robot exploring the wreckage of a ship, or a humanoid robot exploring and fixing a destroyed plant.
 
@@ -24,25 +24,24 @@ For example, it can be a robotic arm building a car in a factory, a surgeon robo
 \label{fig:various}
 \end{figure}
 
-The DARPA Robotics Challenge has shone some light on the humanoid robots.
-This competition brought together a large scope of robotics groups from universities, laboratories, and private companies around a common goal: teleoperate a robot to make it succeed in several challenges without any human physical intervention.
-The robots were expected to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
-All those tasks can usually be broken down into sets of elementary tasks in human language.
-Some typical examples of tasks for a robot can be `Put hand in contact with target', `Put foot on next step', `Avoid collision with that object', `Maintain stability' or `Look in that direction'.
-As is, those tasks do not mean anything for the robot.
-A robot is made of a collection of bodies that are linked together by joints actuated by motors.
-A robots configuration consists of the position and orientation of its base body, and the configuration of each of its joints.
+The DARPA Robotics Challenge has shone some light on the capabilities and limitations of humanoid robots.
+This competition brought together robotics groups from Universities, laboratories, and private companies to work on a common goal: develop a partially teleoperated robot system that can succeed in several tasks without any human physical intervention.
+The robots were required to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
+All these tasks can usually be broken down into sets of elementary tasks in human language, such as `put hand in contact with target', `put foot on next step', `avoid collision with that object', `maintain stability' or `look in that direction'.
+As is, these tasks do not mean anything for the robot because it has no knowledge of it's interaction with the world, or of human language.
+A robot is made of a collection of bodies (or links) that are linked together by joints actuated by motors.
+A robot's configuration consists of the position and orientation of its base body, and the configuration of each of its joints.
 Satisfying a task requires that the joints of the robot reach a configuration for which the task is completed.
-The action of satisfying a task comes down to moving from an initial configuration to a goal.
-Computing the trajectory to follow and actually following it, are handled by the trajectory generator and controller of the robot.
+Thus, the action of satisfying a task comes down to moving from an initial configuration to a goal configuration.
+Computing the trajectory to follow, and actually following it, are handled by the trajectory generator and controller of the robot.
 Trajectory generation and control are by themselves complete sub-fields in robotics, and they both often rely on being given some key postures to help guide the robot's motion(e.g. initial, intermediate and final configurations).
 Finding those configurations is the job of what we call the Posture Generator (PG).
 
-There are two types of robots. The fixed-base robots and the mobile ones.
-As the name suggests, the first type of robots have fixed bases, their workspace is predefined by their geometry and they are usually fully actuated.
+Robots can be divided into two broad categories: fixed-base robots and mobile robots.
+As the name suggests, the first type of robots have fixed bases, their workspace is predefined by their geometry, and they are usually fully actuated.
 This means that the robot has as many degrees of freedom (DoF) as it has actuators. Thus, any particular joint configuration leads to a unique robot posture.
 On the contrary, mobile robots are always underactuated such that the robot has more DoF than actuators.
-Each link of the robot is actuated, but the position of the base of the robot depends on the configuration of the joints as a well as on the locations of the contacts that the robot makes with the environment.
+Each link of the robot is actuated, but the position of the base of the robot depends on the configuration of the joints as well as on the locations of the contacts that the robot makes with the environment.
 
 %A mobile robot's position depends on the location of its contacts with the environment.
 %For biped robots evolving on a flat surface, a footstep planner can be used to decide of the sequence of steps to take so the robot can walk to its goal.
@@ -57,7 +56,7 @@ As the environment becomes more difficult to cross, hands may come into play tog
 Narrow passages may even require other parts of our body (knees, elbows, back\dots) to make contact in order to support the motion.
 
 Planning a sequence of contacts is thus a necessary step in devising a motion for a robot.
-Once the key stances of the motion have been identified by the planner, they can be used by the controller or the trajectory planner and finally the motion can be achieved by the robot.
+Once the key stances of the motion have been identified by the contact planner, they can be used by the controller or the trajectory planner and finally the motion can be achieved by the robot.
 
 All the aforementioned planning methods rely on the fact that we have a tool to decide if a proposed set of contacts is feasible or not for a given robot.
 The tool used for finding a robot configuration that satisfies a set of constraints, like the geometric constraints of contact or the stability of the robot, is called a `Posture Generator' (PG) and the development of this tool is the main topic of this dissertation.
@@ -81,7 +80,7 @@ There exists some methods and algorithms to solve optimization problems on non-E
 However, to our knowledge, these are focused on addressing non-constrained optimization.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
-Through this thesis, we develop our own nonlinear constrained optimization solver on manifolds and use it to solve optimization problems on their native search manifolds. We will exhibit their utility for posture generation problems as well as a few other types of problems.
+Through this thesis, we develop our own nonlinear constrained optimization solver on manifolds and use it to solve optimization problems on their native search manifolds. We will exhibit the interests of such resolution methods for posture generation problems as well as a few other types of problems.
 This has the advantage that, unlike off-the-shelf solvers which are often a black box on which the user has very limited control, we have full control over that solver and can specialize/modify it to fit our needs.
 
 %\paragraph{Specificities of our approach}
@@ -102,18 +101,18 @@ This has the advantage that, unlike off-the-shelf solvers which are often a blac
 
 \paragraph{Contributions and plan}
 The main focus of this thesis is the formulation and resolution of problems of posture generation for robotics systems using nonlinear optimization on manifolds.
-Our contributions are of two types, on one hand, we propose some extensions and improvements on the way to formulate a posture generation problem, and on the other hand, we investigate new ways of solving those problems.
+Our contribution is two fold, on one hand we propose extensions and improvements on the ways to formulate a posture generation problem, and on the other hand, we investigate new ways of solving these problems.
 The organization of this thesis is as follows:
 %In Chapters~\ref{cha:state_of_the_art} and~\ref{cha:posture_generation_problem_formulation}, we present the background of posture generation, with respectively a state of the art and a presentation of the detailed formulation of a posture generation problem.
 %We present several
 \begin{itemize}
-  \item In Chapter~\ref{cha:state_of_the_art_and_problem_definition} we give the state of the art of posture generation and optimization on manifolds.
+  \item In Chapter~\ref{cha:state_of_the_art_and_problem_definition} we describe the state of the art of posture generation and optimization on manifolds.
   \item In Chapter~\ref{cha:posture_generation_problem_formulation}, we present the detailed formulation of a posture generation problem.
   \item In Chapter~\ref{cha:extensions_of_posture_generation} we present three different and unrelated contributions: two formulation extensions, one allowing to generate non-inclusive contacts between convex surfaces, the other is the exact derivation of the torques in the actuators of a robot.
-  Then we present our endeavor to use the `Lifted Newton Method' to solve posture generation problems.
+  We then present our endeavor to use the `Lifted Newton Method' to solve posture generation problems.
   \item Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} describes the principles of nonlinear optimization over non-Euclidean manifolds and our implementation of a solver based on those principles.
-  \item In Chapter~\ref{ch:PG}, we present a framework that simplifies and extends the formulation of posture generation problems by formulating and solving the optimization problem over native non-Euclidean manifolds, managing automatically the variables of the problems and proposing a framework that formalizes and simplifies the writing of functions on geometric entities often used in robotics.
-  \item In Chapter~\ref{cha:evaluation_and_experimentation}, we evaluate the performances of our solver on manifolds and of our posture generator, and then present a preliminary work on how to generate postures on a sensory acquired environment.
+  \item In Chapter~\ref{ch:PG}, we present a framework that simplifies and extends the formulation of posture generation problems by formulating and solving the optimization problem over native non-Euclidean manifolds, managing automatically the variables of the problems, and proposing a framework that formalizes and simplifies the writing of functions on geometric entities often used in robotics.
+  \item In Chapter~\ref{cha:evaluation_and_experimentation}, we evaluate the performances of our solver on manifolds, and the performances of our posture generator. We then present preliminary work on the generation of postures on a sensor acquired environment.
 \end{itemize}
 
 
