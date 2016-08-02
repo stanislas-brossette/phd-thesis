@@ -1030,39 +1030,38 @@ This algorithm efficiently computes the exact joint torques Jacobian for a robot
 % SECTION ON THE USE OF LIFTED VARIABLES FOR ROBOTICS POSTURE GENERATION  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section, we present our work on the use of lifted variables for robotics posture generation.
 The goal of this thesis is, on one hand, to enable writing more complex and various problems in simpler ways by improving the formulation of posture generation problems, and on the other hand, to improve and adapt the resolution methods for those problems.
 This section focuses on the later.
 We formulate posture generation problems in an optimization friendly way in order to solve them using nonlinear constrained optimization algorithms.
-In the following, we propose to apply the methods of lifted optimization presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to posture generation problems.
+In this section, we propose to apply the methods of lifted optimization presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to posture generation problems.
 
-The idea of lifting variables consists in taking a complicated equation $F(u) = 0$ and decomposing it into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on $u$ and on the output of functions of lower index~\ref{eq:simplerFunctions}.
+The idea of lifting optimization is to consider a complicated equation $F(q) = 0$ and decomposing it into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on the original variable $q$ and on the output of functions of lower index~\ref{eq:simplerFunctions} that are replaced by additional variables $\{w_1, w_2, \ldots, w_m\}$, that we call the `lifted variables'.
 
 \begin{equation}
 \label{eq:simplerFunctions}
-  x_i = f_i(u, x_1, x_2, \ldots,x_{i-1}),\ \forall i\in[1,\ldots, m]
+  w_i = f_i(q, w_1, w_2, \ldots,w_{i-1}),\ \forall i\in[1,\ldots, m]
 \end{equation}
 
 Such that they can be used in a chain to recompose $F$:
 
 \begin{align}
-  F(u) &= f_F\left(u, x_1, x_2, \ldots, x_m\right)\\
-       &= f_F\left(u, f_1(u), f_2(u,x_1), f_3(u,x_1,x_2), \ldots, f_m(u, x_1, \ldots, x_m-1)\right) \\
-       &= f_F\left(u, f_1(u), f_2(u,f_1(u)), f_3(u,f_1(u),f_2(u,f_1(u))), \ldots, f_m(u, \ldots, f_{m-1}(u,\cdots))\right)
+  F(q) &= f_F\left(q, w_1, w_2, \ldots, w_m\right)\\
+       &= f_F\left(q, f_1(q), f_2(q,w_1), f_3(q,w_1,w_2), \ldots, f_m(q, w_1, \ldots, w_m-1)\right) \\
+       &= f_F\left(q, f_1(q), f_2(q,f_1(q)), f_3(q,f_1(q),f_2(q,f_1(q))), \ldots, f_m(q, \ldots, f_{m-1}(q,\cdots))\right)
 \end{align}
 
-With this formulation and the additional `lifted' variables $x_i,\ i\in[1,\ldots, m]$, the problem $F(u) = 0$ can be rewritten as a lifted problem:
+With this formulation and the additional lifted variables $w_i,\ i\in[1,\ldots, m]$, the problem $F(q) = 0$ can be rewritten as the following lifted problem:
 
 \begin{equation}
 \label{eq:lifted_variables}
-  G(u,x) =
+  G(q,w) =
   \begin{pmatrix}
-  f_1(u) - x_1 \\
-  f_2(u,x_1) - x_2 \\
-  f_3(u,x_1,x_2) - x_3 \\
+  f_1(q) - w_1 \\
+  f_2(q,w_1) - w_2 \\
+  f_3(q,w_1,w_2) - w_3 \\
   \vdots \\
-  f_m(u,x_1,\ldots, x_{m-1}) - x_m \\
-  f_F(u,x_1,\ldots, x_{m-1}, x_m)
+  f_m(q,w_1,\ldots, w_{m-1}) - w_m \\
+  f_F(q,w_1,\ldots, w_{m-1}, w_m)
   \end{pmatrix}
   =0
 \end{equation}
@@ -1074,7 +1073,7 @@ By reducing the complexity of the functions, we ought to improve the quality of 
 %If $F$ is a complicated function, the quadratic approximation may be quite far from $F$ and simpler functions may have better quadratic approximations, which should lead to better convergence properties of the Newton scheme.
 
 One obvious drawback of this approach for solving a nonlinear problem is the increased size of the linearized problem to solve at each iteration of the optimization.
-Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the jacobian of $G(u,x)$ to condense the lifted problem into a problem of the same size as the original one.
+Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the jacobian of $G(q,w)$ to condense the lifted problem into a problem of the same size as the original one.
 Thus, the resolution of each iteration should take approximately the same time as with the original problem.
 
 The lifted variable approach is known to be superior to the non-lifted one in the problem of shooting methods for boundary value problems~\cite{osborne:1969:shooting}.
@@ -1084,14 +1083,14 @@ If we consider a single chain robot with $m$ bodies, such that $\kappa (m) = \{0
 
 \begin{equation}
 \label{eq:robot_lift}
-  G(u,x) =
+  G(q,w) =
   \begin{pmatrix}
-  {}^1 X_W(q) - x_1 \\
-  {}^2 X_1(q)\cdot x_1 - x_2\\
-  {}^3 X_2(q)\cdot x_2 - x_3 \\
+  {}^1 X_W(q) - w_1 \\
+  {}^2 X_1(q)\cdot w_1 - w_2\\
+  {}^3 X_2(q)\cdot w_2 - w_3 \\
   \vdots \\
-  {}^m X_{m-1}(q)\cdot x_{m-1} - x_{m-1} \\
-  x_{m-1} - X_\text{goal}
+  {}^m X_{m-1}(q)\cdot w_{m-1} - w_{m-1} \\
+  w_{m-1} - X_\text{goal}
   \end{pmatrix}
   =0
 \end{equation}
