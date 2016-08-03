@@ -9,10 +9,10 @@
 
 In this Ph.D., we contributed to the formulation and the resolution of the posture generation problem for robotics.
 %Such problems aim at finding a robot configuration that satisfies some high-level requests while ensuring its viability, in the sense that, in this configuration, the robot is stable, avoid collisions and respects its intrinsic limitations.
-Posture generation aims at finding a robot configuration that is statically stable, avoids collisions and respects the robot's intrinsic limitations while satisfying given high-level requests.
-This problem is traditionally formulated and solved as an optimization problem by minimizing a specific cost function under given geometric and static constraints.
+Posture generation means finding a robot configuration to fulfill high-level task goals under viability or user-specified constraints (e.g. find a posture that is statically stable, avoids no-desired contacts and respects the robot's intrinsic limitations).
+This problem is traditionally formulated and solved as an optimization problem by minimizing a specific cost function under a set of constraints.
 
-We presented a formulation of the basic building blocks of posture generation problems, then proposed some extensions, such as a 'smooth' formulation of non-inclusive contact constraints between two polygons; this allows to find optimal contact configurations in complex situations where the two surfaces in contact cannot be included in each other.
+We described the formulation of the basic building blocks of the posture generation problems, then proposed some extensions, such as a 'smooth' formulation of non-inclusive contact constraints between two polygons; which allows finding optimal contact configurations in complex situations where the two surfaces in contact cannot be included in each other.
 This formulation proved very helpful for planning complex scenarios such as making the HRP-2 robot climb a ladder, it allowed to automatically find some contact configurations that would otherwise take a long time to find manually by trial and errors.
 %even when generate viable configurations of contact that would otherwise not be considered by usual formulations; it relies on the idea of adding to the problem a set of variables that represent an ellipse included in both polygons.
 
@@ -34,7 +34,7 @@ Our framework allows to easily and elegantly write custom constraints on selecte
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 We exploit the capabilities of our framework to generate viable robot's configurations with contacts on non-flat surfaces by parametrizing the location of the contact point with additional variables.
 That approach allowed us to compute manipulation and locomotion postures involving solids defined only by their meshes and where the choice of the contact location was left entirely to the solver.
-That way, we computed some postures of an HRP-4 robot holding the leg of an HRP-2 robot in its hands, and others, for example, where HRP-4 is climbing on a stack of cubes and the contacts locations are chosen automatically.
+That way, we computed some postures of an HRP-4 robot holding the leg of an HRP-2 robot in its grippers, and others, for example, where HRP-4 is climbing on a stack of cubes and the contacts locations are chosen automatically.
 This was made possible by proposing a generic way to parametrize the surface of a solid represented by a mesh, based on the Catmull-Clark subdivision algorithm, and using it to compute configurations where the optimal location of contact on a complex object is chosen by the solver.
 
 We took a great care to eliminate many of the cumbersome aspects of writing a posture generation problem, and in the end, the genericity of our framework allows the definition and use of a wide range of functions applied to any variables of the problem (joint angles, forces, torques or any additional variables).
@@ -48,7 +48,7 @@ We evaluate the performances of our solver on problems relying heavily on the ma
 %We showed that in terms of hessian update method, the self-scaling BFGS update on individual Hessians gives us the best results.
 We then present an approach to evaluate and compare the performances of different resolution methods for solving several types of posture generation problems, which could help develop strategies to tune our solver based on the problem at hand.
 
-We developped our solver in order to solve posture generation problems, but we show that its capabilities can be leveraged to solve other kinds of problems such as the identification of inertial parameters, where the manifold formulation guarantees that the optimization iterates are always physically valid.
+We developed our solver in order to solve posture generation problems, but we show that its capabilities can be leveraged to solve other kinds of problems such as the identification of inertial parameters, where the manifold formulation guarantees that the optimization iterates are always physically valid.
 For this problem, our solver and formulation proved more efficient than the traditional formulation solved with an off-the-shelf solver.
 Finally, we presented our preliminary work in using posture generation in multi-contact planning in real sensory acquired environment.
 
@@ -57,8 +57,8 @@ Finally, we presented our preliminary work in using posture generation in multi-
 
 %Although our solver fairs correctly, compared to other solvers on some problems (Schittkowsky, Inertial identification), we believe that some improvements could still be made to it.
 %This study showed that our solver is able to solve posture generation problems in times comparable to the state of the art, but we are fully aware that those computation times could be improved.
-Although we manage to get some satisfying results out of our posture generator, the solver still requires some tuning of its options, and of the initial guess, to ensure convergence.
-We are fully aware that even though the computation times that we observe are of the same order of magnitude as the ones found in the litterature, improvements could and should be made in the future to make our posture generator more robust and faster, by not only improving the solver's implementation, but also specializing it for posture generation problems.
+Although we manage to get some satisfying results out of our posture generator, the solver still requires some tuning of its options, and of the initial guess, to ensure good convergence rates.
+We are fully aware that even though the computation times that we observe are of the same order of magnitude as the ones found in the literature, improvements could and should be made in the future to make our posture generator more robust and faster, by not only improving the solver's implementation, but also specializing it for robotic posture generation problems.
 %We believe that improvements could be made to make our solver more reliable and to specialize it for the resolution of posture generation problems.
 In particular, we believe that the restoration phase, especially the treatment of the Hessian updates, can be improved.
 We can also try using other QP solvers than LSSOL.
