@@ -11,63 +11,62 @@
 \label{sub:inverse_kinematics}
 
 Posture generation can be viewed as, and is sometimes called, Generalized Inverse Kinematics.
-The Inverse Kinematics(IK) problem consists in finding the joint configuration for an articulated multibody to complete a given set of tasks in order to generate believable motions.
-By definition, it is purely kinematics and has no regards for stability or other physics-related constraints.
-The IK problem has been widely studied and used in the fields of robotics, computer graphics, computer games, and animation.
-In some cases, for example with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found, in ~\cite{asfour2003human} the redundancy in a robot arm is exploited to devise a closed-form formula for its IK.
-But for more complicated cases, optimization methods are usually used.
+The Inverse Kinematics~(IK) problem consists in finding the joint configuration for an articulated multibody system to complete a given set of tasks that are defined in the operational space. For example, by solving repeatedly the IK for a desired motion given in the Cartesian space, we can generate believable motions in the joint space.
+By definition, such a process is purely kinematics. But other constraints need dynamic or other physics-related knowledge such as the inertia or contact friction parameters.
+The IK problem has been widely studied and used in the fields of robotics, computer graphics and games, and animation.
+In few particular cases, for example with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found. For example, in ~\cite{asfour2003human} the redundancy in a robot arm is exploited to derive a closed-form formula for its IK. 
+But for more complex cases, iterative methods are usually used.
 
 
 %Generating desired initial, intermediary or finale posture configurations requires defining static task goals (e.g.\ reach a target point in 6D) to be done under intrinsic constraints such as joint limits, torque limits, avoiding non-desired self-collisions\ldots and perceptual or extrinsic ones such as keeping an object in the embedded camera field-of-view, avoiding non-desired collisions with surrounding objects, etc.
 
-Many approaches to solve IK problems use pseudo-inverse or Gauss-Newton based methods that are the Jacobian inverse and its variations, Jacobian transpose, damped least squares with and without singular values decomposition or selectively damped least squares~\cite{balestrino1984robust, tolani2000real, baillieul1985kinematic, wampler1986manipulator, nakamura1986inverse, buss2005selectively}.
-Those approaches are all computationally expensive and suffer from joint-space and workspace singularities~\cite{aristidou2009inverse}.
+Many approaches to solve IK problems use pseudo-inverse or Gauss-Newton methods with the Jacobian, Jacobian transpose, damped least squares with and without singular values decomposition or selectively damped least squares~\cite{balestrino1984robust, tolani2000real, baillieul1985kinematic, wampler1986manipulator, nakamura1986inverse, buss2005selectively}.
+These approaches are all computationally costly and suffer from joint-space and workspace singularities~\cite{aristidou2009inverse}.
 
 In~\cite{pechev2008inverse} an alternative method based on a control approach is proposed, where no matrix manipulation is required, this approach is as fast as the damped least squares, but outperforms them in terms of handling singularities.
-The closed-loop inverse kinematics scheme presented in~\cite{siciliano1990closed} is a famous approach to solve IK problems in a control context.
+The closed-loop inverse kinematics scheme presented in~\cite{siciliano1990closed} is a well-known approach to solve IK problems in a control context.
 It uses a second order tracking scheme to guarantee satisfactory tracking performances.
 
 Handling conflicting constraints in IK is a challenging problem to which \cite{baerlocher2004inverse} and \cite{sentis2005synthesis} propose solutions by enforcing a number of priority levels among constraints in their resolution schemes to generate whole-body control of complex articulated figures.
 
-Some statistical resolution approaches have been proposed in~\cite{courty2008inverse, hecker2008real}, with respectively a sequential Monte Carlo method and a particle filtering approach, they have the advantage to only use direct calculations and never require matrix inversions, thus, their strength shows particularly when solving problems with high numbers of degrees of freedom.
+Some stochastic approaches have been proposed in~\cite{courty2008inverse, hecker2008real}, with respectively a sequential Monte Carlo method and a particle filtering approach. They have the advantage to only use direct calculations and never require matrix inversions. They outperform particularly when solving problems with high numbers of degrees of freedom.
 
-In~\cite{AristidouFABRIK, Aristidou:2016_ExtFABRIK} the forward and backward reaching inverse kinematics(FABRIK) resolution method is introduced.
+In~\cite{AristidouFABRIK, Aristidou:2016_ExtFABRIK} the forward and backward reaching inverse kinematics (FABRIK) resolution method is introduced.
 It is based on a geometric iterative heuristic approach, where the bodies of a robot are moved iteratively and separately to reach a target with the end effector while maintaining the integrity of the robot's structure.
 This approach is simple to implement, does not suffer from singularities and requires fewer iterations than most other IK methods.
 But it cannot easily be extended to take non-geometric constraints into account.
 
-Finding a solution to an IK problem without regards for the stability of the solution is a common approach in the field of randomized path planning.
+Finding an acceptable approximate (or a probabilistic) solution to an IK problem without any regards for its stability is a common approach in the field of randomized path planning.
 \cite{cortes2002random} proposes a method to generate many random configurations for closed loop systems with an increased probability that they be kinematically valid in terms of closure constraints, these configurations are then used in the construction of a Probabilistic RoadMap. In~\cite{lavalle1999probabilistic}, a similar approach is presented where instead of increasing its probability of validation, the closure constraint is enforced for each configuration by additional treatment.
 
 \subsection{Generalized Inverse Kinematics}
 \label{sub:generalized_inverse_kinematics}
 
-The Generalized Inverse Kinematics refers to a problem similar to the Inverse Kinematics in the sense that it searches a joint configuration for an articulated figure to complete a task, but needs to do so while respecting other constraints, like ensuring the stability of the structure, respecting its torque limits, avoiding collisions with the environment or with itself, etc.
+The term Generalized Inverse Kinematics refers to a problem similar to the Inverse Kinematics in the sense that it searches a joint configuration for an articulated figure to achieve goal tasks, but needs to do so under various constraints, like ensuring the equilibrium stability of the structure, respecting its torque limits, avoiding collisions with the environment or with itself, etc.
 
 All the previously mentioned approaches are used to find a robot configuration solution to the geometric IK problem.
 To solve a Generalized Inverse Kinematics problem with stability constraints, one can first solve the associated IK with one of the methods presented above, and then test the stability of the IK solution, using methods such as the ones presented in~\cite{bretl:itro:2008} or~\cite{rimon2008general} that determine if the configuration can be statically stable.
 This gives a rejection criterion for the proposed solution.
-If the solution can be stable, the optimal contact forces can be computed using the method proposed in~\cite{boyd2007fast} (which in turn allow computing the joint torques).
+If the solution can be stable, the optimal contact forces can be computed using the method proposed in~\cite{boyd2007fast} (which in turn allows computing the joint torques).
 Otherwise, another IK solution is generated and tested.
 And the process is repeated until a satisfactory solution is found.
 This type of sequential approach of posture generation problem resolution features a rejection criterion that can in some cases be difficult to overcome, making this approach costly, for example, if there is a small number of contacts and very few configurations are stable.
 
 %Those approach lead to a sequential resolution of the posture generation problem where a solution to the IK problem is searched, then tested for stability, if it is stable, the optimal forces are computed, otherwise, another solution is searched for.
 
-Another way to solve the posture generation problem is to consider the complete problem as one, with the IK targets and all the other constraints (stability, collisions, torque limits, etc.) in a single nonlinear constrained optimization problem.
+Another way to solve the posture generation problem is to consider the complete problem at once, with the IK targets and all the other constraints (stability, collisions, torque limits, etc.) in a single nonlinear constrained optimization problem.
 That approach is used in~\cite{Zhao1994} to solve the IK problem.
 That is the approach that we and many others use to solve Generalized Inverse Kinematics problems.
-In~\cite{escande:iros:2006}, that approach is employed to generate postures that are used to grow a tree of usable postures in a multi-contact planning algorithm.
+In~\cite{escande:iros:2006}, such an approach is employed to generate postures that are used to grow a tree of usable postures in a multi-contact planning algorithm.
 It was applied to automatically generate a sequence of contact sets and postures where the HRP-2 robot uses its hand to lean on a table in order to grasp an object otherwise out of reach.
 Interestingly enough, in that study, the C-code that computes the robot's kinematics is generated through Maple and the HuMAnS toolbox~\cite{wieber2006humans} provided by INRIA.
 The constraints of contact, stability and collision are then computed on top of it.
 And the problem is solved by the CFSQP solver~\cite{cfsqp:manual}.
 In~\cite{hauser:ijrr:2008}, a similar posture generation approach is used to find viable postures for different legged robots on varied terrains in the context of a Probabilistic RoadMap planning, which is a planning approach based on random sampling of the configuration space.
 %\cite{hauser:issr:2007} presents a different approach to multi-contact planning based on probabilistic roadmap and random sampling of the configuration space.
-In~\cite{bouyarmane2010static}, Bouyarmane proposes a generalization of the formulation of posture generation problems for systems of multiple robots and manipulated objects.
-Also, he generalizes the notion of contacts by allowing them to bear contact forces or not and to not necessarily be coplanar or horizontal.
+In~\cite{bouyarmane2010static}, a generalization of the formulation of posture generation problems for systems of multiple robots and manipulated objects is proposed. In the latter method, the notion of contacts is generalized to bear forces or not and to have any orientation.
 This generic formulation enables the generation of postures with inter-robot contacts.
-The complete posture generation problem is then solved within a single nonlinear constrained optimization query, computing the contact forces and joint configuration at the same time, while ensuring the stability of all the actors, avoiding collision and respecting the robot's joint and torque limits.
+The complete posture generation problem is then solved within a single nonlinear constrained optimization query, computing the contact forces and joint configuration at the same time, while ensuring the stability of all the `robotic agents', avoiding collision and respecting the robot's joint and torque limits.
 
 In the past few years, our team has dedicated considerable efforts in proposing a general multi-contact motion planner to solve cases of non-gaited acyclic planning, using a posture generator as a backbone to select valid configurations.
 Given a humanoid robot, an environment, a start and a final desired postures, the planner generates a sequence of contact stances allowing any part of the humanoid to make contact with any part of the environment to achieve motion towards the goal.
@@ -82,27 +81,28 @@ Those postures are provided as input to a finite state machine that builds addit
 
 Instead of feeding the key postures directly to the controller and trusting that it will find a path to connect them, one can take an additional step and compute a dynamically viable trajectory between successive steps that the controller will then have to follow, as presented in~\cite{lengagne2013generation}.
 That allows to take advantage of the dynamic effects and produce motions with better performances in terms of completion time, energy consumption, or other criterions.
-Although the key postures are guaranteed to be viable by the posture generator, the whole trajectory might not be.
-Interval analysis methods can be leveraged to ensure the satisfaction of constraints over the whole duration of a motion, as proposed in~\cite{lengagne2011planning}.
+%%AK>> Si tu as écris ce qui suit c'est que tu n'as visiblement rien compris au papier de Lengagne 2013 
+%Although the key postures are guaranteed to be viable by the posture generator, the whole trajectory might not be.
+%Interval analysis methods can be leveraged to ensure the satisfaction of constraints over the whole duration of a motion, as proposed in~\cite{lengagne2011planning}.
 
 In many planning approaches~\cite{kuffner2005motion, chestnutt2007navigation, hauser:ijrr:2008, kolter2008control, bouyarmane:icra:2011} the planning problem is decomposed in two stages, first the sets of contacts and associated postures are planned and then the motions to go from one set to another are computed.
 Those two stages are loosely coupled, which can result in suboptimal use of the contacts available.
-\cite{mordatch:acm:2012} presents a different approach to contact planning where some additional terms and variables are added to the optimization problem to decide whether a contact pair should be active(and bear forces) at any given time during the motion.
+\cite{mordatch:acm:2012} presents a different approach to contact planning where some additional terms and variables are added to the optimization problem to decide whether a contact pair should be active (and bear forces) at any given time during the motion.
 The contact sets, as well as the postures associated are discovered along with the entire movement's trajectories by using contact invariant optimization.
 This allows exploiting any synergies that might exist between the contact events and the motion trajectory.
 
-In~\cite{liu:acm:2012}, posture generation is used to find the optimal posture and position of contacts to optimally realize a manipulation task along a path while satisfying geometric and kinematic constraints as well as force and torque constraint.
+In~\cite{liu:acm:2012}, posture generation is used to find the optimal posture and position of contacts to optimally realize a manipulation task along a path while satisfying geometric and kinematic constraints as well as force and torque constraints.
 The task is defined as a path and forces to follow with an end effector.
 Instead of finding a sequence of unrelated postures along the path, all the postures are found by solving a single optimization problem in which successive postures are coupled by constraints to ensure that the foot positions remain constant during the task, even though the rest of the body can move.
 This approach allows the robot or virtual character to apply manipulation forces as strongly as possible while avoiding foot slippage.
 It also allows taking external perturbations into account to generate more robust postures.
 
-A different utilization of posture generation was presented in~\cite{stasse:humanoids:2007}, that deals with the problem of object reconstruction.
+A different utilization of the posture generation was presented in~\cite{stasse:humanoids:2007}, that deals with the problem of object reconstruction.
 An object is presented to the robot in order to generate automatically its 3D model.
 To do so, the object is observed from several different angles with the camera that is mounted in the robot's head.
 The satisfactory postures of the robot to complete this task are obtained by solving a posture generation problem to which a set of constraints defining the direction in which the robot should look and a minimum distance from the object are added.
 In that work, the observation directions are predefined,~\cite{foissotte:humanoids:2008} presents an approach where the choice of the best observation direction is left to the posture generator.
-The representation of the object is iteratively carved into a block of 3D voxels, each new point of view chosen to allow to carve it a little more precisely.
+The representation of the object is iteratively carved into a block of 3D voxels, each new point-of-view chosen to allow to carve it a little more precisely.
 It uses a modified cost function to evaluate the amount of information on the object that a given point of view can provide.
 The posture of the robot that optimizes that cost function is then found by the posture generator under the classical constraints of stability, collision avoidance, and other robot's limitations.
 
