@@ -32,7 +32,7 @@ Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it a
   \midrule
   $\phi_x(\mathbf{z})$ & $\mathbf{x} + \mathbf{z}$ \\
   \midrule
-  $\partial \phi_x(0)$ & $\mathbb{I}_n$ \\
+  $\partial \phi_x(0)$ & $\mathbf{1}_n$ \\
   \bottomrule
 \end{tabular}
 \quad
@@ -40,7 +40,7 @@ Since $\mathbb{R}^n$ is a Euclidean manifold, the operations that we use on it a
   \toprule
   $\zeta(x,y)$ & $\mathbf{y} - \mathbf{x}$ \\
   \midrule
-  $\frac{\partial \zeta_x}{\partial y}(x)$ & $\mathbb{I}_n$ \\
+  $\frac{\partial \zeta_x}{\partial y}(x)$ & $\mathbf{1}_n$ \\
   \midrule
   $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{v}$ \\
   \midrule
@@ -96,7 +96,7 @@ And its inverse:
 
 The exponential map is known as the Rodrigues formula:
 \begin{equation}
-  \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbb{I}_3 +
+  \forall \mathbf{v}\in\mathbb{R}^3,\ \exp(\mathbf{v}) = \mathbf{1}_3 +
   \frac{\sin \|\mathbf{v}\|}{\|\mathbf{v}\|} \hat{\mathbf{v}} +
   \frac{1-\cos \|\mathbf{v}\|}{\|\mathbf{v}\|^2} \hat{\mathbf{v}}^2
 \end{equation}
@@ -306,7 +306,7 @@ And the derivation of the logarithm operation writes as:
   \end{pmatrix} &
   \begin{pmatrix}
     \\
-    f\mathbb{I}_3 + g\mathbf{q_{vec}}\mathbf{q_{vec}}^T\\
+    f\mathbf{1}_3 + g\mathbf{q_{vec}}\mathbf{q_{vec}}^T\\
     \\
   \end{pmatrix}
   \end{bmatrix}
@@ -392,7 +392,7 @@ The pseudo-logarithm operation is the following:
 The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $T_y\mathcal{M}$ with $y = \phi_x(\mathbf{v})$, corresponds to rotating $\mathbf{v}$ by the rotation that transforms $x$ into $y$:
 \begin{align}
   &\mathbf{y} = \phi_x(\mathbf{z}) \\
-  &R = \mathbb{I}_3 + \widehat{\mathbf{x} \wedge \mathbf{y}} + \frac{{\widehat{\mathbf{x} \wedge \mathbf{y} } }^2}{1+\mathbf{x}\cdot\mathbf{y}} \\
+  &R = \mathbf{1}_3 + \widehat{\mathbf{x} \wedge \mathbf{y}} + \frac{{\widehat{\mathbf{x} \wedge \mathbf{y} } }^2}{1+\mathbf{x}\cdot\mathbf{y}} \\
   &\mathcal{T}(x,\mathbf{z}, \mathbf{v}) = R\mathbf{v}
 \end{align}
 
@@ -411,7 +411,7 @@ The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $
   \midrule
   $\phi_x(\mathbf{z})$ & $\frac{\mathbf{x}+\mathbf{z}}{\|\mathbf{x}+\mathbf{z}\|}$ \\
   \midrule
-  $\partial \phi_x(0)$ & $\mathbb{I}_3 - \mathbf{x}\cdot\mathbf{x}^T$ \\
+  $\partial \phi_x(0)$ & $\mathbf{1}_3 - \mathbf{x}\cdot\mathbf{x}^T$ \\
   \bottomrule
 \end{tabular}
 \quad
@@ -419,9 +419,9 @@ The vector transport operation of vector $\mathbf{v}$ from $T_x\mathcal{M}$ to $
   \toprule
   $\zeta(x,y)$ & $\mathbf{y} - (\mathbf{x} \cdot \mathbf{y}) \mathbf{x}$ \\
   \midrule
-  $\frac{\partial \zeta_x(x)}{\partial y}$ & $\mathbb{I}_3 -\mathbf{x}\cdot\mathbf{x}^T$ \\
+  $\frac{\partial \zeta_x(x)}{\partial y}$ & $\mathbf{1}_3 -\mathbf{x}\cdot\mathbf{x}^T$ \\
   \midrule
-  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbb{I}_3 + \widehat{\mathbf{x} \wedge \phi_x(\mathbf{z})} + \frac{{\widehat{\mathbf{x} \wedge \phi_x(\mathbf{z})}}^2}{1+\mathbf{x}\cdot\phi_x(\mathbf{z})}$ \\
+  $\mathcal{T}(x,\mathbf{z}, \mathbf{v})$ & $\mathbf{1}_3 + \widehat{\mathbf{x} \wedge \phi_x(\mathbf{z})} + \frac{{\widehat{\mathbf{x} \wedge \phi_x(\mathbf{z})}}^2}{1+\mathbf{x}\cdot\phi_x(\mathbf{z})}$ \\
   \midrule
   $\pi_\mathcal{M}(\mathbf{x})$ & $\frac{\mathbf{x}}{\|\mathbf{x}\|}$ \\
   \midrule

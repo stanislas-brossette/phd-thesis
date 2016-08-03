@@ -264,7 +264,7 @@ Thus, an ellipse is inside of a convex polygon if it lies entirely in the corres
 Having the ellipse be included in the intersection of two polygons is equivalent to having it included in both polygons:
 \begin{equation}
 \mathcal{E} \subset P_1 \cap P_2 \ \Longleftrightarrow \
-\mathcal{E} \subset P_1 \ \ \wedge \ \  \mathcal{E} \subset P_2
+\mathcal{E} \subset P_1 \ \ \text{AND} \ \  \mathcal{E} \subset P_2
 \end{equation}
 Even if the number of edges of $P_1 \cap P_2$ can change, the numbers of edges of $P_1$ and $P_2$ respectively are fixed.
 %\begin{wrapfigure}{r}{0.4\columnwidth}
@@ -375,8 +375,7 @@ Each non-inclusive geometrical contact adds five variables to the optimization v
 One constraint of ellipse inclusion (as described above) is added to the problem for each edge of the polygons.
 The parameters $r_x$ and $r_y$ are given lower positive bounds to ensure that the ellipse is not empty.
 The existence of a contact between $S_1$ and $S_2$ is thus transformed into the existence of $r_x$ and $r_y$ respecting their bounds.
-In summary, this kind of constraint adds 5 variables and $card(P_1)+card(P_2)$ constraints to the optimization problem, while the `usual' inclusion constraint adds 0 variable and $card(P_1)card(P_2)$ constraints.
-We denote $card(P)$ the number of edges of polygon $P$.
+In summary, this kind of constraint adds 5 variables and $card(P_1)+card(P_2)$ constraints to the optimization problem (where $card(P)$ denotes the number of edges of polygon $P$), while the `usual' inclusion constraint adds 0 variable and $card(P_1)card(P_2)$ constraints.
 The existence of the contact can alternatively be enforced by imposing a minimum area for the ellipse.
 
 
@@ -1067,7 +1066,7 @@ With this formulation and the additional lifted variables $w_i,\ i\in[1,\ldots, 
 \end{equation}
 
 This modified formulation can be used for any function of our optimization problem to reduce the complexity of individual equations at the cost of adding extra variables and constraints.
-By reducing the complexity of the functions, we ought to improve the quality of their quadratic approximations, which should lead to better convergence properties of the Newton scheme.
+By reducing the complexity of the functions, which often comes down to reducing their polynomial degree, we ought to improve the quality of their quadratic approximations, which should lead to better convergence properties of the Newton scheme.
 
 %The reason for expecting this approach to yield good results is that during the optimization process, at each step, a quadratic approximation of the function $F$ is used to compute the next iterate.
 %If $F$ is a complicated function, the quadratic approximation may be quite far from $F$ and simpler functions may have better quadratic approximations, which should lead to better convergence properties of the Newton scheme.

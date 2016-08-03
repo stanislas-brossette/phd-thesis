@@ -180,8 +180,8 @@ For example, the task of making contact between a body (link) of the robot and a
 In addition to satisfying the tasks $T_i$, the solution configuration to our problem must describe a viable posture of the robotic system, in the sense that it ensures its integrity.
 Which translates into the following list of constraints.
 It must respect the joint limits of the robot~\eqref{subeq:bounds}, as well as its torque limits~\eqref{subeq:tau}.
-Equation~\eqref{subeq:autocoll} translates the auto-collision avoidance constraint between a pair of bodies $\{r_i, r_j\}$ given by $\mathcal{I}_\text{auto}$ where $d$ is the minimal distance between two bodies.
-Equation~\eqref{subeq:coll} denotes the collision avoidance constraint between a robot body $r_i$ and an object of the environment $O_k$ defined in $\mathcal{I}_\text{coll}$.
+Equation~\eqref{subeq:autocoll} translates the auto-collision avoidance constraint between a pair of bodies $\{r_i, r_j\}$ given by a set $\mathcal{I}_\text{auto}$ where $d$ is the minimal distance between two bodies.
+Equation~\eqref{subeq:coll} denotes the collision avoidance constraint between a robot body $r_i$ and an object of the environment $O_k$ defined in a set $\mathcal{I}_\text{coll}$.
 $\epsilon_{ij}$ and $\epsilon_{ik}$ denote the smallest acceptable distance for their respective constraints.
 The stability of the robot is ensured by the respect of equation~\eqref{subeq:stab}, which is the Euler-Newton equation(or a simplification of it).
 To avoid slippage of the contacts, the contact forces must remain in the Coulomb friction cones, which is enforced by equation~\eqref{subeq:friction}.

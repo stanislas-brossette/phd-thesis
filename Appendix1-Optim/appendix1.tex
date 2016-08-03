@@ -7,25 +7,25 @@
 \chapter{Numerical Optimization: Introduction}
 \label{chapter:optimization}
 
-\nomenclature[x-R]{$\mathbb{R}$}{Real space}
-\nomenclature[x-R+]{$\mathbb{R}_\geq0$}{The set of positive Reals}
-\nomenclature[x-S]{$\mathit{S}$}{Variable space}
-\nomenclature[x-M]{$\mathcal{M}$}{A Manifold}
-\nomenclature[x-T]{$T_x\mathcal{M}$}{The tangent space of manifold $\mathcal{M}$ at point x}
-\nomenclature[a-F]{$F$}{The set of linearized feasible directions}
-\nomenclature[a-f]{$f$}{Objective function}
-\nomenclature[a-c]{$c_i$}{Constraint function}
-\nomenclature[a-x]{$x$}{Optimization variable}
-\nomenclature[a-xstar]{$x^*$}{Solution of the optimization problem}
-\nomenclature[a-E]{${E}$}{Set of index for which constraints are equality constraints}
-\nomenclature[a-I]{${I}$}{Set of index for which constraints are inequality constraints}
-\nomenclature[x-L]{$\mathcal{L}(x,\lambda)$}{Lagrangian function of the optimization problem}
-\nomenclature[G-o]{$\Omega$}{Feasible set}
-\nomenclature[z-st]{s.t.}{subject to}
-\nomenclature[z-KKT]{KKT}{Karush-Kuhn-Tucker first order optimality conditions}
-\nomenclature[z-LICQ]{LICQ}{Linear Independence Constraints' Qualification}
-\nomenclature[z-QP]{QP}{Quadratic Programming}
-\nomenclature[z-IQP]{IQP}{Inequality constrained Quadratic Programming}
+%\nomenclature[x-R]{$\mathbb{R}$}{Real space}
+%\nomenclature[x-R+]{$\mathbb{R}_\geq0$}{The set of positive Reals}
+%\nomenclature[x-S]{$\mathit{S}$}{Variable space}
+%\nomenclature[x-M]{$\mathcal{M}$}{A Manifold}
+%\nomenclature[x-T]{$T_x\mathcal{M}$}{The tangent space of manifold $\mathcal{M}$ at point x}
+%\nomenclature[a-F]{$F$}{The set of linearized feasible directions}
+%\nomenclature[a-f]{$f$}{Objective function}
+%\nomenclature[a-c]{$c_i$}{Constraint function}
+%\nomenclature[a-x]{$x$}{Optimization variable}
+%\nomenclature[a-xstar]{$x^*$}{Solution of the optimization problem}
+%\nomenclature[a-E]{${E}$}{Set of index for which constraints are equality constraints}
+%\nomenclature[a-I]{${I}$}{Set of index for which constraints are inequality constraints}
+%\nomenclature[x-L]{$\mathcal{L}(x,\lambda)$}{Lagrangian function of the optimization problem}
+%\nomenclature[G-o]{$\Omega$}{Feasible set}
+%\nomenclature[z-st]{s.t.}{subject to}
+%\nomenclature[z-KKT]{KKT}{Karush-Kuhn-Tucker first order optimality conditions}
+%\nomenclature[z-LICQ]{LICQ}{Linear Independence Constraints' Qualification}
+%\nomenclature[z-QP]{QP}{Quadratic Programming}
+%\nomenclature[z-IQP]{IQP}{Inequality constrained Quadratic Programming}
 
 \graphicspath{{Appendix1-Optim/Figs/}}
 
@@ -841,7 +841,7 @@ At each step, the modified problem writes as:
 \begin{equation}
   \begin{array}{ll}
     \minimize\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2}z^T\nabla_{xx}^2Hz + \sum_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
-    \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in \mathcal{F} \\
+    \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)=0,\ i\in E \\
                        & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i\in I\\
                        & |z|<\rho_k
   \end{array}
@@ -851,7 +851,7 @@ At each step, the modified problem writes as:
 Once a solution $z$ of~\ref{approx_QP_TR} is found, the potential next iterate $x_{k+1} = x_k + z$ is checked against the acceptance criterion (should it be a merit function or a filter or other).
 If it is accepted, that means that our current model is good, we move to the next step with $x_{k+1} \leftarrow x_k + z$, and the size of the trust region can be augmented based on some heuristics.
 Otherwise, the iterate is refused, the model is less good than expected, the size of the trust region is reduced based on some heuristics (e.g. $\rho_{k+1}\leftarrow\rho_k /2$) and the problem~\ref{approx_QP_TR} is solved again with the new value of $\rho_{k+1}$.
-This is repeated until a satisfying point is found, or until an infeasible problem is found.
+This is repeated until a satisfying point is found, or until an unfeasible problem is found.
 
 \begin{figure}
   \centering
@@ -860,21 +860,21 @@ This is repeated until a satisfying point is found, or until an infeasible probl
 \label{fig:TR_incompatible}
 \end{figure}
 
-With this approach, a problem that often arises is the generation of infeasible problems.
+With this approach, a problem that often arises is the generation of unfeasible problems.
 The reduction of the size of the trust region can lead to an incompatible set of constraints.
 For example, with a single constraint, as illustrated in figure~\ref{fig:TR_incompatible}.
 The linearisation of the constraint is represented by the green line, and the trust region by the black rectangle.
 If $\rho$ is too small, there is no intersection between the linearization of the constraint and the trust region.
-The QP is then infeasible.
+The QP is then unfeasible.
 An obvious solution for that would be to increase the size of the trust region, but that goes against the core idea of the trust region strategy and it would harm the convergence properties of the algorithm.
 A more appropriate solution is to enter a restoration phase when that event occurs.
-The purpose of a restoration phase is to reduce the infeasibility of a problem by relaxing infeasible constraints without regards for the cost function.
+The purpose of a restoration phase is to reduce the unfeasibility of a problem by relaxing unfeasible constraints without regards for the cost function.
 The restoration phase is exited once a feasible point is found, and the course of the SQP is continued from that point.
 
 \subsection{Restoration phase}
 \label{sub:restoration_phase}
 
-As we stated previously, a restoration phase is entered when an infeasible problem is found by the trust region strategy.
+As we stated previously, a restoration phase is entered when an unfeasible problem is found by the trust region strategy.
 The goal of the restoration is to find a solution to the following problem:
 
 \begin{equation}
@@ -895,7 +895,7 @@ Otherwise, the trust region is reduced and the problem is solved again.
 The acceptance criterion must be tailored for the restoration problem, meaning that it is based on the values of the cost function of the restoration problem and of its constraints.
 The big difference comes from the way the quadratic problem is constructed during this phase.
 
-During a restoration phase step, the first action is to estimate the sets $\mathcal{F}$ and $\mathcal{I}$ of feasible  and infeasible constraints.
+During a restoration phase step, the first action is to estimate the sets $\mathcal{F}$ and $\mathcal{U}$ of feasible  and unfeasible constraints.
 This is done by solving the linearization of problem~\Eqref{eq:resto_NL} as presented in~\Eqref{eq:FP}.
 Each equality constraint is cut in 2 inequality constraints.
 
@@ -912,16 +912,16 @@ Each equality constraint is cut in 2 inequality constraints.
 \label{eq:FP}
 \end{equation}
 
-The resolution of that FP gives the lists $\mathcal{F}$ and $\mathcal{I}$.
-If the list of infeasible constraints is empty, the problem is feasible, so the restoration phase is exited to return to the main SQP algorithm.
+The resolution of that FP gives the lists $\mathcal{F}$ and $\mathcal{U}$.
+If the list of unfeasible constraints is empty, the problem is feasible, so the restoration phase is exited to return to the main SQP algorithm.
 The restoration QP to solve is built based on those lists.
-The infeasible constraints are removed from the constraint set and the expression of their violation is added to the cost function, while the feasible constraints remain in the constraint list.
+The unfeasible constraints are removed from the constraint set and the expression of their violation is added to the cost function, while the feasible constraints remain in the constraint list.
 This results in a problem like~\ref{rest_SQP} to solve.
 (Note that the indexes of the constraints are modified to account for the duplication of the equality constraints)
 
 \begin{equation}
   \begin{array}{ll}
-    \minimize\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2} z^T Hz - \sum\limits_{i\in\mathcal{I}}{\nabla c_i(x_k)}^T z \\
+    \minimize\limits_{z\in \mathbb{R}^n}{} & \frac{1}{2} z^T Hz - \sum\limits_{i\in\mathcal{U}}{\nabla c_i(x_k)}^T z \\
     \text{subject to } & {\nabla c_i(x_k)}^T z+c_i(x_k)\geq 0,\ i \in \mathcal{F} \\
                        & |z|<\rho_k
   \end{array}

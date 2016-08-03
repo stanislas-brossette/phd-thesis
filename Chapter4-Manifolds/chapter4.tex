@@ -290,16 +290,16 @@ Let $R_x$ denote the restriction of $R$ to $T_x\mathcal{M}$.
   \item $R_x(0_x) = x$, where $0_x$ denotes the zero element of $T_x\mathcal{M}$.
   \item With the canonical identification $T_{0_x}T_x\mathcal{M}\approx T_x\mathcal{M}$, $R_x$ satisfies
   \begin{equation}
-    DR_x(0_x) = \mathbb{I}_{T_x\mathcal{M}}
+    DR_x(0_x) = \mathbf{1}_{T_x\mathcal{M}}
   \end{equation}
-  Where $DR_x(0_x)$ denotes the gradient of $R_x$ at $0_x$ and $\mathbb{I}_{T_x\mathcal{M}}$ denotes the identity function on $T_x\mathcal{M}$.
+  Where $DR_x(0_x)$ denotes the gradient of $R_x$ at $0_x$ and $\mathbf{1}_{T_x\mathcal{M}}$ denotes the identity function on $T_x\mathcal{M}$.
 \end{enumerate}
 \end{definition}
 
 This signifies that for any ${\bf z}$, the curve $t \mapsto \varphi_{x_i}(t{\bf z})$ is tangent to ${\bf z}$, see Fig.~\ref{fig:phimap}, so that the update $x_{i+1} = \varphi_{x_i}({\bf z_i})$ is made in the direction given by ${\bf z_i}$.
 
 The exponential map is a good theoretical candidate, but it is often impractical or expensive to compute.
-Depending on the manifold, cheaper functions can be chosen.
+Depending on the manifold, cheaper functions can be chosen such that $\varphi$ is a retractation.
 
 With the iterative formulation approach described above, we do not have any parametrization issue, do not need additional constraints, and have the minimum number of optimization parameters.
 We can use the function $\psi:\mathcal{M} \rightarrow \psi(\mathcal{M})$, which is surjective, to represent the $x_i$ and keep track of them in a global way.
@@ -465,7 +465,7 @@ The projection operator on $\mathcal{M}$ projects an element of $\mathbb{E}$ ont
 To summarize, for each elementary manifold $\mathcal{M}$, we need to implement the following elements:
 \begin{itemize}
   \item Tangent space at point $x$, $T_x\mathcal{M}$
-  \item Embedding spaces $\mathbb{E}$ and $T_x\mathcal{M}$
+  \item Embedding spaces $\mathbb{E}$ and $T_x\mathbb{E}$
   \item Retractation operator $\phi:\ (x,\mathbf{z}) \rightarrow \phi_x(\mathbf{z})$
   \item Gradient of the retractation operator at zero $\partial \phi(x):\rightarrow \frac{\partial \phi_x}{\partial \mathbf{z}}(0)$
   \item Pseudo-logarithm operator $\zeta:\ (x,y) \rightarrow \zeta_x(y)$

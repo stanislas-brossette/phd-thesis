@@ -7,17 +7,17 @@
 \chapter{Posture Generation: Problem Formulation}
 \label{cha:posture_generation_problem_formulation}
 
-\nomenclature[z-PG]{PG}{Posture Generation}
-\nomenclature[z-IK]{IK}{Inverse Kinematics}
-\nomenclature[z-DoF]{DoF}{degrees of freedom}
-\nomenclature[z-w.r.t]{w.r.t}{with respect to}
-\nomenclature[x-I]{$\mathbb{I}_n$}{Matrix identity of dimension $n$}
-\nomenclature[x-w]{$\wedge$}{cross product}
-\nomenclature[a-F]{F}{a frame}
-\nomenclature[a-W]{W}{the world frame}
-\nomenclature[a-w]{w}{a wrench or a force}
-\nomenclature[a-f]{f}{a force resultant}
-\nomenclature[a-m]{m}{a force moment}
+%\nomenclature[z-PG]{PG}{Posture Generation}
+%\nomenclature[z-IK]{IK}{Inverse Kinematics}
+%\nomenclature[z-DoF]{DoF}{degrees of freedom}
+%\nomenclature[z-w.r.t]{w.r.t}{with respect to}
+%\nomenclature[x-I]{$\mathbb{I}_n$}{Matrix identity of dimension $n$}
+%\nomenclature[x-w]{$\wedge$}{cross product}
+%\nomenclature[a-F]{F}{a frame}
+%\nomenclature[a-W]{W}{the world frame}
+%\nomenclature[a-w]{w}{a wrench or a force}
+%\nomenclature[a-f]{f}{a force resultant}
+%\nomenclature[a-m]{m}{a force moment}
 
 
 \graphicspath{{Chapter2-PG/Figs/}}
@@ -155,10 +155,10 @@ Its inverse is:
 
 %Each joint $J_i$ is defined in the reference frame of its predecessor body by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ from the base of the body to the base of the joint.
 Each joint $J_i$ is defined by a static transformation $X^x_i = \{\mathbf{R}^x_i, \mathbf{t}^x_i\}$ between the reference frame of its predecessor body and its own reference frame.
-Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $\mathbf{S}_i$.
-Each column of $\mathbf{S}_i$ described a degree of freedom of $J_i$ its upper part for the rotations and lower for translations (see Section~\ref{sec:joints_formulations}).
+Each joint $J_i$ is associated with a motion subspace which representation matrix is denoted $S_i$.
+Each column of $S_i$ described a degree of freedom of $J_i$ its upper part for the rotations and lower for translations (see Section~\ref{sec:joints_formulations}).
 \begin{equation}
-  \mathbf{S}_i =
+  S_i =
   \begin{bmatrix}
     S^R_{i,0} & \cdots &
     S^R_{i,j} & \cdots &
@@ -169,11 +169,11 @@ Each column of $\mathbf{S}_i$ described a degree of freedom of $J_i$ its upper p
   \end{bmatrix}
 \end{equation}
 
-For a given joint configuration $q$, the transformation due to the joint $J_i$ current configuration from its reference frame to the reference frame of its successor body is denoted \\$X^J_i (q) = \{\mathbf{R}^J_i (q), \mathbf{t}^J_i (q)\}$.
+For a given joint configuration $\mathbf{q}$, the transformation due to the joint $J_i$ current configuration from its reference frame to the reference frame of its successor body is denoted \\$X^J_i (\mathbf{q}) = \{\mathbf{R}^J_i (\mathbf{q}), \mathbf{t}^J_i (\mathbf{q})\}$.
 
-The transformation between $B_{\lambda(i)}$ and $B_i$ is denoted $X^{PtS}_i (q) = \{\mathbf{R}^{PtS}_i, \mathbf{t}^{PtS}_i\}$ (PtS stands for `Parent to Son') can then be computed as:
+The transformation between $B_{\lambda(i)}$ and $B_i$ is denoted $X^{PtS}_i (\mathbf{q}) = \{\mathbf{R}^{PtS}_i, \mathbf{t}^{PtS}_i\}$ (PtS stands for `Parent to Son') can then be computed as:
 \begin{equation}
-  {X}^{PtS}_i (q) = {}^{i}X_{\lambda (i)} (q) = X^J_i (q) X^x_i
+  {X}^{PtS}_i (\mathbf{q}) = {}^{i}X_{\lambda (i)} (\mathbf{q}) = X^J_i (\mathbf{q}) X^x_i
   \label{eq:PtS}
 \end{equation}
 
@@ -192,12 +192,12 @@ It can easily be computed by adding iteratively the parent of the current body:
 \end{algorithmic}
 \end{algorithm}
 
-The transformation from the World base to $B_i$ is denoted \\ ${}^i X_0 (q) = \{{}^i \mathbf{R}_0 (q), {}^i \mathbf{t}_0 (q)\}$.
-The formula~\Eqref{eq:PtS} can be used iteratively on all bodies of the robot to obtain the expression of ${}^i X_0 (q)$.
+The transformation from the World base to $B_i$ is denoted \\ ${}^i X_0 (\mathbf{q}) = \{{}^i \mathbf{R}_0 (\mathbf{q}), {}^i \mathbf{t}_0 (\mathbf{q})\}$.
+The formula~\Eqref{eq:PtS} can be used iteratively on all bodies of the robot to obtain the expression of ${}^i X_0 (\mathbf{q})$.
 
 We obtain the full expression of ${}^i X_0$ as:
 \begin{equation}
-  {}^i X_0 (q) = \prod_{j\in\kappa (i)}X^J_j (q) X^x_j = \prod_{j\in\kappa (i)}\ {}^j X_{\lambda (j)}
+  {}^i X_0 (\mathbf{q}) = \prod_{j\in\kappa (i)}X^J_j (\mathbf{q}) X^x_j = \prod_{j\in\kappa (i)}\ {}^j X_{\lambda (j)}
   = {}^i X_{\kappa (1)}\ ^{\kappa (1)}X_{\kappa (2)} \dots ^{\kappa (\text{end}-1)}X_{W}
 \end{equation}
 
@@ -215,9 +215,9 @@ Which can be computed recursively by a Forward Kinematics algorithm:
 \end{algorithmic}
 \end{algorithm}
 
-In the following section, we provide some detailed description of how to compute $X_J (q)$ for a variety of useful joints.
-Using the joint descriptions and the Forward Kinematics algorithm, we are able to explicit a relation between $q$ the joint parameters of the robot and the 3D position and orientation of  any geometric quantity defined in the reference frame of a body of the robot.
-Given a transformation ${}^p X_i$ defined in the frame of $B_i$, its value in the world frame is given by ${}^p X_0 (q) = {}^p X_i\ {}^i X_0 (q)$
+In the following section, we provide some detailed description of how to compute $X_J (\mathbf{q})$ for a variety of useful joints.
+Using the joint descriptions and the Forward Kinematics algorithm, we are able to explicit a relation between $\mathbf{q}$ the joint parameters of the robot and the 3D position and orientation of  any geometric quantity defined in the reference frame of a body of the robot.
+Given a transformation ${}^p X_i$ defined in the frame of $B_i$, its value in the world frame is given by ${}^p X_0 (\mathbf{q}) = {}^p X_i\ {}^i X_0 (\mathbf{q})$
 
 
 
@@ -359,7 +359,7 @@ The most common ones are the set of unit quaternion embedded in $\mathbb{R}^4$ a
 %To avoid singularities, one must use a higher dimension parametrization, such as the most common $SO(3)$ representation in robotics that are the unit quaternions and the rotation matrices.
 %The unit quaternions space is the subset of $\mathbb{R}^4$ where all elements have unit norm.
 With the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters $q = [q_w, q_x, q_y, q_z]$, and it is necessary to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
-Similarly, if a variable is parameterized by a rotation matrix, then the matrix $M$ representing it has 9 parameters and M must be orthogonal and have determinant 1: $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
+Similarly, if a variable is parameterized by a rotation matrix, then the matrix $M$ representing it has 9 parameters and M must be orthogonal and have determinant 1: $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbf{1}_3\  \&\ \det (M) = 1\}$.
 Similar issues can be found with the parameterization of other non-Euclidean manifolds, like $S^2$ for example.
 
 A quaternion $q = [q_w, q_x, q_y, q_z]$ is a unit quaternion iff $q_w^2+q_x^2+q_y^2+q_z^2 = 1$.
@@ -419,7 +419,7 @@ Given a parameter set $q = \{ q_w, q_x, q_y, q_z, t_x, t_y, t_z\}$, we get the f
   \midrule
   Spherical
   &
-  $\mathbb{I}_6$
+  $\mathbf{1}_6$
   &
   $2 \begin{bmatrix}
     \frac{1}{2} - {q_y}^2 - {q_z}^2 &	q_x q_y - q_z q_w &	q_x q_z + q_y q_w \\
@@ -889,16 +889,16 @@ We denote $\mathbf{I}_i$ the inertia matrix of body $i$.
   \For{$i = n_J-1:0$}
   \State$\tau_i = {f^G_i}^T S_i$
   \If{$pred(i) \neq -1$}
-  \State$f^G_{pred(i)} += {\mathbf{X}^{PtS}_i(q)}^{-*} f^G_i$
+  \State$f^G_{pred(i)} += {\mathbf{X}^{PtS}_i(\mathbf{q})}^{-*} f^G_i$
   \EndIf{}
   \EndFor{}
 \end{algorithmic}
 \end{algorithm}
 
-We can write the torques as a function of the joint parameters and the external forces $\tau(q,f)$.
+We can write the torques as a function of the joint parameters and the external forces $\tau(\mathbf{q},\mathbf{f})$.
 The torque limit constraint writes as:
 \begin{equation}
-  \boxed{\tau^- \leq \tau(q,f) \leq \tau^+}
+  \boxed{\tau^- \leq \tau(\mathbf{q},\mathbf{f}) \leq \tau^+}
 \end{equation}
 
 We will detail the derivation of this constraint in Section~\ref{sec:torque_derivation}.
@@ -1011,7 +1011,7 @@ The cost function helps to choose the `best' candidate solution.
 Various types of cost functions can be chosen, for example, we can minimize the distance to a reference posture $q_R$:
 
 \begin{equation*}
-  f_\text{posture}(q) = {\|q-q_R\|}^2
+  f_\text{posture}(\mathbf{q}) = {\|\mathbf{q}-q_R\|}^2
 \end{equation*}
 
 The effect of that type of cost function is illustrated in~\Figref{fig:cost}.
@@ -1029,20 +1029,20 @@ The only difference is that the right one minimizes the distance to a reference 
 
 We can also want to minimize the sum of norms of contact forces:
 \begin{equation*}
-  f_\text{forces}(f) = \sum\limits_i {\|f_i(f)\|}^2
+  f_\text{forces}(\mathbf{f}) = \sum\limits_i {\|f_i(\mathbf{f})\|}^2
 \end{equation*}
 or the torques in the robot's joints:
 \begin{equation*}
-  f_\text{torques}(q,f) = \sum\limits_i {\|\tau_i(q,f)\|}^2
+  f_\text{torques}(\mathbf{q},\mathbf{f}) = \sum\limits_i {\|\tau_i(\mathbf{q},\mathbf{f})\|}^2
 \end{equation*}
 Some more custom cost functions can also be considered, for example, we may want a point $P_i$ on body $B_i$ with to be as far as possible in a direction $\vec{d}$
 \begin{equation*}
-  f_\text{point} (q) = -{\overrightarrow{O_0 P_i}}\cdot{\vec{d}}
+  f_\text{point} (\mathbf{q}) = -{\overrightarrow{O_0 P_i}}\cdot{\vec{d}}
 \end{equation*}
 
 Any positively weighted combination of cost function can be used, in which case it is important to choose the weights $p_i$ carefully to scale all the costs so that they all can influence the result and none is completely dominated by another.
 \begin{equation}
-  f_\text{cost}(q,f) = \sum\limits_i{p_i f_i(q,f)} = p_0 f_\text{posture}(q) + p_1 f_\text{forces}(f) + p_2 f_\text{torques}(q,f) + \cdots
+  f_\text{cost}(\mathbf{q},\mathbf{f}) = \sum\limits_i{p_i f_i(\mathbf{q},\mathbf{f})} = p_0 f_\text{posture}(\mathbf{q}) + p_1 f_\text{forces}(\mathbf{f}) + p_2 f_\text{torques}(\mathbf{q},\mathbf{f}) + \cdots
 \end{equation}
 
 
@@ -1056,21 +1056,21 @@ Any positively weighted combination of cost function can be used, in which case 
 
 In this section, we have seen how to formulate a robotics problem with several different tasks and objectives as an optimization problem.
 
-We denote $\mathcal{T}_i$ the additional tasks added to the problem, which is described by the set of equations $g_i(q,f) = 0$ and inequations $h_i(q,f) \geq 0$.
+We denote $\mathcal{T}_i$ the additional tasks added to the problem, which is described by the set of equations $g_i(\mathbf{q},\mathbf{f}) = 0$ and inequations $h_i(\mathbf{q},\mathbf{f}) \geq 0$.
 The contact tasks are included in those and the equations describing them must encompass the geometric contact constraint equation like~\Eqref{eq:coplanarity} as well as the unilaterality and friction equations~\Eqref{eq:unilateralContact} in the case of a unilateral contact.
 
 A typical robotics problem can be written as a combination of all those costs and constraints:
 \begin{align}
-\minimize_{q, f} & \quad f_\text{cost}(q,f) \nonumber\\
+\minimize_{\mathbf{q}, \mathbf{f}} & \quad f_\text{cost}(\mathbf{q},\mathbf{f}) \nonumber\\
 \text{s.t.}&
 \left\{
 \begin{array}{lr}
-q^- \le q \le q^+\\
-s(q,f) = 0 \\
-\tau^- \le \tau(f,q) \le \tau^+\\
-\forall \{B_i, B_j, \epsilon_{ij}\} \in Coll,\ d_{\{B_i, B_j\}}(q) > \epsilon_{ij}\\
-g_i(q,f) = 0\ \ \forall\mathcal{T}_i,\\
-h_i(q,f) \geq 0\ \ \forall\mathcal{T}_i.
+q^- \le \mathbf{q} \le q^+\\
+s(\mathbf{q},\mathbf{f}) = 0 \\
+\tau^- \le \tau(\mathbf{f},\mathbf{q}) \le \tau^+\\
+\forall \{B_i, B_j, \epsilon_{ij}\} \in Coll,\ d_{\{B_i, B_j\}}(\mathbf{q}) > \epsilon_{ij}\\
+g_i(\mathbf{q},\mathbf{f}) = 0\ \ \forall\mathcal{T}_i,\\
+h_i(\mathbf{q},\mathbf{f}) \geq 0\ \ \forall\mathcal{T}_i.
 \end{array}\right.
 \label{eq:PG}
 \end{align}
