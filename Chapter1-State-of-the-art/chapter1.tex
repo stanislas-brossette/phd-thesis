@@ -14,7 +14,7 @@ Posture generation can be viewed as, and is sometimes called, Generalized Invers
 The Inverse Kinematics~(IK) problem consists in finding the joint configuration for an articulated multibody system to complete a given set of tasks that are defined in the operational space. For example, by solving repeatedly the IK for a desired motion given in the Cartesian space, we can generate believable motions in the joint space.
 By definition, such a process is purely kinematics. But other constraints need dynamic or other physics-related knowledge such as the inertia or contact friction parameters.
 The IK problem has been widely studied and used in the fields of robotics, computer graphics and games, and animation.
-In few particular cases, for example with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found. For example, in ~\cite{asfour2003human} the redundancy in a robot arm is exploited to derive a closed-form formula for its IK. 
+In few particular cases, for example with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found. For example, in~\cite{asfour2003human} the redundancy in a robot arm is exploited to derive a closed-form formula for its IK.
 But for more complex cases, iterative methods are usually used.
 
 
@@ -29,7 +29,9 @@ It uses a second order tracking scheme to guarantee satisfactory tracking perfor
 
 Handling conflicting constraints in IK is a challenging problem to which \cite{baerlocher2004inverse} and \cite{sentis2005synthesis} propose solutions by enforcing a number of priority levels among constraints in their resolution schemes to generate whole-body control of complex articulated figures.
 
-Some stochastic approaches have been proposed in~\cite{courty2008inverse, hecker2008real}, with respectively a sequential Monte Carlo method and a particle filtering approach. They have the advantage to only use direct calculations and never require matrix inversions. They outperform particularly when solving problems with high numbers of degrees of freedom.
+Some stochastic approaches have been proposed in~\cite{courty2008inverse, hecker2008real}, with respectively a sequential Monte Carlo method and a particle filtering approach.
+They have the advantage to only use direct calculations and never require matrix inversions.
+They perform particularly well compared to other methods when solving problems with high numbers of degrees of freedom.
 
 In~\cite{AristidouFABRIK, Aristidou:2016_ExtFABRIK} the forward and backward reaching inverse kinematics (FABRIK) resolution method is introduced.
 It is based on a geometric iterative heuristic approach, where the bodies of a robot are moved iteratively and separately to reach a target with the end effector while maintaining the integrity of the robot's structure.
@@ -64,7 +66,8 @@ The constraints of contact, stability and collision are then computed on top of 
 And the problem is solved by the CFSQP solver~\cite{cfsqp:manual}.
 In~\cite{hauser:ijrr:2008}, a similar posture generation approach is used to find viable postures for different legged robots on varied terrains in the context of a Probabilistic RoadMap planning, which is a planning approach based on random sampling of the configuration space.
 %\cite{hauser:issr:2007} presents a different approach to multi-contact planning based on probabilistic roadmap and random sampling of the configuration space.
-In~\cite{bouyarmane2010static}, a generalization of the formulation of posture generation problems for systems of multiple robots and manipulated objects is proposed. In the latter method, the notion of contacts is generalized to bear forces or not and to have any orientation.
+In~\cite{bouyarmane2010static}, a generalization of the formulation of posture generation problems for systems of multiple robots and manipulated objects is proposed.
+In the latter method, the notion of contacts is generalized to bear forces or not and to have any orientation.
 This generic formulation enables the generation of postures with inter-robot contacts.
 The complete posture generation problem is then solved within a single nonlinear constrained optimization query, computing the contact forces and joint configuration at the same time, while ensuring the stability of all the `robotic agents', avoiding collision and respecting the robot's joint and torque limits.
 
@@ -79,11 +82,13 @@ Another way of planning a multi-contact scenario, which is actually often used w
 This type of approach is used when the plan to execute is complex and when a lot of fine tuning of the postures is required, as in~\cite{vaillant:autonomousrobots:2016}, where a sequence of postures allowing the HRP-2 robot to climb a vertical ladder is generated and tuned manually.
 Those postures are provided as input to a finite state machine that builds additional intermediary tasks and specific grasps procedures to be realized on the real robot by a multi-objective model-based QP controller.
 
-Instead of feeding the key postures directly to the controller and trusting that it will find a path to connect them, one can take an additional step and compute a dynamically viable trajectory between successive steps that the controller will then have to follow, as presented in~\cite{lengagne2013generation}.
-That allows to take advantage of the dynamic effects and produce motions with better performances in terms of completion time, energy consumption, or other criterions.
-%%AK>> Si tu as écris ce qui suit c'est que tu n'as visiblement rien compris au papier de Lengagne 2013 
-%Although the key postures are guaranteed to be viable by the posture generator, the whole trajectory might not be.
-%Interval analysis methods can be leveraged to ensure the satisfaction of constraints over the whole duration of a motion, as proposed in~\cite{lengagne2011planning}.
+Instead of feeding the key postures directly to the controller and trusting that it will find a path to connect them, one can take an additional step and compute a dynamically viable trajectory between successive steps that the controller will then have to follow.
+Classical methods generate satisfactory configurations on a discretized time-grid and then extrapolate the motion between configurations at successive time-grid points.
+This approach does not guarantee that the constraints are satisfied at every point of a continuous time interval, which is dangerous for the robot.
+Interval analysis methods can be leveraged to compute safe motions over continuous time intervals, as proposed in~\cite{lengagne2011planning}.
+This work was extended in~\cite{lengagne2013generation} to generate whole-body multi-contact dynamic motions.
+The constraints are transformed into a computation of extrema of time polynomials, which coefficients are function of the optimization variables, over each time interval.
+Generating full body dynamic motions allows to take advantage of the dynamic effects and to produce motions with better performances in terms of completion time, energy consumption, or other criterions.
 
 In many planning approaches~\cite{kuffner2005motion, chestnutt2007navigation, hauser:ijrr:2008, kolter2008control, bouyarmane:icra:2011} the planning problem is decomposed in two stages, first the sets of contacts and associated postures are planned and then the motions to go from one set to another are computed.
 Those two stages are loosely coupled, which can result in suboptimal use of the contacts available.
@@ -293,6 +298,6 @@ In Appendix~\ref{chapter:optimization}, we present some classical concepts of no
 %The SNOPT solver~\cite{gill2005snopt} was used in~\cite{dai2014whole} to plan dynamic whole-body trajectories.
 %Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver, the solver that we develop in this thesis.
 
-In this thesis, we used the off-the-shelf solvers IPOPT~\cite{wachter:mathprog:2006} in the beginning. At a later stage we developped our own nonlinear solver, called {\tt PGSolver}, and then use it.
+In this thesis, we used the off-the-shelf solver IPOPT~\cite{wachter:mathprog:2006} in the beginning. At a later stage we developped our own nonlinear solver, called {\tt PGSolver}, and then use it.
 From now on, we formulate and solve posture generation problems as nonlinear constrained optimization problem.
 And in the next chapter, we focus on formulating all the basic functions and algorithms used to describe robotics constraints and cost function in the formalism of nonlinear optimization.
