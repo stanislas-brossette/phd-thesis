@@ -121,21 +121,21 @@ This method is very slow, especially when the dimension of the problem is large.
 In order to design an efficient optimization algorithm, we will focus on methods using derivative information and will implement those derivatives' computations.
 The finite difference approach can be used to verify the correctness of the computed derivative.
 
-Nonlinear optimization is a wide topic that has been extensively studied in the past.
-One can find some excellent reference books about it, such as~\cite{nocedal:book:2006, bonnans:book:2003, boyd2004convex}.
+Nonlinear optimization is a well-established research field by its own and has been extensively studied in the past and nowadays.
+One can find some excellent reference books about optimization, such as~\cite{nocedal:book:2006, bonnans:book:2003, boyd2004convex}.
 
 Furthermore, several off-the-shelf solvers are available and have been widely used to solve robotics problems.
 The CFSQP solver~\cite{cfsqp:manual} was used in~\cite{escande:iros:2009} and~\cite{escande:ras:2013} where thousands of HRP-2 posture generation queries were made to explore the feasible space.
-The IPOPT solver~\cite{wachter:mathprog:2006} has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator had been extended to handle multi-robot problems and more complex and various contact models.
+The IPOPT solver~\cite{wachter:mathprog:2006} has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator has been extended to handle multi-robot problems and more complex and various contact models.
 The SNOPT solver~\cite{gill2005snopt} was used in~\cite{dai2014whole} to plan dynamic whole-body trajectories.
-Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver(the solver that we develop in this thesis).
+Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver (the solver that we develop in this thesis).
 
 Traditionally, optimization problems are solved over Euclidean spaces.
 When the need comes to find a solution to an optimization problem in a non-Euclidean space $\mathcal{M}$, the commonly used method is to represent the elements of $\mathcal{M}$ in a Euclidean manifold of higher dimension, and enforcing that solution of the optimization problem should lie on $\mathcal{M}$ by adding the necessary constraints to the problem.
 We will detail the drawbacks of such approaches in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}.
 Alternatively, there exists some method to run an optimization algorithm directly on a non-Euclidean manifold, as it is presented in great details in the book~\cite{absil:book:2008}.
 A non-Euclidean manifold, can be thought of as a space that is locally Euclidean, but not globally.
-For example, a sphere, if one looks in a small enough neighborhood, looks Euclidean, just like the surface of a giant sphere like the earth looks flat for a human being standing on it.
+For example, a sphere, if one examines a small-enough neighborhood, looks Euclidean, just like the surface of a giant sphere like the earth looks flat for a human being standing on it.
 Based on the fact that manifolds are locally Euclidean, the classic properties of distance, derivatives, and in general all the Euclidean geometry can be used locally.
 Based on that property, several optimization methods traditionally used on Euclidean manifolds have been extended to non-Euclidean manifolds.
 The gradient methods have been extended to manifolds in~\cite{luenberger1972gradient, gabay1982minimizing}.
@@ -147,7 +147,7 @@ The main idea to optimize on manifolds is that we use a local map between the ne
 Once the iterate has been incremented, the process is repeated with the map and tangent space associated with the new iterate.
 This comes down to re-parameterizing the problem around the current iterate at each iteration.
 
-In the field of robotics, we are only aware of the work of Schulman \emph{et al.}~\cite{Schulman2014}, where the authors explain the adaptation of their solver to work on $SE(3)$.
+In the field of robotics, we are only aware of the work of Schulman~\emph{et al.}~\cite{Schulman2014}, where the authors explain the adaptation of their solver to work on $SE(3)$.
 In the field of computer vision, and especially for solving pose estimation problems, optimization on manifolds is often used, e.g.~\cite{hertzberg2011, lu2000fast}.
 
 In this thesis, we develop a nonlinear solver on manifolds that can handle constraints, and we were largely inspired by the work of Fletcher concerning the notions of Sequential Quadratic Programming without a penalty method~\cite{Fletcher:ifip:2006, fletcher2010sequential, fletcher:mathprog:2000}, along with other optimization approaches that we adapted to work with manifolds.
@@ -170,7 +170,7 @@ Each task $T_i$ can be represented by a set of equality and inequality equations
     \end{aligned}
   \right.
 \end{equation}
-For example, the task of making contact between a body of the robot and a part of the environment can be represented in such a way.
+For example, the task of making contact between a body (link) of the robot and a part of the environment can be represented in such a way.
 
 In addition to satisfying the tasks $T_i$, the solution configuration to our problem must describe a viable posture of the robotic system, in the sense that it ensures its integrity.
 Which translates into the following list of constraints.
@@ -202,12 +202,12 @@ We illustrate those constraints in figure~\ref{fig:PG} and will explicit them in
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.7\textwidth]{PG.pdf}
-  \caption{HRP4 on a stack of cubes. The color of each box corresponds to the color of the constraint it depicts.}
+  \caption{The HRP-4 on a stack of cubes. The color of each box corresponds to the color of the constraint it depicts.}
 \label{fig:PG}
 \end{figure}
 
 In addition to satisfying the set of constraints $T_i$ while being viable, one can require the searched posture to be optimal in the sense of some cost function $f$.
-Defining a cost function can help the user control the result of the problem, by for example minimizing the distance to a reference posture or maximizing the contact force applied by one end-effector.
+Defining a cost function can help the user control the result of the problem; for example, by minimizing the distance to a reference posture or maximizing the contact force applied by one end-effector.
 In~\cite{escande2009} the cost function was used to guide the posture toward the end of a planning problem.
 A sum of different criterions can be used as cost function.
 The optimization problem that describes the posture generation problem becomes:
@@ -284,8 +284,7 @@ This type of problem is called a nonlinear constrained optimization problem and 
     \right.
   \end{array}
 \end{equation}
-
-Where $x$ is the optimization variable we want to find that minimizes the cost function $f(x)$ while satisfying the equality constraints $c_i(x) = 0,\ \forall i\in{E}$ and inequality constraints $c_i(x) \geq 0,\ \forall i\in{I}$.
+where $x$ is the optimization variable we want to find that minimizes the cost function $f(x)$ while satisfying the equality constraints $c_i(x) = 0,\ \forall i\in{E}$ and inequality constraints $c_i(x) \geq 0,\ \forall i\in{I}$.
 Such problems can be solved by a nonlinear optimization solver.
 In Appendix~\ref{chapter:optimization}, we present some classical concepts of nonlinear optimization.
 %Several off-the-shelf solvers are available and have been widely used in for solving robotics problems.
@@ -294,6 +293,6 @@ In Appendix~\ref{chapter:optimization}, we present some classical concepts of no
 %The SNOPT solver~\cite{gill2005snopt} was used in~\cite{dai2014whole} to plan dynamic whole-body trajectories.
 %Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver, the solver that we develop in this thesis.
 
-In this thesis, we use the off-the-shelf solvers IPOPT~\cite{wachter:mathprog:2006} in the beginning and later we tackle the development of our own nonlinear solver, called PGSolver, and then use it.
-From this point forward, we formulate and solve posture generation problems as nonlinear constrained optimization problem.
+In this thesis, we used the off-the-shelf solvers IPOPT~\cite{wachter:mathprog:2006} in the beginning. At a later stage we developped our own nonlinear solver, called {\tt PGSolver}, and then use it.
+From now on, we formulate and solve posture generation problems as nonlinear constrained optimization problem.
 And in the next chapter, we focus on formulating all the basic functions and algorithms used to describe robotics constraints and cost function in the formalism of nonlinear optimization.
