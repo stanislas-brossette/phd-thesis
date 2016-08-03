@@ -17,7 +17,6 @@ The IK problem has been widely studied and used in the fields of robotics, compu
 In few particular cases, for example with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found. For example, in~\cite{asfour2003human} the redundancy in a robot arm is exploited to derive a closed-form formula for its IK.
 But for more complex cases, iterative methods are usually used.
 
-
 %Generating desired initial, intermediary or finale posture configurations requires defining static task goals (e.g.\ reach a target point in 6D) to be done under intrinsic constraints such as joint limits, torque limits, avoiding non-desired self-collisions\ldots and perceptual or extrinsic ones such as keeping an object in the embedded camera field-of-view, avoiding non-desired collisions with surrounding objects, etc.
 
 Many approaches to solve IK problems use pseudo-inverse or Gauss-Newton methods with the Jacobian, Jacobian transpose, damped least squares with and without singular values decomposition or selectively damped least squares~\cite{balestrino1984robust, tolani2000real, baillieul1985kinematic, wampler1986manipulator, nakamura1986inverse, buss2005selectively}.

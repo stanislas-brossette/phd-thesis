@@ -36,14 +36,14 @@
 \nomenclature[R]{$X_i^x$}{Static transformation of joint i}
 \nomenclature[R]{$X_i^J$}{Transformation from the reference frame of joint i to the reference frame of its successor body}
 \nomenclature[R]{$X_i^{PtS}$}{Transformation from $B_{\lambda_i}$ to $B_i$}
-\nomenclature[N]{$\kappa(i)$}{List of indexes of successive joints going from $B_0$ to $B_i$}
-
 \nomenclature[R]{$\text{Jac}_i$}{Jacobian of Body i}
+
+\nomenclature[N]{$\kappa(i)$}{List of indexes of successive joints going from $B_0$ to $B_i$}
 
 \nomenclature[O]{$\frac{\partial a}{\partial b}$}{Derivative of a with respect to b}
 \nomenclature[O]{$a\cdot b$}{Dot product between a and b}
-
 \nomenclature[O]{$.^{-1}$}{Inverse of $.$}
+\nomenclature[O]{$.^{T}$}{Transpose of $.$}
 \nomenclature[O]{$\hat{v}$}{3D skew-symmetric matrix such that $\hat{v}u=v\wedge u$}
 \nomenclature[O]{$\vec{.}$}{Denotes a vector}
 \nomenclature[O]{$.\times .$}{Cartesian product}
@@ -52,19 +52,20 @@
 
 % Chapter 3
 \nomenclature[R]{$\mathcal{E}$}{An ellipse}
-% Chapter 4
 
-\nomenclature[O]{$\psi(.)$}{Functional to represent an element of a manifold in its representation space}
-\nomenclature[O]{$\varphi_x(.)$}{Local parametrization of a manifold on its tangent space at $x$}
-\nomenclature[O]{$\phi_x(.)$}{Retractation operator}
-\nomenclature[O]{$\pi(.)$}{Projection on a manifold from its representation space}
-\nomenclature[P]{$H_k$}{Hessian matrix at iteration k}
-\nomenclature[O]{$\mathcal{T}_{x,z}(.)$}{Vector transport function from $x$ to $\varphi_x(z)$}
-\nomenclature[O]{$\mathcal{T}_{x,z}(.)$}{Vector transport function from $x$ to $\varphi_x(z)$}
-\nomenclature[O]{$\zeta_x(.)$}{Pseudo-logarithm function at point $x$}
-\nomenclature[P]{$\mathbf{z}_\text{map}^.$}{Bounds of validity of the tangent map}
-\nomenclature[P]{$\rho$}{Trust-region}
+% Chapter 4
 \nomenclature[O]{$.^\text{rest}$}{Restoration quantity}
+
+\nomenclature[P]{$\psi(.)$}{Functional to represent an element of a manifold in its representation space}
+\nomenclature[P]{$\varphi_x(.)$}{Local parametrization of a manifold on its tangent space at $x$}
+\nomenclature[P]{$\phi_x(.)$}{Retractation operator}
+\nomenclature[P]{$\pi(.)$}{Projection on a manifold from its representation space}
+\nomenclature[P]{$H_k$}{Hessian matrix at iteration k}
+\nomenclature[P]{$\mathcal{T}_{x,z}(.)$}{Vector transport function from $x$ to $\varphi_x(z)$}
+\nomenclature[P]{$\mathcal{T}_{x,z}(.)$}{Vector transport function from $x$ to $\varphi_x(z)$}
+\nomenclature[P]{$\zeta_x(.)$}{Pseudo-logarithm function at point $x$}
+\nomenclature[P]{$\mathbf{z}_\text{map}^-$, $\mathbf{z}_\text{map}^+$}{Bounds of validity of the tangent map}
+\nomenclature[P]{$\rho$}{Trust-region}
 
 % Chapter 5
 % Chapter 6
@@ -80,8 +81,8 @@
 
 \nomenclature[R]{$\vec{f}$}{Wrench's resultant part}
 \nomenclature[R]{$\vec{m}$}{Wrench's moment part}
-\nomenclature[R]{w}{Wrench}
-\nomenclature[R]{$w|_F^O$}{Expression of wrench $w$ calculated at the point $O$ expressed in the frame $F$}
+\nomenclature[R]{$w$}{Wrench}
+\nomenclature[R]{$w\vert_F^O$}{Expression of wrench $w$ calculated at the point $O$ expressed in the frame $F$}
 \nomenclature[P]{$x$}{Optimization variable}
 \nomenclature[P]{$x^*$}{Solution of the optimization problem}
 
