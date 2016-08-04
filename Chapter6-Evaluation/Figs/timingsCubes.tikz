@@ -19,7 +19,7 @@ xlabel={number of cubes},
 every outer y axis line/.append style={black},
 every y tick label/.append style={font=\color{black}},
 ymin=10,
-ymax=35,
+ymax=84,
 %ylabel={Number of iterations},
 axis background/.style={fill=white},
 title={Number of iterations},
@@ -48,6 +48,17 @@ legend style={at={(0.047,0.788)},anchor=south west,legend cell align=left,align=
 7	34.45\\
 };
 \addlegendentry{RealSpace};
+
+\addplot [color=green,solid]
+  table[row sep=crcr]{%
+2	18.6533\\
+3	33.1233\\
+4	46.14\\
+5	75.61\\
+6	76.0733\\
+7	83.9733\\
+};
+\addlegendentry{CFSQP};
 
 \end{axis}
 
@@ -89,6 +100,15 @@ axis y line*=left
 6	0.00818339\\
 7	0.016517\\
 };
+\addplot [color=green,solid,forget plot]
+  table[row sep=crcr]{%
+2	0.000312294\\
+3	0.00127155\\
+4	0.00407225\\
+5	0.0108545\\
+6	0.0273492\\
+7	0.0461626\\
+};
 \end{axis}
 
 \begin{axis}[%
@@ -128,6 +148,15 @@ axis y line*=left
 5	0.103350655899\\
 6	0.260504308887\\
 7	0.56901065\\
+};
+\addplot [color=green,solid,forget plot]
+  table[row sep=crcr]{%
+2	0.00582531\\
+3	0.04211793\\
+4	0.18789362\\
+5	0.82070874\\
+6	2.0805439 \\
+7	3.87642586\\
 };
 \end{axis}
 \end{tikzpicture}%
