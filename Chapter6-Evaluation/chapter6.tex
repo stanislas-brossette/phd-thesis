@@ -83,19 +83,22 @@ This gives rise to a problem on
 We have a problem of dimension $5n+2n^2$ with ,$32.5n+8.5n^2$ constraints, which is $\frac{n(n+1)}{2}$ more variables and constraints than with the manifold formulation.
 
 We solve those problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, time taken to converge and time spent per iterations.
-In each resolution, both problems are initialized with the same randomized initial guess, and the solver is set up with the same set of parameters.
+In each resolution, both problems(Real Space and Manifold formulations) are initialized with the same randomized initial guess.
+The resolutions with PGSolver are set up with the same set of parameters, and the ones with the CFSQP solver use its default parameters.
 The initial positions of the cubes are chosen randomly, and each plane is initialized at a position between the two cubes it separates.
 We display the results of these tests in figure~\ref{fig:timings-cubes}.
 
 \begin{figure}[htpb]
   \centering
   \input{Chapter6-Evaluation/Figs/timingsCubes.tikz}
-  \caption{Comparison of resolutions with and without using manifolds with $\mu=10^{-8}$}
+  \caption{Comparison of resolutions with and without using manifolds with $\mu=10^{-8}$. Red represents the results with PGSolver on the manifold formulation, blue on Real Space formulation and green with CFSQP on Real Space formulation}
 \label{fig:timings-cubes}
 \end{figure}
 
-With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non-manifold formulation.
-We observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spent per iteration is consistently smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with the manifold formulation.
+With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non-manifold formulation with PGSolver, whereas the success rates of CFSQP drop incrementally from $100\%$ for 2 cubes to $70\%$ for 7 cubes.
+Concerning the resolutions with PGSolver, we observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spent per iteration is consistently smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with manifolds.
+The resolutions with CFSQP take up to 4 times more iterations and each iteration is on average 3 times longer than with PGSolver.
+Which results in resolutions with PGSolver on manifold formulation being on average 7 times faster than with CFSQP on real-space formulation for this specific type of problem.
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
 In particular, the minimum value for the diagonal terms $\mu$ is important.
@@ -105,6 +108,7 @@ Too high values tend to damp the hessian, which translates into bigger numbers o
 Too small values make the hessian closer to being rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
 
 This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds not only allows the user to profit of a simpler and more intuitive formulation of the problem but also outperforms the classical approach.
+And for this specific problem, PGSolver clearly outperforms CFSQP in term of success rates as well as convergence speed.
 
 
 \section{Evaluation of the Posture Generation}
