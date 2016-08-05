@@ -15,51 +15,98 @@
 
 \graphicspath{{Chapter0-Introduction/Figs/Vector/}{Chapter0-Introduction/Figs/}}
 
-The ultimate goal of robotics is to make robots realize some tasks to assist humans in their various fields of work.
-The tasks, as well as the robots used to fulfill them, are various.
-For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human body, a submarine robot exploring the wreckage of a ship, or a humanoid robot exploring and fixing a destroyed plant.
+Science fiction novels and movies often present humanoid robots in a technological utopist way, being able to plan and realize a wide variety of tasks as efficiently or sometimes even better than humans can.
+The road towards creating such performant robots is still long, but in the recent years, we have witnessed a wide growth of the number of robots used in many environments and of the variety of tasks that they are entrusted with.
+%The ultimate goal of robotics is to make robots realize some tasks to assist humans in their various fields of work.
+%The tasks, as well as the robots used to fulfill them, are various.
+For example, robotic arms are used to autonomously build cars in factories, surgeon robots are teleoperated to save lives, submarine robots are exploring the oceans, and humanoid robots are used in order to realize various tasks.
+%For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human body, a submarine robot exploring the wreckage of a ship, or a humanoid robot exploring and fixing a destroyed plant.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.9\textwidth]{various-tasks.png}
+  \includegraphics[width=0.8\textwidth]{variousRobots.pdf}
 \label{fig:various}
 \end{figure}
 
 The DARPA Robotics Challenge has shone some light on the capabilities and limitations of humanoid robots.
-This competition brought together robotics groups from Universities, laboratories, and private companies to work on a common goal: develop a partially teleoperated robot system that can succeed in several tasks without any human physical intervention.
+This competition brought together robotics groups from Universities, laboratories, and private companies to work on a common goal: develop a partially teleoperated robot system that can realize several tasks without any human physical intervention.
 The robots were required to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
-All these tasks can usually be broken down into sets of elementary tasks in human language, such as `put hand in contact with target', `put foot on next step', `avoid collision with that object', `maintain stability' or `look in that direction'.
-As is, these tasks do not mean anything for the robot that has no knowledge of its interaction with the world, or of human language.
-The way to complete a task must be provided to the robot as a sequence of joint configurations.
+All these tasks can usually be broken down into sets of elementary tasks in human language, such as `put a hand in contact with target', `put a foot on next step', `avoid collision with that object', `maintain stability' or `look in that direction'.
+As is, these tasks do not mean anything for the robot that has no knowledge of its interaction with the world, nor of human language.
+All the joints of the robot must be piloted separately and in coordination in order to make the whole robot complete the tasks at hand.
 
-Tasks are generally expressed in the operational space of the robot, and to satisfy them, one needs to find a configuration of the robot, in its articular space, that allows completion of the task, and also to find a way for the robot to reach that configuration.
-For mobile underactuated robots, such as humanoids, the position of its base depends on the configuration of the joints as well as on the locations of the contacts that the robot makes with the environment.
-Thus, even if each link of the robot is actuated, it is possible that for a given set of contacts, some tasks are out of reach, in which case, it becomes necessary to modify the set by adding or removing some contacts.
-Much like humans, the robot must choose appropriate parts of its body to create contacts with the surrounding environment in order to support its motion while avoiding obstacles and reaching its goal.
-A whole motion can be described by a sequence of contact creations and releases with joint trajectories inbetween successive elements of the sequence.
+%Tasks are generally expressed in the workspace of the robot, and to satisfy them, one needs to find a configuration of the robot that completes the task, in the robot's articular space, and a way for the robot to reach that configuration.
+Given a set of tasks specified by the user for a robot to satisfy, the questions that immediatly comes to mind is: "Is that set of tasks feasible?".
+In general, answering this question comes down to solving the problem of `Posture Generation', which consists of finding a `viable' configuration of the robot that satisfies that set of tasks.
+The tasks are generally expressed in the workspace of the robot, whereas the solution that we are looking for is a configuration of the robot, in its articular space potentially augmented by some additional variables, the Posture Generation problem creates a link between workspace and articular space.
 
-Computing a trajectory to follow, and actually following it, are respectively handled by the trajectory generator and controller of the robot.
-Trajectory generation and control are by themselves complete sub-fields in robotics, and they both often rely on being given some key postures to help guide the robot's motion(e.g. initial, intermediate and final configurations).
+The formulation and resolution of posture generation problems are the missions of the `Posture Generator', and the development of this tool is the central topic of this dissertation.
+%Computing robotic system's configurations to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
+Traditionally this problem is formulated as a collection of constraints and objective function that translate the tasks to achieve, as well as the conditions for the configuration to be viable and is solved using optimization algorithms.
 
-Computing a sequence of key configurations that allows the robot to complete some tasks is handled by the contact planner, which explores the space of possible sets of contacts between the robot and its environment in order to devise a path, composed of `viable' configurations, along which contacts are iteratively added and removed, that leads to the task completion.
-A configuration is deemed `viable' if it guarantees the integrity of the robotic system by respecting its intrinsic limitations, avoiding undesired collisions and guaranteeing its stability.
-Depending on the complexity of the scenario, different approaches to planning can be used.
-On flat terrains, the robot can walk based on a cyclic motion and the locations of footsteps can be generated by a footstep planner using some simplified models to maintain its stability.
-As the environment becomes more difficult to cross, in cumbersome and unstructured environments for example, hands may come into play together with feet to help with the motion.
-Narrow passages may even require other parts of the body (knees, elbows, back\dots) to make contact in order to support the motion.
-In such multi-contact scenarios, less simplifications are possible, and the problem of finding a `viable' configuration is traditionally formulated as a collection of constraints and objective function in the operational and articular spaces of the robot, that translate the tasks to achieve, as well as the conditions for the configuration to be viable.
-Once a satisfactory configuration is found, it is a candidate to be added to the planner's path.
-%Such problems, that we call multi-contact posture generation problems, usually do not have closed-form solutions, and are solved as optimization programs using off-the-shelf optimization solver.
-
-The formulation and resolution of multi-contact posture generation problems, as the one described above, are the missions of the `Posture Generator' (PG) and the development of this tool is the central topic of this dissertation.
-Computing robot configurations to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
-When the robotic problem studied becomes too complex for closed-form solutions, it is formulated as a nonlinear optimization program and solved using optimization algorithms.
+%Posture generation is used as a building block of many robotics applications.
 The PG is a key tool for many robotics applications and as such, it is an important component of any robotics framework.
-It needs to be efficient at finding a solution when one exists, and at figuring out if a problem is not feasible.
-The speed of generating a multi-contact sequence is directly related to the quality of the PG, which is directly related to the quality of the optimization algorithm that it uses.
+Contact planners make heavy use of posture generators as they search a sequence of successive feasible postures, defined by a set of tasks such as the list of contacts between the robot and its environment, to go through to reach a goal.
+The feasibility of each of those postures needs to be checked by a PG before being used by the planner.
+Trajectory generation and control also make use of posture generation as they both often rely on being given some key postures to help guide the robot's motion (e.g. initial, intermediate and final configurations).
+
+%The PG is a key tool for many robotics applications and as such, it is an important component of any robotics framework.
+%The speed of generating a multi-contact sequence is directly related to the quality of the PG, which is itself directly related to the quality of the problem's formulation and of the optimization algorithm that it uses.
 
 The formulation of a posture generation problem is often a cumbersome and time-consuming task for the programmer, requiring a fine-tuning of the problem's constraints and cost functions, as well as of the solver, to get satisfactory results.
-In this thesis, we present a posture generation framework that makes the development of posture generation problems easier, as will as richer, by proposing several extensions to their formulation.
+In this thesis, we present a posture generation framework that makes the development of posture generation problems easier, as well as richer, by proposing several extensions to their formulation.
+
+%to compute key postures that are used to guide the robot's motion.
+%Computing a trajectory to follow, and actually following it, are respectively handled by the trajectory generator and controller of the robot.
+%Trajectory generation and control are by themselves complete sub-fields in robotics, and they both often rely on being given some key postures to help guide the robot's motion (e.g. initial, intermediate and final configurations).
+
+
+%In cumbersome and unstructured environments, as the environment becomes more difficult to cross, hands may come into play together with feet to help with the motion.
+%Narrow passages may even require other parts of the body (knees, elbows, back\dots) to make contact in order to support the motion.
+%Much like humans, the robot must choose appropriate parts of its body to create contacts with the surrounding environment in order to support its motion while avoiding obstacles and reaching its goal.
+
+%Posture generation can be leveraged to check the feasibility of a set of contacts between the robot and its environment in the context of multi-contact planning.
+%It can also be used to generate key postures that are used to guide a trajectory in a trajectory generation or in a control context.
+
+%For mobile underactuated robots, such as humanoids, the position of their base depends on the configuration of the joints, but also on the locations of the contacts that the robot makes with the environment.
+%Thus, even if each link of the robot is actuated, for a given set of contacts, some tasks may remain out of reach, in which case, it becomes necessary for the robot to find and reach a more appropriate contact set to complete its tasks.
+%This is handled by a multi-contact planner that computes a sequence of successive contact sets, and checks the feasibility of each contact set with a posture generator.
+
+%The entire motion of a robot can be decomposed in a sequence of contact creation/release configurations with joint trajectories in between.
+%Each key configuration can be computed as a solution of a posture generation problem and used to guide the trajectory generation or the control of the robot.
+
+%When the robotic problem studied becomes too complex for closed-form solutions, it is formulated as a nonlinear optimization program and solved using optimization algorithms.
+%The PG is a key tool for many robotics applications and as such, it is an important component of any robotics framework.
+%It needs to be efficient at finding a solution when one exists, and at figuring out if a problem is not feasible.
+%%The speed of generating a multi-contact sequence is directly related to the quality of the PG, which is itself directly related to the quality of the problem's formulation and of the optimization algorithm that it uses.
+
+%The formulation of a posture generation problem is often a cumbersome and time-consuming task for the programmer, requiring a fine-tuning of the problem's constraints and cost functions, as well as of the solver, to get satisfactory results.
+%In this thesis, we present a posture generation framework that makes the development of posture generation problems easier, as well as richer, by proposing several extensions to their formulation.
+
+
+%Much like humans, the robot must choose appropriate parts of its body to create contacts with the surrounding environment in order to support its motion while avoiding obstacles and reaching its goal.
+%A whole motion can be described by a sequence of contact creations and releases with joint trajectories inbetween successive elements of the sequence.
+
+
+%Computing a sequence of successive key configurations that allows the robot to complete some tasks is handled by the contact planner.
+%Each key configuration needs to be `viable', in the sense that it guarantees the integrity of the robotic system by respecting its intrinsic limitations, avoiding undesired collisions and guaranteeing its stability.
+%%A configuration is deemed `viable' if it guarantees the integrity of the robotic system by respecting its intrinsic limitations, avoiding undesired collisions and guaranteeing its stability.
+%The contact planner explores the space of possible sets of contacts between the robot and its environment by growing a tree of `viable' configurations in which nodes are iteratively created by adding or removing contacts to their predecessor until a contact set is found that completes the tasks.
+%At that point, backtracking along the tree allows computing the full sequence of key configurations to reach in order to complete the tasks.
+%For each candidate set of contacts, one needs to check that a `viable' configuration exists.
+%%During this process, it is necessary to verify that each node
+%%in order to devise a sequence of `viable' configurations, along which contacts are iteratively added and removed, that leads to the task completion.
+
+%Depending on the complexity of the scenario, different levels of simplification can be used.
+%On flat terrains, the robot can walk based on a cyclic motion and the locations of footsteps can be generated by a footstep planner using some simplified models to maintain its stability.
+%In cumbersome and unstructured environments, as the environment becomes more difficult to cross, hands may come into play together with feet to help with the motion.
+%Narrow passages may even require other parts of the body (knees, elbows, back\dots) to make contact in order to support the motion.
+%Much like humans, the robot must choose appropriate parts of its body to create contacts with the surrounding environment in order to support its motion while avoiding obstacles and reaching its goal.
+%In such multi-contact scenarios, fewer simplifications are possible, and the problem of finding a `viable' configuration is traditionally formulated as a collection of constraints and objective function that translate the tasks to achieve, as well as the conditions for the configuration to be viable.
+%That problem is called multi-contact posture generation problem.
+%Once a satisfactory configuration is found, it can be added to the planner's tree.
+%%Such problems, that we call multi-contact posture generation problems, usually do not have closed-form solutions, and are solved as optimization programs using off-the-shelf optimization solver.
+
 
 %Planning a sequence of key configurations is a necessary step in devising a robot motion.
 %Once the key stances of the motion have been identified by the contact planner, they can be used by the controller or the trajectory planner and finally the motion can be achieved by the robot.
@@ -77,18 +124,20 @@ In this thesis, we present a posture generation framework that makes the develop
 
 Once the problem of posture generation is formulated, its resolution can take place.
 The variables of a robotics problem sometimes naturally belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
-A manifold is a topological space that locally resembles a Euclidean space near each point.
-Each point of an n-dimensional manifold has a neighborhood that is homeomorphic to the Euclidean space of dimension n.
-An n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
-Most of the optimization solvers available make the assumption that the search space is Euclidean, and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
-But it is often possible to parametrize $\mathcal{M}$ over a Euclidean space of higher dimension with added constraints (e.g. unit quaternions, rotation matrices).
-It is then possible to solve those problems with classical solvers at the cost of additional variables, constraints and special treatments in the resolution of the optimization problem.
-There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters.
+A manifold is a topological space that locally resembles a Euclidean space in the neighborhood of each point.
+%Each point of an n-dimensional manifold has a neighborhood that is homeomorphic to the Euclidean space of dimension n.
+However, an n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
+Most of the off-the-shelf optimization solvers available make the assumption that the search space is Euclidean, and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
+It is often possible to parametrize $\mathcal{M}$ over a Euclidean space of higher dimension with added constraints (e.g. unit quaternions, rotation matrices).
+Then those problems can be solved with classical solvers at the cost of additional variables, constraints and special treatments in the resolution of the optimization problem.
+There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters.
 However, to our knowledge, these are focused on addressing non-constrained optimization.
+We propose to extend those methods to solve constrained optimization problems on manifolds.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
-Through this thesis, we develop our own nonlinear constrained optimization solver on manifolds and use it to solve optimization problems on their native search manifolds. We will exhibit the interests of such resolution methods for posture generation problems as well as a few other types of problems.
-This has the advantage that, unlike off-the-shelf solvers which are often a black box on which the user has very limited control, we have full control over that solver and can specialize/modify it to fit our needs.
+Through this thesis, we develop a nonlinear constrained optimization solver on manifolds, that we believe to be the first ever developed, and use it to solve optimization problems on their native search manifolds.
+We will exhibit the interests of such resolution methods for solving posture generation problems as well as any other problems formulated on manifolds.
+This has the added advantage that, unlike off-the-shelf solvers which are often a black box on which the user has very limited control, we have full control over that solver and can specialize/modify it to fit our needs.
 
 %Satisfying a task requires that the joints of the robot reach a configuration for which the task is completed.
 %A robot is made of a collection of bodies (or links) that are linked together by joints actuated by motors.
@@ -136,7 +185,7 @@ This has the advantage that, unlike off-the-shelf solvers which are often a blac
 %Similarly, if a variable is parameterized by a rotation matrix, then the variable $M$ has 9 parameters and several constraints need to be added to the problem so that M is symmetric, positive definite and its determinant is 1 $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
 %Similar issues can be found with the parameterization of other non-Euclidean manifold, like $S^2$ for example.
 
-%There exists some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
+%There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
 
 \paragraph{Contributions and plan}
 The main focuses of this thesis are the formulation and the resolution of problems of posture generation for robotics systems using nonlinear optimization on manifolds.
