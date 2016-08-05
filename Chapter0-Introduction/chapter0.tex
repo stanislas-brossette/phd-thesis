@@ -16,7 +16,7 @@
 \graphicspath{{Chapter0-Introduction/Figs/Vector/}{Chapter0-Introduction/Figs/}}
 
 Science fiction novels and movies often present humanoid robots in a technological utopist way, being able to plan and realize a wide variety of tasks as efficiently or sometimes even better than humans can.
-The road towards creating such performant robots is still long, but in the recent years, we have witnessed a wide growth of the number of robots used in many environments and of the variety of tasks that they are entrusted with.
+The road towards creating such performant robots is still long, but in the recent years, we have witnessed a wide growth of the numbers of robots used in many environments and of the variety of tasks that they are entrusted with.
 %The ultimate goal of robotics is to make robots realize some tasks to assist humans in their various fields of work.
 %The tasks, as well as the robots used to fulfill them, are various.
 For example, robotic arms are used to autonomously build cars in factories, surgeon robots are teleoperated to save lives, submarine robots are exploring the oceans, and humanoid robots are used in order to realize various tasks.
@@ -29,20 +29,21 @@ For example, robotic arms are used to autonomously build cars in factories, surg
 \end{figure}
 
 The DARPA Robotics Challenge has shone some light on the capabilities and limitations of humanoid robots.
-This competition brought together robotics groups from Universities, laboratories, and private companies to work on a common goal: develop a partially teleoperated robot system that can realize several tasks without any human physical intervention.
+This competition brought together robotics groups from Universities, laboratories, and private companies to work on a common goal: develop a partially teleoperated robot system that can realize several tasks without any human \emph{physical} intervention.
 The robots were required to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
-All these tasks can usually be broken down into sets of elementary tasks in human language, such as `put a hand in contact with target', `put a foot on next step', `avoid collision with that object', `maintain stability' or `look in that direction'.
+All these tasks can usually be broken down into sets of elementary tasks in human language, such as `put hand in contact with target', `put foot on next step', `avoid collision with that object', `maintain stability' or `look in that direction'.
 As is, these tasks do not mean anything for the robot that has no knowledge of its interaction with the world, nor of human language.
-All the joints of the robot must be piloted separately and in coordination in order to make the whole robot complete the tasks at hand.
+All the joints of the robot must be piloted individually and in coordination in order to make the whole robot complete the tasks at hand.
 
 %Tasks are generally expressed in the workspace of the robot, and to satisfy them, one needs to find a configuration of the robot that completes the task, in the robot's articular space, and a way for the robot to reach that configuration.
 Given a set of tasks specified by the user for a robot to satisfy, the questions that immediatly comes to mind is: "Is that set of tasks feasible?".
 In general, answering this question comes down to solving the problem of `Posture Generation', which consists of finding a `viable' configuration of the robot that satisfies that set of tasks.
-The tasks are generally expressed in the workspace of the robot, whereas the solution that we are looking for is a configuration of the robot, in its articular space potentially augmented by some additional variables, the Posture Generation problem creates a link between workspace and articular space.
+The tasks are generally expressed in the workspace of the robot, whereas the solution that we are looking for is a configuration of the robot, in its articular space potentially augmented by some additional variables, % the Posture Generation problem creates a link between workspace and articular space.
+the Posture Generation problem searches a configuration in the articular space that is solution to a problem expressed in the workspace.
 
-The formulation and resolution of posture generation problems are the missions of the `Posture Generator', and the development of this tool is the central topic of this dissertation.
+The formulation and resolution of posture generation problems are the missions of the `Posture Generator' (PG), and the development of this tool is the central topic of this dissertation.
 %Computing robotic system's configurations to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
-Traditionally this problem is formulated as a collection of constraints and objective function that translate the tasks to achieve, as well as the conditions for the configuration to be viable and is solved using optimization algorithms.
+Traditionally, this problem is formulated as a collection of constraints and objective function that translate the tasks to achieve, as well as the conditions for the configuration to be viable and is solved using optimization algorithms.
 
 %Posture generation is used as a building block of many robotics applications.
 The PG is a key tool for many robotics applications and as such, it is an important component of any robotics framework.
@@ -135,7 +136,7 @@ However, to our knowledge, these are focused on addressing non-constrained optim
 We propose to extend those methods to solve constrained optimization problems on manifolds.
 
 %Usually, the solver used for solving optimization problems is a black box on which the user has a very limited control.
-Through this thesis, we develop a nonlinear constrained optimization solver on manifolds, that we believe to be the first ever developed, and use it to solve optimization problems on their native search manifolds.
+Through this thesis, we develop a nonlinear constrained optimization solver on manifolds, that we believe to be the first of its kind, and use it to solve optimization problems on their native search manifolds.
 We will exhibit the interests of such resolution methods for solving posture generation problems as well as any other problems formulated on manifolds.
 This has the added advantage that, unlike off-the-shelf solvers which are often a black box on which the user has very limited control, we have full control over that solver and can specialize/modify it to fit our needs.
 
