@@ -9,24 +9,23 @@
 
 \graphicspath{{Chapter6-Evaluation/Figs/}}
 
-In this chapter, we study the performances of our solver to solve problems formulated on manifolds as well as the performances of our posture generator.
-We then present an approach to make use of posture generation in real-environment with data acquired directly from the robot.
+In this chapter, we study the performances of our posture generator in solving problems formulated on manifolds. We then present an approach to make use of posture generation in real-environment with data acquired directly from the robot.
 
 \section{On the performance of formulation with Manifolds}
 \label{sec:On_the_performance_of_formulation_with_manifolds}
 
-In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our approach developing a nonlinear SQP solver on non-Euclidean Manifolds.
-We then proposed to take advantage of it in the posture generator presented in Chapter~\ref{ch:PG}.
-The choice of using optimization on manifolds was driven by the intuition that such approach would lead to generally faster and more robust convergence of resolution when the search space is a non-Euclidean manifold (due to the reduction of the numbers of constraints and variables).
+In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our developments for a new nonlinear SQP solver dedicated to non-Euclidean Manifolds.
+We then took advantage of it in the posture generator framework, with use-case examples presented in Chapter~\ref{ch:PG}.
+The choice of using optimization on manifolds was driven by the intuition that such an approach would lead to relatively faster and more robust convergence of resolution when the search space is a non-Euclidean manifold (due to the reduction of the numbers of constraints and variables).
 
-Robotics optimization problems may be complex and many aspects play a role in the efficiency of their resolution.
-To isolate the influence of optimizing on manifolds, we consider a toy problem: cube stacking.
+Robotics optimization problems may be complex and many issues can come into play in the efficiency of their resolution.
+Therefore we first consider a toy problem for evaluation: cubes stacking.
 %In a typical robotic posture generation problem, the search manifold is a composition of several instances of $\mathbb{R}^n$ and one $SO(3)$ per robot, and the equations involving the $SO(3)$ variables are quite complex.
 %Thus it may be difficult to extract the actual influence of the use of manifold formulation on the resolution.
 %In order to evaluate the influence of the formulation and resolution with manifolds, we choose to study a problem different from a typical robotic posture generation.
-Given a set of unit cubes, each one defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not penetrating each other.
-For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertex, $\vec{t_i}\in\mathbb{R}^3$ and $R_i\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
-To ensure that the cubes are inside the box, we write a constraint that forces each corner of each cube to be inside the box.
+Given a set of unit cubes, each one defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not interpenetrating with each other.
+For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertices, $\vec{t_i}\in\mathbb{R}^3$ and $R_i\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
+To ensure that the cubes are inside the box, we write constraints that enforces each corner of each cube to be inside the box.
 For each plane composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plane to the origin along $\vec{n}$.
 The constraint for each cube $C_i$ being `above' a plane defined by $\{d, \vec{n}\}$ is of dimension 8 (1 per vertex) and can be written as:
 \begin{equation}
@@ -35,12 +34,11 @@ The constraint for each cube $C_i$ being `above' a plane defined by $\{d, \vec{n
 
 To avoid interpenetration of the cubes, we could use the usual collision avoidance constraints as presented in Section~\ref{sec:problem_formulations}.
 But the use of the exact mesh of the cubes would generate gradient discontinuities of the constraints.
-Approximating the mesh with STPBV would allow avoiding those discontinuities, but then, if the STPBV approximates the exact mesh closely, we would have a gradient close to discontinuous.
+Approximating the mesh with STP-BV would allow avoiding those discontinuities, but then, if the STP-BV approximates the exact mesh closely, we would have a gradient close to discontinuous.
 Instead, we propose another approach that uses non-Euclidean manifolds: for each pair of cubes $C_i,\ C_j$, we require a plane $P_{ij}$ to separate them.
 The plane's location can be parametrized by its normal $\vec{n}\in S^2$ and $d\in\mathbb{R}$, the signed distance from the plane to the origin along $\vec{n}$.
 Each plane's pose can be represented by a variable on $\mathbb{R} \times S^2$.
 Thus we can write a constraint of dimension 16 (1 per vertex) such that $C_i$ is above $P_{ij}$ and $C_j$ is below $P_{ij}$ as follows:
-
 \begin{align}
   \begin{split}
     &\forall v\in V_i,\ (\vec{t_i} + R_i v)\cdot \vec{n} \geq d \\
@@ -56,12 +54,12 @@ In order to simulate gravity, we minimize the potential energy of the all the cu
 
 We consider the problem of stacking $n$ cubes in an open-top box composed of 5 plans (the ground and 4 walls).
 %Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plane is parametrized on $\mathbb{R}\times S^2$.
-In figure~\ref{fig:cubes}, we illustrate the case of stacking 3 cubes.
+In Figure~\ref{fig:cubes}, we illustrate the case of stacking 3 cubes.
 With the initial condition on the left side and a solution on the right.
 \begin{figure}
 \centering
   \includegraphics[width=.8\linewidth]{3cubes.png}
-  \caption{Problem of stacking 3 red cubes in a blue box, separating each pair of cubes by a yellow plane. Initial (left) and final (right) configurations}
+  \caption{Problem of stacking 3 red cubes in a blue box, separating each pair of cubes by a yellow plane. Initial (left) and final (right) configurations.}
 \label{fig:cubes}
 \end{figure}
 
@@ -71,53 +69,52 @@ Thus the search manifold is:
   \mathcal{M} = {\left( \mathbb{R}^3\times SO(3) \right)}^n \times {\left( \mathbb{R} \times S^2 \right)}^{\frac{n(n-1)}{2}} \nonumber
 \end{equation}
 The problem contains 5 constraints of dimension 8 per cube to fit them in the box and $n(n-1)/2$ constraints of dimension 16 to avoid the interpenetration of cubes.
-We have a problem of dimension $4.5n+1.5n^2$ with $32n+8n^2$ constraint.
+We have a problem of dimension $4.5n+1.5n^2$ with $32n+8n^2$ constraints.
 
 In order to compare the resolution with and without the use of manifolds, we also formulate this problem over $\mathbb{R}^n$.
 To do so, each variable on $SO(3)$ is replaced by a variable on $\mathbb{R}^4$, while each variable on $S^2$ is replaced by one on $\mathbb{R}^3$.
 In both cases, a norm-1 constraint on the variable is added to the problem to force those variables on the manifolds.
-This gives rise to a problem on
+This results in a problem on
 \begin{equation}
   \mathcal{M}={\left( \mathbb{R}^3\times \mathbb{R}^4 \right)}^n \times {\left( \mathbb{R} \times \mathbb{R}^3 \right)}^{\frac{n(n-1)}{2}} = \mathbb{R}^{5n+2n^2} \nonumber
 \end{equation}
-We have a problem of dimension $5n+2n^2$ with ,$32.5n+8.5n^2$ constraints, which is $\frac{n(n+1)}{2}$ more variables and constraints than with the manifold formulation.
+that is a problem of dimension $5n+2n^2$ with $32.5n+8.5n^2$ constraints, which is $\frac{n(n+1)}{2}$ more variables and constraints than with the manifold formulation.
 
-We solve those problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, time taken to converge and time spent per iterations.
-In each resolution, both problems(Real Space and Manifold formulations) are initialized with the same randomized initial guess.
-The resolutions with PGSolver are set up with the same set of parameters, and the ones with the CFSQP solver use its default parameters.
+We solve these two problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, converge time, and time spent per iterations.
+In each resolution, both problems (Real Space and Manifold formulations) are initialized with the same randomized initial guess.
+The resolutions with {\tt PGSolver} are set up with the same set of parameters, and the ones with the CFSQP solver use its default parameters.
 The initial positions of the cubes are chosen randomly, and each plane is initialized at a position between the two cubes it separates.
-We display the results of these tests in figure~\ref{fig:timings-cubes}.
-
+We display the results of these tests in Figure~\ref{fig:timings-cubes}.
 \begin{figure}[htpb]
   \centering
   \input{Chapter6-Evaluation/Figs/timingsCubes.tikz}
-  \caption{Comparison of resolutions with and without using manifolds with $\mu=10^{-8}$. Red represents the results with PGSolver on the manifold formulation, blue on Real Space formulation and green with CFSQP on Real Space formulation}
+  \caption{Comparison of resolutions with and without using manifolds with $\mu=10^{-8}$. Red represents the results with {\tt PGSolver} on the manifold formulation, blue on Real Space formulation and green with CFSQP on Real Space formulation.}
 \label{fig:timings-cubes}
 \end{figure}
 
-With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non-manifold formulation with PGSolver, whereas the success rates of CFSQP drop incrementally from $100\%$ for 2 cubes to $70\%$ for 7 cubes.
-Concerning the resolutions with PGSolver, we observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spent per iteration is consistently smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with manifolds.
-The resolutions with CFSQP take up to 4 times more iterations and each iteration is on average 3 times longer than with PGSolver.
-Which results in resolutions with PGSolver on manifold formulation being on average 7 times faster than with CFSQP on real-space formulation for this specific type of problem.
+With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non-manifold formulation with {\tt PGSolver}, whereas the success rates of CFSQP drop incrementally from $100\%$ for 2 cubes to $70\%$ for 7 cubes.
+Concerning the resolutions with {\tt PGSolver}, we observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spent per iteration is consistently smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with manifolds.
+The resolutions with CFSQP take up to 4 times more iterations and each iteration is on average 3 times longer than with {\tt PGSolver}.
+Which results in resolutions with {\tt PGSolver} on manifold formulation being on average 7 times faster than with CFSQP on real-space formulation for this specific type of problem.
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
 In particular, the minimum value for the diagonal terms $\mu$ is important.
-We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$(presented in figure~\ref{fig:timings-cubes}), and the formulation with manifolds is consistently faster than the one without manifolds.
+We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$ (presented in Figure~\ref{fig:timings-cubes}), and the formulation with manifolds is consistently faster than the one without manifolds.
 Values outside of that span tend to degrade both resolutions.
-Too high values tend to damp the hessian, which translates into bigger numbers of iterations.
+Too high values tend to damp the Hessian, which translates into bigger numbers of iterations.
 Too small values make the hessian closer to being rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
 
 This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds not only allows the user to profit of a simpler and more intuitive formulation of the problem but also outperforms the classical approach.
-And for this specific problem, PGSolver clearly outperforms CFSQP in term of success rates as well as convergence speed.
+And for this specific problem, {\tt PGSolver} clearly outperforms CFSQP in term of success rates as well as convergence speed.
 
 
 \section{Evaluation of the Posture Generation}
 \label{sec:evaluation_of_the_posture_generation}
 
-In an effort to evaluate the performances of our posture generator framework and solver on manifolds, we ran a campaign of tests in which we solve problems that are known to be feasible and compare the success rates and computation times of different resolution approaches for different types of problems.
+In an effort to evaluate the performances of our posture generator framework and solver on manifolds, we devised a campaign of tests in which we solve problems that are known to be feasible and compare the success rates and computation times of different resolution approaches for different types of problems.
 We always search viable solutions, where the joint and torque limits are respected, collisions are avoided and static stability is guaranteed.
-To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper%(that we denote respectively $F_\text{rightFoot}$, $F_\text{leftFoot}$, $F_\text{rightGripper}$, $F_\text{leftGripper}$)
-, by querying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
+To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper,%(that we denote respectively $F_\text{rightFoot}$, $F_\text{leftFoot}$, $F_\text{rightGripper}$, $F_\text{leftGripper}$)
+by querying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
 Given those 4 frames, we can create a posture generation problem where the robot has to reach those frames with its end-effectors while respecting its viability constraints.
 In particular, we require the contacts on the foot to be fixed unilateral friction contacts (with the forces in the friction cones) and the contacts on the hands to be fixed bilateral contacts (where the forces can be in applied in any direction).
 If feasible, this problem can easily be solved by providing as initial guess the configuration $q_\text{rand}$.
@@ -166,7 +163,7 @@ We computed another set of feasible problems in which the value of $q_\text{rand
 %In that case, a solution is found in 85\% of the tests.
 The resolution of those feasible problems showed a rate of success of 85\%.
 This implies that the initial guess and its distance from the solution, which we coin the \emph{initial distance}, have a crucial importance in the resolution of posture generation problems.
-The initial distance for a problem where $q_0$ is the initial guess and $q^*$ is a solution is defined as: $d=\|q_0-q^*\|^2$.
+The initial distance for a problem where $q_0$ is the initial guess and $q^*$ is a solution, is defined as: $d=\|q_0-q^*\|^2$.
 
 %The topology of the problem to solve is also an important factor of the resolution, thus, we generated several sets of feasible problems with different numbers of contact constraints.
 %In the first set, contact constraints are only imposed on the two feet of the robot, we denote this set `2 Contacts'.
@@ -175,19 +172,19 @@ The initial distance for a problem where $q_0$ is the initial guess and $q^*$ is
 %We study the influence of the initial distance on each of those sets separately.
 
 We propose to evaluate the effect of the initial distance on the success rate and on the convergence time of the posture generator.
-In that experiment, each feasible problem is solved several times, with a value of the initial guess increasingly closer to the solution.
+In this case, each feasible problem is solved several times, with a value of the initial guess increasingly closer to the solution.
 Given a randomly chosen initial guess $q_0$, and $q^*$ being the known solution of the problem, we solve the problem starting from a configuration $q_0^{n\%}$ defined as:
 \begin{equation}
   q_0^{n\%} = n q_0 + (1-n)q^*
 \end{equation}
 With $n$ taking successively the values $1.0$, $0.8$, $0.6$, $0.4$,and $0.2$.
 After aggregating the results, we are able to estimate the influence of the initial distance on the success rate and convergence time of the optimization.
-During all our work with our solver, we observed that the choice of hessian approximation method influenced a lot the resolutions.
-We take here the opportunity to verify this observation by solving series of problems with the solver using different hessian update methods.
-As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraint's second-order derivative is maintained and combined in the global hessian matrix.
+During all our work with our solver, we observed that the choice of Hessian approximation method has a substantial effect on the resolution.
+We take here the opportunity to assess this observation by solving series of problems with the solver using different Hessian update methods.
+As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraint's second-order derivative is maintained and combined in the global Hessian matrix.
 We compare the results obtained with the three update methods that are BFGS, BFGS with self-scaling and SR1 and using whole or individual updates for each of them.
 We gather those results after solving 250 different posture generation problems, 5 times each, starting increasingly close from the solution.
-We sample the range of initial distances into 20 segments of the same length and report the average results on each segment as a data point in figure~\ref{fig:evalPG}.
+We sample the range of initial distances into 20 segments of the same length and report the average results on each segment as a data point in Figure~\ref{fig:evalPG}.
 
 %\begin{figure}[htb]
 %\centering
@@ -213,7 +210,7 @@ This experiment shows that the closer the initial guess is to the solution, the 
 Aside from the BFGS with self-scaling methods, all others usually reach convergence in a few seconds, taking longer when starting further from the solution.
 On average, a solution is found faster for problems with only 2 contacts, within 2 seconds, problems with 3 contacts take a little longer, up to 3 seconds, and problems with 4 contacts are the longest to solve, taking up to 4 seconds.
 
-Although those computation times are long, and make it inconvenient to compute large numbers of postures, as is often done in contact planning, they remain of the same order of magnitude as the ones reported in~\cite{brossette:RAM:2013}, \cite{escande:iros:2006}, \cite{bouyarmane2011autonomous} and \cite{hauser:ijrr:2008}, that were all based on off-the-shelf solvers, while we use an open solver that we developped and are able to modify.
+Although those computation times are long, and make it inconvenient to compute large numbers of postures, as is often done in contact planning, they remain of the same order of magnitude as the ones reported in~\cite{brossette:RAM:2013}, \cite{escande:iros:2006}, \cite{bouyarmane2011autonomous} and \cite{hauser:ijrr:2008}, that were all based on off-the-shelf solvers, while we use an open solver that we developed and are able to modify or even specialize.
 
 It would be interesting to run more tests like those to study the influence of the different solver options and find optimal strategies to set the solver's option to solve posture generation problems.
 Perhaps choosing automatically the update method and other options based on the structure of the problem at hand would allow increasing the general performance of our posture generator.
