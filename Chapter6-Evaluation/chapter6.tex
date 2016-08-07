@@ -395,7 +395,6 @@ Thus, we propose to solve that problem with our solver on manifolds.
 \label{sub:resolution_with_optimization_on_manifolds}
 
 The formulation of the problem becomes:
-
 \begin{equation}
 \begin{aligned}
 \label{eq:finalProblem}
@@ -405,25 +404,25 @@ The formulation of the problem becomes:
 \end{equation}
 
 We can solve it with our solver on manifolds.
-It has an immediate advantage: we can write directly the problem ~\eqref{eq:finalProblem} without the need to add any parametrization-related constraints.
+It has an immediate advantage: we can write directly the problem~\eqref{eq:finalProblem} without the need to add any parametrization-related constraints.
 Because there are fewer variables and fewer constraints, it is also faster to solve.
-To check this, we compared the resolution of~\eqref{eq:finalProblem} formulated with each of the three parametrizations of $SO(3)$ available, namely, native $SO(3)$, unit quaternion and rotation matrix.
-We solved the three formulations with our PGSolver, and the two last ones with an off-the-shelf solver (CFSQP~\cite{cfsqp:manual}), using the dataset presented in section~\ref{sub:experiments}.
+To assess this, we compared the resolution of~\eqref{eq:finalProblem} formulated with each of the three parametrizations of $SO(3)$ available, namely, native $SO(3)$, unit quaternion and rotation matrix.
+We solved the three formulations with our {\tt PGSolver}, and the two last ones with an off-the-shelf solver (CFSQP~\cite{cfsqp:manual}), using the dataset presented in section~\ref{sub:experiments}.
 The formulation with native $SO(3)$ was consistently solved faster.
 We observed timings around $0.5$s for it, and over $1$s for non-manifold formulations with CFSQP.
 The mean time for an iteration was also the lowest with the native formulation (at least $30\%$ lower when compared to all other possibilities).
 
 Working directly with manifolds has also an advantage that we do not leverage here, but could be useful for future work: at each iteration, the variables of the problem represent a \emph{fully physically consistent} set of inertial parameters.
 This is not the case with the other formulations we discussed, as the (additional) constraints are guaranteed to be satisfied only at the end of the optimization process.
-Having physically meaningful intermediate values can be useful to evaluate additional functions that presuppose it (additional constraints, external monitoring $\ldots$).
+Having physically meaningful intermediate values can be useful to evaluate additional functions that presuppose it (additional constraints, external monitoring...).
 It can also be leveraged for real-time applications where only a short time is allocated repeatedly to the inertial identification, so that when the optimization process is stopped after a few iterations, the output is physically valid.
 
 \subsection{Experiments}
 \label{sub:experiments}
-We ran some experiments with the iCub robot.
-It is a full-body humanoid with 53 degrees of freedom \cite{metta2010icub}.
+We ran some experiments with the iCub robot as an example.
+It is a full-body humanoid with 53 degrees of freedom~\cite{metta2010icub}.
 For validating the presented approach, we used the six-axis force/torque (F/T) sensor embedded in iCub's right arm to collect experimental F/T measurements.
-We locked the elbow, wrist and hand joints of the arm, simulating the presence of a rigid body directly attached to the F/T sensor, a scenario similar to the one in which an unknown payload needs to be identified \cite{kubus2008line}.
+We locked the elbow, wrist and hand joints of the arm, simulating the presence of a rigid body directly attached to the F/T sensor, a scenario similar to the one in which an unknown payload needs to be identified~\cite{kubus2008line}.
 
 \begin{figure}[htb]
 \centering
@@ -440,14 +439,13 @@ We locked the elbow, wrist and hand joints of the arm, simulating the presence o
 \end{figure}
 
 We generated five 60 seconds trajectories in which the three shoulder joints were reaching successive random joint positions using minimum-jerk like trajectories.
-Each trajectory is decomposed in sub-trajectories to travel between two consecutive random positions in respectively $10$s, $5$s, $2$s, $1$s and $0.5$s (As a result, the trajectories are ordered from the slowest to the fastest).
-We played those trajectories on the robot and sampled the F/T sensors and joint encoders outputs at $100$Hz.
+Each trajectory is decomposed in sub-trajectories to travel between two consecutive random positions in respectively $10$s, $5$s, $2$s, $1$s and $0.5$s (As a result, the trajectories are ordered from the slowest to the fastest). We played those trajectories on the robot and sampled the F/T sensors and joint encoders outputs at $100$Hz.
 %We filtered the joint positions and obtained joint velocities and accelerations using a Savitzky-Golay filtering of order 2 and with a windows size of $499$, $41$, $21$, $9$, $7$ samples.
 We used joint positions, velocities and accelerations with the kinematic model of the robot to compute $A^g$ and $V$ of the F/T sensor for each time sample.
 %We removed the unknown offset from the F/T measurements using the offset removal technique described in \cite{traversaro2015situ}.
-We solved the inertial identification problem~\eqref{eq:classicIdentif} using a classical linear algorithm and the one using the proposed \emph{fully physically consistent} parametrization \eqref{eq:finalProblem} with our solver on manifolds.
-We report the identified inertial parameters in Table \ref{table:results}.
-It is interesting to highlight that for slow datasets (sub-trajectory times of $10$s or $5$s) the unconstrained optimization problem \eqref{eq:classicIdentif} results in inertial parameters that are not \emph{fully physically consistent}.
+We solved the inertial identification problem~\eqref{eq:classicIdentif} using a classical linear algorithm and the one using the proposed \emph{fully physically consistent} parametrization~\eqref{eq:finalProblem} with our solver on manifolds.
+We report the identified inertial parameters in Table~\ref{table:results}.
+It is interesting to highlight that for slow datasets (sub-trajectory times of $10$s or $5$s) the unconstrained optimization problem~\eqref{eq:classicIdentif} results in inertial parameters that are not \emph{fully physically consistent}.
 In particular, this is due to the low values of angular velocities and acceleration, that do not properly excite the inertial parameters, which are then \emph{numerically not identifiable}.
 \begin{figure}
 \centering
@@ -460,8 +458,7 @@ Masses are expressed in $kg$, first moment of masses in $kg.m$, inertia matrix e
 \FloatBarrier
 The proposed optimization problem clearly cannot identify those parameters anyway, as the identified parameters are an order of magnitude larger than the ones estimated for faster datasets, nevertheless, it always estimates inertial parameters that are \emph{fully physically consistent}.
 For faster datasets (sub-trajectory times of $1$s or $0.5$s) the results of the two optimization problems are the same because the high values of angular velocities and accelerations permit to identify all the parameters perfectly.
-While this is possible to identify all the inertial parameters of a single rigid body, this is not the case when identifying the inertial parameters of a complex structure such as a humanoid robot, for which both structural \cite{ayusawa2014identifiability} and numerical \cite{pham1991essential} not identifiable parameters exists.
-In this later application, the enforcement of \emph{full physical consistency}  will always be necessary to get meaningful results.
+While this is possible to identify all the inertial parameters of a single rigid body, this is not the case when identifying the inertial parameters of a complex structure such as a humanoid robot, for which both structural~\cite{ayusawa2014identifiability} and numerical~\cite{pham1991essential} not identifiable parameters exists. In this later application, the enforcement of \emph{full physical consistency}  will always be necessary to get meaningful results.
 
 \section{Application to contact planning on real-environment}
 \label{sec:application_of_contact_planning_on_real_environment}
@@ -483,11 +480,11 @@ The goal is written as a set of specific constraints.
 A node is a final node if its associated posture generation problem augmented by these constraints remains feasible.
 By backtracking from this final node to the initial root node, we obtain a sequence of nodes and thus a sequence of contact sets, that can be executed on the robot by a whole-body controller such as the one based on a quadratic programming (QP) formulation presented in~\cite{bouyarmane:iros:2011}.
 
-The potential field is derived from a crude path, made of a few key postures, that does not take contacts into account.
+The potential field is derived from a rough path, made of a few key postures, that does not take contacts into account.
 Such a path is either user-defined or can be the output of a first dedicated planner~\cite{bouyarmane:icra:2009}.
 
 The MCP relies largely on the 3D geometric models of the environment and robotic agents.
-In our previous work~\cite{escande:ras:2013,bouyarmane:ar:2012}, the geometric models are provided by the user.
+In previous work~\cite{escande:ras:2013,bouyarmane:ar:2012}, the geometric models are provided by the user.
 The contact transition for the robot are planned off-line and later executed by the robot assuming exactness of the models and their relative positioning.
 We aim at extending our MCP to deal directly with real data acquired by the robot.
 Subsequently, we must deal with two kinds of situations:
@@ -508,8 +505,7 @@ Still, since the robot only navigates in a flat environment, and does not realiz
 The use of humanoid robots allows to navigate in more complex environments, some work has been done to make a humanoid robot go down a ramp~\cite{lutz:iros:2012} or climb stairs~\cite{osswald:iros:2012}.
 Yet, those methods use laser-based vision rather than point-cloud-based vision, so as to have a precise analysis of a known environment.
 
-In this work, we aim at enabling a robot to analyze and plan a motion into a 3D environment.
-Hence, we use the surface extraction of a point cloud to directly have a global picture of the environment and determine the convex planar surfaces that the robot can use to its advantage to progress using the MCP.\@
+In order to enable a robot to analyze and plan a motion into a 3D environment, one can use the surface extraction of a point cloud to directly have a global picture of the environment and determine the convex planar surfaces that the robot can use to its advantage to progress using the MCP.\@
 In our approach to make such an extension, we intentionally seek for technical solutions that minimize changes to be done on the existing MCP software.
 
 \subsection{Building an understandable environment}
@@ -519,8 +515,6 @@ Our first concern is to build an environment that our multi-contact planner is a
 
 The simplest entity that our planner would be able to deal with and that could correctly describe the robot's environment is a set of convex polygonal planar surfaces.
 Therefore, starting from an acquired point cloud, we extract a relevant set of such geometrical entities that will be used as of the surroundings of the robot.
-
-The different steps we follow to create a set of relevant convex polygonal plane surfaces out of an acquired point cloud are the following:
 
 \begin{figure}
 \centering
@@ -695,7 +689,7 @@ The simulation results revealed that our MCP does not require major adjustments 
 %Of course, this does not mean that we are fully satisfied since our results also suggest additional future work.
 
 Although we choose to treat the case of not having 3D models, we believe that the implementation of an MCP with knowledge of the 3D model is necessary.
-For example, even in a disaster situation as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc\ldots).
+For example, even in a disaster situation as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc.).
 So having their models would then still permit our MCP to rely on 3D models to plan contacts for motion.
 PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
 %Of course, our ultimate future plan is to handle uncertainties, control and planning recovery of discrepancies when they occur.
@@ -738,8 +732,8 @@ PCL provides only partial information, it is then necessary to drive the planner
 \section{Conclusion}
 \label{sec:conclusion_chap_6}
 
-In this section, we presented several evaluations and applications of our solver and posture generator.
-We first evaluated the influence of the formulation on manifolds on a problem making heavy usage of them and showed that as expected, this formulation outperforms the classical approach in terms of convergence times.
+In this section, we presented several evaluations and potential usage applications of our solver and posture generator.
+We first evaluated the influence of the formulation on manifolds on a problem making substantial usage of them and showed that as expected, this formulation outperforms the classical approach in terms of convergence times.
 Then we propose an approach to estimate the success rate of our posture generator with respect to the distance between the initial guess and the solution.
 We then present a different application of our solver to the problem of inertial identification of a rigid body.
 In which case, working with manifolds ensures the \emph{full physical consistency} of the inertial parameters in any situation and all along the optimization process.
