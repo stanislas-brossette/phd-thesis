@@ -106,8 +106,10 @@ We start by defining convex areas of contact on the robot's body and the environ
 We can generate contacts with an arbitrary intersection of a pair of any of these predefined contact patches.
 Virtually any planar surface can be a contact patch.
 In our group's previous works, the constraints formulating a new contact in the posture generator, states that a contact patch is totally included into another, which is obviously a limitation of the posture generation.
-A simple example is when a human climbs stairs. S/he usually contacts only the front half of its foot with each step, the heel almost never touches the steps.
-Our new geometric contact modeling writes very simply as additional constraints and variables added to the optimization problem. It consists of searching for an ellipse inscribed in the intersection of the pair of patches we want in contact.
+A simple example is when a human climbs stairs.
+S/he usually contacts only the front half of its foot with each step, the heel almost never touches the steps.
+Our new geometric contact modeling writes very simply as additional constraints and variables added to the optimization problem.
+It consists of searching for an ellipse inscribed in the intersection of the pair of patches we want in contact.
 The result of our posture generator is then a configuration where contact patches are not necessarily included in one another (therefore we named it non-inclusive) and the shape and area of their intersection can be monitored.
 This allows our posture generator to propose contacts of different shapes with a non-predefined number of contact points (used later to compute reaction/contact forces).
 We illustrate the efficiency of our method in multi-contact posture generation with the HRP-2 and ATLAS humanoid robots with results that can not be generated automatically by existing methods.
@@ -128,12 +130,13 @@ We illustrate the efficiency of our method in multi-contact posture generation w
 A contact is generally defined by a pair of points (one on each object in contact) and a normal vector.
 A contact constraint consists in finding a posture in which the predefined authorized contact points and normal of each body match~\cite{zhang:TePRA:2013}\cite{hauser:ijrr:2008}.
 Likewise, in~\cite{osswald:iros:2011}, the position of the feet of the NAO robot is manually tuned in order to obtain statically stable position during the climbing of a spiral staircase.
-In~\cite{Chestnutt:2009:BNR:1733023.1733314}, the surface in contact is chosen according to two criteria: the position of the force sensors of the feet, and the desired contact.
+In~\cite{Chestnutt:2009:BNR:1733023.1733314}, the surface in contact is chosen according to two criteria: the position of the force sensors of the feet, and the desired type of contact.
 In~\cite{sentis:itro:2010}, the problem of contact discovery in not considered.
 In~\cite{mordatch:acm:2012}, two surfaces are considered in contact as soon as the center point of one of them touches the other one and their normals match.
 Although used in many papers, it is not difficult to see that this definition of contact excludes a series of possibilities that would have been obtained if the predefined points were placed in different configurations within their respective patches.
 Table~\ref{tbl:contact_description} presents some diagrams describing some typical methods used for constraining the relative positions of contact surfaces.
-On each figure, the blue rectangle describes a surface $S_2$ with which we want to make contact with surface $S_1$. $S_1$ is drawn in green if the contact is valid and in red otherwise.
+On each figure, the blue rectangle describes a surface $S_2$ with which we want to make contact with surface $S_1$.
+$S_1$ is drawn in green if the contact is valid and in red otherwise.
 
 \begin{table}[ht!]
   \centering
@@ -1032,7 +1035,8 @@ This algorithm efficiently computes the exact joint torques Jacobian for a robot
 The goal of this thesis is, on the one hand, to enable writing more complex and various problems in simpler ways by improving the formulation of posture generation problems, and on the other hand, to improve and adapt the resolution methods for those problems.
 This section focuses on the latter issue.
 We formulate posture generation problems in an optimization friendly way in order to solve them using nonlinear constrained optimization algorithms.
-In this section, we investigated the usage of the lifted optimization method presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to the posture generation problems. In fact, the authors concluded that their method would be suitable for inverse kinematic problems.
+In this section, we investigated the usage of the lifted optimization method presented in~\cite{Albersmeyer:2010:LNM:1958447.1958472} to the posture generation problems.
+In fact, the authors suggested that their method would be suitable for inverse kinematic problems.
 
 The idea of lifting optimization is to consider a complex equation $F(q) = 0$ and decompose it into simpler functions $\{f_1, f_2, \ldots, f_m\}$ that all depend only on the original variable $q$ and on the output of functions of lower index eq.~(\ref{eq:simplerFunctions}) that are replaced by additional variables $\{w_1, w_2, \ldots, w_m\}$, that are called the `lifted variables'.
 
@@ -1072,7 +1076,7 @@ By reducing the complexity of the functions, which often results in reducing the
 %If $F$ is a complicated function, the quadratic approximation may be quite far from $F$ and simpler functions may have better quadratic approximations, which should lead to better convergence properties of the Newton scheme.
 
 One obvious drawback of this approach for solving nonlinear problems is the increased size of the linearized problem to solve at each iteration of the optimization.
-Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} propose an algorithmic trick leveraging the triangularity of the Jacobian of $G(q,w)$ to condense the lifted problem into a problem of the same size as the original one.
+Fortunately, \cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the Jacobian of $G(q,w)$ to condense the lifted problem into a problem of the same size as the original one.
 Thus, the resolution of each iteration should take approximately the same time as with the original problem.
 
 The lifted variable approach is known to be superior to the non-lifted one in the problem of shooting methods for boundary value problems~\cite{osborne:1969:shooting}.
@@ -1126,7 +1130,8 @@ This observation extends to the case of any robot composed of the joints present
 The operators `addition', `subtraction', `multiplication', `sinus' and `cosinus' are enough to describe the kinematics of a robot.
 
 We developed a generic algorithm which allows to automatically lift symbolic functions, and in particular, polynomials of trigonometric functions, based on a given criterion.
-To do so, we use symbolic variables. A symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn, be explored and truncated at appropriate places where we insert additional variables.
+To do so, we use symbolic variables.
+A symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn, be explored and truncated at appropriate places where we insert additional variables.
 Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the original variables, the yellow ones represent the lifted variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the end effector equations.
 \begin{figure}
   \centering
@@ -1135,7 +1140,8 @@ Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equati
 \label{fig:graph_direct}
 \end{figure}
 
-To lift a set of equations, we explore the graph from left to right. At each node of the graph, we consider the sub-graph that lies on its left.
+To lift a set of equations, we explore the graph from left to right.
+At each node of the graph, we consider the sub-graph that lies on its left.
 If this sub-graph violates our criterion, a lifting variable is added and replaces the sub-graph.
 Then we iterate this process on the remaining graph until it does not violate the criterion.
 Given that the equations to solve are polynomials in terms of the trigonometric functions, we decided to lift them based on a criterion of maximum degree of the lifted polynomials.
@@ -1230,7 +1236,7 @@ The hessian matrices in our problems are usually not symmetric positive definite
 For globalization, we implemented some line search methods with Armijo and Wolfe conditions, as well as a filter with line search (see~\ref{ssub:the_filter_method}).
 And for regularization, we approximate the full-space hessian matrix through BFGS updates (with Powell's correction) or SR1 updates.
 We implemented different ways to initialize the lifted variables.
-They can either be all initialized with zero value, or all random, or their initial value can be computed such that all the lifter equations are satisfied ($m$ first lines of~\ref{eq:lifted_variables}).
+They can either be all initialized with zero value, or all random, or their initial value can be computed such that all the lifted equations are satisfied ($m$ first lines of~\ref{eq:lifted_variables}).
 Those methods are presented in~\cite{bonnans:springer:2002}.
 %All those methods are applied on the full-space iteration, during the update process of the optimization, the lifted and final equations are treated the same way.
 
