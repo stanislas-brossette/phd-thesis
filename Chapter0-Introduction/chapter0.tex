@@ -15,11 +15,11 @@
 
 \graphicspath{{Chapter0-Introduction/Figs/Vector/}{Chapter0-Introduction/Figs/}}
 
-Science fiction novels and movies often present humanoid robots in a technological utopist way, being able to plan and realize a wide variety of tasks as efficiently or sometimes even better than humans can.
-The road towards creating such performant robots is still long, but in the recent years, we have witnessed a wide growth of the numbers of robots used in many environments and of the variety of tasks that they are entrusted with.
+Science fiction novels and movies often present humanoid robots in a technological overselling way, being able to reason, plan and achieve a wide variety of tasks as efficiently or sometimes even better than humans.
+The road towards creating such performant robots is still long and probably not aimed for under movies' perspectives. But in the recent years, we have witnessed a wide growth of the numbers of robots, of various shapes and sizes, used in many applications, achieving well the tasks they are assigned.
 %The ultimate goal of robotics is to make robots realize some tasks to assist humans in their various fields of work.
 %The tasks, as well as the robots used to fulfill them, are various.
-For example, robotic arms are used to autonomously build cars in factories, surgeon robots are teleoperated to save lives, submarine robots are exploring the oceans, and humanoid robots are used in order to realize various tasks.
+For example, the robotic arms traditionally used to autonomously build cars in factories are replaced slowly by cobotic systems instead, minimally invasive surgery robots are teleoperated by qualified surgeons to save lives, submarine robots are exploring the oceans, and humanoid robots are envisioned seriously as a solution in large-scale manufacturing industries such us aircraft, building, etc.
 %For example, it can be a robotic arm building a car in a factory, a surgeon robot operating on a human body, a submarine robot exploring the wreckage of a ship, or a humanoid robot exploring and fixing a destroyed plant.
 
 \begin{figure}[ht]
@@ -28,18 +28,18 @@ For example, robotic arms are used to autonomously build cars in factories, surg
 \label{fig:various}
 \end{figure}
 
-The DARPA Robotics Challenge has shone some light on the capabilities and limitations of humanoid robots.
-This competition brought together robotics groups from Universities, laboratories, and private companies to work on a common goal: develop a partially teleoperated robot system that can realize several tasks without any human \emph{physical} intervention.
+The DARPA Robotics Challenge has shone some light on the capabilities and limitations of current humanoid robots technology.
+This competition brought together robotics groups from Universities, laboratories, and private companies to work on a common goal: develop a partially teleoperated --i.e. in a shared autonomy scheme, robotic systems that can realize several tasks without any human co-located intervention or assistance.
 The robots were required to drive a car, open a door, climb stairs, cross debris, drill a hole in a wall, etc.
-All these tasks can usually be broken down into sets of elementary tasks in human language, such as `put hand in contact with target', `put foot on next step', `avoid collision with that object', `maintain stability' or `look in that direction'.
+All these tasks can usually be broken down into sets of elementary tasks yet understandable to common language, such as `put hand in contact with target', `put foot on next step', `avoid collision with that object', `maintain stability' or `look in that direction', etc.
 As is, these tasks do not mean anything for the robot that has no knowledge of its interaction with the world, nor of human language.
-All the joints of the robot must be piloted individually and in coordination in order to make the whole robot complete the tasks at hand.
+All the joints of the robot must be piloted individually and in coordination in order to make the whole robot complete the required task objectives.
 
 %Tasks are generally expressed in the workspace of the robot, and to satisfy them, one needs to find a configuration of the robot that completes the task, in the robot's articular space, and a way for the robot to reach that configuration.
-Given a set of tasks specified by the user for a robot to satisfy, the questions that immediately comes to mind is: "Is that set of tasks feasible?".
+Tasks requires motions, which in turn can be defined by a set of continuous discreet postures. For a given snapshot of time (e.g. before initiating a motion), given a set of tasks specified by the user for a robot to satisfy, the questions that immediately comes to mind is: ``Is that set of tasks feasible?''.
 In general, the answer to that question is found by solving the problem of `Posture Generation', which consists of finding a `viable' configuration of the robot that satisfies that set of tasks.
 The tasks are generally expressed in the workspace of the robot, whereas the solution that we are looking for is a configuration of the robot, in its articular space potentially augmented by some additional variables. % the Posture Generation problem creates a link between workspace and articular space.
-the Posture Generation problem searches a configuration in the articular space that is a solution to a problem expressed in the workspace.
+The Posture Generation problem searches a configuration in the articular space that is a solution to a problem expressed in the workspace.
 
 The formulation and resolution of posture generation problems are the missions of the `Posture Generator' (PG), and the development of this tool is the central topic of this dissertation.
 %Computing robotic system's configurations to meet the requirements of a given set of tasks, within a viable state, is a recurrent problem whose complexity grows with that of the robot.
@@ -124,7 +124,7 @@ In this thesis, we present a posture generation framework that makes the develop
 %The speed of generating a multi-contact sequence is directly related to the quality of the PG, which is directly related to the quality of the optimization algorithm that it uses.
 
 Once the problem of posture generation is formulated, its resolution can take place.
-The variables of a robotics problem sometimes naturally belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
+Some variables of a robotic problem belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
 A manifold is a topological space that locally resembles a Euclidean space in the neighborhood of each point.
 %Each point of an n-dimensional manifold has a neighborhood that is homeomorphic to the Euclidean space of dimension n.
 However, an n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
