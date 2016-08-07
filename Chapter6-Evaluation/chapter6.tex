@@ -9,7 +9,9 @@
 
 \graphicspath{{Chapter6-Evaluation/Figs/}}
 
-In this chapter, we study the performances of our posture generator in solving problems formulated on manifolds. We then present an approach to make use of posture generation in real-environment with data acquired directly from the robot.
+In this chapter, we study the performances of our solver to solve problems formulated on manifolds as well as the performances of our posture generator.
+We then present a usecase of our solver on manifolds with a problem of inertial identification.
+And finally, we present an approach to make use of posture generation in real-environment with data acquired directly from the robot.
 
 \section{On the performance of formulation with Manifolds}
 \label{sec:On_the_performance_of_formulation_with_manifolds}
@@ -18,8 +20,8 @@ In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our
 We then took advantage of it in the posture generator framework, with use-case examples presented in Chapter~\ref{ch:PG}.
 The choice of using optimization on manifolds was driven by the intuition that such an approach would lead to relatively faster and more robust convergence of resolution when the search space is a non-Euclidean manifold (due to the reduction of the numbers of constraints and variables).
 
-Robotics optimization problems may be complex and many issues can come into play in the efficiency of their resolution.
-Therefore we first consider a toy problem for evaluation: cubes stacking.
+Robotics optimization problems may be complex and many aspects play a role in the efficiency of their resolution.
+To isolate the influence of optimizing on manifolds, we consider a toy problem: cube stacking.
 %In a typical robotic posture generation problem, the search manifold is a composition of several instances of $\mathbb{R}^n$ and one $SO(3)$ per robot, and the equations involving the $SO(3)$ variables are quite complex.
 %Thus it may be difficult to extract the actual influence of the use of manifold formulation on the resolution.
 %In order to evaluate the influence of the formulation and resolution with manifolds, we choose to study a problem different from a typical robotic posture generation.
@@ -80,9 +82,9 @@ This results in a problem on
 \end{equation}
 that is a problem of dimension $5n+2n^2$ with $32.5n+8.5n^2$ constraints, which is $\frac{n(n+1)}{2}$ more variables and constraints than with the manifold formulation.
 
-We solve these two problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, converge time, and time spent per iterations.
+We solve these two problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, convergence time, and time spent per iterations.
 In each resolution, both problems (Real Space and Manifold formulations) are initialized with the same randomized initial guess.
-The resolutions with {\tt PGSolver} are set up with the same set of parameters, and the ones with the CFSQP solver use its default parameters.
+The resolutions with {\tt PGSolver} are set up with the same set of parameters, and the ones with the CFSQP solver uses its default parameters.
 The initial positions of the cubes are chosen randomly, and each plane is initialized at a position between the two cubes it separates.
 We display the results of these tests in~\Figref{fig:timings-cubes}.
 \begin{figure}[htpb]
@@ -113,8 +115,7 @@ And for this specific problem, {\tt PGSolver} clearly outperforms CFSQP in term 
 
 In an effort to evaluate the performances of our posture generator framework and solver on manifolds, we devised a campaign of tests in which we solve problems that are known to be feasible and compare the success rates and computation times of different resolution approaches for different types of problems.
 We always search viable solutions, where the joint and torque limits are respected, collisions are avoided and static stability is guaranteed.
-To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper,%(that we denote respectively $F_\text{rightFoot}$, $F_\text{leftFoot}$, $F_\text{rightGripper}$, $F_\text{leftGripper}$)
-by querying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
+To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper, by querying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
 Given those 4 frames, we can create a posture generation problem where the robot has to reach those frames with its end-effectors while respecting its viability constraints.
 In particular, we require the contacts on the foot to be fixed unilateral friction contacts (with the forces in the friction cones) and the contacts on the hands to be fixed bilateral contacts (where the forces can be in applied in any direction).
 If feasible, this problem can easily be solved by providing as initial guess the configuration $q_\text{rand}$.
@@ -712,7 +713,7 @@ PCL provides only partial information, it is then necessary to drive the planner
 %\end{equation}
 %In addition to that cost function, the robot needs keep its foot on the ground, its left hand is used to lean on a beam of the structure to allow a longer reach with the right hand that is in contact with the wall.
 %Those constraints must be satisfied while respecting the joint and torque limits of the robot, maintaining balance and avoiding auto-collisions.
-%The result is depicted in figure~\ref{fig:comanoid}
+%The result is depicted in~\Figref{fig:comanoid}
 %\begin{figure}
   %\centering
   %\includegraphics[width=0.6\linewidth]{comanoid.png}
@@ -722,7 +723,7 @@ PCL provides only partial information, it is then necessary to drive the planner
 
 %\paragraph{Generating postures in highly constrained environment}
 %In this scenario, the HRP-4 robot is required to evolve in a highly constrained environment, in the sense that many obstacles limit its displacement, and it must avoid collision with them.
-%The goal is to real a pannel of circuit breakers (in green on figure~\ref{fig:getafe}) to activate them.
+%The goal is to real a pannel of circuit breakers (in green on~\Figref{fig:getafe}) to activate them.
 %We generated a sequence of steps to reach that panel and then some postures to reach different points of this panel.
 %In figure~\ref{fig:getafe}, we show some extracts of this sequence of postures.
 %In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance and stability constraints.
