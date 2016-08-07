@@ -37,7 +37,7 @@ All the joints of the robot must be piloted individually and in coordination in 
 
 %Tasks are generally expressed in the workspace of the robot, and to satisfy them, one needs to find a configuration of the robot that completes the task, in the robot's articular space, and a way for the robot to reach that configuration.
 Given a set of tasks specified by the user for a robot to satisfy, the questions that immediately comes to mind is: "Is that set of tasks feasible?".
-In general, answering this question comes down to solving the problem of `Posture Generation', which consists of finding a `viable' configuration of the robot that satisfies that set of tasks.
+In general, the answer to that question is found by solving the problem of `Posture Generation', which consists of finding a `viable' configuration of the robot that satisfies that set of tasks.
 The tasks are generally expressed in the workspace of the robot, whereas the solution that we are looking for is a configuration of the robot, in its articular space potentially augmented by some additional variables. % the Posture Generation problem creates a link between workspace and articular space.
 the Posture Generation problem searches a configuration in the articular space that is a solution to a problem expressed in the workspace.
 
@@ -47,7 +47,7 @@ Traditionally, this problem is formulated as a collection of constraints and obj
 
 %Posture generation is used as a building block of many robotics applications.
 The PG is a key tool for many robotics applications and as such, it is an important component of any robotics framework.
-Contact planners make heavy use of posture generators as they search a sequence of successive feasible postures, defined by a set of tasks such as the list of contacts between the robot and its environment, to go through to reach a goal.
+Contact planners make heavy use of posture generators as they search a sequence of successive feasible postures to go through to reach a goal, each posture being defined by a set of tasks, such as the list of contacts between the robot and its environment.
 The feasibility of each of those postures needs to be checked by a PG before being used by the planner.
 Trajectory generation and control also make use of posture generation as they both often rely on being given some key postures to help guide the robot's motion (e.g. initial, intermediate and final configurations).
 
@@ -190,18 +190,18 @@ This has the added advantage that, unlike off-the-shelf solvers which are often 
 
 \paragraph{Contributions and plan}
 The main focuses of this thesis are the formulation and the resolution of problems of posture generation for robotics systems using nonlinear optimization on manifolds.
-Our contribution is twofold, on one hand, we propose extensions and improvements on the ways to formulate a posture generation problem, and on the other hand, we investigate new ways of solving these problems.
+Our contribution is twofold, on the one hand, we propose extensions and improvements of the ways to formulate a posture generation problem, and on the other hand, we investigate new ways of solving these problems.
 The organization of this thesis is as follows:
 %In Chapters~\ref{cha:state_of_the_art} and~\ref{cha:posture_generation_problem_formulation}, we present the background of posture generation, with respectively a state of the art and a presentation of the detailed formulation of a posture generation problem.
 %We present several
 \begin{itemize}
   \item In Chapter~\ref{cha:state_of_the_art_and_problem_definition} we describe the state of the art of posture generation and optimization on manifolds.
   \item In Chapter~\ref{cha:posture_generation_problem_formulation}, we present the detailed formulation of a posture generation problem.
-  \item In Chapter~\ref{cha:extensions_of_posture_generation} we present three different and unrelated contributions: two formulation extensions, one allowing to generate non-inclusive contacts between convex surfaces, the other is the exact derivation of the torques in the actuators of a robot.
+  \item In Chapter~\ref{cha:extensions_of_posture_generation} we present three different and unrelated contributions: two formulation extensions, one allowing to generate non-inclusive contacts between convex surfaces, the other is the exact derivation of the joint torques of a robot.
   We then present our endeavor to use the `Lifted Newton Method' to solve posture generation problems.
   \item Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} describes the principles of nonlinear optimization over non-Euclidean manifolds and our implementation of a solver based on those principles.
   \item In Chapter~\ref{ch:PG}, we present a framework that simplifies and extends the formulation of posture generation problems by formulating and solving the optimization problem over native non-Euclidean manifolds, managing automatically the variables of the problems, and proposing a framework that formalizes and simplifies the writing of functions on geometric entities often used in robotics.
-  \item In Chapter~\ref{cha:evaluation_and_experimentation}, we evaluate the performances of our solver on manifolds and the performances of our posture generator. We then present preliminary work on the generation of postures on a sensor acquired environment.
+  \item In Chapter~\ref{cha:evaluation_and_experimentation}, we evaluate the performances of our solver on manifolds and the performances of our posture generator. Then, we present a usecase of our solver for inertial identification problems and some preliminary work on the generation of postures on a sensor acquired environment.
 \end{itemize}
 
 

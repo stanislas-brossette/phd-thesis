@@ -1076,7 +1076,7 @@ By reducing the complexity of the functions, which often results in reducing the
 %If $F$ is a complicated function, the quadratic approximation may be quite far from $F$ and simpler functions may have better quadratic approximations, which should lead to better convergence properties of the Newton scheme.
 
 One obvious drawback of this approach for solving nonlinear problems is the increased size of the linearized problem to solve at each iteration of the optimization.
-Fortunately,~\cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the Jacobian of $G(q,w)$ to condense the lifted problem into a problem of the same size as the original one.
+Fortunately, \cite{Albersmeyer:2010:LNM:1958447.1958472} proposes an algorithmic trick leveraging the triangularity of the Jacobian of $G(q,w)$ to condense the lifted problem into a problem of the same size as the original one.
 Thus, the resolution of each iteration should take approximately the same time as with the original problem.
 
 The lifted variable approach is known to be superior to the non-lifted one in the problem of shooting methods for boundary value problems~\cite{osborne:1969:shooting}.
