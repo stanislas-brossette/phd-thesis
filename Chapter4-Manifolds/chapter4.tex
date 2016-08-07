@@ -251,10 +251,10 @@ By definition, there is always, at a point $x$ of a smooth $n$-dimensional manif
 \end{equation}
 
 $\varphi_x$ gives us a local parametrization for $\mathcal{M}$.
-Figure~\ref{fig:stepOnSphere} illustrates the difference between a step through $\varphi_x$ in optimization on manifolds and a step followed by a projection $\pi_\mathcal{M}$ as it can be done in classical optimization.
+\Figref{fig:stepOnSphere} illustrates the difference between a step through $\varphi_x$ in optimization on manifolds and a step followed by a projection $\pi_\mathcal{M}$ as it can be done in classical optimization.
 
 $T_x\mathcal{M}$ can be identified with $\mathbb{R}^n$, but in some cases, it needs to be considered as a hyperplane of a higher dimensionality space.
-For example, in figures~\ref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplane embedded in $\mathbb{R}^3$.
+For example, in~\Figref{fig:stepOnSphere} and~\ref{fig:phimap}, $T_x\mathcal{M}$ is a 2-dimensional hyperplane embedded in $\mathbb{R}^3$.
 We denote $T_x\mathbb{E}$ the representation space of $T_x\mathcal{M}$.
 The driving idea of the optimization on manifolds is to change the parametrization of the problem by using a local function $\varphi_{x_i}$ at the current iterate $x_i$ at each iteration.
 Applying this idea, we can reformulate Problem~\Eqref{eq:optim_problem} around $x_i$ as:
@@ -297,7 +297,7 @@ Let $R_x$ denote the restriction of $R$ to $T_x\mathcal{M}$.
 \end{enumerate}
 \end{definition}
 
-This means that for any ${\bf z}$, the curve $t \mapsto \varphi_{x_i}(t{\bf z})$ is tangent to ${\bf z}$, see Fig.~\ref{fig:phimap}, so that the update $x_{i+1} = \varphi_{x_i}({\bf z_i})$ is made in the direction given by ${\bf z_i}$.
+This means that for any ${\bf z}$, the curve $t \mapsto \varphi_{x_i}(t{\bf z})$ is tangent to ${\bf z}$, see~\Figref{fig:phimap}, so that the update $x_{i+1} = \varphi_{x_i}({\bf z_i})$ is made in the direction given by ${\bf z_i}$.
 
 The exponential map is a good theoretical candidate, but it is often impractical or expensive to compute.
 Depending on the manifold, cheaper functions can be chosen such that $\varphi$ is a retractation.
@@ -371,7 +371,7 @@ The gradient of $f \circ \varphi_x$ is
 
 $\frac{\partial f'}{\partial y}$ denotes the gradient of $f'$ with respect to an element of $\mathbb{E}$, which is the derivative that is usually computed for use in classical optimization schemes.
 
-In figure~\ref{fig:diagram_function}, we present a summary of the different functions used in our approach to represent functions on manifolds.
+In~\Figref{fig:diagram_function}, we present a summary of the different functions used in our approach to represent functions on manifolds.
 
 \subsection{Vector transport}
 \label{sub:vector_transport}
@@ -405,7 +405,7 @@ One can describe the vector transport function from a point $x\in \mathcal{M}$ a
   %\end{equation}
 %\end{definition}
 
-Figure~\ref{fig:transport} illustrates the transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
+\Figref{fig:transport} illustrates the transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
 %$\mathbf{v}_2$ can then be compared to the transported $\mathbf{v}_1$: $\mathcal{T}_{x_1,\mathbf{z}}(\mathbf{v}_1)$.
 %This operation will come in handy for the computation of Hessian approximations explained in Section~\ref{sub:hessian_update_on_manifolds}.
 
@@ -450,7 +450,7 @@ It is used to compute the (pseudo-) distance between two points of $\mathcal{M}$
 \end{equation*}
 
 \paragraph{Vector transport:}
-To compare two vectors living in the tangent spaces of different points of $\mathcal{M}$, it is necessary to use the vector transport operation to transport one of them in the space of the other one before comparing them, see Figure~\ref{fig:transport}.
+To compare two vectors living in the tangent spaces of different points of $\mathcal{M}$, it is necessary to use the vector transport operation to transport one of them in the space of the other one before comparing them, see~\Figref{fig:transport}.
 %To compare two vectors of the tangent spaces of $\mathcal{M}$, it is necessary to use the vector transport operation to transport one of them in the space of the other one before comparing them, see Figure~\ref{fig:transport}.
 %To compare two vectors $\mathbf{v}_1$ and $\mathbf{v}_2$ defined in tangent spaces of different points, respectively, $T_{x_1}\mathcal{M}$ and $T_{x_2}\mathcal{M}$, it is necessary to transport $\mathbf{v}_1$ into $T_{x_2}\mathcal{M}$.
 %Figure~\ref{fig:transport} illustrates the transport of a vector $\mathbf{v}_1$ from $T_{x_1}\mathcal{M}$ to $T_{x_2}\mathcal{M}$.
@@ -521,7 +521,7 @@ The Cartesian Product class is used to build compound manifolds by being `multip
 The Point class represents a point on a manifold, it contains the data that represents its numerical value.
 It can only be constructed by a manifold, and provides some proxy to its manifolds operations.
 In particular, it is equipped with an increment method, that applies a retractation on it.
-Figure~\ref{fig:uml_manifold} presents a simplified class diagram of this project, omitting all the settor, gettor, bookkeeping mechanics and accessory functions.
+\Figref{fig:uml_manifold} presents a simplified class diagram of this project, omitting all the settor, gettor, bookkeeping mechanics and accessory functions.
 
 \begin{figure}[htpb]
   \centering
@@ -1043,7 +1043,7 @@ Those tests can also be used in a non-regression criterion for our software.
 \section{Diagrams of the algorithms}
 \label{sec:diagrams_of_the_algorithms}
 
-In Figures~\ref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:second_order_correction}, we summarize the functioning of the algorithms that are respectively the main loop of the SQP, the restoration phase, and the second order correction phase.
+In~\Figref{fig:main_sqp_loop}, \ref{fig:restoration_loop}, and \ref{fig:second_order_correction}, we summarize the functioning of the algorithms that are respectively the main loop of the SQP, the restoration phase, and the second order correction phase.
 
 \begin{figure}[H]
   \centering

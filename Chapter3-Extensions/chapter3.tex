@@ -552,7 +552,7 @@ We use indeed safety margins to account for modeling errors so that the obtained
 In the second example, we generate a posture in which the robot climbs a vertical ladder.
 In this particular step, the robot is using its right foot and both hands to maintain its stability on top of the first rung of the ladder.
 We search a posture that keeps those previous contacts and adds a geometrical contact between the left foot and the second rung of the ladder.
-The result of that optimization can be observed on figure~\ref{fig:hrp2_jrl_complete}, with the robot posture on the left and a close-up look at the contact areas on the right.
+The result of that optimization can be observed on~\Figref{fig:hrp2_jrl_complete}, with the robot posture on the left and a close-up look at the contact areas on the right.
 The difficulty of this situation is that a contact has to be made with a very thin surface of the environment (the ladder rung).
 %Usual contact generation method would reduce a lot the span of possible contact positions (by patching the robot's foot with a very small surface or by imposing a set of authorized contact positions).
 %Whereas with our method, the contact configuration is found during the optimization process without requiring any extra human work.
@@ -633,7 +633,7 @@ with which the feet of the robot will be in contact are too small for making a
 complete contact, instead, non-inclusive geometric contacts are found by
 maximizing the area of an ellipse that fits in the intersection of the polygons
 involved in the contact.
-Results are presented in figure~\ref{fig:riviere}.
+Results are presented in~\Figref{fig:riviere}.
 As we can see, the feet turns slightly, to be more aligned with the support
 surfaces, yet they do not become completely aligned with these supports, which would permit to get the biggest ellipse area.
 This is due to the fact that a posture cost is competing with the area cost, yielding this compromise.
@@ -1132,7 +1132,7 @@ The operators `addition', `subtraction', `multiplication', `sinus' and `cosinus'
 We developed a generic algorithm which allows to automatically lift symbolic functions, and in particular, polynomials of trigonometric functions, based on a given criterion.
 To do so, we use symbolic variables.
 A symbolic equation can be seen as a graph of atomic operations (addition, multiplication, and other functions), which can, in turn, be explored and truncated at appropriate places where we insert additional variables.
-Figure~\ref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the original variables, the yellow ones represent the lifted variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the end effector equations.
+\Figref{fig:graph_direct} presents the graph of atomic operations for equation~\Eqref{eq:direct_position}, where the green circles represent the original variables, the yellow ones represent the lifted variables, the pink ones represent the atomic operations and the red circles represent the final atomic operations that lead to the end effector equations.
 \begin{figure}
   \centering
   \includegraphics[width=0.65\textwidth]{graphDirectLiftedEEPos.pdf}
@@ -1300,7 +1300,7 @@ We devised a set of simple robots to be the toy examples of our experimentation.
 We used fixed base robots with revolute joints only.
 To study the influence of the number of degrees of freedom of a robot on the optimization performance, we studied planar robots composed of $n$ successive links of length 1 attached to one another by revolute joints.
 We also studied a 7 axis 3D manipulator arm robot and a planar upper body robot with 2 arms.
-Illustration of those different types of robots are given in figure~\ref{fig:robots}, where blue lines represent the links, red circles represent the revolute joints, green squares represent the origin of links, the biggest green square being the origin of the base link of the robot, and the red cross is the end effector.
+Illustration of those different types of robots are given in~\Figref{fig:robots}, where blue lines represent the links, red circles represent the revolute joints, green squares represent the origin of links, the biggest green square being the origin of the base link of the robot, and the red cross is the end effector.
 \begin{figure}
   \centering
   \includegraphics[width=0.98\textwidth]{robots.png}
@@ -1326,8 +1326,8 @@ We propose to use the following test to compare the performances of different li
 This approach allows to fairly compare the performances of all lifting approaches on a given problem.
 And to observe the influence of the number of degrees of freedom of the robot on those performances, we use the n-axis planar robot model.
 We plot the average number of iterations needed to reach convergence against the number of degrees of freedom of the planar robot.
-In figure~\ref{fig:lift_results} we present the results obtained for the resolution with our custom SQP, using BFGS updates and a filter line-search, without cost function, initializing all the variables randomly.
-In figure~\ref{fig:lift_results2} we present the best case in favor of the lifted approach that we encountered, those results are obtained for the resolution with our custom SQP, using SR1 updates and a filter line-search, without cost function, initializing all the variables such that the lifted equations are satisfied.
+In~\Figref{fig:lift_results} we present the results obtained for the resolution with our custom SQP, using BFGS updates and a filter line-search, without cost function, initializing all the variables randomly.
+In~\Figref{fig:lift_results2} we present the best case in favor of the lifted approach that we encountered, those results are obtained for the resolution with our custom SQP, using SR1 updates and a filter line-search, without cost function, initializing all the variables such that the lifted equations are satisfied.
 
 \begin{figure}
 \centering
@@ -1398,10 +1398,10 @@ In figure~\ref{fig:lift_results2} we present the best case in favor of the lifte
 \label{fig:lift_results2}
 \end{figure}
 
-The results presented in figure~\ref{fig:lift_results} show that the direct formulation outperforms every form of lifting for almost all the robots tested.
+The results presented in~\Figref{fig:lift_results} show that the direct formulation outperforms every form of lifting for almost all the robots tested.
 This is the typical result that we observed in most cases.
 
-In figure~\ref{fig:lift_results2}, we show one specific case where, with long kinematic chains ($\geq10$ DOF), the lifted methods are slightly faster to solve.
+In~\Figref{fig:lift_results2}, we show one specific case where, with long kinematic chains ($\geq10$ DOF), the lifted methods are slightly faster to solve.
 
 We studied many of the possible configurations of resolution methods (22 in total), but not all of them.
 Still, it seems possible to draw some conclusions out of it, because in most cases, the direct approach outperforms the lifted one.

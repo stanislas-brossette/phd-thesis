@@ -54,7 +54,7 @@ In order to simulate gravity, we minimize the potential energy of the all the cu
 
 We consider the problem of stacking $n$ cubes in an open-top box composed of 5 plans (the ground and 4 walls).
 %Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plane is parametrized on $\mathbb{R}\times S^2$.
-In Figure~\ref{fig:cubes}, we illustrate the case of stacking 3 cubes.
+In~\Figref{fig:cubes}, we illustrate the case of stacking 3 cubes.
 With the initial condition on the left side and a solution on the right.
 \begin{figure}
 \centering
@@ -84,7 +84,7 @@ We solve these two problems for different numbers of cubes and compare the resul
 In each resolution, both problems (Real Space and Manifold formulations) are initialized with the same randomized initial guess.
 The resolutions with {\tt PGSolver} are set up with the same set of parameters, and the ones with the CFSQP solver use its default parameters.
 The initial positions of the cubes are chosen randomly, and each plane is initialized at a position between the two cubes it separates.
-We display the results of these tests in Figure~\ref{fig:timings-cubes}.
+We display the results of these tests in~\Figref{fig:timings-cubes}.
 \begin{figure}[htpb]
   \centering
   \input{Chapter6-Evaluation/Figs/timingsCubes.tikz}
@@ -99,7 +99,7 @@ Which results in resolutions with {\tt PGSolver} on manifold formulation being o
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
 In particular, the minimum value for the diagonal terms $\mu$ is important.
-We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$ (presented in Figure~\ref{fig:timings-cubes}), and the formulation with manifolds is consistently faster than the one without manifolds.
+We observed that for values of $\mu$ between $10^{-8}$ and $10^{-2}$, the behaviors of both resolutions are quite consistent (the influence of $\mu$ is small in that span), with the best results observed for $10^{-8}$ (presented in~\Figref{fig:timings-cubes}), and the formulation with manifolds is consistently faster than the one without manifolds.
 Values outside of that span tend to degrade both resolutions.
 Too high values tend to damp the Hessian, which translates into bigger numbers of iterations.
 Too small values make the hessian closer to being rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
@@ -184,14 +184,7 @@ We take here the opportunity to assess this observation by solving series of pro
 As we explained in Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds}, the Hessian can be updated as a whole, or individually, in which case a list of Hessians approximating each constraint's second-order derivative is maintained and combined in the global Hessian matrix.
 We compare the results obtained with the three update methods that are BFGS, BFGS with self-scaling and SR1 and using whole or individual updates for each of them.
 We gather those results after solving 250 different posture generation problems, 5 times each, starting increasingly close from the solution.
-We sample the range of initial distances into 20 segments of the same length and report the average results on each segment as a data point in Figure~\ref{fig:evalPG}.
-
-%\begin{figure}[htb]
-%\centering
-  %\includegraphics[width=0.8\linewidth]{histogram4BFGS.png}
-  %\caption{Rate of success of the posture generation compared to the distance between initial guess and solution.}
-%\label{hist:dist}
-%\end{figure}
+We sample the range of initial distances into 20 segments of the same length and report the average results on each segment as a data point in~\Figref{fig:evalPG}.
 \begin{figure}[htb]
 \centering
   \includegraphics[width=\linewidth]{evalPG/resWithSR1Grouped.png}
@@ -536,7 +529,7 @@ The different steps we follow to create a set of relevant convex polygonal plane
 \label{fig:full_pipeline}
 \end{figure}
 
-The Figure~\ref{fig:full_pipeline} illustrates the major steps of this point cloud treatment.
+The~\Figref{fig:full_pipeline} illustrates the major steps of this point cloud treatment.
 We use Willow Garage's Point Cloud Library\footnote{\url{http://pointclouds.org/}} (PCL)~\cite{rusu:icra:2011} extensively for processing the point cloud.
 
 \paragraph{Acquisition of point cloud from an RGB and depth sensor}
