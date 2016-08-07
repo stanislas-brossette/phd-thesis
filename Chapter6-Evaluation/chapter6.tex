@@ -440,7 +440,8 @@ We locked the elbow, wrist and hand joints of the arm, simulating the presence o
 \end{figure}
 
 We generated five 60 seconds trajectories in which the three shoulder joints were reaching successive random joint positions using minimum-jerk like trajectories.
-Each trajectory is decomposed in sub-trajectories to travel between two consecutive random positions in respectively $10$s, $5$s, $2$s, $1$s and $0.5$s (As a result, the trajectories are ordered from the slowest to the fastest). We played those trajectories on the robot and sampled the F/T sensors and joint encoders outputs at $100$Hz.
+Each trajectory is decomposed in sub-trajectories to travel between two consecutive random positions in respectively $10$s, $5$s, $2$s, $1$s and $0.5$s (As a result, the trajectories are ordered from the slowest to the fastest).
+We played those trajectories on the robot and sampled the F/T sensors and joint encoders outputs at $100$Hz.
 %We filtered the joint positions and obtained joint velocities and accelerations using a Savitzky-Golay filtering of order 2 and with a windows size of $499$, $41$, $21$, $9$, $7$ samples.
 We used joint positions, velocities and accelerations with the kinematic model of the robot to compute $A^g$ and $V$ of the F/T sensor for each time sample.
 %We removed the unknown offset from the F/T measurements using the offset removal technique described in \cite{traversaro2015situ}.
@@ -459,7 +460,8 @@ Masses are expressed in $kg$, first moment of masses in $kg.m$, inertia matrix e
 \FloatBarrier
 The proposed optimization problem clearly cannot identify those parameters anyway, as the identified parameters are an order of magnitude larger than the ones estimated for faster datasets, nevertheless, it always estimates inertial parameters that are \emph{fully physically consistent}.
 For faster datasets (sub-trajectory times of $1$s or $0.5$s) the results of the two optimization problems are the same because the high values of angular velocities and accelerations permit to identify all the parameters perfectly.
-While this is possible to identify all the inertial parameters of a single rigid body, this is not the case when identifying the inertial parameters of a complex structure such as a humanoid robot, for which both structural~\cite{ayusawa2014identifiability} and numerical~\cite{pham1991essential} not identifiable parameters exists. In this later application, the enforcement of \emph{full physical consistency}  will always be necessary to get meaningful results.
+While this is possible to identify all the inertial parameters of a single rigid body, this is not the case when identifying the inertial parameters of a complex structure such as a humanoid robot, for which both structural~\cite{ayusawa2014identifiability} and numerical~\cite{pham1991essential} not identifiable parameters exists.
+In this later application, the enforcement of \emph{full physical consistency}  will always be necessary to get meaningful results.
 
 \section{Application to contact planning on real-environment}
 \label{sec:application_of_contact_planning_on_real_environment}
