@@ -189,7 +189,7 @@ We define a class called DescriptiveWrapper that contains a RobOptim function an
 Once a function is wrapped in a DescriptiveWrapper and the optimization problem is set, we need to establish the mapping between the variable of the problem, which is defined on the global manifold of the problem, and the input of the function that must match the description of its application manifold.
 That is the role fulfilled by the WrapperOnManifold layer, that compares the two manifolds, matches them and computes an input mapping from the problem's input vector to the function's, which we denote $\pi_I$.
 This mapping is computed once during the instantiation of the problem and then used at each call of the function.
-The use of the input mapping is illustrated by the example in Fig.~\ref{fig:auto_map}
+The use of the input mapping is illustrated by the example in~\Figref{fig:auto_map}
 %\begin{equation}
   %\begin{split}
   %\pi_I:\mathbb{E}\to\mathbb{E}_I\\
@@ -267,7 +267,7 @@ For example, spherical joints can be parametrized on $S^2 \times \mathbb{R}$, th
 %\end{align}
 %Those two sets of equations~\Eqref{eq:planar_contact} and~\Eqref{eq:fix_planar_contact} can easily be recombined to generate other types of constraints (e.g.\ fixing only the translation, or only the rotations\ldots).
 
-\item The Frame constraint is a generic type of constrain which consists in blocking a predefined set of degrees of freedom of one frame $F_2$ w.r.t. another frame $F_1$.
+\item The Frame constraint is a generic type of constraint which consists in blocking a predefined set of degrees of freedom of one frame $F_2$ w.r.t. another frame $F_1$.
 By default, the frame $F_2$ has 6 degrees of freedom w.r.t. $F_1$, three translational degrees of freedom TX, TY, and TZ, respectively along $\vec{x_1}$, $\vec{y_1}$ and $\vec{z_1}$ and three rotational ones RX, RY, and RZ, respectively around $(O_1,\vec{x_1})$, $(O_1,\vec{y_1})$ and $(O_1,\vec{z_1})$.
 We can write constraints such that any combination of the translational degrees of freedom is blocked:
 
@@ -312,7 +312,8 @@ A punctual contact constraint can be devised by blocking TX, TY and TZ.
 To completely fix the position of $F_2$ w.r.t. $F_1$, one can block TX, TY, TZ, RX, RY, and RZ.
 And many other types of custom constraints can be devised with this formulation.
 
-In the event that the two frames do not have a satisfying configuration to write the desired constraint with this formalism (for example, if one wants to write a planar contact between two surfaces $S_1$ and $S_2$, where $\vec{z_1}$ and $\vec{z_2}$ are outbound normal vectors, then equation~\ref{eq:2_rotations_blocked} is not satisfactory because we want to oppose $\vec{z_1}$ and $\vec{z_2}$, not identify them). Then the user defines a new frame $F_2'$ that is a constant 3D transformation away from $F_2$ (in that case a rotation of $\pi$ around $(O_1,\vec{x_1})$ would suffice).
+In the event that the two frames do not have a satisfying configuration to write the desired constraint with this formalism (for example, if one wants to write a planar contact between two surfaces $S_1$ and $S_2$, where $\vec{z_1}$ and $\vec{z_2}$ are outbound normal vectors, then equation~\ref{eq:2_rotations_blocked} is not satisfactory because we want to oppose $\vec{z_1}$ and $\vec{z_2}$, not identify them).
+Then the user defines a new frame $F_2'$ that is a constant 3D transformation away from $F_2$ (in that case a rotation of $\pi$ around $(O_1,\vec{x_1})$ would suffice).
 
 \item The stability constraint ensures that the Euler-Newton equation~\Eqref{eq:NewtonWrench} is balanced for the set of external wrenches applied to the robot (gravity $\mathcal{W}_G$ and contact forces $\mathcal{W}_i$).
 \begin{equation}
@@ -368,7 +369,8 @@ For each collision avoidance constraint, we require that the distance between th
 \end{equation}
 
 \item The torque limit constraint makes use of the Inverse Statics Algorithm~\ref{alg:ISmatrix} to compute the torques in all the joints of every robots and their derivatives are computed by Algorithm~\ref{alg:TJC}.
-Denoting $\tau_i$ the torque in joint $i$ resulting from the robot's configuration and the external forces applied on it, and its lower and upper limits as $\tau_i^-$ and $\tau_i^+$. The torque limit constraint writes as follows:
+Denoting $\tau_i$ the torque in joint $i$ resulting from the robot's configuration and the external forces applied on it, and its lower and upper limits as $\tau_i^-$ and $\tau_i^+$.
+The torque limit constraint writes as follows:
 \begin{equation}
   \forall i,\ \tau_i^- \leq \tau_i \leq \tau_i^+
 \end{equation}
@@ -490,7 +492,7 @@ After creating the complete manifold, the PostureProblem class can be used to fa
 \section{Examples of postures generation}
 \label{sec:examples_of_postures_generation}
 
-In this section, we present some scenarios that are build and solved with our posture generator and solver.
+In this section, we present some scenarios that are built and solved with our posture generator and solver.
 \paragraph{Application of a desired force}
 In the context of using a humanoid robot in aircraft manufacturing\footnote{\url{www.comanoid.eu}}, we formulate a problem where the HRP-4 robot is required to apply a desired force on a given point of the airplane's structure (printing or gluing a braquet, preparation for drilling, etc.).
 We denote $f_d$ the desired value of the force in direction $\vec{d}$, and $\vec{f_c}$ the actual force at the contact point. One can simply implement the following function $f_{\text{target}}(f_c)$ to minimize (hence a cost) to get the desired result:
@@ -499,7 +501,7 @@ We denote $f_d$ the desired value of the force in direction $\vec{d}$, and $\vec
 \end{equation}
 In addition to that cost function, the robot needs to keep its foot on the ground, its left hand is used to lean on a beam of the structure to allow a longer reach with the right hand that is in contact with the wall.
 Those constraints must be satisfied while respecting the joint and torque limits of the robot, maintaining balance and avoiding auto-collisions.
-The result generated by our {\tt PGSolver} is depicted in Figure~\ref{fig:comanoid}
+The result generated by our {\tt PGSolver} is depicted in~\Figref{fig:comanoid}
 \begin{figure}
   \centering
   \includegraphics[width=0.6\linewidth]{comanoid.png}
@@ -509,9 +511,9 @@ The result generated by our {\tt PGSolver} is depicted in Figure~\ref{fig:comano
 
 \paragraph{Generating postures in highly constrained environment}
 In this scenario, we need to find task-compatible postures of the the HRP-4 inside a highly constrained environment, in the sense that many obstacles limit its displacement, and it must avoid collision with them.
-The goal is to be able the reach the four corners of a panel of circuit breakers (in green on Figure~\ref{fig:getafe}) to activate them.
+The goal is to be able the reach the four corners of a panel of circuit breakers (in green on~\Figref{fig:getafe}) to activate them.
 We generated a sequence of steps to reach that panel and then some postures to reach different points of this panel.
-In Figure~\ref{fig:getafe}, we show some extracts of this sequence of postures.
+In~\Figref{fig:getafe}, we show some extracts of this sequence of postures.
 In each of them the two foot are in planar contact with the ground, alternatively bearing forces, while always respecting the joint, torque limits, collision avoidance, and stability constraints.
 On the last posture, the top left corner of the panel is reached with the tip of the right hand of the robot.
 \begin{figure}
@@ -582,8 +584,8 @@ To do that, we create a variable $v_{S^2}$ on $S^2$, add it to our optimization 
 In our framework, this constraint is expressed exactly as the contact between 2 planar surfaces, once the mappings of $p_s(v_{S^2})$ and $n_s(v_{S^2})$ are done.
 In a framework that does not handle manifolds, it would require to setup a specific constraint, ensuring that the distance between $c_s$ and $S_B$ is equal to $r_S$.
 
-In Figure~\ref{fig:contact_plan_sphere} we show the results obtained by solving a problem where the HRP-2Kai robot has to keep its feet in contact with the ground at fixed positions, touch a sphere with a side of its right wrist and point as far as possible in a given direction $d$ with its left hand, under balance constraints.
-The top row of Figure~\ref{fig:contact_plan_sphere} shows the results for this problem with several different $d$.
+In~\Figref{fig:contact_plan_sphere} we show the results obtained by solving a problem where the HRP-2Kai robot has to keep its feet in contact with the ground at fixed positions, touch a sphere with a side of its right wrist and point as far as possible in a given direction $d$ with its left hand, under balance constraints.
+The top row of~\Figref{fig:contact_plan_sphere} shows the results for this problem with several different $d$.
 %It shows that our optimization algorithm finds an optimal contact point on the sphere to reach its goal as best as possible while satisfying the given constraints.
 In every situation, the projection of the CoM is outside the polygon of support, meaning that such postures would not be reached without leaning on the sphere.
 \begin{figure}
@@ -615,17 +617,17 @@ In every situation, the projection of the CoM is outside the polygon of support,
 Being able to parametrize the choice for the location of the contact point on the sphere is interesting, but a limitation of this formulation is that the contact point on the wrist of the robot is restricted to one single user-defined face.
 Instead, we describe the shape of the wrist body as a parametric function and let the contact point on the wrist as well as its counterpart on the sphere, result from the optimization process.
 The section of HRP-2Kai's wrist is a square with rounded edges.
-We parametrize this shape as shown in Figure~\ref{fig:param_wrist_detail}:
+We parametrize this shape as shown in~\Figref{fig:param_wrist_detail}:
 we consider the angular coordinate $\theta$ of the point on the section.
 It is added as a variable on $\mathbb{R}$ to the problem.
 The shape of the quarter of section $[0;\pi/2]$ is a succession of a vertical line, a quarter of a circle and a horizontal line.
 This pattern is repeated for the 3 other quarters.
-The equations are given in Figure~\ref{fig:param_wrist_detail}.
+The equations are given in~\Figref{fig:param_wrist_detail}.
 In our framework, we define the function describing the shape of the wrist, create a frame parametrized by that function and then define the contact between that frame and the point and the normal on the sphere.
 This formulation not only is very easy to implement but most importantly, allows for richer posture generations.
 The optimization algorithm chooses the contact point on the sphere as well as the contact point on the wrist, which leads to a wider accessibility range, and a better optimization of the cost function.
 
-The bottom row of Figure~\ref{fig:contact_plan_sphere} displays the results of this simulation for the robot pointing in 4 directions.
+The bottom row of~\Figref{fig:contact_plan_sphere} displays the results of this simulation for the robot pointing in 4 directions.
 Notice that on the 2nd and the 4th (pointing forward and to the left) images, the results for the 2 types of models are nearly identical, whereas in the 1st and 3rd images, different faces of the wrist have been chosen (On the 1st, the wrist is rotated by $180^{\circ}$, and $90^{\circ}$ on the 3rd).
 In these 4 cases, the contact with parametrized wrist gives a better value of the objective function (the left hand points further).
 This observation scales:
@@ -655,7 +657,7 @@ At this point, the normal is given by $\dfrac{\nabla S(\alpha v)}{\left\|\nabla 
 %Also we generate a similar function that returns the normal of the intersection point.
 Given this parametrization, we write a contact constraint between the frame of the hand of the robot and the point and normal on the surface of the superellipsoid.
 
-In Figure~\ref{fig:hrp4_cube} we present some results for a posture generation problem with manipulation: On the left side, the feet are free to move on a sphere, and, on the right side, the left foot position is fixed and the right foot is free to move on the ground.
+In~\Figref{fig:hrp4_cube} we present some results for a posture generation problem with manipulation: On the left side, the feet are free to move on a sphere, and, on the right side, the left foot position is fixed and the right foot is free to move on the ground.
 The hands must be in contact with the cube.
 The cube is free to move (parametrized by $\mathbb{R}^3 \times SO(3)$) and has it own set of Euler-Newton equations, which must be fulfilled.
 %On the accompanying video, one can observe how the contact points on the cube evolve along with the optimization.
@@ -680,7 +682,7 @@ Right: it is to put the cube as far as possible in a given direction}
 We have presented some methods to formulate contact constraints with parameterized surfaces.
 The surfaces that we used so far could all be approximately represented by closed-form equations (sphere, superellipsoid, wrist of HRP-2).
 %We showed that to generate contacts between a body of a robot and simple geometric surfaces (sphere, superellipsoid, wrist of HRP2) we can devise some ad hoc parametrization of the surface and write constraints on the resulting approximated surface.
-This is sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014}\cite{vaillant:autonomousrobots:2016}.
+This is sufficient to tackle a large number of interesting scenarios, especially for robots in structured environment~\cite{vaillant:humanoids:2014} \cite{vaillant:autonomousrobots:2016}.
 However, contacts with more complex objects are needed too, for unstructured environment or for manipulating objects.
 
 To work with derivative-based optimization algorithms, such as SQP or Interior Points, the functions involved in the optimization problem need to be at least $C^1$ and gradients must be full rank at the solution (for ensuring constraints qualification, see~\cite{nocedal:book:2006}).
@@ -697,7 +699,8 @@ In~\cite{escande:icra:2016}, we provide a systematic way to obtain a parametric 
 To that end, we combine the use of Catmull-Clark subdivision surfaces with a tailored ray casting algorithm, and propose an efficient and robust numerical method to evaluate a point, a normal and their derivatives at a given set of parameters.
 
 The Catmull-Clark algorithm is used to create a smooth surface modeling a given \emph{control mesh}.
-It iteratively subdivides a control mesh by following a set of rules. The limit surface of this subdivision process is called the Catmull-Clark Surface (CCS), see~\ref{fig:CCIterations}.
+It iteratively subdivides a control mesh by following a set of rules.
+The limit surface of this subdivision process is called the Catmull-Clark Surface (CCS), see~\Figref{fig:CCIterations}.
 \begin{figure}
 \centering
   \includegraphics[height = 2cm]{cube1.png}
@@ -714,7 +717,7 @@ This gives us a mapping from $S^2$ to the CCS.
 From there, we propose methods to compute the normal to the CCS point associated with an element of $S^2$ and we devise the derivations of both those mappings.
 
 As a result, we get a smooth parametrization of the input mesh that satisfies the continuity requirements.
-In Figure~\ref{fig:CCS}, we show the Catmull-Clark surface (in blue) corresponding to the mesh (in green) of an HRP-2 link, for two different levels of smoothness.
+In~\Figref{fig:CCS}, we show the Catmull-Clark surface (in blue) corresponding to the mesh (in green) of an HRP-2 link, for two different levels of smoothness.
 On the right picture, we first apply twice a simple subdivision scheme, before using Catmull-Clark subdivisions, thus obtaining a surface closer to the original mesh but less smooth.
 The red line is the image of a great circle of the unit sphere through our parametrization.
 \begin{figure}
@@ -754,7 +757,7 @@ We make use of the capacity of our optimization solver to directly work with a v
   %\label{fig:hand}
 %\end{figure}
 
-In the first example (Figure~\ref{fig:examples_CCS}, left), a HRP-4 robot is asked to grasp an object (here a leg part of HRP-2) and to hold it as far as possible in front of it, with the following constraints: contacts must occur between predefined points on the hands of HRP-4 and points free to move on the surface of the object, modeled as a parametric surface with our approach~\cite{escande:icra:2016}; furthermore the robot has to keep its left foot at a given fixed position and has its right foot anywhere on the floor.
+In the first example (\Figref{fig:examples_CCS}, left), a HRP-4 robot is asked to grasp an object (here a leg part of HRP-2) and to hold it as far as possible in front of it, with the following constraints: contacts must occur between predefined points on the hands of HRP-4 and points free to move on the surface of the object, modeled as a parametric surface with our approach~\cite{escande:icra:2016}; furthermore the robot has to keep its left foot at a given fixed position and has its right foot anywhere on the floor.
 The forces applied by the robot on the object must be sufficient to counter the gravity, and the system (robot, object) must be stable with all forces within their friction cones.
 Additionally, the robot must stay within its joint limits.
 We do not check here for collisions or torque limits.
@@ -763,17 +766,17 @@ The solver finds a solution in about $70$ iterations.
 Contacts also occur in manipulation.
 Actually, manipulation and locomotion are closely related.
 Locomotion can be seen as a manipulation of the environment, it is only a matter of reference frame (see~\cite{bouyarmane:ar:2012}).
-The second example (Figure~\ref{fig:examples_CCS}, right) demonstrates our PG applied to grasping an object.
+The second example (\Figref{fig:examples_CCS}, right) demonstrates our PG applied to grasping an object.
 The base of the hand is fixed, and the contact points on the fingers are given.
 The contact points on the objects are parametrized with our method and are free to move on the entire (approximated) surface of the object: the optimization finds automatically how to grasp the object so as to be able to maintain its stability, taking about $50$ iterations.
 Note that the object is non-convex.
 %The example is a simple show-case, and we look forward to compare this approach with state-of-the-art methods for grasping.
 
-The third example (Figure~\ref{fig:HRP4_cubes}) involves a stack of cubes on which the robot must stand, using its hands and feet to maintain its stability and respect its torque limits.
+The third example (\Figref{fig:HRP4_cubes}) involves a stack of cubes on which the robot must stand, using its hands and feet to maintain its stability and respect its torque limits.
 The stack is modeled as a single object.
 Once again, contact points are fixed on the robot and free on the surface.
 The surface is modeled by a single object. That object is not convex, thus it cannot be used as is for collision avoidance.
-For collisions, we model the stack of cubes with a set of 21 cubes all slightly smaller than the actual cubes see Figure~\ref{fig:HRP4_cubes} (Right), and we require the robot to avoid collision with those cubes.
+For collisions, we model the stack of cubes with a set of 21 cubes all slightly smaller than the actual cubes see~\Figref{fig:HRP4_cubes} (Right), and we require the robot to avoid collision with those cubes.
 The optimization takes around $115$ iteration to converge to a solution.
 Since there is a single surface to contact with, we do not need to specify with which faces, edges or corners the robot needs to be in contact with.
 The optimization decides it automatically.
@@ -781,7 +784,7 @@ This is a very attractive feature of our approach as it allows to include discre
 This can be used to alleviate the work to be done by the user, be it a human or a planning algorithm: the user still has to specify the bodies in contact, but part of the combinatorics relative to the matching of a body with a particular surface or object is handled directly by the PG\@.
 
 \section{Conclusion}
-\label{sec:conclusion_ch4}
+\label{sec:conclusion_ch5}
 
 In this chapter, we presented our approach for formulating a posture generation problem and generating an optimization problem that describes it.
 We presented several tools that are meant to simplify this process for the developer, with the automatic variable management, the use of non-Euclidean manifolds and the geometric expressions framework.

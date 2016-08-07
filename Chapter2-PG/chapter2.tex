@@ -63,7 +63,7 @@
 In this Chapter, we present in detail the formulation of a posture generation problem.
 We present the algorithms used to compute the kinematics of a robot and its derivatives as well as the joint torques.
 Then we formulate some classical functions that are often used in posture generation: joint limits, contact constraints, collision avoidance, stability, torque limits and friction cones.
-In Figure~\ref{fig:PG}, we illustrate those constraints with the result of a posture generation problem where the HRP-4 robot must climb on a stack of cubes while being statically stable, respecting its joint and torque limits, the contact forces must remain within their respective friction cones and the robot must avoid auto-collisions and non-desired contacts (i.e. collisions) with the environment.
+In~\Figref{fig:PG}, we illustrate those constraints with the result of a posture generation problem where the HRP-4 robot must climb on a stack of cubes while being statically stable, respecting its joint and torque limits, the contact forces must remain within their respective friction cones and the robot must avoid auto-collisions and non-desired contacts (i.e. collisions) with the environment.
 
 %\begin{figure}[ht]
   %\centering
@@ -101,7 +101,7 @@ Each joint defines the relation between its predecessor and successor bodies.
 For joint $J_i$, they are respectively denoted $pred(i)$ and $succ(i)$, and $B_{pred(i)}$ is called the parent body of $B_{succ(i)}$.
 We denote $\lambda(j)$ the index of the parent body of $B_j$.
 The number of degrees of freedom of $J_i$ is denoted $dof^J_i$ and the number of degrees of freedom of the whole robot is denoted $dof$.
-Figure~\ref{fig:mbg} illustrates this numbering system for a simple robot with 4 joints and 5 bodies (including the basis)
+\Figref{fig:mbg} illustrates this numbering system for a simple robot with 4 joints and 5 bodies (including the basis)
 
 The geometric relations between bodies and joints are described through transformations between their reference frames.
 We use transformations as described in the Spatial Vector Algebra chapter of `Rigid Body Dynamics Algorithm' by Roy Featherstone~\cite{featherstone:book:2007}.
