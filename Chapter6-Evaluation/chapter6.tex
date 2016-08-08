@@ -487,7 +487,7 @@ In this later application, the enforcement of \emph{full physical consistency}  
 
 When an exact model of the environment is not available, it in necessary to plan a robot's motion based on data acquired by its sensors.
 In this section, we investigate the generation of `viable' postures in an environment acquired by a RGBD camera as a point cloud.
-Our goal here is to generate postures with constraints that describe contacts between the robot and the acquired point cloud that represent the environment.
+Our goal here is to generate postures with constraints that describe contacts between the robot and the acquired point cloud representing the environment.
 To do so, we need to formulate contact and collisions avoidance constraints between geometric features of the robot and a point cloud.
 This can be done in two different ways:
 \begin{itemize}
@@ -519,17 +519,17 @@ Another approach consists in extracting the surfaces from the point cloud, and t
 Since working on raw point clouds is costly because of the high number of data points, this extraction has also been enhanced~\cite{biswas:icra:2012} in order to be run in real-time.
 This approach has recently been experimented on a humanoid robot in~\cite{maier:humanoids:2012}, where two methods are combined: the surface extraction from a point cloud, and the voxel-based 3D decomposition of the environment~\cite{nakhaei:humanoids:2008}.
 Still, since the robot only navigates in a flat environment, and does not realize manipulation tasks, the surfaces extracted from the 3D point cloud are down projected to a 2D plan, on which are based the navigation and collision avoidance processes.
-The use of humanoid robots allows to navigate in more complex environments, some work has been done to make a humanoid robot go down a ramp~\cite{lutz:iros:2012} or climb stairs~\cite{osswald:iros:2012}.
-Yet, those methods use laser-based vision rather than point cloud-based vision, so as to have a precise analysis of a known environment.
+The use of humanoid robots allows to navigate in more complex environments.
+Some work has been done to make a humanoid robot go down a ramp~\cite{lutz:iros:2012} or climb stairs~\cite{osswald:iros:2012}.
 
 In order to enable a robot to analyze and plan a motion inside a 3D sensory-acquired environment, we propose to extract the relevant surfaces of an acquired point cloud, to directly have a global picture of the environment and determine the convex planar surfaces that the robot can contact with.
 
 \subsection{Building an understandable environment}
 \label{sub:building_an_understandable_environment}
 
-Our first concern is to build an environment that our multi-contact planner and posture generator are able to ``understand'' and that can be extracted from a point cloud scene.
+%Our first concern is to build an environment that our multi-contact planner and posture generator are able to ``understand'' and that can be extracted from a point cloud scene.
 
-The simplest entity that our planner would be able to deal with and that could correctly describe the robot's environment is a set of convex polygonal planar surfaces.
+The simplest entity that our PG would be able to deal with and that could correctly describe the robot's environment is a set of convex polygonal planar surfaces.
 Therefore, starting from an acquired point cloud, we extract a relevant set of such geometric entities that will be used as the surroundings of the robot.
 
 \begin{figure}
@@ -614,9 +614,8 @@ After re-orienting each frame to get their expression with respect to the world 
 %\end{algorithmic}
 %\end{algorithm}
 
-Once the surfaces are defined, we can choose which ones are suitable for the robot to make contact with.
-Using flat contact constraints formulations as described previously.
-Although it is not a mandatory step, it allows reducing the amount of exploration during the planning phase by removing undesired or inappropriate pairs of robot/environment surfaces.
+Once the surfaces are defined, we can choose which ones are suitable for the robot to make contact with, using flat contact constraints formulations as described previously.
+%Although it is not a mandatory step, it allows reducing the amount of exploration during the planning phase by removing undesired or inappropriate pairs of robot/environment surfaces.
 For the time being, this is determined by heuristics that are defined depending on the situation.
 If we want the robot to walk on various surfaces, only those that have a normal vector closely aligned with the gravity field would be selected as potential candidates (so as to eliminate the walls and other surfaces on which the robot cannot walk).
 Similarly, only surfaces located at a certain height can be considered for hand contact, etc.
@@ -627,7 +626,7 @@ Basically, we extrude each surface by a few centimeters in the direction opposit
 \subsection{Results}
 \label{sub:results_pcl_plannif}
 
-We illustrate this approach with two experiments where the HRP-2 robot is required to move $2$m forward.
+We illustrate this approach with two planning scenarios where the HRP-2 robot is required to move $2$m forward, using the planner presented in~\cite{bouyarmane:humanoids:2010}.
 In both scenarios, this results in climbing on a table (The first one is $71$cm high and the second one is $53$cm high) with the help of various surrounding objects.
 The knowledge of the environment and surrounding objects is obtained from a point cloud captured with an RGBD camera.
 
@@ -688,15 +687,15 @@ Alternatively, postures could be generated directly with contacts on point cloud
 Approximating the mesh with a Catmull-Clark surface and smoothly parametrizing the contact location on it could be a solution.
 But again, that would require some pre-processing of the point cloud to generate the surfaces.
 In~\cite{hauser:isrr:2013}, a contact formulation between robot and point clouds is presented, where the mesh representing each object is thickened by a thin layer, and a little interpenetration of those layers is allowed.
-A similar formulation could be used in posture generation to smoothen the contact constraints when a point cloud is involved.
+A similar formulation could be used in posture generation to describe the contact constraints when a point cloud is involved.
 
 %PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
 
 Besides the issue of generating postures on acquired point cloud data, this study raises some questions regarding the handling of uncertainties in posture generation.
 Since the acquired point cloud data is subject to measurement errors, it would be beneficial to be able to generate postures that are robust to those errors.
 For example, given a plan $P$ extracted from a point cloud, its location in space is known with a limited precision $\delta$ in its orientation and position.
-It would serve our purpose to devise a criterion that guarantees that for all imprecision of value less than a given $\delta$ on the location of the element to contact with, there exists a solution configuration in which the contact with $P$ is maintained.
-But such criterion is not straightforward to devise, and as of now, we have not found any promising leads, except using a space-grid discretisation of the possible uncertainty and generating a solution posture for each point of the grid.
+It would serve our purpose to devise a formulation that guarantees that for all imprecision of value less than a given $\delta$, there exists a solution configuration in which the contact with $P$ is maintained.
+But such formulation is not straightforward to devise, and as of now, we have not found any promising leads, except using a space-grid discretisation of the possible uncertainty and generating a solution posture for each point of the grid.
 Although this could be solved fairly quickly in most cases by initializing one posture generation with the solution found for a neighbor grid point, such approach does not guarantee that solutions exist for any point between the grid points.
 
 %Besides the issue of generating postures on acquired point cloud data, this study raises some questions regarding the handling of uncertainties in multi-contact planning and posture generation.
