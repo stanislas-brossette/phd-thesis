@@ -98,6 +98,12 @@ These two stages are loosely coupled, which can result in suboptimal use of the 
 The contact sets, as well as the postures associated, are discovered along with the entire movement's trajectories by using contact invariant optimization.
 This allows for the exploitation of any synergies that might exist between the contact events and the motion trajectory.
 
+In~\cite{tonneauijrr16}, a multi-contact planning framework is presented that allows the computation of complex multi-contact motions in very short times.
+It is based on several heuristics that allow fast computations of the motions.
+Starting by generating a guide path that satisfies the reachability condition, which means that the root body is close to obstacles to allow making contacts with them but not too close to avoid collisions.
+A discrete sequence of statically stable whole-body configurations along this path is then generated efficiently by taking advantage of several approximations and heuristics.
+This approach allows generating complex contact plans in a few seconds, whereas other approaches usually take several minutes.
+
 In~\cite{liu:acm:2012}, posture generation is used to find the optimal posture and position of contacts to optimally realize a manipulation task along a path while satisfying geometric, kinematic, as well as force and torque constraints.
 The task is defined as a path and forces to follow with an end effector.
 Instead of finding a sequence of unrelated postures along the path, all the postures are found by solving a single optimization problem in which successive postures are coupled by constraints to ensure that the foot positions remain constant during the task, even though the rest of the body can move.

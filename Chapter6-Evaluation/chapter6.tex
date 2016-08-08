@@ -466,58 +466,71 @@ In this later application, the enforcement of \emph{full physical consistency}  
 \section{Application to contact planning on real-environment}
 \label{sec:application_of_contact_planning_on_real_environment}
 
-In this section, we present our approach to generate multi-contact planning scenarios in a sensory acquired environment.
-This work was done prior to the development of our posture generator and therefore makes use of a previous version of it that is presented in~\cite{bouyarmane:humanoids:2010}.
-Our plan is now to use our Posture Generator in this framework.
+%In this section, we present our approach to generating postures in environments acquired by an RGBD camera mounted on the head of the robot in a multi-contact planning context.
+%This work was done prior to the development of our posture generator and therefore makes use of a previous version of it that is presented in~\cite{bouyarmane:humanoids:2010}.
+%Our plan is now to use our Posture Generator in this framework.
 
-Generating isolated postures is not sufficient to make a robot move or achieve tasks in ways similar to humans.
-It needs to plan entire motions, with sequences of contact creations and releases, and trajectories in-between.
-That's the role of the Multi-Contact Planner (MCP).
-The core of the planner consists of the multi-contact search and the posture generator.
-The former incrementally builds a tree of contact sets and is presented in~\cite{escande:ras:2013}.
-The children of a node are obtained by adding or removing exactly one contact to its set.
-At each iteration of the search, the best leaf, according to a potential field, is expanded this way.
-The tentative sets of contacts are tested by a posture generator.
-Upon success, the contact set is validated, and a new leaf is created.
-The goal is written as a set of specific constraints.
-A node is a final node if its associated posture generation problem augmented by these constraints remains feasible.
-By backtracking from this final node to the initial root node, we obtain a sequence of nodes and thus a sequence of contact sets, that can be executed on the robot by a whole-body controller such as the one based on a quadratic programming (QP) formulation presented in~\cite{bouyarmane:iros:2011}.
+%Generating isolated postures is not sufficient to make a robot move or achieve tasks in ways similar to humans.
+%Entire motions, with sequences of contact creations and releases, and trajectories in-between need to be planned.
+%That's the role of the Multi-Contact Planner (MCP).
+%The core of the planner consists of the multi-contact search and the posture generator.
+%The former incrementally builds a tree of contact sets and is presented in~\cite{escande:ras:2013}.
+%The children of a node are obtained by adding or removing exactly one contact to its set.
+%At each iteration of the search, the best leaf, according to a potential field, is expanded this way.
+%Every tentative set of contacts are tested by a posture generator.
+%Upon success, the contact set is validated, and a new leaf is created.
+%The goal is written as a set of specific constraints.
+%A node is a final node if its associated posture generation problem augmented by these constraints is feasible.
+%By backtracking from this final node to the initial root node, we obtain a sequence of nodes and thus a sequence of contact sets, that can be executed on the robot by a whole-body controller such as the one based on a quadratic programming formulation presented in~\cite{bouyarmane:iros:2011}.
 
-The potential field is derived from a rough path, made of a few key postures, that does not take contacts into account.
-Such a path is either user-defined or can be the output of a first dedicated planner~\cite{bouyarmane:icra:2009}.
+%After the creation of each node, the MCP queries the PG to check the feasibility of the node and compute a `viable' configuration that satisfies the node's contact set's constraints.
 
-The MCP relies largely on the 3D geometric models of the environment and robotic agents.
-In previous work~\cite{escande:ras:2013,bouyarmane:ar:2012}, the geometric models are provided by the user.
-The contact transition for the robot are planned off-line and later executed by the robot assuming exactness of the models and their relative positioning.
-We aim at extending our MCP to deal directly with real data acquired by the robot.
-Subsequently, we must deal with two kinds of situations:
-\begin{enumerate}
-  \item the models of the objects in the environment are known: in this case adapting the MCP consists mainly in dealing with recognition, model superposition, and handling uncertainties.
-  In brief, once model superposition is achieved, we can use the 3D model for MCP as in~\cite{escande:ras:2013,bouyarmane:ar:2012}, yet some adjustments are needed.
-  \item the models of the hurdles and the environment are not known (e.g.\ disaster or outdoor environments, for example, related to the Fukushima disaster that inspired the DARPA Robotic Challenge), MCP is to be achieved in an egocentric way with models built from the robot's embedded sensors.
-  This section deals with this case and we describe how the MCP is modified to achieve this goal.
-  In a nutshell, we construct planar surfaces from the 3D point clouds data and feed them to the MCP.\@
-\end{enumerate}
+When an exact model of the environment is not available, it in necessary to plan a robot's motion based on data acquired by its sensors.
+In this section, we investigate the generation of `viable' postures in an environment acquired by a RGBD camera as a point cloud.
+Our goal here is to generate postures with constraints that describe contacts between the robot and the acquired point cloud that represent the environment.
+To do so, we need to formulate contact and collisions avoidance constraints between geometric features of the robot and a point cloud.
+This can be done in two different ways:
+\begin{itemize}
+  \item Formulate contacts with the raw point cloud;
+  \item Pre-process the point cloud to extract some geometric features with which contacts can be formulated;
+\end{itemize}
+
+Formulating contact constraints between geometric features of the robot and a raw point cloud would require the development of new contact formulations, and the high number of data points may induce longer computation times of some constraints of the optimization problem.
+Pre-processing the point cloud data in order to extract geometric features on which contacts can be generated presents the advantage of simplicity of formulation, as the posture generation formulation would be unchanged.
+Also, assuming that the environment is static, the results of a pre-processing can be used for several posture generations, which is particularly advantageous in the context of multi-contact planning where the posture generator is queried many times in a row.
+
+Although the pre-processing of the point cloud takes a long time, it is only done once, one can assume that the constraint evaluations in the pre-processed case will be faster than with the raw point cloud, simply due to the fact that simpler geometric entities are used.
+So we can assume that for a few posture generations, the formulation on raw point cloud may be faster, but as we do more generations on the same data-set, the cost of pre-process will disapear in front of the time excess of constraint evaluation in the raw point cloud case.
+Thus, we decided to take the pre-processing approach to generate postures in a sensory acquired environment.
+
+%The MCP relies largely on the 3D geometric models of the environment and robotic agents.
+%In previous work~\cite{escande:ras:2013,bouyarmane:ar:2012}, the geometric models are provided by the user.
+%The contact transition for the robot are planned off-line and later executed by the robot assuming exactness of the models and their relative positioning.
+To extract geometric features that are relevant to use in a posture generation, we must deal with two kinds of situations:
+\begin{itemize}
+  \item the models of the objects in the environment are known: in this case pre-processing consists mainly in dealing with recognition, model superposition, and handling uncertainties.
+  In brief, once model superposition is achieved, we can use the 3D model in the PG as in~\cite{escande:ras:2013,bouyarmane:ar:2012, escande:icra:2016}.
+  \item the models of the hurdles and the environment are not known (e.g.\ disaster or outdoor environments, for example, related to the Fukushima disaster that inspired the DARPA Robotic Challenge), models of the environment need to be built from the robot's embedded sensors in an egocentric way.
+  This section deals with this case and we describe how we construct planar surfaces from the 3D point clouds data and feed them to the PG.\@
+\end{itemize}
 
 In robotics, the use of 3D-based vision for recognition and navigation in environments known or partially unknown has first been used on mobile robots, evolving in a flat environment, for example by coupling it with a SLAM system~\cite{whitty:acra:2012}.
 Another approach consists in extracting the surfaces from the point cloud, and then link them to the known environment or simply consider them as obstacles to be avoided~\cite{poppinga:iros:2008}.
 Since working on raw point clouds is costly because of the high number of data points, this extraction has also been enhanced~\cite{biswas:icra:2012} in order to be run in real-time.
 This approach has recently been experimented on a humanoid robot in~\cite{maier:humanoids:2012}, where two methods are combined: the surface extraction from a point cloud, and the voxel-based 3D decomposition of the environment~\cite{nakhaei:humanoids:2008}.
 Still, since the robot only navigates in a flat environment, and does not realize manipulation tasks, the surfaces extracted from the 3D point cloud are down projected to a 2D plan, on which are based the navigation and collision avoidance processes.
-
 The use of humanoid robots allows to navigate in more complex environments, some work has been done to make a humanoid robot go down a ramp~\cite{lutz:iros:2012} or climb stairs~\cite{osswald:iros:2012}.
-Yet, those methods use laser-based vision rather than point-cloud-based vision, so as to have a precise analysis of a known environment.
+Yet, those methods use laser-based vision rather than point cloud-based vision, so as to have a precise analysis of a known environment.
 
-In order to enable a robot to analyze and plan a motion into a 3D environment, one can use the surface extraction of a point cloud to directly have a global picture of the environment and determine the convex planar surfaces that the robot can use to its advantage to progress using the MCP.\@
-In our approach to make such an extension, we intentionally seek for technical solutions that minimize changes to be done on the existing MCP software.
+In order to enable a robot to analyze and plan a motion inside a 3D sensory-acquired environment, we propose to extract the relevant surfaces of an acquired point cloud, to directly have a global picture of the environment and determine the convex planar surfaces that the robot can contact with.
 
 \subsection{Building an understandable environment}
 \label{sub:building_an_understandable_environment}
 
-Our first concern is to build an environment that our multi-contact planner is able to ``understand'' and that can be extracted from a point cloud scene.
+Our first concern is to build an environment that our multi-contact planner and posture generator are able to ``understand'' and that can be extracted from a point cloud scene.
 
 The simplest entity that our planner would be able to deal with and that could correctly describe the robot's environment is a set of convex polygonal planar surfaces.
-Therefore, starting from an acquired point cloud, we extract a relevant set of such geometrical entities that will be used as of the surroundings of the robot.
+Therefore, starting from an acquired point cloud, we extract a relevant set of such geometric entities that will be used as the surroundings of the robot.
 
 \begin{figure}
 \centering
@@ -603,13 +616,13 @@ After re-orienting each frame to get their expression with respect to the world 
 
 Once the surfaces are defined, we can choose which ones are suitable for the robot to make contact with.
 Using flat contact constraints formulations as described previously.
-Although it is not a mandatory step, it allows to reduce the amount of exploration during the planning phase by removing undesired or inappropriate pairs of robot/environment surfaces.
+Although it is not a mandatory step, it allows reducing the amount of exploration during the planning phase by removing undesired or inappropriate pairs of robot/environment surfaces.
 For the time being, this is determined by heuristics that are defined depending on the situation.
-If we want the robot to walk on various surfaces, only surfaces that have a normal vector closely aligned with the gravity field would be selected as potential candidates (so as to eliminate the walls and other surfaces on which the robot cannot walk).
+If we want the robot to walk on various surfaces, only those that have a normal vector closely aligned with the gravity field would be selected as potential candidates (so as to eliminate the walls and other surfaces on which the robot cannot walk).
 Similarly, only surfaces located at a certain height can be considered for hand contact, etc.
 
 For collision avoidance with the environment, we consider each surface generated by our point cloud treatment algorithm as a thin 3D body.
-Basically, we extrude each surface by few centimeters in the direction opposite to its normal (provided that this normal is pointing toward the outside of the real body) and create a convex hull surface using {\tt QHull}~\cite{qhull:acm:1996}.
+Basically, we extrude each surface by a few centimeters in the direction opposite to its normal (provided that this normal is pointing toward the outside of the real body) and create a convex hull surface using {\tt QHull}~\cite{qhull:acm:1996}.
 
 \subsection{Results}
 \label{sub:results_pcl_plannif}
@@ -619,6 +632,8 @@ In both scenarios, this results in climbing on a table (The first one is $71$cm 
 The knowledge of the environment and surrounding objects is obtained from a point cloud captured with an RGBD camera.
 
 All the computations of the following experiments are performed on a single thread of an Intel (R) Core (TM) i7--3840QM CPU at 2.80GHz, with 16Go of RAM\@.
+This work was done prior to the development of our posture generator and therefore makes use of a previous version of it that is presented in~\cite{bouyarmane:humanoids:2010}.
+Our plan is now to use our Posture Generator in this framework.
 
 \paragraph{Plan 1: irregular stairs}
 In this first experiment, the robot has to walk up some irregular stairs made of several random pieces of furniture to reach its goal.
@@ -653,48 +668,76 @@ In total, 40 nodes were generated and the planning time was $122.3$ s.
 \subsection{Discussion}
 \label{sub:discussion_planning_pcl}
 
-This work is a first step toward a fully sensory-perception-based multi-contact planner.
-It raises several interesting questions on the way to adapt our MCP\@.
+This work is a first step toward a fully sensory-perception-based multi-contact planner with posture generation on acquired environment data.
+We devised a data processing algorithm that extracts relevant information from a point cloud to generate an environment in which classical posture generation's formulations can be used.
+%Our main goal was to devise a process the acquired data to be able to extract the relevant informations from it that would allow to generation on acquired environment.
+%It raises several interesting questions on the way to adapt our MCP\@.
+In this work, we extract convex planar surfaces from the acquired point cloud, and generate postures where the robot makes contact with those surfaces.
+%The simulation results revealed that our MCP and PG do not require major adjustments to handle egocentric sensory data.
+This could straightforwardly be extended to extract other geometric primitives such as spheres and cylinders from the point cloud.
 
-One advantage of our approach is to avoid having to precisely position the robot in the environment prior to the plan execution.
-Yet, for now, the positioning is done once and for all with the acquisition of the point cloud, before planning.
-When executing the plan, the robot might still deviate from it, for example, a support might move, or a foot might contact a few centimeters away from where it was planned to, or the support might not be at its expected position because of measurement errors in the acquired point cloud.
-We thus need to close the loop between the planning and its execution.
-To do so, we need robust detection of discrepancies to be made by the robot.
-This can be achieved by combining point-cloud-based SLAM with contact sensing.
-Once the robot has acquired knowledge of its deviation or of the position error of the support, it has to adapt to it.
-This adaptation should not be time-consuming so as to not interrupt the execution for too long.
-A slight deviation can be recovered by simply positioning with care the next contacts and the closed-loop multi-contact controller shall work on guarded-motions basis.
-However, a bigger deviation might make the next contact stances infeasible.
-In this later case, re-planning the next contacts is necessary to go back to the plan.
-How many contacts have to be re-planned depends on the context.
-In difficult situations, changes in contacts might cascade up to requiring an entire re-planning.
-Recognizing the situation should be the task of a local planner that re-plans as few steps as possible.
-In case too much contacts must be reprocessed, the re-planning phase can be stopped before it ends and resumed at the next step.
+A direct extension of this work would be to recognize known objects in the environment and use their 3D models in the posture generations.
+For example, even in a disaster situation as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc.).
+So having their models would then still permit to rely on 3D models to plan contacts and generate postures.
+For objects of complex shapes, our approach for making contact with complex surfaces based on a Catmull-Clark approximation presented in Section~\ref{sec:contact_with_complex_surfaces} could be leveraged.
+In fact, even for unknown objects and parts of the environments, it would be possible to generate a mesh of their surfaces from the acquired point cloud and a smooth parametrization of it on which contacts can be generated through our PG.
+Since a point cloud acquired from a single point of view provides only partial information, the acquired meshes should be updated and improved along the execution of the plan with the acquisition of new point clouds from different point of views.
 
-This partial planning approach can also be seen in the context of semi-autonomous motion: an operator gives the overall direction with, for example, a joystick, and the planner reactively finds a sequence of a few contact sets to move as closely as possible in this desired direction.
-The operator is thus in charge of preventing the robot from getting stuck while the planner only concentrates on finding the correct contacts over a short time window.
+Alternatively, postures could be generated directly with contacts on point clouds.
+%The obvious point by point approach where each point is considered as a contact candidate would be prohibitively expensive for the MCP.
+Approximating the mesh with a Catmull-Clark surface and smoothly parametrizing the contact location on it could be a solution.
+But again, that would require some pre-processing of the point cloud to generate the surfaces.
+In~\cite{hauser:isrr:2013}, a contact formulation between robot and point clouds is presented, where the mesh representing each object is thickened by a thin layer, and a little interpenetration of those layers is allowed.
+A similar formulation could be used in posture generation to smoothen the contact constraints when a point cloud is involved.
 
-Another question stems from the partial knowledge of the environment: it is not possible to give a guide path as we used to do with the 3D models.
-This guide path will necessarily be very crude, either a straight line to the desired position or a plan in a known environment before it was changed (for example in the case of a disaster in a plant).
-The planning must then be driven also by the need of getting information about the environment, for example reaching a viewpoint allowing to see parts of the environment that were hidden before, filling empty spaces and possibly adding new supports on-the-fly.
-Planning is then only partial since necessary part of the environment might be unknown.
+%PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
 
-Later on, the discovery of the environment might be improved by the use of other sensors.
-One can then imagine having the robot test a contact to ensure a given surface is fit for support or that it is precisely at the position measured by vision.
-If the surface is not, this is another kind of discrepancy in the plan that needs to be handled by re-planning.
+Besides the issue of generating postures on acquired point cloud data, this study raises some questions regarding the handling of uncertainties in posture generation.
+Since the acquired point cloud data is subject to measurement errors, it would be beneficial to be able to generate postures that are robust to those errors.
+For example, given a plan $P$ extracted from a point cloud, its location in space is known with a limited precision $\delta$ in its orientation and position.
+It would serve our purpose to devise a criterion that guarantees that for all imprecision of value less than a given $\delta$ on the location of the element to contact with, there exists a solution configuration in which the contact with $P$ is maintained.
+But such criterion is not straightforward to devise, and as of now, we have not found any promising leads, except using a space-grid discretisation of the possible uncertainty and generating a solution posture for each point of the grid.
+Although this could be solved fairly quickly in most cases by initializing one posture generation with the solution found for a neighbor grid point, such approach does not guarantee that solutions exist for any point between the grid points.
+
+%Besides the issue of generating postures on acquired point cloud data, this study raises some questions regarding the handling of uncertainties in multi-contact planning and posture generation.
+%%One advantage of our approach is to avoid having to precisely position the robot in the environment prior to the plan execution.
+%%Yet, for now, the positioning is done once and for all with the acquisition of the point cloud, before planning.
+%When executing the plan, the robot might deviate from it, for example, a support might move, or a foot might contact a few centimeters away from where it was planned to, or the support might not be at its expected position because of measurement errors in the acquired point cloud.
+%We thus need to close the loop between the planning and its execution.
+%To do so, we need robust detection of discrepancies to be made by the robot.
+%This can be achieved by combining point cloud-based SLAM with contact sensing.
+%Once the robot has acquired knowledge of its deviation or of the position error of the support, it has to adapt to it.
+%This adaptation should not be time-consuming so as to not interrupt the execution for too long.
+%A slight deviation can be recovered by simply positioning with care the next contacts and the closed-loop multi-contact controller shall work on guarded-motions basis.
+%However, a bigger deviation might make the next contact stances infeasible.
+%In this later case, re-planning the next contacts is necessary to go back to the plan.
+%How many contacts have to be re-planned depends on the context.
+%In difficult situations, changes in contacts might cascade up to requiring an entire re-planning.
+%Recognizing the situation should be the task of a local planner that re-plans as few steps as possible.
+%In case too much contacts must be reprocessed, the re-planning phase can be stopped before it ends and resumed at the next step.
+
+%This partial planning approach can also be seen in the context of semi-autonomous motion: an operator gives the overall direction with, for example, a joystick, and the planner reactively finds a sequence of a few contact sets to move as closely as possible in this desired direction.
+%The operator is thus in charge of preventing the robot from getting stuck while the planner only concentrates on finding the correct contacts over a short time window.
+
+%Another question stems from the partial knowledge of the environment: it is not possible to give a guide path as we used to do with the 3D models.
+%This guide path will necessarily be very crude, either a straight line to the desired position or a plan in a known environment before it was changed (for example in the case of a disaster in a plant).
+%The planning must then be driven also by the need of getting information about the environment, for example reaching a viewpoint allowing to see parts of the environment that were hidden before, filling empty spaces and possibly adding new supports on-the-fly.
+%Planning is then only partial since necessary part of the environment might be unknown.
+
+%Later on, the discovery of the environment might be improved by the use of other sensors.
+%One can then imagine having the robot test a contact to ensure a given surface is fit for support or that it is precisely at the position measured by vision.
+%If the surface is not, this is another kind of discrepancy in the plan that needs to be handled by re-planning.
 
 %We present preliminary results in extending our previous work in multi-contact planning to operate directly on environment that is built on-the-fly from a robot's embedded sensors.
 %This first study makes use of depth camera and implemented modules from the PCL which extract planar surfaces that are fed to our MCP\@.
 %We intentionally seek for technical implementations that minimize the changes on our existing MCP software and illustrate successful plans generated on the basis of 3D point clouds solely.
 
-The simulation results revealed that our MCP does not require major adjustments to handle egocentric sensory data.
 %Of course, this does not mean that we are fully satisfied since our results also suggest additional future work.
 
-Although we choose to treat the case of not having 3D models, we believe that the implementation of an MCP with knowledge of the 3D model is necessary.
-For example, even in a disaster situation as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc.).
-So having their models would then still permit our MCP to rely on 3D models to plan contacts for motion.
-PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
+%Although we choose to treat the case of not having 3D models, we believe that the implementation of an MCP with knowledge of the 3D model is necessary.
+%For example, even in a disaster situation as in Fukushima nuclear power plants, the inside exploration videos available show that many objects kept their shape and were not totally destroyed (e.g.\ door, stairs, ladders, etc.).
+%So having their models would then still permit our MCP to rely on 3D models to plan contacts for motion.
+%PCL provides only partial information, it is then necessary to drive the planner by the mission objective and also a perceptual one (e.g.\ SLAM).
 %Of course, our ultimate future plan is to handle uncertainties, control and planning recovery of discrepancies when they occur.
 
 %\section{Examples of postures generation}
