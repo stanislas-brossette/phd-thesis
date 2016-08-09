@@ -76,7 +76,7 @@ The complete posture generation problem is then solved within a single nonlinear
 In the past few years, our team has dedicated considerable efforts in proposing a general multi-contact motion planner to solve cases of non-gaited acyclic planning, using a posture generator as a backbone to select valid configurations.
 Given a humanoid robot, an environment, a start and a final desired postures, the planner generates a sequence of contact stances allowing any part of the humanoid to make contact with any part of the environment to achieve motion towards the goal.
 The planner's role is to grow a tree of contact stances iteratively; from a given posture, it tries to add or remove contacts one by one.
-The tree grows following some heuristics, until the solution is reached.
+The tree grows following some heuristics until the solution is reached.
 For each set of contacts to add to the tree, a posture generation problem is solved in order to validate the feasibility of the set. If it is not feasible, the set is rejected.
 A typical experiment with an HRP-2 robot achieving such an acyclic motion is presented in~\cite{escande:iser:2008}, and the planner is thoroughly described in~\cite{escande:ras:2013}.
 Extensions of this multi-contact planner to multi-agent robots and objects gathering locomotion and manipulation are presented in~\cite{bouyarmane:ar:2012}, and preliminary validations with some DARPA challenge scenarios, such as climbing a ladder, ingress/egress a utility car, or crossing through a relatively constrained pathway are presented in~\cite{bouyarmane:humanoids:2012}.
@@ -308,6 +308,6 @@ In Appendix~\ref{chapter:optimization}, we present some classical concepts of no
 %Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver, the solver that we develop in this thesis.
 
 In this thesis, we used the off-the-shelf solver IPOPT~\cite{wachter:mathprog:2006} in the beginning.
-At a later stage we developed and use our own nonlinear solver called {\tt PGSolver}.
+At a later stage, we developed and use our own nonlinear solver called {\tt PGSolver}.
 From here on, we will formulate and solve posture generation problems as nonlinear constrained optimization problems.
 In the next chapter, we focus on formulating all the basic functions and algorithms used to describe the robotic constraints and cost function in the formalism of nonlinear optimization.

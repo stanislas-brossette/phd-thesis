@@ -10,14 +10,14 @@
 \graphicspath{{Chapter6-Evaluation/Figs/}}
 
 In this chapter, we study the performances of our solver to solve problems formulated on manifolds as well as the performances of our posture generator.
-We then present a usecase of our solver on manifolds with a problem of inertial identification.
+We then present a use case of our solver on manifolds with a problem of inertial identification.
 And finally, we present an approach to make use of posture generation in real-environment with data acquired directly from the robot.
 
 \section{On the performance of formulation with Manifolds}
 \label{sec:On_the_performance_of_formulation_with_manifolds}
 
 In Chapter~\ref{chapter:optimization_on_noneuclidean_manifolds} we presented our developments for a new nonlinear SQP solver dedicated to non-Euclidean Manifolds.
-We then took advantage of it in the posture generator framework, with use-case examples presented in Chapter~\ref{ch:PG}.
+We then took advantage of it in the posture generator framework, with use case examples presented in Chapter~\ref{ch:PG}.
 The choice of using optimization on manifolds was driven by the intuition that such an approach would lead to relatively faster and more robust convergence of resolution when the search space is a non-Euclidean manifold (due to the reduction of the numbers of constraints and variables).
 
 Robotics optimization problems may be complex and many aspects play a role in the efficiency of their resolution.
@@ -27,7 +27,7 @@ To isolate the influence of optimizing on manifolds, we consider a toy problem: 
 %In order to evaluate the influence of the formulation and resolution with manifolds, we choose to study a problem different from a typical robotic posture generation.
 Given a set of unit cubes, each one defined on $\mathbb{R}^3 \times SO(3)$, we want to find a configuration in which the cubes are all inside a box, while not interpenetrating with each other.
 For any cube $C_i$, we denote $V_i = \{v_0, v_1, \ldots, v_7\}$  the set of all its vertices, $\vec{t_i}\in\mathbb{R}^3$ and $R_i\in SO(3)$ respectively represent its translation and rotation w.r.t the world frame.
-To ensure that the cubes are inside the box, we write constraints that enforces each corner of each cube to be inside the box.
+To ensure that the cubes are inside the box, we write constraints that enforce each corner of each cube to be inside the box.
 For each plane composing the box, we denote $\vec{n}$ its normal toward the inside of the box, and $d$ the signed distance from the plane to the origin along $\vec{n}$.
 The constraint for each cube $C_i$ being `above' a plane defined by $\{d, \vec{n}\}$ is of dimension 8 (1 per vertex) and can be written as:
 \begin{equation}
@@ -486,7 +486,7 @@ In this later application, the enforcement of \emph{full physical consistency}  
 %After the creation of each node, the MCP queries the PG to check the feasibility of the node and compute a `viable' configuration that satisfies the node's contact set's constraints.
 
 When an exact model of the environment is not available, it in necessary to plan a robot's motion based on data acquired by its sensors.
-In this section, we investigate the generation of `viable' postures in an environment acquired by a RGBD camera as a point cloud.
+In this section, we investigate the generation of `viable' postures in an environment acquired by an RGBD camera as a point cloud.
 Our goal here is to generate postures with constraints that describe contacts between the robot and the acquired point cloud representing the environment.
 To do so, we need to formulate contact and collisions avoidance constraints between geometric features of the robot and a point cloud.
 This can be done in two different ways:
@@ -500,7 +500,7 @@ Pre-processing the point cloud data in order to extract geometric features on wh
 Also, assuming that the environment is static, the results of a pre-processing can be used for several posture generations, which is particularly advantageous in the context of multi-contact planning where the posture generator is queried many times in a row.
 
 Although the pre-processing of the point cloud takes a long time, it is only done once, one can assume that the constraint evaluations in the pre-processed case will be faster than with the raw point cloud, simply due to the fact that simpler geometric entities are used.
-So we can assume that for a few posture generations, the formulation on raw point cloud may be faster, but as we do more generations on the same data-set, the cost of pre-process will disapear in front of the time excess of constraint evaluation in the raw point cloud case.
+So we can assume that for a few posture generations, the formulation on raw point cloud may be faster, but as we do more generations on the same data-set, the cost of pre-processing will disappear in front of the time excess of constraint evaluation in the raw point cloud case.
 Thus, we decided to take the pre-processing approach to generate postures in a sensory acquired environment.
 
 %The MCP relies largely on the 3D geometric models of the environment and robotic agents.
@@ -671,7 +671,7 @@ This work is a first step toward a fully sensory-perception-based multi-contact 
 We devised a data processing algorithm that extracts relevant information from a point cloud to generate an environment in which classical posture generation's formulations can be used.
 %Our main goal was to devise a process the acquired data to be able to extract the relevant informations from it that would allow to generation on acquired environment.
 %It raises several interesting questions on the way to adapt our MCP\@.
-In this work, we extract convex planar surfaces from the acquired point cloud, and generate postures where the robot makes contact with those surfaces.
+In this work, we extract convex planar surfaces from the acquired point cloud and generate postures where the robot makes contact with those surfaces.
 %The simulation results revealed that our MCP and PG do not require major adjustments to handle egocentric sensory data.
 This could straightforwardly be extended to extract other geometric primitives such as spheres and cylinders from the point cloud.
 
