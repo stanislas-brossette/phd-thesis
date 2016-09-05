@@ -315,9 +315,9 @@ We get:
 \end{table}
 
 A spherical joint blocks all translations and allows all rotations.
-This joint must be parameterized by a 3D rotation.
+This joint must be parametrized by a 3D rotation.
 The space of 3D rotations $SO(3)$ can be represented in many different ways.
-The simplest and most intuitive way to parameterize $SO(3)$ is to use Euler Angles.
+The simplest and most intuitive way to parametrize $SO(3)$ is to use Euler Angles.
 It comes down to decomposing the 3D rotation into a succession of three 1D rotations around different axes.
 For example, the roll, pitch, yaw is a succession of a rotation of $F_1$ around its $x$ axis, followed by a rotation around the $y$ axis of the resulting frame, finally a rotation around the $z$ axis of the resulting  frame of the latter rotation.
 The rotation matrix for such a convention is given by:
@@ -348,16 +348,16 @@ But they all suffer from the so-called gimbal-lock problem or more generally fro
 In such a configuration, the only rotations possible are one rotation around the two aligned axis and one rotation around the third axis.
 Thus, one degree of freedom is lost.
 Those singularities are prohibitive for the use of that type of formulation in a posture generation.
-In~\cite{grassia1998}, Grassia states that any attempt to parameterize the entire set of 3D rotations by an open subset of Euclidean space (as do Euler angles) will suffer from gimbal lock.
-Note that this singularity is only due to the user's choice of parameterization, it is not intrinsic to the manifold $SO(3)$.
+In~\cite{grassia1998}, Grassia states that any attempt to parametrize the entire set of 3D rotations by an open subset of Euclidean space (as do Euler angles) will suffer from gimbal lock.
+Note that this singularity is only due to the user's choice of parametrization, it is not intrinsic to the manifold $SO(3)$.
 %One can prove that there is no smooth mapping between $SO(3)$ and $\mathbb{R}^3$ that is free of singularities.
-It is possible to parameterize $SO(3)$ without having to face singularities by parameterizing it over another non-Euclidean manifold.
+It is possible to parametrize $SO(3)$ without having to face singularities by parametrizing it over another non-Euclidean manifold.
 The most common ones are the set of unit quaternion embedded in $\mathbb{R}^4$ and the set of rotation matrices embedded in $\mathbb{R}^{3\times 3}$.
 %To avoid singularities, one must use a higher dimension parametrization, such as the most common $SO(3)$ representation in robotics that are the unit quaternions and the rotation matrices.
 %The unit quaternions space is the subset of $\mathbb{R}^4$ where all elements have unit norm.
-With the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters $q = [q_w, q_x, q_y, q_z]$, and it is necessary to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
-Similarly, if a variable is parameterized by a rotation matrix, then the matrix $M$ representing it has 9 parameters and M must be orthogonal and have determinant 1: $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbf{1}_3\  \text{and}\ \det (M) = 1\}$.
-Similar issues can be found with the parameterization of other non-Euclidean manifolds, like $S^2$ for example.
+With the unit quaternion parametrization, a variable on $SO(3)$ is represented by 4 parameters $q = [q_w, q_x, q_y, q_z]$, and it is necessary to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
+Similarly, if a variable is parametrized by a rotation matrix, then the matrix $M$ representing it has 9 parameters and M must be orthogonal and have determinant 1: $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbf{1}_3\  \text{and}\ \det (M) = 1\}$.
+Similar issues can be found with the parametrization of other non-Euclidean manifolds, like $S^2$ for example.
 
 A quaternion $q = [q_w, q_x, q_y, q_z]$ is a unit quaternion iff $q_w^2+q_x^2+q_y^2+q_z^2 = 1$.
 It represents a rotation of angle $\theta$ around an axis ${\bf u}$ such that:
@@ -530,7 +530,7 @@ A common approach to limit shoulder joint, inspired from the biomechanics field,
 \label{fig:ballAndSocket}
 \end{figure}
 
-The spherical motion can be parameterized by a vector of the 3D unit sphere $S^2$ and constrained to lay within a limit cone, the axial motion can be parameterized in $\mathbb{R}$ and limited by equation~\Eqref{eq:joint_limits}.
+The spherical motion can be parametrized by a vector of the 3D unit sphere $S^2$ and constrained to lay within a limit cone, the axial motion can be parametrized in $\mathbb{R}$ and limited by equation~\Eqref{eq:joint_limits}.
 This type of formulation is presented in~\cite{baerlocher}.
 
 

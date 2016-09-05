@@ -129,11 +129,11 @@ Once the problem of posture generation is formulated, its resolution can take pl
 Some variables of a robotic problem belong to a non-Euclidean manifold $\mathcal{M}$, like $SO(3)$ for the 3D rotation of the base of a mobile robot.
 A manifold is a topological space that locally resembles a Euclidean space in the neighborhood of each point.
 %Each point of an n-dimensional manifold has a neighborhood that is homeomorphic to the Euclidean space of dimension n.
-However, an n-dimensional non-Euclidean manifold cannot always be globally parameterized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
+However, an n-dimensional non-Euclidean manifold cannot always be globally parametrized over a subset of $\mathbb{R}^n$ without presenting problems of singularity.
 Most of the off-the-shelf optimization solvers available make the assumption that the search space is Euclidean, and thus, do not feature the capability of solving problems on non-Euclidean manifolds natively.
 It is often possible to parametrize $\mathcal{M}$ over a Euclidean space of higher dimension with added constraints (e.g. unit quaternions, rotation matrices).
 Then those problems can be solved with classical solvers at the cost of additional variables, constraints and special treatments in the resolution of the optimization problem.
-There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities, and with the minimal number of parameters.
+There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parametrization singularities, and with the minimal number of parameters.
 However, to our knowledge, these are focused on addressing non-constrained optimization.
 We propose to extend those methods to solve constrained optimization problems on manifolds.
 
@@ -177,18 +177,18 @@ This has the added advantage that, unlike off-the-shelf solvers which are often 
 %\paragraph{Specificities of our approach}
 %If we consider a problem of posture generation on a mobile robot with $n$ joints, the configuration space of the joints of the robot is $\mathbb{R}^n$ and the configuration space of the position and orientation of its base body is $SE(3) = \mathbb{R}^3\times SO(3)$.
 %Thus, the variable that describes the configuration of the robot in the optimization problem lives in $\mathbb{R}^3\times SO(3) \times \mathbb{R}^n$.
-%$SO(3)$ is by nature a non-Euclidean manifold, it cannot be parameterized on an open subset of Euclidean space without having to deal with problems of gimbal lock.
-%The gimbal lock is a singularity that happens when parameterizing $SO(3)$ on $\mathbb{R}^3$, with Euler angles, for example, and when two axis of rotation become aligned, in that situation, 2 elements of the parameterization correspond to the same rotation.
+%$SO(3)$ is by nature a non-Euclidean manifold, it cannot be parametrized on an open subset of Euclidean space without having to deal with problems of gimbal lock.
+%The gimbal lock is a singularity that happens when parametrizing $SO(3)$ on $\mathbb{R}^3$, with Euler angles, for example, and when two axis of rotation become aligned, in that situation, 2 elements of the parametrization correspond to the same rotation.
 %Thus, one degree of freedom is lost.
-%Note that this singularity can block the optimization algorithm and that it is only due to the choice of parameterization, it is not intrinsic to the manifold $SO(3)$.
-%It is possible to parameterize $SO(3)$ without having to face singularities by parameterizing it over another non-Euclidean manifold.
+%Note that this singularity can block the optimization algorithm and that it is only due to the choice of parametrization, it is not intrinsic to the manifold $SO(3)$.
+%It is possible to parametrize $SO(3)$ without having to face singularities by parametrizing it over another non-Euclidean manifold.
 %The most common ones are the unit quaternion space and the $3\times 3$ rotation matrix.
 %Most of the solvers available make the assumption that the search space is Euclidean, which makes is complicated to use quaternion or rotation matrix efficiently.
-%To put it simply, for the unit quaternion parameterization, a variable on $SO(3)$ is represented by 4 parameters, the coefficients of the quaternion and an equality constraint needs to be added to the optimization problem to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
-%Similarly, if a variable is parameterized by a rotation matrix, then the variable $M$ has 9 parameters and several constraints need to be added to the problem so that M is symmetric, positive definite and its determinant is 1 $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
-%Similar issues can be found with the parameterization of other non-Euclidean manifold, like $S^2$ for example.
+%To put it simply, for the unit quaternion parametrization, a variable on $SO(3)$ is represented by 4 parameters, the coefficients of the quaternion and an equality constraint needs to be added to the optimization problem to ensure that the quaternion is of norm 1, $\{q\in\mathbb{R}^4:||q||=1\}$.
+%Similarly, if a variable is parametrized by a rotation matrix, then the variable $M$ has 9 parameters and several constraints need to be added to the problem so that M is symmetric, positive definite and its determinant is 1 $\{M\in\mathbb{R}^{3\times 3}:M^T M = \mathbb{I}_3\  \&\ \det (M) = 1\}$.
+%Similar issues can be found with the parametrization of other non-Euclidean manifold, like $S^2$ for example.
 
-%There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parameterization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
+%There exist some methods and algorithms to solve optimization problems on non-Euclidean manifolds with no substantial extra cost and guaranteeing a good coverage of the manifolds without facing parametrization singularities and with the minimal number of parameters, though to our knowledge, they are focused on non-constrained optimization.
 
 \paragraph{Contributions and plan}
 The main focuses of this thesis are the formulation and the resolution of problems of posture generation for robotics systems using nonlinear optimization on manifolds.

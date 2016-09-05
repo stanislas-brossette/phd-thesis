@@ -117,7 +117,7 @@ In an effort to evaluate the performances of our posture generator framework and
 We always search viable solutions, where the joint and torque limits are respected, collisions are avoided and static stability is guaranteed.
 To generate problems that are known to be feasible, we start by computing the pose of 4 frames that the robot can reach simultaneously with its right foot, left foot, right gripper and left gripper, by querying the Direct Kinematics algorithm for a random configuration $q_\text{rand}$ of the robot that is within its joint limits.
 Given those 4 frames, we can create a posture generation problem where the robot has to reach those frames with its end-effectors while respecting its viability constraints.
-In particular, we require the contacts on the foot to be fixed unilateral friction contacts (with the forces in the friction cones) and the contacts on the hands to be fixed bilateral contacts (where the forces can be in applied in any direction).
+In particular, we require the contacts on the foot to be fixed unilateral friction contacts (with the forces in the friction cones) and the contacts on the hands to be fixed bilateral contacts (where the forces can be applied in any direction).
 If feasible, this problem can easily be solved by providing as initial guess the configuration $q_\text{rand}$.
 If a solution $q^*$ is found, the problem is deemed feasible and is recorded for further use.
 

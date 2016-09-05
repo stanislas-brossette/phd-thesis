@@ -13,8 +13,8 @@
 Posture generation can be viewed as, and is sometimes called, Generalized Inverse Kinematics.
 The Inverse Kinematics~(IK) problem consists of finding the joint configuration for an articulated multibody system in order to complete a given set of tasks that are defined in the operational space.
 For example, by solving repeatedly the IK for a desired motion given in the Cartesian space, we can generate motions in the joint space.
-By definition, such a process is purely kinematics. But other constraints need dynamic or other physics-related knowledge such as the inertia or contact friction parameters.
-The IK problem has been widely studied and used in the fields of robotics, computer graphics and games, and animation.
+By definition, such a process is purely kinematic. But other constraints need dynamic or other physics-related knowledge such as the inertia or contact friction parameters.
+The IK problem has been widely studied and used in the fields of robotics, computer graphics, games, and animation.
 In few particular cases, for example with robotic arms that have less than 7 degrees of freedom, a closed-form solution can be found.
 For example, in~\cite{asfour2003human} the redundancy in a robot arm is exploited to derive a closed-form formula for its IK.
 However, for most complex cases, iterative methods are required.
@@ -90,7 +90,7 @@ This approach does not guarantee that the constraints are satisfied at every poi
 Interval analysis methods can be leveraged to compute safe motions over continuous time intervals, as proposed in~\cite{lengagne2011planning}.
 This work was extended in~\cite{lengagne2013generation} to generate whole-body multi-contact dynamic motions.
 The constraints are transformed into a computation of extrema of time polynomials, whose coefficients are a function of the optimization variables, over each time interval.
-Generating full body dynamic motions allows one to take advantage of the dynamic effects and to produce motions with better performances in terms of completion time, energy consumption, or other criterions.
+Generating full body dynamic motions allows one to take advantage of the dynamic effects and to produce motions with better performances in terms of completion time, energy consumption, or other criteria.
 
 In many planning approaches~\cite{kuffner2005motion, chestnutt2007navigation, hauser:ijrr:2008, kolter2008control, bouyarmane:icra:2011} the planning problem is decomposed into two stages, first the sets of contacts and associated postures are planned and then the motions to go from one set to another are computed.
 These two stages are loosely coupled, which can result in suboptimal use of the contacts available.
@@ -158,7 +158,7 @@ Those approaches are only meant to solve unconstrained optimization problems, wh
 
 The main idea to optimize on manifolds is that we use a local map between the neighborhood of the current iterate and its Euclidean tangent space in order to run an optimization step and choose an increment in the tangent space that is mapped back to the manifold.
 Once the iterate has been incremented, the process is repeated with the map and tangent space associated with the new iterate.
-This comes down to re-parameterizing the problem around the current iterate at each iteration.
+This comes down to re-parametrizing the problem around the current iterate at each iteration.
 
 In the field of robotics, we are only aware of the work of Schulman~\emph{et al.}~\cite{Schulman2014}, where the authors explain the adaptation of their solver to work on $SE(3)$.
 In the field of computer vision, and especially for solving pose estimation problems, optimization on manifolds is used often, e.g.~\cite{hertzberg2011, lu2000fast}.

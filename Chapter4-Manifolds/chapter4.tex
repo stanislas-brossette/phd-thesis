@@ -306,7 +306,7 @@ With the iterative formulation approach described above, we do not have any para
 We can use the function $\psi:\mathcal{M} \rightarrow \psi(\mathcal{M})$, which is surjective, to represent the $x_i$ and keep track of them in a global way.
 %But we still need a map $\psi$ and real space $\mathbb{E}$ to represent the $x_i$ and keep track of them in a global way.
 %The ${\bf x_i}$ are guaranteed to be on $\mathcal{M}$ so we can choose a representation with $r>n$ where $\psi$ is singularity-free without any drawback.
-Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it was a function from $\mathbb{E}$ to $\mathbb{R}$ without the need to project on $\psi(\mathcal{M})$ first (same goes for $c' = c \circ \psi^{-1}$).
+Also, the programmer can write the function $f' = f \circ \psi^{-1}$ as if it were a function from $\mathbb{E}$ to $\mathbb{R}$ without the need to project on $\psi(\mathcal{M})$ first (same goes for $c' = c \circ \psi^{-1}$).
 For example, if $\mathcal{M} = SO(3)$ and $\mathbb{E} = \mathbb{R}^{3\times 3}$, ${\bf x_i}=\psi(x_i)$ is always a rotation matrix and can be used directly as such when writing the function.
 
 %}}}
@@ -1013,9 +1013,9 @@ As of now, the best results were observed when using the self-scaling BFGS updat
 \subsection{Hessian Update in Restoration phase}
 \label{sub:hessian_update_in_restoration_phase}
 
-The hessian $H$ (computed through whichever method presented above) is meant to approximate the value of $\nabla^2 \mathcal{L}_{xx}(x,\lambda) = \nabla^2 f(x) + \lambda^T \nabla^2 c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
+The Hessian $H$ (computed through whichever method presented above) is meant to approximate the value of $\nabla^2 \mathcal{L}_{xx}(x,\lambda) = \nabla^2 f(x) + \lambda^T \nabla^2 c(x)$, with $f$ the cost function of the current problem to solve, and $c$ its constraints.
 But during the restoration phase, the definitions of $f$ and $c$ change at each iteration, depending on the sets of unfeasible and feasible constraints ($\mathcal{I}$ and $\mathcal{F}$).
-In order to account for that change, we propose to compute an approximation of each constraints second derivative separately, denoting $H_i$ the hessian of $c_i$, and correctly combining the Hessians based on the current set of feasible constraints.
+In order to account for that change, we propose to compute an approximation of each constraints second derivative separately, denoting $H_i$ the Hessian of $c_i$, and correctly combining the Hessians based on the current set of feasible constraints.
 
 \begin{align}
   \begin{split}

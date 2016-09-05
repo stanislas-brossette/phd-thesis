@@ -664,7 +664,7 @@ Consequently, this method offering a richer contact search (exploration) during 
 In fact, it truly allows us to substantially reduce the time spent by the user in ad-hoc tuning the shapes of the contact patches, or fixing the contact positions that were previously done by hand.
 Also, it is fairly easy to implement and extends multi-contact planning algorithms like the one described in~\cite{escande:ras:2013} to give it richer planning possibilities.
 This method extends straightforwardly to point cloud data as far as polygonal convex patches can be extracted.
-But one of its limitation is that in its current form, it cannot handle contacts with non-convex surfaces.
+But one of its limitations is that in its current form, it cannot handle contacts with non-convex surfaces.
 
 %There are several opportunities for future work.
 %For example, we could improve the generality of our contact constraint formulation even further to manage linear and punctual contacts without the approximations we currently use.
@@ -784,7 +784,7 @@ Note the following relations that make use of the robot's Jacobian to compute de
   + {}^i\mathbf{R}_W \widehat{\left(\widehat{{}^i\mathbf{t}_W}\mathbf{u}\right)} \omega_{i,j}
 \end{align}
 
-Let's differentiate the first equation of~\ref{alg:ISmatrix} w.r.t $q_j$.
+Let's differentiate the first equation of Algorithm~\ref{alg:ISmatrix} w.r.t $q_j$.
 
 \begin{align}
   A &=
