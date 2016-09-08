@@ -48,7 +48,7 @@ Thus we can write a constraint of dimension 16 (1 per vertex) such that $C_i$ is
   \end{split}
 \end{align}
 
-In order to simulate gravity, we minimize the potential energy of the all the cubes (simplified by a factor mass times gravity):
+In order to simulate gravity, we minimize the potential energy of all the cubes (simplified by a factor mass times gravity):
 
 \begin{equation}
   f = \sum\limits_i \vec{t_i}\cdot \vec{z}
@@ -84,20 +84,20 @@ that is a problem of dimension $5n+2n^2$ with $32.5n+8.5n^2$ constraints, which 
 
 We solve these two problems for different numbers of cubes and compare the results in terms of number of iterations before convergence, convergence time, and time spent per iterations.
 In each resolution, both problems (Real Space and Manifold formulations) are initialized with the same randomized initial guess.
-The resolutions with {\tt PGSolver} are set up with the same set of parameters, and the ones with the CFSQP solver uses its default parameters.
+The resolutions with {\tt PGSolver} are set up with the same set of parameters, and the ones with the {\tt CFSQP} solver use its default parameters.
 The initial positions of the cubes are chosen randomly, and each plane is initialized at a position between the two cubes it separates.
 We display the results of these tests in~\Figref{fig:timings-cubes}.
 \begin{figure}[htpb]
   \centering
   \input{Chapter6-Evaluation/Figs/timingsCubes.tikz}
-  \caption{Comparison of resolutions with and without using manifolds with $\mu=10^{-8}$. Red represents the results with {\tt PGSolver} on the manifold formulation, blue on Real Space formulation and green with CFSQP on Real Space formulation.}
+  \caption{Comparison of resolutions with and without using manifolds with $\mu=10^{-8}$. Red represents the results with {\tt PGSolver} on the manifold formulation, blue on Real Space formulation and green with {\tt CFSQP} on Real Space formulation.}
 \label{fig:timings-cubes}
 \end{figure}
 
-With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non-manifold formulation with {\tt PGSolver}, whereas the success rates of CFSQP drop incrementally from $100\%$ for 2 cubes to $70\%$ for 7 cubes.
+With 300 resolutions per case, approximately $98\%$ converged when using a manifold formulation versus $99.5\%$ with a non-manifold formulation with {\tt PGSolver}, whereas the success rates of {\tt CFSQP} drop incrementally from $100\%$ for 2 cubes to $70\%$ for 7 cubes.
 Concerning the resolutions with {\tt PGSolver}, we observe that the numbers of iterations are sensibly similar for the two types of resolutions, but the time spent per iteration is consistently smaller in the case of a resolution with manifolds, which is in agreement with our expectations and subsequently, the convergence time is consistently shorter for the formulation with manifolds.
-The resolutions with CFSQP take up to 4 times more iterations and each iteration is on average 3 times longer than with {\tt PGSolver}.
-Which results in resolutions with {\tt PGSolver} on manifold formulation being on average 7 times faster than with CFSQP on real-space formulation for this specific type of problem.
+The resolutions with {\tt CFSQP} take up to 4 times more iterations and each iteration is on average 3 times longer than with {\tt PGSolver}.
+Which results in resolutions with {\tt PGSolver} on manifold formulation being on average 7 times faster than with {\tt CFSQP} on real-space formulation for this specific type of problem.
 
 During our experimentations, we noticed that the regularization applied on the Hessian of the problem plays an important role in the convergence speed.
 In particular, the minimum value for the diagonal terms $\mu$ is important.
@@ -107,7 +107,7 @@ Too high values tend to damp the Hessian, which translates into bigger numbers o
 Too small values make the hessian closer to being rank deficient, in that case, we observe larger numbers of internal iterations of the QP solver, which translates into longer times per iteration.
 
 This study shows that on a simple example that makes heavy use of non-Euclidean manifolds, solving a problem on non-Euclidean manifolds with optimization on manifolds not only allows the user to profit of a simpler and more intuitive formulation of the problem but also outperforms the classical approach.
-And for this specific problem, {\tt PGSolver} clearly outperforms CFSQP in term of success rates as well as convergence speed.
+And for this specific problem, {\tt PGSolver} clearly outperforms {\tt CFSQP} in term of success rates as well as convergence speed.
 
 
 \section{Evaluation of the Posture Generation}
@@ -408,9 +408,9 @@ We can solve it with our solver on manifolds.
 It has an immediate advantage: we can write directly the problem~\eqref{eq:finalProblem} without the need to add any parametrization-related constraints.
 Because there are fewer variables and fewer constraints, it is also faster to solve.
 To assess this, we compared the resolution of~\eqref{eq:finalProblem} formulated with each of the three parametrizations of $SO(3)$ available, namely, native $SO(3)$, unit quaternion and rotation matrix.
-We solved the three formulations with our {\tt PGSolver}, and the two last ones with an off-the-shelf solver (CFSQP~\cite{cfsqp:manual}), using the dataset presented in section~\ref{sub:experiments}.
+We solved the three formulations with our {\tt PGSolver}, and the two last ones with an off-the-shelf solver ({\tt CFSQP}~\cite{cfsqp:manual}), using the dataset presented in section~\ref{sub:experiments}.
 The formulation with native $SO(3)$ was consistently solved faster.
-We observed timings around $0.5$s for it, and over $1$s for non-manifold formulations with CFSQP.
+We observed timings around $0.5$s for it, and over $1$s for non-manifold formulations with {\tt CFSQP}.
 The mean time for an iteration was also the lowest with the native formulation (at least $30\%$ lower when compared to all other possibilities).
 
 Working directly with manifolds has also an advantage that we do not leverage here, but could be useful for future work: at each iteration, the variables of the problem represent a \emph{fully physically consistent} set of inertial parameters.

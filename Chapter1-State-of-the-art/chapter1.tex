@@ -64,7 +64,7 @@ In~\cite{escande:iros:2006}, such an approach is employed to generate postures t
 \cite{escande:iros:2006} applied the approach to automatically generate a sequence of contact sets and postures where the HRP-2 robot uses its hand to lean on a table in order to grasp an object otherwise out of reach.
 Interestingly, in this study, the C-code that computes the robot's kinematics is generated once and for all for each robot, using Maple and the HuMAnS toolbox~\cite{wieber2006humans} provided by INRIA.
 The constraints of contact, stability and collision are then computed based on the outputs of the generated code.
-And the problem is solved by the CFSQP solver~\cite{cfsqp:manual}.
+And the problem is solved by the {\tt CFSQP} solver~\cite{cfsqp:manual}.
 In~\cite{hauser:ijrr:2008}, a similar posture generation approach is used to find viable postures for different legged robots on varied terrains in the context of Probabilistic RoadMap planning, which is a planning approach based on random sampling of the configuration space.
 %\cite{hauser:issr:2007} presents a different approach to multi-contact planning based on probabilistic roadmap and random sampling of the configuration space.
 In~\cite{bouyarmane2010static}, a generalization of the formulation of posture generation problems for systems of multiple robots and manipulated objects is proposed.
@@ -138,10 +138,10 @@ Nonlinear optimization is a well-established research field by its own and has b
 One can find some excellent reference books about optimization, such as~\cite{nocedal:book:2006, bonnans:book:2003, boyd2004convex}.
 
 Furthermore, several off-the-shelf solvers are available and have been widely used to solve robotics problems.
-The CFSQP solver~\cite{cfsqp:manual} was used in~\cite{escande:iros:2009} and~\cite{escande:ras:2013} where thousands of HRP-2 posture generation queries were made to explore the feasible space.
-The IPOPT solver~\cite{wachter:mathprog:2006} has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator has been extended to handle multi-robot problems with more complex and various contact constraints.
+The {\tt CFSQP} solver~\cite{cfsqp:manual} was used in~\cite{escande:iros:2009} and~\cite{escande:ras:2013} where thousands of HRP-2 posture generation queries were made to explore the feasible space.
+The {\tt IPOPT} solver~\cite{wachter:mathprog:2006} has been used in~\cite{vaillant:humanoids:2014},~\cite{vaillant:autonomousrobots:2016},~\cite{bouyarmane:ar:2012} where the posture generator has been extended to handle multi-robot problems with more complex and various contact constraints.
 The SNOPT solver~\cite{gill2005snopt} was used in~\cite{dai2014whole} to plan dynamic whole-body trajectories.
-Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as IPOPT, CFSQP, CMinPack~\cite{cminpack}, NAG~\cite{nag}, KNITRO~\cite{knitro} and PGSolver (the solver that we develop in this thesis).
+Several nonlinear optimization solvers are available and have been packaged for use in robotics problems in the Roboptim Framework~\cite{moulard:jsme:2013}, such as {\tt IPOPT}, {\tt CFSQP}, {\tt CMinPack}~\cite{cminpack}, {\tt NAG}~\cite{nag}, {\tt KNITRO}~\cite{knitro} and {\tt PGSolver} (the solver that we develop in this thesis).
 
 Traditionally, optimization problems are solved over Euclidean spaces.
 When the need comes to find a solution to an optimization problem in a non-Euclidean space $\mathcal{M}$, the commonly used method is to represent the elements of $\mathcal{M}$ in a Euclidean manifold of higher dimension, and enforcing that solution of the optimization problem should lie on $\mathcal{M}$ by adding the necessary constraints to the problem.
