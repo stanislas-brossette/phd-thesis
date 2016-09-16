@@ -969,7 +969,7 @@ After testing several possibilities, we settled for a self-scaling damped BFGS u
 More precisely, given the Hessian approximation $H_k$ at iteration $k$, we compute the approximation $H_{k+1}$ as follows:
 Note that as explained in Section~\ref{sub:vector_transport}, the gradients are transformed through vector transport before being compared.
 \begin{align}
-  &s_k = \mathcal{T}_{\bf z}(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_{\bf z}(\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
+  &s_k = \mathcal{T}_{\bf z}(z), \quad y_k = \nabla_z \mathcal{L}_{x_{k+1}}(0,\lambda_{k+1}) - \mathcal{T}_{\bf z}(\nabla_z\mathcal{L}_{x_{k}}(0,\lambda_{k})) \nonumber\\
   &\theta_k = \left\{\begin{array}{ll}
     1 & \mbox{if} \; s_k^T y_k \geq 0.2 s_k^T \tilde{H}_k s_k \\
     \frac{0.8 s_k^T \tilde{H}_k s_k}{s_k^T \tilde{H}_k s_k - s_k^T y_k} & \mbox{otherwise}
