@@ -25,9 +25,9 @@ axis background/.style={fill=white},
 title={Number of iterations},
 axis x line*=bottom,
 axis y line*=left,
-legend style={at={(0.047,0.788)},anchor=south west,legend cell align=left,align=left,fill=white}
+legend style={at={(0.047,0.658)},anchor=south west,legend cell align=left,align=left,fill=none}
 ]
-\addplot [color=red,solid]
+\addplot [color=red,line width=2pt,solid]
   table[row sep=crcr]{%
 2	10.87\\
 3	18.5633\\
@@ -36,9 +36,9 @@ legend style={at={(0.047,0.788)},anchor=south west,legend cell align=left,align=
 6	31.0467\\
 7	32.4933\\
 };
-\addlegendentry{Manifold};
+\addlegendentry{PGSolver $\mathcal{M}$};
 
-\addplot [color=blue,solid]
+\addplot [color=blue,line width=2pt,solid]
   table[row sep=crcr]{%
 2	12.0467\\
 3	18.0967\\
@@ -47,9 +47,9 @@ legend style={at={(0.047,0.788)},anchor=south west,legend cell align=left,align=
 6	31.8333\\
 7	34.45\\
 };
-\addlegendentry{RealSpace};
+\addlegendentry{PGSolver $\mathbb{R}^n$};
 
-\addplot [color=green,solid]
+\addplot [color=green,line width=2pt,solid]
   table[row sep=crcr]{%
 2	18.6533\\
 3	33.1233\\
@@ -58,7 +58,7 @@ legend style={at={(0.047,0.788)},anchor=south west,legend cell align=left,align=
 6	76.0733\\
 7	83.9733\\
 };
-\addlegendentry{CFSQP};
+\addlegendentry{CFSQP $\mathbb{R}^n$};
 
 \end{axis}
 
@@ -82,7 +82,7 @@ title={Time per iteration (s)},
 axis x line*=bottom,
 axis y line*=left
 ]
-\addplot [color=red,solid,forget plot]
+\addplot [color=red,line width=2pt,solid,forget plot]
   table[row sep=crcr]{%
 2	0.000169146\\
 3	0.00050932\\
@@ -91,7 +91,7 @@ axis y line*=left
 6	0.00659808\\
 7	0.0135693\\
 };
-\addplot [color=blue,solid,forget plot]
+\addplot [color=blue,line width=2pt,solid,forget plot]
   table[row sep=crcr]{%
 2	0.000218966\\
 3	0.000629589\\
@@ -100,7 +100,7 @@ axis y line*=left
 6	0.00818339\\
 7	0.016517\\
 };
-\addplot [color=green,solid,forget plot]
+\addplot [color=green,line width=2pt,solid,forget plot]
   table[row sep=crcr]{%
 2	0.000312294\\
 3	0.00127155\\
@@ -131,7 +131,7 @@ title={Total time (s)},
 axis x line*=bottom,
 axis y line*=left
 ]
-\addplot [color=red,solid,forget plot]
+\addplot [color=red,line width=2pt,solid,forget plot]
   table[row sep=crcr]{%
 2	0.00183861702\\
 3	0.009454659956\\
@@ -140,7 +140,7 @@ axis y line*=left
 6	0.204848610336\\
 7	0.44091133569\\
 };
-\addplot [color=blue,solid,forget plot]
+\addplot [color=blue,line width=2pt,solid,forget plot]
   table[row sep=crcr]{%
 2	0.0026378177122\\
 3	0.0113934832563\\
@@ -149,7 +149,7 @@ axis y line*=left
 6	0.260504308887\\
 7	0.56901065\\
 };
-\addplot [color=green,solid,forget plot]
+\addplot [color=green,line width=2pt,solid,forget plot]
   table[row sep=crcr]{%
 2	0.00582531\\
 3	0.04211793\\

@@ -468,7 +468,7 @@ This specific constraint is composed of four distinct parts:
   \item A custom geometric additional function field (optional) allows the user to add extra geometry constraints to the problem (through a \texttt{C++11} lambda that is executed after the geometric constraints are added to the problem).
   \item A custom static additional function field (optional) allows the user to add extra static constraints to the problem (through a \texttt{C++11} lambda that is executed after the constraint's wrench has been created and added to the problem).
 \end{itemize}
-The custom geometric additional function can typically be used in the context of a planar contact to limit the position of $O_2$ to the inside of a polygon defined in the plan $(O_1,\vec{x_1},\vec{x_2})$.
+The custom geometric additional function can typically be used in the context of a planar contact to limit the position of $O_2$ to the inside of a polygon defined in the plane $(O_1,\vec{x_1},\vec{x_2})$.
 As for the static additional function, it can be used to add constraints on the values of the constraint's wrench, for example, enforcing the friction cone constraints.
 
 %In terms of geometry, the canonical constraints one can enforce between two frames consist in blocking each of the 6 degrees of freedom of $F_2$ w.r.t $F_1$, e.g.\ blocking the translation and rotations along each axis.
@@ -578,7 +578,7 @@ In this section, we successively present several ways to parametrize various non
 
 %In that case, an additional set of variables $u_S\in \mathcal{M}_S$ is added the optimization problem and we can desctibe  as well as the constraint set \Eqref{eq:planar_contact} depending on it.
 
-\subsection{Application to plan-sphere contact}
+\subsection{Application to plane-sphere contact}
 We consider the contact between a body's flat surface $S_B$ of normal $n_B$, with the surface of a sphere $S_s$ of center $c_s$, radius $r_s$, and let $p_s$ and $n_s$ be a point and its normal on $S_s$.
 The most general way to express such a constraint is to ensure that $p_s$ is on $S_B$ and that $n_s$ and $n_B$ are opposite.
 To do that, we create a variable $v_{S^2}$ on $S^2$, add it to our optimization problem and map $p_S$ and $n_S$ on it.

@@ -285,7 +285,7 @@ A prismatic joint along $x_1$ is described by the following formulas:
 \end{table}
 
 Planar joints are also frequently used in robotics.
-A planar joint describes a plan sliding on another plan. Assuming that the normal to both plans is $z_1 = z_2$, this type of joint allows free relative rotation of $F_2$ around $z_1$ and relative translations along $x_1$ and $y_1$.
+A planar joint describes a plane sliding on another plane. Assuming that the normal to both planes is $z_1 = z_2$, this type of joint allows free relative rotation of $F_2$ around $z_1$ and relative translations along $x_1$ and $y_1$.
 We denote $q = \{q_1, q_2, q_3\}$ the joint parameters, $q_1$ corresponding to the rotation and $q_2,\ q_3$ to the translations.
 We get:
 \begin{table}[H]
@@ -301,9 +301,9 @@ We get:
   \end{bmatrix}$
   &
   $\begin{bmatrix}
-    1 & 0 & 0 \\
-    0 & \cos(q_1) & \sin(q_1) \\
-    0 & -\sin(q_1) & \cos(q_1) \\
+    \cos(q_1) & \sin(q_1) & 0 \\
+    -\sin(q_1) & \cos(q_1) & 0 \\
+    0 & 0 & 1 \\
   \end{bmatrix}$
   &
   $\begin{bmatrix}

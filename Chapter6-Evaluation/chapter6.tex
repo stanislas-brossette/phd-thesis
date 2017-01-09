@@ -54,7 +54,7 @@ In order to simulate gravity, we minimize the potential energy of all the cubes 
   f = \sum\limits_i \vec{t_i}\cdot \vec{z}
 \end{equation}
 
-We consider the problem of stacking $n$ cubes in an open-top box composed of 5 plans (the ground and 4 walls).
+We consider the problem of stacking $n$ cubes in an open-top box composed of 5 planes (the ground and 4 walls).
 %Each cube's pose is parametrized on $\mathbb{R}^3\times SO(3)$, while each plane is parametrized on $\mathbb{R}\times S^2$.
 In~\Figref{fig:cubes}, we illustrate the case of stacking 3 cubes.
 With the initial condition on the left side and a solution on the right.
@@ -518,7 +518,7 @@ In robotics, the use of 3D-based vision for recognition and navigation in enviro
 Another approach consists in extracting the surfaces from the point cloud, and then link them to the known environment or simply consider them as obstacles to be avoided~\cite{poppinga:iros:2008}.
 Since working on raw point clouds is costly because of the high number of data points, this extraction has also been enhanced~\cite{biswas:icra:2012} in order to be run in real-time.
 This approach has recently been experimented on a humanoid robot in~\cite{maier:humanoids:2012}, where two methods are combined: the surface extraction from a point cloud, and the voxel-based 3D decomposition of the environment~\cite{nakhaei:humanoids:2008}.
-Still, since the robot only navigates in a flat environment, and does not realize manipulation tasks, the surfaces extracted from the 3D point cloud are down projected to a 2D plan, on which are based the navigation and collision avoidance processes.
+Still, since the robot only navigates in a flat environment, and does not realize manipulation tasks, the surfaces extracted from the 3D point cloud are down projected to a 2D plane, on which are based the navigation and collision avoidance processes.
 The use of humanoid robots allows to navigate in more complex environments.
 Some work has been done to make a humanoid robot go down a ramp~\cite{lutz:iros:2012} or climb stairs~\cite{osswald:iros:2012}.
 
@@ -567,10 +567,10 @@ We divide a global point cloud scene into clusters of points that belong to the 
 
 \paragraph{Planar extraction}
 For each cluster, we use a plane segmentation to find the plane model that fits the highest number of points.
-The outlying points can then be either filtered, or we can try to find another plan to fit them.
+The outlying points can then be either filtered, or we can try to find another plane to fit them.
 
 \paragraph{Planar projection and hull convex generation}
-We extract the convex hull of the projection of each cluster on their respective fitting plan.
+We extract the convex hull of the projection of each cluster on their respective fitting plane.
 %The exact knowledge of all the data points contained in the plane model of a flat area is not necessary for our planning; we can reduce the point cloud to its convex hull without loss of information (except if the surface is concave, but this issue will be tackled in future works). In order to obtain the convex hull of each set of points, we first project every point of the set on its plane model ({\tt pcl::ProjectInliers} class) and then compute the 2D convex hull of the projected set of points ({\tt pcl::ConvexHull} class).
 After this step, each plane surface of the scene is represented by a frame composed of the barycentre of the set of points and the convex hull of the surface.
 
@@ -651,7 +651,7 @@ In total, 23 nodes were generated and the planning time was $98.4$ s.
 
 \paragraph{Plan 2: helping motion with the hand}
 This second experiment was designed to showcase a more complex plan involving the use of the HRP-2 upper limbs.
-In this experiment, we extracted 11 plan surfaces from the point cloud.
+In this experiment, we extracted 11 plane surfaces from the point cloud.
 The point cloud processing took $2.7$ s.
 The planner computation generates a path of 19 nodes, some of which are depicted in~\Figref{fig:crapahut-simulation}{}.
 To climb on the table, the robot uses its left arm and walks on an inclined slope before climbing a step at the end of the slope, once again, with the help of its left arm as support.
@@ -693,7 +693,7 @@ A similar formulation could be used in posture generation to describe the contac
 
 Besides the issue of generating postures on acquired point cloud data, this study raises some questions regarding the handling of uncertainties in posture generation.
 Since the acquired point cloud data is subject to measurement errors, it would be beneficial to be able to generate postures that are robust to those errors.
-For example, given a plan $P$ extracted from a point cloud, its location in space is known with a limited precision $\delta$ in its orientation and position.
+For example, given a plane $P$ extracted from a point cloud, its location in space is known with a limited precision $\delta$ in its orientation and position.
 It would serve our purpose to devise a formulation that guarantees that for all imprecision of value less than a given $\delta$, there exists a solution configuration in which the contact with $P$ is maintained.
 But such formulation is not straightforward to devise, and as of now, we have not found any promising leads, except using a space-grid discretisation of the possible uncertainty and generating a solution posture for each point of the grid.
 Although this could be solved fairly quickly in most cases by initializing one posture generation with the solution found for a neighbor grid point, such approach does not guarantee that solutions exist for any point between the grid points.
